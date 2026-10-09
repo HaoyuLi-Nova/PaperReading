@@ -1,0 +1,951 @@
+\documentclass{article}
+
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2025
+
+
+% ready for submission
+% \usepackage{neurips_2025}
+
+
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+    % \usepackage[preprint]{neurips_2025}
+
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+    \usepackage[final]{neurips_2025}
+
+
+% to avoid loading the natbib package, add option nonatbib:
+%    \usepackage[nonatbib]{neurips_2025}
+
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage[pagebackref=false,breaklinks=true,colorlinks=True,urlcolor=tongyi,citecolor=tongyi,linkcolor=tongyi,bookmarks=false]{hyperref}
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{bm}
+\usepackage{colortbl}
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{ctable}
+\usepackage{lipsum}
+\usepackage{multirow}
+\usepackage{soul}
+\usepackage{xspace}\xspace
+\usepackage{adjustbox}
+\usepackage{array}
+\usepackage{epsfig}
+\usepackage{bbding}
+\usepackage{dblfloatfix}
+\usepackage{transparent}
+\usepackage{diagbox}
+\usepackage{listings}
+\usepackage{times}
+\urlstyle{rm}
+\usepackage{bbm}
+\usepackage{amsbsy}
+\usepackage{cases}
+\usepackage{enumitem}
+\usepackage{subcaption}
+\usepackage[titletoc]{appendix}
+\usepackage{grffile}
+\usepackage{diagbox}
+\usepackage{pifont}
+\usepackage{makecell}
+\usepackage{multicol}
+\usepackage{comment}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage{wrapfig}
+\usepackage{etoc}
+\etocdepthtag.toc{mtchapter}
+\etocsettagdepth{mtchapter}{subsection}
+\etocsettagdepth{mtappendix}{none}
+
+\definecolor{citecolor}{HTML}{0071bc}
+\definecolor{linkc}{rgb}{0, 0.44, 0.74}
+\definecolor{eqc}{rgb}{1, 0, 0}
+\definecolor{newcitecolor}{rgb}{0,0.6,0}
+\definecolor{tongyi}{HTML}{615CED}
+
+\definecolor{midgreen}{HTML}{69c5a3}
+\definecolor{midblue}{HTML}{69a3f1}
+\definecolor{Gray}{gray}{0.92}
+
+
+\newcommand{\rh}[1]{{\color{blue}{#1}}}
+
+\newcommand{\method}{Wan-Move}
+
+\newcommand{\ie}{\textit{i.e.}}
+\newcommand{\eg}{\textit{e.g.}}
+\newcommand{\ci}[1]{\scriptsize{\textcolor{gray}{~($+#1$)}}}
+\newcommand{\progressbar}[2][2cm]{%
+    \textcolor{mygreen}{\rule{#1 * \real{#2} / 100}{1.5ex}}%
+    \textcolor{mygray!15}{\rule{#1 - #1 * \real{#2} / 100}{1.5ex}}}
+
+
+\title{\textcolor{tongyi}{Wan-Move}: Motion-controllable Video Generation via Latent Trajectory Guidance}
+
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to break the
+% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
+% authors names on the first line, and the last on the second line, try using
+% \AND instead of \And before the third author name.
+
+\author{\textbf{Ruihang Chu}$^{1,2}$\thanks{Equal contribution}\space\space\thanks{Corresponding authors} \space\thanks{Project leader}\space\space\space\space\space\space
+  \textbf{Yefei He}$^{1}$\footnotemark[1]\space\space\space\space\space\space\space\space
+  \textbf{Zhekai Chen}$^{3}$\footnotemark[1]\space\space\space\space\space\space\space\space
+  \textbf{Shiwei Zhang}$^{1}$\footnotemark[2]\space\space\space\space\space\space\space\space
+  \textbf{Xiaogang Xu}$^{4}$\\
+  \textbf{Bin Xia}$^{4}$\space\space\space\space\space\space\space\space
+  \textbf{Dingdong Wang}$^{4}$\space\space\space\space\space\space\space\space
+  \textbf{Hongwei Yi}\space\space\space\space\space\space\space\space
+  \textbf{Xihui Liu}$^{3}$\space\space\space\space\space\space\space\space
+  \textbf{Hengshuang Zhao}$^{3}$\\
+  \textbf{Yu Liu}$^{1}$\space\space\space\space\space\space\space\space
+  \textbf{Yingya Zhang}$^{1}$\space\space\space\space\space\space\space\space
+  \textbf{Yujiu Yang}$^{2}$\footnotemark[2]
+  \\[0.3em]
+  {\fontsize{9pt}{10pt}
+  $^{1}$ \raisebox{-0.2em}{\includegraphics[height=1em]{figures/logo.png}} Tongyi Lab, Alibaba Group \quad
+  $^{2}$Tsinghua University \quad
+  $^{3}$HKU \quad
+  $^{4}$CUHK}\\\\
+  {Github: \url{https://github.com/ali-vilab/Wan-Move}}
+  }
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We present \method, a simple and scalable framework that brings motion control to video generative models.
+Existing motion-controllable methods typically suffer from coarse control granularity and limited scalability, leaving their outputs insufficient for practical use.
+We narrow this gap by achieving precise and high-quality motion control.
+Our core idea is to directly make the original condition features motion-aware for guiding video synthesis.
+To this end, we first represent object motions with dense point trajectories, allowing fine-grained control over the scene.
+We then project these trajectories into latent space and propagate the first frame's features along each trajectory, producing an aligned spatiotemporal feature map that tells how each scene element should move.
+This feature map serves as the updated latent condition, which is naturally integrated into the off-the-shelf image-to-video model, \eg, Wan-I2V-14B, as motion guidance without any architecture change. It removes the need for auxiliary motion encoders and makes fine-tuning base models easily scalable.
+Through scaled training, \method~generates 5-second, 480p videos whose motion controllability rivals Kling 1.5 Pro's commercial Motion Brush, as indicated by user studies.
+To support comprehensive evaluation, we further design MoveBench, a rigorously curated benchmark featuring diverse content categories and hybrid-verified annotations.
+It is distinguished by larger data volume, longer video durations, and high-quality motion annotations.
+Extensive experiments on MoveBench and the public dataset consistently show \method's superior motion quality. Code, models, and benchmark data are made available.
+
+
+
+\end{abstract}
+
+\begin{figure}[htbp]
+	\begin{center}
+		%\fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
+\includegraphics[width=1.0\columnwidth]{figures/teaser_new.pdf}
+\end{center}	
+\vspace{-3mm}
+\caption{\method~is a image-to-video generation framework that supports diverse motion control applications. The generated samples (832$\times$480p, 5s) exhibits high visual fidelity and accurate motion.}
+\label{fig:teaser}
+\vspace{-5mm}
+\end{figure}
+
+\section{Introduction}
+
+Motion lies at the heart of video generation as it fundamentally transforms static images into dynamic visual narratives.
+% 
+Recognizing its importance, both the research community~\cite{wu2024draganything,yin2023dragnuwa,burgert2025gowiththeflow} and commercial players~\cite{kuaishou2024kling,runway2024gen3,kong2024hunyuanvideo} have devoted considerable effort to controlling motion in video generative models.
+
+The essence of motion control lies in injecting a motion guidance signal into the video generation process.
+Thus, the two key choices are (i) how to represent the guidance signal and (ii) how to integrate it into the generator.
+First, existing motion guidance representations can be broadly classified into sparse and dense types.
+Sparse representations include bounding boxes~\cite{motionbooth,wang2024boximator} and segmentation masks~\cite{wu2024draganything,dai2023animateanything,zhou2025trackgo}.
+Although these signals can steer an object's global movement, they fail to control local motions. In contrast, dense representations, such as pixel-wise optical flow~\cite{yin2023dragnuwa, koroglu2024onlyflow,shi2024motioni2v,burgert2025gowiththeflow} and point trajectories~\cite{geng2024motion,zhang2024tora}, offer more fine-grained control ability. Yet, optical flow requires an additional model for flow estimation during inference, which adds cumulative errors across frames and hampers scalability. While point trajectories are easy to specify during inference, each track is only a single-pixel thread and lacks surrounding spatial context. This makes it hard to align textures and motion patterns across neighboring regions.
+Second, to inject the guidance signal into generative models, a range of motion encoders have been designed~\cite{zhang2024tora,wang2024motionctrl,wu2024draganything,geng2024motion,wang2024levitor,chen2025disco}, with ControlNet~\cite{controlnet} being a popular way to fuse motion cues.
+However, all of these pipelines introduce extra motion-aware modules, which may degrade the motion signal during processing and make it harder to fine-tune the video-generation backbone at scale.
+
+To tackle these challenges, we present \method, a novel motion-control framework that builds on the existing image-to-video (I2V) generation model without adding auxiliary motion-processing modules.
+Our core idea is to inject motion information by directly editing the image condition features. We turn it into an updated latent guide that conveys both appearance and motion throughout video generation.
+Thanks to this simple and effective design, \method~delivers high-quality motion control and scales easily by fine-tuning the powerful I2V backbone.
+
+Specifically, we represent motion trajectories using point tracks~\cite{geng2024motion} as they capture fine-grained local and global movement.
+Unlike prior work~\cite{geng2024motion} that embeds point trajectories into latent features, we transfer each trajectory from pixel space into latent coordinates.
+As I2V generation aims to animate the first frame, we guide this process by copying the first-frame feature at each tracked position to its corresponding location in later frames along the latent trajectory.
+Each copied feature preserves rich context, thus the propagated signal drives more natural local motion, as verified in Sec.~\ref{subsec:ablation}. Moreover, since motion guidance is injected by editing the image condition features, we add no extra modules.
+As a result, \method~can plug straight into the I2V backbone, such as Wan-I2V-14B~\cite{wan}, and support scalable fine-tuning with fast convergence.
+Fig.~\ref{fig:teaser} shows that \method~generates high-fidelity video clips (832$\times$480p, 5s) with precise motion control, enabling a diverse set of applications, as illustrated in Sec.~\ref{subsec:application}.
+To our best knowledge, it is the first research model (\textit{to be open-sourced}) to match the visual quality of commercial products such as Kling 1.5 Pro’s Motion Brush~\cite{kuaishou2024kling}.
+
+
+To set a rigorous, comprehensive evaluation for motion-control methods, we introduce a free-license benchmark termed MoveBench.
+Compared with existing benchmarks~\cite{li2025magicmotion,pont2017davis,miao2022vipseg} that offer fewer clips, shorter durations, and incomplete motion annotations, MoveBench provides more data, greater diversity, and reliable motion annotations (Fig.~\ref{fig:statistics_2}).
+Concretely, we design a curation pipeline to categorize the video library into 54 content categories, 10-25 videos each, giving rise to over 1000 cases to ensure a broad scenario coverage.
+All video clips maintain a 5-second duration to facilitate evaluation of long-range dynamics.
+Every clip is paired with detailed motion annotations for single or multiple objects. They include both precise point trajectories and sparse segmentation masks to fit a wide range of motion-control models.
+We ensure annotation quality by developing an interactive labeling pipeline. It combines human labeling with SAM~\cite{sam} predictions, marrying annotation precision with automated scalability.
+In summary, our contributions are as follows: 
+\begin{itemize}
+\item We propose \method~for motion control in image-to-video generation. Unlike prior approaches that require motion encoding, it injects the motion guidance by editing condition features, adding no new modules and allowing the easy fine-tuning of base models at scale.
+
+\item We introduce MoveBench, a comprehensive and well-curated benchmark to assess motion control. A hybrid human+SAM labeling pipeline ensures annotation quality.
+
+\item Extensive experiments on MoveBench and public datasets show that \method~supports diverse motion-control tasks and delivers commercial-grade results with scaled training.
+\end{itemize}
+
+\section{Related Work}
+\noindent \textbf{Video generation models.}
+Visual generation~\cite{rombach2022high,chen2025tts,li2024mini,chu2023diffcomplete,qiu2024freescale} has attracted increasing attention in recent years.
+Video diffusion models~\cite{ho2022video} pioneer the extension of denoising diffusion probabilistic models (DDPMs) to video generation through a 3D U-Net architecture. Subsequent advancements, such as Imagen Video~\cite{ho2022imagenvideo} and Phenaki~\cite{villegas2022phenaki}, enhance this framework to produce longer and higher-resolution sequences. Nevertheless, these CNN-based approaches~\cite{chen2024videocrafter2,wang2023modelscope,bar2024lumiere} face limitations in capturing long-range spatiotemporal dependencies.
+Transformer-based architectures~\cite{dit,hong2022cogvideo,chen2023pixartalpha,jin2024pyramidal,HaCohen2024LTXVideo,ma2024latte,lin2024open,openaisora2024,polyak2024moviegencastmedia,bao2024vidu,minimax2024hailuo,opensora,genmo2024mochi,step_video,chen2025sana,yang2025longlive,li2025adaviewplanner} overcome this bottleneck and greatly improve training scalability.
+Recent innovations, including CogVideoX~\cite{cogvideox} and HunyuanVideo~\cite{kong2024hunyuanvideo}, further validate the efficacy of spatio-temporal attention mechanisms for coherent video synthesis. Notably, Wan~\cite{wan} introduces an efficient framework for both text-to-video and image-to-video generation, setting a new standard for open-source video models.
+Our \method, introduces how to leverage latent trajectory guidance to enable motion control upon the image-to-video diffusion model, enabling precise motion control while preserving visual fidelity.
+
+\noindent \textbf{Motion-controllable video generation.}
+To adapt pretrained video generation models for motion-controllable synthesis, training-free methods~\cite{namekata2024sg,qiu2024freetraj,ma2024trailblazer,jain2024peekaboo} optimize input noisy latents or manipulate attention mechanisms, enabling zero-shot control.
+However, these approaches often exhibit performance degradation when controlling fine-grained or multi-object motion. 
+In contrast, fine-tuning based methods~\cite{wang2023videocomposer,yin2023dragnuwa,wang2024motionctrl,wu2024draganything,burgert2025gowiththeflow,zhang2024tora,li2025magicmotion,li2025image,wang2024levitor,xiao20243dtrajmaster,wang2025cinemaster,gu2025diffusion,zhou2025trackgo,shi2024motioni2v,chen2025perception,wang2024replace,xia2025dreamve} leverage diverse motion signals and introduce various techniques to integrate them into the base model. 
+While these methods significantly enhance output quality, they typically require auxiliary encoders or fusion modules, complicating the model architecture and limiting training scalability.
+Among these studies, the most relevant to our work is Motion Prompting~\cite{geng2024motion}, as both employ point trajectories to represent motion guidance. However, we differ in two key aspects.
+First, Motion Prompting~\cite{geng2024motion} encodes point tracks via random embeddings in pixel space, where the guidance is pixel-level threads that lack surrounding context to offer local control. We express point trajectories in latent space using the image feature, providing rich local information and finer control.
+Second, Motion Prompting~\cite{geng2024motion} integrates motion guidance through a separate ControlNet~\cite{controlnet}, whereas we directly use the pretrained base model without architectural modifications, which facilitates its scalable fine-tuning.
+Sec.~\ref{subsec:ablation} provides quantitative and qualitative evidence of our advantages.
+
+For more specific robotic scenarios, 
+works~\cite{hassan2025gem,davtyan2025cage} rely on pretrained DINOv2 features~\cite{oquab2023dinov2} to transfer object representations across frames for motion control in generated videos, yet both delivers DINOv2’s limitation in representing motion signals.
+DINOv2 excels at high-level semantic encoding but lacks fine-grained object details. Thus, GEM [1] employs additional identity embeddings to distinguish objects and train an ObjectNet to bridge the domain gap between DINOv2 and the UNet’s feature space. Moreover, the 14 patch size in DINOv2 may restrict the granularity of the proposed control. In contrast, our approach mitigates these limitations by employing native VAE in I2V foundation models without relying on any auxiliary modules (\eg, identity embeddings).
+
+
+\noindent \textbf{Benchmark for motion-controllable video generation.}
+Most motion-controllable work evaluates on small, task-specific datasets, which are typically ad hoc, limited in scope, or insufficient for evaluating long-range dynamics and multi-object interactions. For example, datasets such as DAVIS~\cite{pont2017davis} and VIPSeg~\cite{miao2022vipseg} have been repurposed for trajectory control methods, yet their short clip durations and sparse annotations make them inadequate for assessing long-term consistency or complex interactions. While MagicBench~\cite{li2025magicmotion} expands to 600 video clips, it categorizes samples solely by object count and relies on automatically generated labels from noisy pipelines, limiting the annotation precision.
+To address these limitations, we introduce MoveBench, a comprehensive benchmark for motion-controllable video generation.
+It includes carefully selected 1018 videos with extensive annotations, long-range dynamics, and 54 well-classified content patterns.
+
+\section{Method}
+\label{sec:method}
+
+\subsection{Preliminary}
+Video diffusion models~\cite{ho2022video,wan,kong2024hunyuanvideo,blattmann2023svd} apply Gaussian noise to clean data during the forward process and learn a reverse process to denoise and generate videos. 
+To reduce computational costs, the denoising network typically operates on latent video representations obtained from a pretrained VAE~\cite{kingma2013vae}. 
+Given an input video  $\mathbf{V} \in \mathbb{R}^{(1+T)\times H \times W \times 3}$, the encoder $\mathcal{E}$ compresses both the temporal and spatial dimensions with compression ratios $f_t$ (temporal) and $f_s$ (spatial), while expanding the channel dimension to $C$, yielding $\mathbf{x} = \mathcal{E}(\mathbf{V}) \in \mathbb{R}^{(1+\frac{T}{f_t})\times \frac{H}{f_s} \times \frac{W}{f_s} \times C}$. 
+The decoder $\mathcal{D}$ then reconstructs the video from the latent representation as $\hat{\mathbf{V}} = \mathcal{D}(\mathbf{x})$.
+
+Our work focuses on motion-controllable image-to-video (I2V) generation, where models are required to generate motion-coherent videos based on the input first-frame image and motion trajectories. 
+While the first frame will be encoded into the condition feature $\mathbf{z}_{\text{image}}$ by the VAE, motion trajectories, which can be represented in diverse formats, remain in pixel space.
+Thus, the key challenge lies in effectively encoding motion trajectories into the condition feature $\mathbf{z}_{\text{motion}}$ and injecting it into the generative model. To avoid the signal degradation and training difficulties associated with additional motion encoder and fusion modules, we aim to develop a motion-control framework that leverages existing I2V models without architectural modifications, as detailed below.
+
+\subsection{Latent Trajectory Guidance} \label{sec:latent_trajectory}
+
+\begin{figure}
+	\begin{center}
+\includegraphics[width=1\columnwidth]{figures/method.pdf}
+	\end{center}
+    \vspace{-2mm}
+    \caption{(a) To inject motion guidance, we transfer point trajectories from videos to latent space, then replicate the first frame feature into subsequent zero-padded frames along each latent trajectory. (b) \method~is trained upon an existing image-to-video generation model (\eg, work~\cite{wan,bar2024lumiere}), with an efficient latent feature replication step (as in (a)) to update the condition feature. The CLIP~\cite{radford2021clip} image encoder and umT5~\cite{chung2023umt5} text encoder from the base model are omitted for simplicity.}
+\label{fig:method}
+    \vspace{-2mm}
+\end{figure}
+
+To enable video generation conditioned on the first frame, an effective approach of popular I2V models~\cite{wan,bar2024lumiere} concatenates the latent noise $\mathbf{x}_t$ and the first-frame condition feature $\mathbf{z}_{\text{image}}$ along the channel dimension.
+
+$\mathbf{z}_{\text{image}}$ is obtained by encoding the first frame $\mathbf{I}$ along with zero-padded subsequent frames $\mathbf{0}_{T \times H \times W \times C}$ using a pretrained VAE encoder $\mathcal{E}$:
+\begin{align}
+    \mathbf{z}_{\text{image}} = \mathcal{E}\left(\text{concat}\left[\mathbf{I}, \mathbf{0}_{T\times H \times W \times 3}\right]\right) \in \mathbb{R}^{(1+\frac{T}{f_t})\times \frac{H}{f_s} \times \frac{W}{f_s} \times C}.
+\end{align}
+
+For motion guidance representation, we adopt point trajectories, following prior studies~\cite{geng2024motion,zhang2024tora}, as they provide fine-grained control and capture both local and global motion. Formally, a point trajectory of length $1+T$ can be represented as $\mathbf{p} \in \mathbb{R}^{(1+T)\times2}$, where $\mathbf{p}[n]=(x_n, y_n)$ specifies the trajectory location in the $n$-th frame in the pixel space. 
+Existing methods often employ auxiliary modules to encode and integrate trajectories into the backbone. Yet, this approach may degrade motion signals during motion encoding.
+In addition, training extra modules increases the complexity of fine-tuning the base model at scale.
+This raises a key question: \textit{Can we inject pixel-space motion guidance without auxiliary modules?}
+
+Intuitively, I2V generation aims to animate the first frame, while motion trajectories specify object positions in each subsequent frame.
+Given the translation equivariance of VAE models, latent features at corresponding trajectory positions should closely resemble those in the first frame.
+Motivated by this, we propose encoding trajectories directly into latent space via spatial mapping, eliminating the need for an extra motion encoder:
+\begin{equation}
+    \tilde{\mathbf{p}}[n] = 
+    \begin{cases}
+        \frac{\mathbf{p}[n]}{f_s} & \text{if } n = 0, \\
+        \frac{\sum_{i=(n-1)\cdot f_t +1}^{n\cdot f_t} \mathbf{p}[i]}{f_t \cdot f_s} & 1\leq n \leq \frac{T}{f_t},
+    \end{cases}
+\end{equation}
+The latent trajectory position at the first frame is derived by spatial mapping, while for subsequent frames, it is averaged over each consecutive $f_t$ frames.
+This deterministically transforms pixel-space trajectories into latent space.
+To inject the obtained latent trajectories, we extract the latent features of the first frame at the initial trajectory point $\tilde{\mathbf{p}}[0]$ and replicate them across subsequent frames according to $\tilde{\mathbf{p}}$, leveraging the translation equivariance of latent features, as shown in Fig.~\ref{fig:method} (a):
+
+\begin{align} \label{eq:feature_propagate}
+    \mathbf{z}_{\text{image}}\left[n, \tilde{\mathbf{p}}[n,0], \tilde{\mathbf{p}}[n,1], :\right] = \mathbf{z}_{\text{image}}\left[0, \tilde{\mathbf{p}}[0,0], \tilde{\mathbf{p}}[0,1], :\right] \quad \text{for} \quad n = 1,\ldots,\frac{T}{f_t}.
+\end{align}
+Here, $\mathbf{z}_{\text{image}}[t, h, w, :]$ denotes the feature vector at temporal index $t$, height $h$, and width $w$. 
+This operation efficiently injects motion guidance into the condition feature by updating $\mathbf{z}_{\text{image}}$, eliminating the need for explicit motion condition features and injection modules. An overview of the \method~generation framework is presented in Fig.~\ref{fig:method}(b).
+When multiple visible point trajectories coincide at a given spatiotemporal position, we randomly select one trajectory's corresponding first-frame feature.
+
+\subsection{Training and Inference} \label{sec:details}
+\noindent \textbf{Training data.}
+We curate a high-quality training dataset, which undergoes rigorous two-stage filtering to ensure both visual quality and motion consistency. First, we manually annotate the visual quality of 1,000 samples and use them to train an expert scoring model for initial quality assessment. To further enhance temporal coherence, we introduce a motion quality filtering stage. Specifically, for each video, we extract SigLIP~\cite{zhai2023siglip} features from the first frame and compute the mean SigLIP features for the remaining frames. The cosine similarity between these features serves as our stability metric. Based on empirical analysis of 10,000 samples, we establish a threshold to retain only videos where the content remains consistent with the initial frame. This two-stage pipeline produces a final dataset of 2 million high-quality 720p videos with strong visual quality and motion coherence. Additional details on the training data sources are provided in the supplementary material.
+
+
+\noindent \textbf{Modeling training.}
+Based on our training dataset, we use CoTracker~\cite{karaev2024cotracker} to track the trajectories of a dense 32×32 grid of points. For each training iteration, we sample $k$ trajectories from a mixed distribution: with 5\% probability, no trajectory is used ($k=0$); with 95\% probability, $k$ is uniformly sampled from 1 to 200.
+Notably, we retain a 5\% probability of dropping motion conditions, which effectively preserves the model’s original image-to-video generation capability.
+For the selected trajectories, we extract the first-frame features and replicate them to subsequent zero-padded frames, as formalized by Eq.~\eqref{eq:feature_propagate}.
+Since CoTracker distinguishes between visible and occluded point trajectories, we perform feature replication only along the visible trajectories.
+During training, the model parameters $\theta$ is initialized from the I2V model~\cite{wan} and fine-tuned to predict the vector field $\mathbf{v}_t(\mathbf{x}_t)$ that transports samples from the noise distribution to the data distribution~\cite{lipman2022flowmatching}:
+\begin{align}  \label{eq:fm_objective}
+    \mathcal{L}_{\text{FM}}(\theta) = \mathbb{E}_{t, \mathbf{x}_t, \textbf{c}} \left[ \| \mathbf{v}_\theta(\mathbf{x}_t, t, \textbf{c}) - \mathbf{v}_t(\mathbf{x}_t) \|^2 \right],  
+\end{align}
+where $\textbf{c}$ denotes the union of the generation condition.
+
+
+\noindent \textbf{Inference with \method.}
+% As illustrated in Fig.~\ref{fig:method}(b), 
+The inference process closely resembles the original I2V model, with an additional latent feature replication operation. Specifically, \method~conditions generation on three inputs: (1) a text prompt, (2) an input image as the first frame, and (3) sparse or dense point trajectories for motion control. 
+Pretrained umT5~\cite{chung2023umt5} and CLIP~\cite{radford2021clip} models are employed to encode global context from the text prompt and first frame, respectively. The resulting image embedding $\mathbf{z}_{\text{global}}$ and text embeddings $\mathbf{z}_{\text{text}}$ are then injected into the DiT backbone via decoupled cross-attention~\cite{controlnet}. Additionally, a VAE is used to extract the first-frame condition feature $\mathbf{z}_{\text{image}}$, which will be injected through latent feature replication (as detailed in Sec.~\ref{sec:latent_trajectory}). Classifier-free guidance is applied to enhance alignment with conditional information.
+Formally, let unconditional vector field $\mathbf{v}_{\text{uncond}}$= $\mathbf{v}_\theta(\mathbf{x}_t, t,\mathbf{z}_{\text{image}},\mathbf{z}_{\text{global}})$, and conditional vector field $\mathbf{v}_{\text{cond}}$=$\mathbf{v}_\theta(\mathbf{x}_t, t,\mathbf{z}_{\text{image}},\mathbf{z}_{\text{global}},\mathbf{z}_{\text{text}})$.
+The guided vector field $\tilde{\mathbf{v}}_\theta(\mathbf{x}_t, t,\mathbf{z}_{\text{image}},\mathbf{z}_{\text{global}},\mathbf{z}_{\text{text}})$ is a weighted combination of the conditional and unconditional outputs, with the guidance scale $w$:
+\begin{align}
+\tilde{\mathbf{v}}_\theta(\mathbf{x}_t, t,\mathbf{z}_{\text{image}},\mathbf{z}_{\text{global}},\mathbf{z}_{\text{text}})=\mathbf{v}_{\text{uncond}}+w(\mathbf{v}_{\text{cond}}-\mathbf{v}_{\text{uncond}})
+\end{align}
+ 
+
+\section{MoveBench}
+
+
+\begin{figure}[t]
+\begin{center}
+\includegraphics[width=1.0\columnwidth]{figures/benchmark_construction.pdf}
+\end{center}
+\vspace{-3mm}
+\caption{Construction pipeline of MoveBench to obtain high-quality samples with rich annotations.}
+\label{fig:MoveBench_construct}
+\end{figure}
+
+
+\begin{figure}[t]
+\vspace{-2mm}
+  \centering
+  \begin{minipage}[b]{0.45\textwidth}
+\includegraphics[width=\textwidth]{figures/Benchmark_statstic_1.pdf}
+    \caption{Balanced sample number per class.}
+    \label{fig:statistics_1}
+    \vspace{-2mm}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.54\textwidth}
+    \includegraphics[width=\textwidth]{figures/Benchmark_statstic_2.pdf}
+    \caption{Comparison with related benchmarks.}
+    \vspace{-2mm}
+    \label{fig:statistics_2}
+  \end{minipage}
+\end{figure}
+
+Current benchmarks for motion-controllable video generation suffer from small scale, short duration, and lack precise, comprehensive motion annotations, thus introducing bias and limiting granularity. To address these gaps, we introduce MoveBench, a high-quality benchmark with 1018 videos (480×832 resolution, 5-second duration), designed for comprehensive evaluation of motion-controllable generation, as illustrated in Fig.~\ref{fig:MoveBench_construct}-\ref{fig:statistics_2}.
+The evaluation videos are selected from Pexels~\cite{Pexels400k}, a large-scale, high-quality dataset containing about 400K videos, all released under a free license.
+
+MoveBench combines algorithmic curation with human expertise to ensure diverse, representative, and precisely annotated motion data.
+Compared to prior works, it offers three key features: \textbf{(i) High quality.} We curate videos through a rigorous four-stage pipeline, as illustrated in Fig.~\ref{fig:MoveBench_construct}(a). We first utilize the expert scoring model obtained from Sec.~\ref{sec:details} to score videos based on visual quality, filtering out low-quality content. Then, the selected videos are cropped to 480p and uniformly sampled to 81 frames to ensure temporal consistency. Finally, videos are clustered into 54 content categories and we manually select the 15-25 most representative examples for each category, balancing diversity and quality (Fig.~\ref{fig:statistics_1}).
+\textbf{(ii) Precise annotations.} As shown in Fig.~\ref{fig:statistics_2}, we provide both point and mask annotations, so that methods using mask guidance signals can also be evaluated using our benchmark. To precisely annotate motion regions, we design an interactive annotation interface as shown in Fig.~\ref{fig:MoveBench_construct}. Annotators click on a target region in the first frame, prompting SAM~\cite{sam} to generate an initial mask. When the mask exceeds the desired area, annotators add negative points to exclude irrelevant regions. This is critical for isolating articulated motions or small objects in cluttered scenes.
+After annotation, each video contains at least one point indicating a representative motion, with 192 videos additionally including multiple-object motion trajectories.
+\textbf{(iii) Detailed captions.} As captions~\cite{ren2025anycap,wang2025inserter,wang2025mmsu} are validated critical for generation tasks, we use powerful Gemini~\cite{team2023gemini} to generate dense descriptions covering objects, actions, and camera dynamics. Unlike segmentation datasets like DAVIS~\cite{pont2017davis}, our captions are tailored for video generation tasks.
+
+\section{Experiment}
+\subsection{Experimental Setup} \label{sec:experimental_setup}
+\method~is implemented on top of Wan-I2V-14B~\cite{wan}, a state-of-the-art image-to-video (I2V) generation model. As described in Sec.~\ref{sec:details}, we fine-tune \method~on a high-quality dataset consisting of 2M high-quality videos. Only the DiT backbone is trainable, while the image and text encoders remain frozen. During inference, we use a classifier-free guidance scale $w$ of 5.0 unless otherwise specified. Detailed training configurations are provided in the supplementary material.
+
+To quantitatively evaluate the fidelity of generated videos, we compute standard video quality metrics including FID~\cite{heusel2017gans}, FVD~\cite{2019FVD}, PSNR, and SSIM~\cite{wang2004ssim}. To assess motion accuracy, we measure the L2 distance between ground truth tracks and those estimated from generated videos, following~\cite{geng2024motion} in denoting this metric as end-point error (EPE). All evaluations are performed at a resolution of 480p.
+
+\begin{table*}[t]
+\caption{Performance comparisons on MoveBench and DAVIS. \method~consistently yields substantial improvements in both visual fidelity and motion quality across all metrics.}
+\vspace{-2mm}
+\centering
+\renewcommand\tabcolsep{5pt}
+\resizebox{0.95\linewidth}{!}{
+\begin{tabular}{l|ccccc|ccccc}
+\toprule
+\multirow{2}{*}{Method} &\multicolumn{5}{c|}{MoveBench}                                            & \multicolumn{5}{c}{DAVIS}         \\ \cmidrule(l){2-11}
+& FID$\downarrow$ & FVD$\downarrow$ & PSNR$\uparrow$ & SSIM$\uparrow$ & EPE$\downarrow$ & FID$\downarrow$ & FVD$\downarrow$ & PSNR$\uparrow$ & SSIM$\uparrow$ & EPE$\downarrow$ \\ \midrule
+ImageConductor~\cite{li2025image}  & 34.5         & 424.0     & 13.4    & 0.49           & 15.6         & 54.2            & 513.6           & 11.6              &  0.47 & 14.8              \\
+LeviTor~\cite{wang2024levitor}     & 18.1            & 98.8           & 15.6                & 0.54              & 3.4       &   22.0        &     115.4    &   13.3 & 0.51 & 3.7   \\
+Tora~\cite{zhang2024tora}    &     22.5   &   100.4  &          15.7   &     0.55 &   3.3   &   25.9    &   129.2  &  13.7 & 0.49 & 3.5 \\
+MagicMotion~\cite{li2025magicmotion}    &     17.5   &   96.7  &          14.9   &     0.56 &   3.2  &   24.2  &   113.4  &  12.8 & 0.53 & 3.5 \\
+% \midrule
+\method~(Ours)        & \textbf{12.2}    & \textbf{83.5}   & \textbf{17.8}       & \textbf{0.64}       & \textbf{2.6}   & \textbf{14.7}   & \textbf{94.3}       & \textbf{16.5}   & \textbf{0.61}  & \textbf{2.5}      \\
+
+\bottomrule
+\end{tabular}
+}
+\label{tab:main_comparison}
+\end{table*}
+
+\begin{figure}[t]
+	\begin{center}
+		%\fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
+\includegraphics[width=0.95\columnwidth]{figures/main_comparison_new.pdf}
+\end{center}
+\vspace{-2mm}
+\caption{Qualitative comparisons between \method~and recent approaches, including both academic methods~\cite{li2025image,wang2024levitor} and commercial solutions~\cite{kuaishou2024kling}. Motions that deviate from the specified trajectories and major visual artifacts are marked with red dots and boxes, respectively.}
+\vspace{-1em}
+\label{fig:main_comparison}
+\end{figure}
+
+\begin{figure}[t]
+	\begin{center}
+		%\fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
+\includegraphics[width=1.0\columnwidth]{figures/sparse_comparison.pdf}
+\end{center}
+\vspace{-2mm}
+\caption{Qualitative comparisons with MagicMotion~\cite{li2025magicmotion}, controlling motions using sparse signals (\ie, bounding boxes) as input. Motions that break the guidance are marked with red dots.}
+\vspace{-1em}
+\label{fig:sparse_comparison}
+\end{figure}
+
+\begin{table}[t]
+    \centering
+    \begin{minipage}{0.53\textwidth}
+     \caption{MoveBench multi-object motion results.}
+        \centering
+        \renewcommand\arraystretch{1.35}
+        \renewcommand\tabcolsep{5pt}
+        \resizebox{\textwidth}{!}{        \begin{tabular}{lccccc}
+        % \specialrule{0.3pt}{0.1pt}{0pt}
+        % \hline
+        \toprule
+         Method & FID$\downarrow$ & FVD$\downarrow$ & PSNR$\uparrow$ & SSIM$\uparrow$ & EPE$\downarrow$ \\
+         \hline
+        ImageConductor& 77.5       & 764.5     & 13.9    & 0.51          & 9.8  \\
+        Tora   &      53.2  &  350.0   &  14.5  &  0.54   & 3.5 \\
+        \method~(Ours)   &  \textbf{28.8}      &  \textbf{226.3}    &  \textbf{16.7}  &  \textbf{0.62}    & \textbf{2.2} \\
+        \specialrule{0.6pt}{0.5pt}{0pt}
+        \end{tabular}
+        }
+\label{tab:multi_comparison}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.44\textwidth}
+      \caption{Our win rates in 2AFC human study.}
+      \vspace{0.2mm}
+        \centering
+        % \scalebox{0.685}{
+        \renewcommand\tabcolsep{6pt}
+         \resizebox{\textwidth}{!}{  
+        \begin{tabular}{llll}
+        % \specialrule{0.3pt}{0.1pt}{0pt}
+        % \hline
+        \toprule
+        Method & \makecell{Motion \\ accuracy}  & \makecell{Motion \\ quality}  & \makecell{Visual \\ quality} \\
+         \midrule
+         LeviTor &  98.2~\textcolor{midgreen}{\rule{9.82mm}{2mm}} & 98.0~\textcolor{midgreen}{\rule{9.8mm}{2mm}}  & 98.8~\textcolor{midgreen}{\rule{9.88mm}{2mm}} \\
+        Tora &  96.2~\textcolor{midgreen}{\rule{9.62mm}{2mm}} & 93.8~\textcolor{midgreen}{\rule{9.38mm}{2mm}}  & 98.4~\textcolor{midgreen}{\rule{9.84mm}{2mm}} \\
+         MagicMotion &  89.4~\textcolor{midgreen}{\rule{8.94mm}{2mm}} & 96.4~\textcolor{midgreen}{\rule{9.64mm}{2mm}}  & 98.2~\textcolor{midgreen}{\rule{9.82mm}{2mm}} \\
+        Kling 1.5 Pro  &  47.8~\textcolor{midblue}{\rule{5.34mm}{2mm}}   &  53.4~\textcolor{midgreen}{\rule{5.34mm}{2mm}} & 50.2~\textcolor{midgreen}{\rule{5.02mm}{2mm}}  \\
+
+        \specialrule{0.6pt}{0.1pt}{0pt}
+        \end{tabular}
+        }
+    \label{tab:humanstudy}
+    \end{minipage}
+    \vspace{-1em}
+\end{table}
+
+\begin{table}[!h]
+    \centering
+    \begin{minipage}{0.51\textwidth}
+        \centering
+        \normalsize
+        \caption{Ablation on motion guidance strategies.}
+        % \scalebox{0.625}
+\renewcommand\arraystretch{1.0}
+\renewcommand\tabcolsep{2pt}
+    \resizebox{\textwidth}{!}{  
+    \begin{tabular}{lccccc}
+        % \specialrule{0.3pt}{0.1pt}{0pt}
+        % \hline
+        \toprule
+         \textit{Motion guidance} & FID$\downarrow$ & FVD$\downarrow$ & PSNR$\uparrow$ & SSIM$\uparrow$ & EPE$\downarrow$ \\
+         \midrule
+         Pixel replication  &  17.3   & 91.0    &  15.3  &   0.56   & 3.7 \\
+        Random track embedding  & 15.4       & 89.2     & 16.1   & 0.59         & 2.7  \\
+        Latent feature replication   &  \textbf{12.2}      &  \textbf{83.5}    &  \textbf{17.8}  &  \textbf{0.64}    & \textbf{2.6} \\
+        
+        \specialrule{0.6pt}{0.1pt}{0pt}
+        \end{tabular}
+        }
+\label{tab:abla_guidance}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.47\textwidth}
+        \centering
+        \caption{Ablation on condition fusion strategies.}
+        % \scalebox{0.75}
+        \renewcommand\arraystretch{1.2}
+\renewcommand\tabcolsep{4pt}
+    \resizebox{\textwidth}{!}{
+        \begin{tabular}{lccccc}
+        % \specialrule{0.3pt}{0.1pt}{0pt}
+        % \hline
+        \toprule
+         \textit{Cond. fusion} & FID$\downarrow$ & FVD$\downarrow$ & EPE$\downarrow$ & Latency (s)\\
+         \midrule
+          ControlNet  &   12.4  &  84.6   &  2.5   &  987\ci{225}  \\
+          Concat.~(Ours)  & 12.2   &  83.5   &  2.6  &  765\ci{3} \\
+        
+        \specialrule{0.6pt}{0.1pt}{0pt}
+        \end{tabular}
+        }
+        \label{tab:abla_fusion}
+    \end{minipage}
+    \vspace{-1em}
+\end{table}
+
+\subsection{Main Results}
+\noindent \textbf{Single-object motion control.}
+We present an extensive comparison between \method~and recent motion-controllable video generation methods~\cite{li2025image,wang2024levitor,zhang2024tora,li2025magicmotion,kuaishou2024kling}.
+Quantitative results on MoveBench and the public DAVIS~\cite{pont2017davis} are shown in Table~\ref{tab:main_comparison}.
+Qualitative visualizations are presented in Fig.~\ref{fig:main_comparison}.
+% 
+Unlike other methods that rely on point tracks for motion guidance, MagicMotion~\cite{li2025magicmotion} takes as input sparse masks and bounding boxes. Since boxes can be directly derived from segmentation masks, they are inherently compatible with MoveBench that covering mask annotations.
+Hence, we also conduct comparisons using box-based inputs in Fig.~\ref{fig:sparse_comparison}.
+Among these methods, ImageConductor~\cite{li2025image} exhibits poor performance in both image and motion quality, which can be attributed to its reliance on direct pixel-level trajectory injection, where single-pixel features lack sufficient semantic and texture information.
+The remaining methods report similar EPE (3.2–3.4), despite differing motion guidance approaches: Levitor~\cite{wang2024levitor} and MagicMotion~\cite{li2025magicmotion} utilize the complex ControlNet~\cite{controlnet}, while Tora~\cite{zhang2024tora} adopts the lightweight adaLN~\cite{dit}.
+Notably, our method achieves the \textbf{best motion control performance} (lowest EPE) and \textbf{video quality} (highest PSNR and SSIM) through latent trajectory replication without introducing additional parameters. This underscores the effectiveness of our latent trajectory guidance in adhering to motion constraints. Consistent results on the DAVIS dataset further validate the robustness of our approach.
+
+
+\noindent \textbf{Multi-object motion control.}
+As MoveBench includes 192 cases with annotated multi-object motion, we further evaluate \method~against baselines~\cite{li2025image,zhang2024tora} on this challenging setting, as presented in Table~\ref{tab:multi_comparison}. Our method achieves significantly lower FVD and reduced EPE compared to other methods, highlighting its precise adherence to motion constraints in more complex scenarios.
+
+\noindent \textbf{Human study.}
+We conduct a two-alternative forced-choice (2AFC) human evaluation comparing \method~with SOTA approaches~\cite{zhang2024tora,kuaishou2024kling,wang2024levitor,li2025magicmotion}. Each method generated 50 conditioned samples, which are evaluated by 20 participants. The results, presented in Table~\ref{tab:humanstudy}, report \method's win rates across three metrics: motion accuracy, motion quality, and visual quality.
+% 
+Compared to Tora~\cite{zhang2024tora}, \method~achieves win rates exceeding 96\% in all categories. When evaluated against the commercial model Kling 1.5 Pro, our method demonstrates competitive performance, with superior win rates in motion quality. This narrows the gap between research-oriented and commercial models.
+
+
+\subsection{Ablation Study} \label{subsec:ablation}
+
+\noindent
+\textbf{Trajectory guidance strategy.}
+We investigate the impact of motion guidance strategies on video 
+\begin{wrapfigure}{r}{7.5cm}
+\centering
+\includegraphics[width=0.5\columnwidth]
+{figures/ablation_guidance.pdf}
+        \caption{Visualization of various guidance strategies.} 
+        \vspace{-1em}
+\label{fig:abla_guidance}
+\end{wrapfigure}
+quality and motion consistency. 
+% 
+Quantitative and qualitative results as presented in Table~\ref{tab:abla_guidance} and Fig.~\ref{fig:abla_guidance}, respectively.
+Pixel replication applies pixel-level copy-paste along the original trajectory, followed by VAE encoding.
+Yet, since single-pixel features contain limited semantic and texture information, the resulting motion control is weak, as reflected by a high EPE value of 3.7 and generation failures (see Fig.~\ref{fig:abla_guidance}).
+The random track embedding approach, originally proposed for pixel space representations~\cite{geng2024motion}, is adapted to assign randomly initialized embeddings in latent space for injecting motion guidance. While effective for rigid single-region control, this approach fails to incorporate contextual information from surrounding regions, resulting in suboptimal video quality (lower PSNR and SSIM) and stiff motion near tracked points. For example, the hand moves, but surrounding bread remains static in Fig.~\ref{fig:abla_guidance}.
+In contrast, our proposed latent feature replication method achieves superior video quality (highest PSNR of 17.8) and precise motion control (lowest EPE of 2.6).
+
+\noindent
+\textbf{Condition fusion strategy.} We compare different motion condition approaches, namely ControlNet~\cite{controlnet} and direct concatenation (our approach). The results are presented in Table~\ref{tab:abla_fusion}. Notably, simple concatenation of motion conditions with input noise achieves performance comparable to ControlNet in motion-controllable generation.
+Yet, ControlNet introduces significant additional modules, substantially increasing inference latency by 225 seconds over the original I2V model. In contrast, \method~preserves the base model architecture and only adds a one-time trajectory extraction process, increasing just 3-second inference time.
+
+\noindent
+\textbf{Number of point trajectories during training.} 
+Table~\ref{tab:abla_k} evaluates the impact of the maximum number of point tracks ($N$) during training. As $N$ increases from 10 to 200, the model's motion-following capability improves progressively, evidenced by the decreasing EPE. The optimal performance, in terms of both structural similarity (SSIM) and EPE, is achieved at $N$=200. However, further increasing the number of point tracks leads to a rise in EPE. This can be attributed to the mismatch between the dense point tracks in the training and the sparse point tracks during evaluation.
+
+\begin{wrapfigure}{r}{7.5cm}
+\centering \includegraphics[width=0.5\columnwidth]{figures/i2v.pdf}
+        \vspace{-2mm}
+        \caption{I2V results of \method~(no point tracks).
+        } 
+        \vspace{-1em}
+        \label{fig:i2v}
+\end{wrapfigure}
+
+\noindent
+\textbf{Number of point tracks during inference.}
+Table~\ref{tab:abla_track_num} ablates the performance of \method~across varying numbers of point tracjectories over MoveBench. As the number of tracks increases, EPE drops significantly, indicating better motion guidance and enhanced temporal coherence.
+When reaching the maximum number of point trajectories extracted by CoTracker, \method~achieves the lowest EPE of 1.1. Though it is trained with at most 200 tracks, the model shows strong generalization capability. Notably, naive I2V inference (with no point tracks) yields PSNR and SSIM scores comparable to motion-controlled generation, confirming that our model strongly retains its inherent I2V quality.
+Naive I2V samples generated by \method~are presented in Fig.~\ref{fig:i2v}.
+
+\begin{table}[!t]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+    \vspace{-1em}
+     \caption{Ablation on maximum number of point trajectories (see Sec.~\ref{sec:details}) during training.}
+        \centering
+        % \renewcommand\arraystretch{1.0}
+        \renewcommand\tabcolsep{6.5pt}
+        \resizebox{\textwidth}{!}{        \begin{tabular}{lccccc}
+        % \specialrule{0.3pt}{0.1pt}{0pt}
+        % \hline
+        \toprule
+         \textit{Number} & FID$\downarrow$ & FVD$\downarrow$ & PSNR$\uparrow$ & SSIM$\uparrow$ & EPE$\downarrow$ \\
+         \midrule
+        $N=10$ & 12.8 &  86.6   &  17.6 &  0.62  & 3.3\\
+        $N=100$ & 12.9  &  84.7  & 17.7 & 0.65  & 2.7 \\
+        $N=200$ & 12.2   & 83.5     & 17.8   & 0.64 & 2.6 \\
+        $N=500$  & 13.3  &   83.9  &  17.6 &  0.63 & 3.0  \\
+        $N=1024$ & 13.4  &  83.7  &  17.2   & 0.61 & 3.9 \\
+        
+        \specialrule{0.6pt}{0.1pt}{0pt}
+        \end{tabular}
+        }
+        \label{tab:abla_k}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+    \vspace{-1em}
+      \caption{Ablation on actual number of point trajectories during inference.}
+      % \vspace{0.2mm}
+        \centering
+        % \scalebox{0.685}{
+        \renewcommand\tabcolsep{6pt}
+         \resizebox{0.96\textwidth}{!}{  
+        \begin{tabular}{lccccc}
+        % \specialrule{0.3pt}{0.1pt}{0pt}
+        % \hline
+        \toprule
+         \textit{Number} & FID$\downarrow$ & FVD$\downarrow$ & PSNR$\uparrow$ & SSIM$\uparrow$ & EPE$\downarrow$ \\
+         \midrule
+        \rowcolor{Gray}$N=0$ & 12.8 &  87.9  & 17.9 &  0.64   & 12.4 \\
+        $N=1$ & 12.2   & 83.5     & 17.8   & 0.64        & 2.6  \\
+        $N=16$   &  10.6   &  78.3   &   18.2 &  0.67  & 2.2 \\
+        $N=512$    &   7.7   &  51.0   & 20.3 &   0.75  & 1.5 \\
+        $N=1024$    &   6.2  &   45.2  & 21.9  &  0.79  & 1.1 \\
+        
+        \specialrule{0.6pt}{0.1pt}{0pt}
+        \end{tabular}
+        }
+        \label{tab:abla_track_num}
+    \end{minipage}
+        \vspace{-1em}
+\end{table}
+
+\begin{table}[!t]
+    \centering
+    \begin{minipage}{0.66\textwidth}
+    % \vspace{-1em}
+     \caption{Ablation on different I2V backbones and training data scale. \method~attains better results under the same setting.}
+        \centering
+        % \renewcommand\arraystretch{1.0}
+        \renewcommand\tabcolsep{1pt}
+        \resizebox{\textwidth}{!}{        \begin{tabular}{llcccccc}
+        % \specialrule{0.3pt}{0.1pt}{0pt}
+        % \hline
+        \toprule
+         \textit{Method} & \textit{Backbone} & \textit{Data scale} & FID$\downarrow$ & FVD$\downarrow$ & PSNR$\uparrow$ & SSIM$\uparrow$ & EPE$\downarrow$ \\
+         \midrule
+         MagicMotion & CogVideoX-5B	& 23K & 17.5 & 96.7 & 14.9 & 0.56 &3.2\\
+         \method-Cog-23K & CogVideoX-5B & 23K & 16.0 & 92.3 & 16.8 &0.59 & 2.8\\
+         Tora & CogVideoX-5B & 630K & 22.5 & 100.4 & 15.7 & 0.55 & 3.3 \\
+         \method-Cog-630K & CogVideoX-5B & 630K & 14.1 & 87.3 & 17.2& 0.61 & 2.8\\
+         \method & Wan2.1-I2V-14B & 2000K & \textbf{12.2} & \textbf{83.5} & \textbf{17.8} & \textbf{0.64} & \textbf{2.6}\\
+        \specialrule{0.6pt}{0.1pt}{0pt}
+        \end{tabular}
+        }
+        \label{tab:abla_backbone}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.31\textwidth}
+    % \vspace{-1em}
+      \caption{Large-motion and out-of-distribution-motion subset.}
+      % \vspace{0.2mm}
+        \centering
+        % \scalebox{0.685}{
+        \renewcommand\tabcolsep{3.5pt}
+         \resizebox{0.96\textwidth}{!}{  
+        \begin{tabular}{llccc}
+        % \specialrule{0.3pt}{0.1pt}{0pt}
+        % \hline
+        \toprule
+         \textit{Subset} & \textit{Method} & FID$\downarrow$ & FVD$\downarrow$ & EPE$\downarrow$ \\
+         \midrule
+         \multirow{3}{*}{Large} & Tora & 29.1 & 126.3 & 4.3 \\
+          & MagicMotion & 24.6 & 119.3 & 4.1 \\
+          & \method & \textbf{14.5} & \textbf{86.6} & \textbf{3.0} \\
+          \midrule
+         \multirow{3}{*}{OOD}& Tora & 28.9 & 120.2 & 4.0\\
+         & MagicMotion & 23.5 & 115.7 & 3.9\\
+         & \method & \textbf{13.5} & \textbf{86.0} & \textbf{2.8}\\
+        \specialrule{0.6pt}{0.1pt}{0pt}
+        \end{tabular}
+        }
+        \label{tab:abla_large_motion}
+    \end{minipage}
+        \vspace{-1.5em}
+\end{table}
+
+\noindent
+\textbf{Backbones and data scale.}
+In pursuit of the best generation quality, we initially train \method~with a large-scale dataset and a strong backbone.
+To ensure a fair comparison with the leading approaches MagicMotion and Tora, we align \method's backbone and training data scale with them. This yields two variants, \ie, \method-Cog-23K and \method-Cog-630K, which are trained on 23K and 630K data samples respectively, using CogVideoX1.5-5B-I2V~\cite{cogvideox} as backbone.
+The detailed comparison on MoveBench is shown in Table~\ref{tab:abla_backbone}. Under the same backbone and data scale, \method~still outperforms these two powerful methods.
+
+\noindent
+\textbf{Evaluation on large-motion and out-of-distribution motion scenarios.}
+To further verify the model generalizability, we curate subsets from MoveBench containing high-amplitude and out-of-distribution motion control cases.
+For each video, its motion amplitude score is computed as the average of the top 2\% largest optical flow values extracted by RAFT~\cite{teed2020raft}. The top 20\% highest-score videos are selected as large-motion videos. Besides, we manually curate 50 uncommon motion cases as out-of-distribution subset, including complex foreground–background interactions, objects moving out of frame, and rare camera motions.
+Evaluation results on these challenging examples are shown in Table~\ref{tab:abla_large_motion}.
+Notably, \method~consistently outperforms two leading baselines, with performance gaps further widening under these difficult condition. In addition, \method’s performance only marginally drops compared to its results on the full benchmark, demonstrating its robustness. 
+
+\subsection{Motion Control Applications}
+\label{subsec:application}
+\vspace{-0.5em}
+As point trajectories can flexibly represent various types of motion, \method~supports a wide range of motion control applications, as showcased in Fig.~\ref{fig:teaser}.
+First, rows 1–2 show object control using single or multiple point trajectories.
+For camera control (row 3), we can either drag background elements directly or follow the approach of work~\cite{geng2024motion}. The latter estimates a point cloud from a monocular depth predictor~\cite{yang2024depth}, projects it along a camera pose trajectory, and applies z-buffering to obtain camera-aligned 2D trajectories.
+Following work~\cite{geng2024motion}, we perform primitive-level control by rotating a virtual sphere to generate projected 2D trajectories for globe motion (row 4).
+In row 5, we enable motion transfer by applying trajectories extracted from one video to update the condition features of a different image.
+Row 6 shows 3D rotation control by estimating depth-based positions, applying a rotation, and projecting the results to 2D.
+We refer readers to the supplementary file for more visualizations and full videos.
+
+
+\section{Conclusion and Discussion}
+We propose \method, a simple and scalable framework for precise motion control in video generation.
+It represents motion with point trajectories and transfers them into latent coordinates through spatial mapping, requiring no extra motion encoder. We then inject trajectory guidance into first-frame condition features via latent feature replication, achieving effective motion control without architectural changes. For rigorous evaluation, we further present MoveBench, a comprehensive and well-curated benchmark featuring diverse content categories with hybrid-verified annotations.
+Extensive experiments on MoveBench and public datasets show that \method~generates high-quality, long-duration (5s, 480p) videos with motion controllability on par with commercial tools like Kling 1.5 Pro’s Motion Brush.
+We believe our open-sourced solution offers an efficient path to scale motion-controllable video generation and will empower a wide range of creators.
+
+\noindent \textbf{Limitations and broader impacts.}
+\method~uses point trajectories to guide motion, which can be unreliable when tracks are missing due to occlusion.
+While we observe that short-term occlusions can be recovered once the point reappears, showing a degree of generalization, prolonged absence may lead to loss of control (see Appendix).
+As with other generative models, \method~carries dual-use potential. Its ability to produce realistic, controllable videos can benefit creative industries, education, and simulation, but also risks misuse for generating misleading or harmful content. 
+
+% \newpage
+\section{Acknowledgment}
+
+This work was supported by the National Natural Science Foundation of China (Grant No. 62576191).
+
+\newpage
+
+\begin{center}
+ \LARGE \bf {Wan-Move: Motion-controllable Video Generation via Latent Trajectory Guidance\ \\ \ \\ \textit{Supplementary Material}}
+\end{center}
+\etocdepthtag.toc{mtappendix}
+\etocsettagdepth{mtchapter}{none}
+\etocsettagdepth{mtappendix}{subsection}
+\tableofcontents
+
+\section{Implementation Details}
+\label{sec:supp_detail}
+
+
+\subsection{Training Data Details}
+\label{subsec:supp_training_data}
+Table~\ref{tab:supp_data_source} presents the composition of the filtered training datasets, which are sourced from Panda70M~\cite{chen2024panda70m}, Pixabay~\cite{pixabay_videos}, Pexels~\cite{Pexels400k}, and YouTube.
+YouTube videos are independently collected for this study. To prevent data leakage, the videos from Pexels are strictly separated from those in the proposed MoveBench.
+
+All videos for training are captioned using Qwen2.5-VL~\cite{Qwen2.5-VL}, with the prompt structure illustrated in Fig.~\ref{fig:supp_prompt}.
+This prompt emphasizes motion and camera attributes while preserving the fundamental scene descriptions, ensuring that the model semantically understands the context and generates physically plausible motions. The same captioning prompt is applied to the videos in MoveBench.
+
+\begin{figure*}[thb]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \renewcommand{\arraystretch}{2.0} 
+        \captionof{table}{The statistics of the training datasets.}
+        \renewcommand\tabcolsep{10pt}
+             \resizebox{\textwidth}{!}{
+             \begin{tabular}{l c c}
+        \toprule
+        Dataset source & Number & Captioner \\  
+        \specialrule{0em}{2pt}{0pt}
+        \hline
+        Panda70M~\cite{chen2024panda70m} & 0.56M & Qwen2.5-VL \\
+        Pixabay~\cite{pixabay_videos} & 0.42M & Qwen2.5-VL \\
+        Pexels~\cite{Pexels400k} & 0.25M & Qwen2.5-VL \\
+        YouTube & 0.75M & Qwen2.5-VL \\
+        \bottomrule
+        \end{tabular}
+        }
+        \label{tab:supp_data_source}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \caption{Prompt for video caption.}
+        \label{fig:supp_prompt}
+        \includegraphics[width=\columnwidth]{figures/Supp_prompt.pdf}
+    \end{minipage}
+\end{figure*}
+
+\subsection{MoveBench Construction Details}
+\label{subsec:supp_benchmark}
+
+\noindent
+\textbf{Video content clustering.}
+Following the initial filtering stage, we conduct a rigorous content clustering process to ensure broad scenario coverage in our benchmark. Specifically, we sample 16 frames per filtered video and compute the average of their SigLip~\cite{zhai2023siglip} features. Using k-means clustering, we group these features into 54 distinct content categories. Each category label, \eg, Tennis, is then automatically captioned using Qwen2.5-VL~\cite{Qwen2.5-VL}. Finally, we manually select the 15–25 most representative videos per category to maintain a balance of diversity.
+
+\noindent
+\textbf{Interactive labeling.}
+Existing models often fail to accurately identify representative motion regions in videos, as the most prominent motion may not be optimal, and many motions terminate prematurely. 
+% 
+To facilitate precise annotation of motion regions, we introduce an interactive labeling interface (Fig.~\ref{fig:supp_annotation}) for selecting the initial motion point and its corresponding mask in the first frame. Annotators begin by selecting a target point in the initial frame, prompting SAM~\cite{sam} to generate a preliminary segmentation mask. If the mask extends beyond the desired area, negative points can be added to exclude irrelevant regions. This method effectively isolates articulated motions or small objects.
+For subsequent frames, point trajectories are automatically extracted using CoTracker~\cite{karaev2024cotracker}.
+
+\begin{figure}[t]
+	\begin{center}
+\includegraphics[width=1.0\columnwidth]{figures/Supp_annotation.pdf}
+	\end{center}
+\caption{The interactive annotation interface displays the video (left) and its first frame (right). Users click green positive points to specify the start point of a motion trajectory, and red negative points to exclude irrelevant regions if needed. SAM segments the mask of moving objects \& regions for user review. To annotate multiple motion trajectories, users must assign different object IDs.}
+\label{fig:supp_annotation}
+\end{figure}
+
+
+\subsection{Training and Inference Configuration}
+\label{subsec:supp_configuration}
+
+As illustrated in Sec.~\ref{sec:experimental_setup} of the main paper, we employ Wan-I2V-14B~\cite{wan} as the base I2V model.
+During training, both the DiT and umT5 components of Wan are wrapped with Fully Sharded Data Parallel (FSDP)~\cite{pytorch-fsdp}, with parameters cast to \texttt{torch.bfloat16} for memory efficiency. The training employs the AdamW optimizer~\cite{kingma2017adam} with a weight decay of 1e-3 and a base learning rate of 5e-6. The first 2,000 steps are used for linear warm-up to enable a smooth transition from the initial I2V generation (corresponding to 0 point trajectories) to motion-controllable video generation. We adopt flow matching objective for optimization, where the number of time sampling steps is set to 1,000 during training.
+To enable large-scale training with long sequences (\eg, 5s video clip), we adopt the Ulysses sequence parallelism strategy~\cite{jacobs2023deepspeed} following Wan, setting the sequence parallel size to 4. We train our model using 64 NVIDIA A100 GPUs, with each GPU processing a quarter of the sequence length, for a total of 30,000 steps.
+During inference, we follow Wan’s sampling scheme with 50 sampling steps.
+
+
+\section{Additional Experiments}
+\label{sec:supp_exp}
+
+\begin{table}[!t]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+    \vspace{-1em}
+     \caption{Impact of feature replication strategies when multiple motion trajectories overlap.}
+        \centering
+        % \renewcommand\arraystretch{1.0}
+        \renewcommand\tabcolsep{6.5pt}
+        \resizebox{\textwidth}{!}{        \begin{tabular}{lccccc}
+        % \specialrule{0.3pt}{0.1pt}{0pt}
+        % \hline
+        \toprule
+         \textit{strategy} & FID$\downarrow$ & FVD$\downarrow$ & PSNR$\uparrow$ & SSIM$\uparrow$ & EPE$\downarrow$ \\
+         \midrule
+        Average & 13.1 &  83.4   &  17,5 &  0.63  & 2.7\\
+        Random & 12.2   & 83.5     & 17.8   & 0.64 & 2.6 \\
+        \specialrule{0.6pt}{0.1pt}{0pt}
+        \end{tabular}
+        }
+        \label{tab:supp_overlap}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+    \vspace{-1em}
+      \caption{Impact of using a dense-to-sampling training strategy.}
+      % \vspace{0.2mm}
+        \centering
+        % \scalebox{0.685}{
+        \renewcommand\tabcolsep{2.2pt}
+    \resizebox{0.96\textwidth}{!}{  
+        \begin{tabular}{lccccc}
+        % \specialrule{0.3pt}{0.1pt}{0pt}
+        % \hline
+        \toprule
+         \textit{Strategy} & FID$\downarrow$ & FVD$\downarrow$ & PSNR$\uparrow$ & SSIM$\uparrow$ & EPE$\downarrow$ \\
+         \midrule
+        Dense-to-Sampling & 12.9 &  84.2 & 17.5 &  0.62   & 2.6 \\
+        Sampling & 12.2   & 83.5     & 17.8   & 0.64        & 2.6  \\
+        \specialrule{0.6pt}{0.1pt}{0pt}
+        \end{tabular}
+        }
+        \label{tab:abla_track_num}
+    \end{minipage}
+\end{table}
+
+
+\subsection{Choice of Feature Replication Strategies under Trajectory Overlap}
+We analyze the impact of feature replication strategies in cases of trajectory overlap. The results, presented in Table~\ref{tab:supp_overlap}, demonstrate that randomly selecting a single trajectory's first-frame feature for replication when multiple trajectories coincide yields superior video quality and motion control. This is evidenced by lower FVD and EPE compared to feature averaging. We hypothesize that averaging features from overlapping trajectories leads to information loss, thereby degrading performance.
+
+\subsection{Choice of Different Training Strategies}
+This subsection evaluates the performance differences between dense-to-sampling and direct sampling training strategies, as presented in Table~\ref{tab:abla_track_num}. Prior work~\cite{zhang2024tora,wang2024motionctrl,yin2023dragnuwa,li2025image} commonly employs a two-stage dense-to-sampling pipeline, where the first stage uses dense motion trajectories to enhance motion control followed by sparse trajectories in the second stage. However, we find that our model, trained with randomly sampling of 1-200 points (as refer to Sec.~\ref{sec:details} in the main paper), achieves comparable EPE and lower FVD compared to the two-stage approach. These results demonstrate that our method provides generalization capability in point trajectory numbers while simplifying the training process.
+This generalization ability is also verified in Table~\ref{tab:abla_track_num} of the main paper.
+
+
+\subsection{Model Performance Under Trajectory Disappearance}
+Fig.~\ref{fig:supp_disappear} illustrates our model's capability to generate motion-coherent videos when handling temporarily invisible trajectories. The \method~maintains stable generation quality in these challenging scenarios, which we attribute to both the presence of similar cases in the training data and the model's inherent generalization capacity.
+
+\begin{figure}[t]
+	\begin{center}
+\includegraphics[width=1.0\columnwidth]{figures/Supp_generalization.pdf}
+	\end{center}
+\caption{\method~generalizes to continue controlling motion trajectories when they temporarily disappears.
+Green circles indicate visible segments, while red circles mark invisible segments, \eg, occluded or out-of-frame parts.}
+\label{fig:supp_disappear}
+\end{figure}
+
+
+\subsection{Failure Cases}
+This subsection analyzes and visualizes three primary failure modes of \method, as illustrated in Fig.~\ref{fig:supp_failure}. First, control degradation occurs when motion trajectories remain invisible for extended durations, causing the model to lose conditional guidance. Second, performance deteriorates in visually complex scenes with multiple interacting objects in crowded environments. Third, implausible motion trajectories that violate fundamental physical laws result in out-of-distribution predictions. Further, erroneous tracking points identified by CoTracker~\cite{karaev2024cotracker} may compound these failure modes.
+
+\begin{figure}[t]
+	\begin{center}
+\includegraphics[width=1.0\columnwidth]{figures/Supp_failure_case.pdf}
+	\end{center}
+\caption{Three primary failure modes of \method. (a) Loss of motion control due to persistent trajectory disappearance; (b) Visual artifacts in overly complex, crowded environments; and (c) motion outputs that violate rigorous physical laws.}
+\label{fig:supp_failure}
+\end{figure}
+
+\section{Qualitative Visualizations}
+\label{sec:supp_vis}
+
+\subsection{More Qualitative Comparisons}
+We present additional qualitative comparisons with state-of-the-art academic~\cite{zhang2024tora} and commercial~\cite{kuaishou2024kling} approaches, as shown in Fig.~\ref{fig:supp_main_comparison}.
+
+\begin{figure}[t]
+	\begin{center}
+\includegraphics[width=1.0\columnwidth]{figures/Supp_main_comparison.pdf}
+	\end{center}
+\caption{Additional qualitative comparisons with Tora~\cite{zhang2024tora} and the commercial model Kling 1.5 Pro~\cite{kuaishou2024kling}. \method~demonstrates superior motion accuracy and visual quality. Major motion control failures or visual artifacts are denoted with red boxes.}
+\label{fig:supp_main_comparison}
+\end{figure}
+
+
+\subsection{More Camera Control Results}
+As demonstrated in Fig.~\ref{fig:supp_camera}, \method~enables camera control. This can be accomplished, following the work~\cite{geng2024motion}, by estimating a point cloud using a monocular depth predictor~\cite{yang2024depth}, projecting it along a predefined camera trajectory, and applying z-buffering to derive occlusion flags and camera-aligned 2D trajectories.
+\begin{figure}[t]
+	\begin{center}
+\includegraphics[width=1.0\columnwidth]{figures/Supp_camera.pdf}
+	\end{center}
+\caption{\method~enables effective and flexible camera control through different point trajectories, such as linear displacement, dolly in, and dolly out.}
+\label{fig:supp_camera}
+\end{figure}
+
+\subsection{More Motion Transfer Results}
+This subsection presents dense motion transfer visualizations generated by \method~using dense point trajectories (1,024 in our implementation). As illustrated in Fig.~\ref{fig:supp_motion_copy}, \method~achieves nearly identical appearance quality and motion alignment compared to the original videos given dense trajectory conditions and the same first frame. Moreover, \method~also enables video editing by copying the motion while using an additional image editing model to modify the content in the first frame, maintaining the original video's motion trajectories, as shown in Fig.~\ref{fig:supp_motion_edit}.
+
+\begin{figure}[t]
+	\begin{center}
+\includegraphics[width=1.0\columnwidth]{figures/Supp_motion_copy.pdf}
+	\end{center}
+\caption{\method~enables accurate video motion copy using dense point trajectories (\eg, 1024 points). The synthesized video preserves high fidelity in both appearance and object-level motion alignment with the original video, even under complex environmental conditions.}
+\label{fig:supp_motion_copy}
+\end{figure}
+
+\begin{figure}[t]
+	\begin{center}
+\includegraphics[width=1.0\columnwidth]{figures/Supp_edit.pdf}
+	\end{center}
+\caption{\method~enables video editing through motion copy and additional image editing models. It first applies the image editing model (\eg, ControlNet~\cite{controlnet}, GPT-4o~\cite{hurst2024gpt}) to modify the style or content of the first frame, then uses the original video’s motion trajectories to animate the edited image frame.}
+\label{fig:supp_motion_edit}
+\end{figure}
+
+\subsection{More 3D Rotation Results}
+As illustrated in Fig.~\ref{fig:supp_rotation}, \method~additionally supports 3D object rotation. This capability is realized by first estimating depth-based 3D positions, applying a rotational transformation, and then reprojecting the results into 2D trajectories. These trajectories subsequently serve as conditioning inputs for our model to rotate the objects in videos.
+\begin{figure}[t]
+	\begin{center}
+\includegraphics[width=1.0\columnwidth]{figures/Supp_rotation.pdf}
+	\end{center}
+\caption{\method~enables object 3D rotation by estimating depth-based positions, applying a rotation, and projecting the results to 2D.}
+\label{fig:supp_rotation}
+\end{figure}
+
+
+\bibliography{egbib}
+\bibliographystyle{unsrt}
+
+
+\end{document}
+

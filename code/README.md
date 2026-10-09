@@ -30,6 +30,14 @@
 | AnyTalker | [`audio_driven/anytalker/`](audio_driven/anytalker/) | 官方推理代码（SSH 完整克隆）；见 `README.md` / `README_LOCAL.md` |
 | InterActHuman | [`audio_driven/interacthuman/`](audio_driven/interacthuman/) | 官方 demonstration 代码（SSH 完整克隆）；见 `README.md` / `README_LOCAL.md` |
 
+## Geometry control
+
+官方仓库浅克隆（`--depth 1`，`GIT_LFS_SKIP_SMUDGE=1`），路径与 `papers.yaml` 的 `geometry_control` slug 对齐。权重不在本仓库，见目录内 `README_LOCAL.md`。
+
+| 论文 | 路径 | 来源 |
+|------|------|------|
+| Wan-Move | [`geometry_control/wan_move/`](geometry_control/wan_move/) | [ali-vilab/Wan-Move](https://github.com/ali-vilab/Wan-Move) |
+
 ## Multi view
 
 官方仓库浅克隆（`--depth 1`，`GIT_LFS_SKIP_SMUDGE=1`），路径与 `papers.yaml` 的 `multi_view` slug 对齐。权重不在本仓库，见各目录 `README_LOCAL.md`。

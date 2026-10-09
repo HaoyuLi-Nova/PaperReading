@@ -6,7 +6,7 @@
 # priority: P0 (must) | P1 (important) | P2 (context)
 
 version: 1
-updated: 2026-09-30
+updated: 2026-10-08
 
 tracks:
   foundations:
@@ -585,6 +585,21 @@ papers:
     tags: [4d, reconstruction, scene_flow, vae]
     one_liner: 4D VAE 从单目视频联合重建稠密几何与 scene flow
     translation: translations/geometry_control/motioncrafter/paper_zh.md
+
+  - id: wan_move
+    track: geometry_control
+    slug: wan_move
+    title: "Wan-Move: Motion-controllable Video Generation via Latent Trajectory Guidance"
+    venue: NeurIPS
+    year: 2025
+    arxiv: "2512.08765"
+    status: reading
+    priority: P1
+    deps: [wan]
+    tags: [trajectory, point_motion, i2v, latent_guidance, wan]
+    github: https://github.com/ali-vilab/Wan-Move
+    code: code/geometry_control/wan_move/
+    one_liner: 沿点轨迹搬运首帧潜特征，不改 Wan-I2V 结构做细粒度运动控制
 
   # ---------- multi_view ----------
   - id: zero123
