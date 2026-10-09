@@ -1,6 +1,15 @@
 # `code/` — 论文学习代码
 
-按 `code/<track>/<slug>/` 与笔记、原文对齐。这里放**可运行的最小实现 / 教程**，不是仓库运维脚本（运维在 `scripts/`）。
+按 `code/<track>/<slug>/` 与笔记、原文对齐。这里放**可运行的最小实现 / 教程**，或官方仓库的源码；不是仓库运维脚本（运维在 `scripts/`）。
+
+放入官方代码时完整克隆，并在交给本仓库跟踪之前删掉嵌套 `.git`：
+
+```bash
+git clone <url> code/<track>/<slug>
+rm -rf code/<track>/<slug>/.git
+```
+
+不要使用 `--depth 1`。留下 `.git` 时，父仓库只会记下 gitlink，GitHub 收不到源码。权重、图片和压缩包仍由仓库根目录 `.gitignore` 排除。新增目录后，在 `papers.yaml` 该条目加上 `code:` 字段。
 
 ## Foundations
 
@@ -19,7 +28,7 @@
 | 论文 | 路径 | 运行 |
 |------|------|------|
 | LDM | [`base_models/ldm/`](base_models/ldm/) | `python base_models/ldm/featuremap_to_sequence.py` |
-| Wan | [`base_models/wan/`](base_models/wan/) | 官方推理代码（Wan2.1 浅克隆）；笔记见 `notes/base_models/wan2.1/` |
+| Wan | [`base_models/wan/`](base_models/wan/) | 官方推理代码；笔记见 `notes/base_models/wan2.1/` |
 | Ovi | [`base_models/ovi/`](base_models/ovi/) | 官方推理代码；见目录内 `README.md` / `README_LOCAL.md` |
 
 ## Audio driven
@@ -32,7 +41,7 @@
 
 ## Geometry control
 
-官方仓库浅克隆（`--depth 1`，`GIT_LFS_SKIP_SMUDGE=1`），路径与 `papers.yaml` 的 `geometry_control` slug 对齐。权重不在本仓库，见目录内 `README_LOCAL.md`。
+路径与 `papers.yaml` 的 `geometry_control` slug 对齐。权重不在本仓库，见目录内 `README_LOCAL.md`。
 
 | 论文 | 路径 | 来源 |
 |------|------|------|
@@ -40,7 +49,7 @@
 
 ## Multi view
 
-官方仓库浅克隆（`--depth 1`，`GIT_LFS_SKIP_SMUDGE=1`），路径与 `papers.yaml` 的 `multi_view` slug 对齐。权重不在本仓库，见各目录 `README_LOCAL.md`。
+路径与 `papers.yaml` 的 `multi_view` slug 对齐。权重不在本仓库，见各目录 `README_LOCAL.md`。
 
 | 论文 | 路径 | 来源 |
 |------|------|------|
@@ -48,7 +57,7 @@
 
 ## EEG Visual
 
-官方仓库浅克隆（`--depth 1`，`GIT_LFS_SKIP_SMUDGE=1`），路径与 `papers.yaml` 的 `eeg_visual` slug 对齐。
+路径与 `papers.yaml` 的 `eeg_visual` slug 对齐。权重不在本仓库。
 
 | 论文 | 路径 | 来源 |
 |------|------|------|
@@ -64,10 +73,9 @@
 
 ## Remote sensing
 
-官方仓库浅克隆（`--depth 1`），路径与 `papers.yaml` 的 `remote_sensing` slug 对齐。权重与训练数据不在本仓库。
+路径与 `papers.yaml` 的 `remote_sensing` slug 对齐。权重与训练数据不在本仓库。
 
 | 论文 | 路径 | 来源 |
 |------|------|------|
 | S³Mamba-Pan | [`remote_sensing/s3mamba_pan/`](remote_sensing/s3mamba_pan/) | [FreeZS-a/S3Mamba](https://github.com/FreeZS-a/S3Mamba) |
 
-新增代码时：在对应 slug 下建目录，并在 `papers.yaml` 该条目加 `code:` 字段。

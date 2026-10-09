@@ -1,6 +1,6 @@
 # Paper_Reading（Codex）
 
-目录约定以 `STRUCTURE.md` 为准，路线图见 `ROADMAP.md`，元数据以 `papers.yaml` 为准。一文四路径：`arxiv/` · `translations/` · `notes/` · `code/`，同一 `track/slug`。
+目录约定以 `STRUCTURE.md` 为准，路线图见 `ROADMAP.md`，元数据以 `papers.yaml` 为准。一文四路径：`arxiv/` · `translations/` · `notes/` · `code/`，同一 `track/slug`。官方代码完整 `git clone` 到 `code/<track>/<slug>/` 后立刻删除其中的 `.git`，再由本仓库跟踪；不要 `--depth 1`。
 
 - 全文译本只写 `translations/<track>/<slug>/paper_zh.md`，**人工撰写**，禁止脚本/API 批量生成正文。
 - 精读三件套只写 `notes/<track>/<slug>/{QA,critique,note}.md`，**不得覆盖译本**。

@@ -16,6 +16,7 @@
 6. **插图先转 PNG 再引用**：原图若为 PDF / JPG 等，先用 `scripts/figures_to_png.py`（PyMuPDF + Pillow）转为 PNG，译本中只引用 `.png`。
 7. **工具与学习分离**：`scripts/` 只放下载与转图等运维工具；玩具/教程进 `code/`。
 8. **大文件不进 git**：`paper.pdf`、`source.tar.gz` 默认 gitignore，本地用脚本拉取。
+9. **官方代码完整克隆后删除 `.git`**：`git clone <url> code/<track>/<slug>`（不要 `--depth 1`），立刻删除该目录下的 `.git`，再由本仓库跟踪源码。留下 `.git` 时，父仓库只会记下 gitlink，GitHub 收不到文件。
 
 ---
 
@@ -27,7 +28,7 @@
 | `arxiv/<track>/<slug>/`                   | 从 arXiv 下载的`paper.pdf`、`source.tar.gz`、`extracted/`（含转好的 `.png`） |
 | `translations/<track>/<slug>/paper_zh.md` | 全文中文译本（人工撰写）                                                             |
 | `notes/<track>/<slug>/`                   | 单篇三件套：`QA.md`、`critique.md`、`note.md`                                     |
-| `code/<track>/<slug>/`                    | 最小可运行实现、教程脚本                                                             |
+| `code/<track>/<slug>/`                    | 最小可运行实现、教程脚本，或完整克隆后已去掉 `.git` 的官方代码                     |
 | `comparisons/<track>/`                    | 跨论文对比                                                                           |
 | `scripts/`                                | `download_catalog.py`、`figures_to_png.py` 等                                    |
 | `ROADMAP.md`                              | 读什么、什么顺序                                                                     |
@@ -134,5 +135,6 @@ python scripts/figures_to_png.py arxiv/base_models/ldm/extracted/img/bar.jpg
 | 下载一批 PDF        | `python scripts/download_catalog.py --track base_models`                                            |
 | 图转 PNG            | `python scripts/figures_to_png.py arxiv/<track>/`（只扫 `extracted/`；PyMuPDF+Pillow，EPS 需 gs） |
 | 跑 Transformer 玩具 | `cd code/foundations/transformer/toy && python demo.py`                                             |
+| 放入官方代码        | `git clone <url> code/<track>/<slug> && rm -rf code/<track>/<slug>/.git`，再在 `papers.yaml` 写 `code:` |
 | 看进度              | 打开`papers.yaml`                                                                                   |
 | 写对比              | `comparisons/<track>/*.md`                                                                          |

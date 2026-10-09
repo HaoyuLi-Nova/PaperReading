@@ -94,7 +94,16 @@ python scripts/figures_to_png.py arxiv/base_models/ldm/extracted/img/bar.jpg
 编辑 [`papers.yaml`](papers.yaml) 的 `status`：`pending` → `reading` → `notes_done` → `mastered`。
 译本路径写在 `translation:`；阅读笔记写在 `notes:`（指向该 slug 目录或其中某件，如 `critique.md`）。
 
-**5. 跑学习代码 / 写笔记（可选）**
+**5. 放入官方代码（可选）**
+
+完整克隆到 `code/<track>/<slug>/`，立刻删除其中的 `.git`，再由本仓库跟踪。不要使用 `--depth 1`。
+
+```bash
+git clone <url> code/<track>/<slug>
+rm -rf code/<track>/<slug>/.git
+```
+
+**6. 跑学习代码 / 写笔记（可选）**
 
 ```bash
 cd code/foundations/transformer/toy && python demo.py
