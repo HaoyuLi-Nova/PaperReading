@@ -5,13 +5,13 @@ Tiny hydraulic-press LoRA on [finetrainers/crush-smol](https://huggingface.co/da
 ```
 data  /data1/lihaoyu/video_workspace/data/lora/crush-smol
 runs  /data1/lihaoyu/video_workspace/runs/lora/crush-smol
-code  paper_reading/code/mycode/lora
+code  Paper/code/mycode/lora
 ```
 
 ```bash
 source /data1/lihaoyu/video_workspace/env.sh
 export HF_ENDPOINT=https://hf-mirror.com
-cd paper_reading/code/mycode/lora
+cd Paper/code/mycode/lora
 # or: bash run.sh
 python download.py
 python precompute.py

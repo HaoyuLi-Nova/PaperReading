@@ -1,0 +1,60 @@
+\begin{table*}[t]
+\centering
+\caption{\textbf{Controllable video generation on DynPose-100K~\cite{rockwell2025dynamic} and Cooking.}
+We compare models with camera and object motion control. Tracking-based methods (MP, ATI, WanMove) require privileged foreground/background tracks, while \ours uses only first-frame reprojected trajectories and camera poses. Despite weaker inputs, \ours achieves comparable visual quality and more accurate motion control. All methods use the Wan2.1-14B backbone; * denotes models reimplemented and trained by us. Best and second-best results are marked in \textbf{bold} and \underline{underline}.}
+\label{tab:ctrl_twodsets}
+
+\setlength{\tabcolsep}{3.5pt}
+\renewcommand{\arraystretch}{1.12}
+\small
+
+\definecolor{ctrlgray}{gray}{0.96}
+\adjustbox{width=\textwidth}{
+\begin{tabular}{
+l c
+c c >{\columncolor{ctrlgray}}c >{\columncolor{ctrlgray}}c >{\columncolor{ctrlgray}}c
+c c >{\columncolor{ctrlgray}}c >{\columncolor{ctrlgray}}c >{\columncolor{ctrlgray}}c
+}
+\toprule
+& & \multicolumn{5}{c}{\textbf{DynPose-100K}} & \multicolumn{5}{c}{\textbf{Cooking}} \\
+\cmidrule(lr){3-7}\cmidrule(lr){8-12}
+Method
+& Full info
+& PSNR $\uparrow$
+& SSIM $\uparrow$
+& \cellcolor{ctrlgray}Rot $\downarrow$
+& \cellcolor{ctrlgray}Trans $\downarrow$
+& \cellcolor{ctrlgray}EPE $\downarrow$
+& PSNR $\uparrow$
+& SSIM $\uparrow$
+& \cellcolor{ctrlgray}Rot $\downarrow$
+& \cellcolor{ctrlgray}Trans $\downarrow$
+& \cellcolor{ctrlgray}EPE $\downarrow$ \\
+\midrule
+Wan2.1~\cite{wan2025wan} & $\times$
+& 11.23 & 0.435 & - & - & --
+& 14.23 & 0.527 & - & - & -- \\
+
+Gen3c*~\cite{ren2025gen3c} & $\times$
+& \underline{12.45} & \underline{0.507} & 5.46 & \underline{4.09} & -
+& 15.37 & \textbf{0.613} & \textbf{1.97} & \textbf{10.03} & - \\
+
+MP*~\cite{geng2024motionprompting} & $\checkmark$
+& 11.72 & 0.455 & 6.76 & 6.04 & \underline{7.56}
+& 15.68 & 0.564 & 2.50 & 12.24 & \textbf{4.25} \\
+
+ATI~\cite{wang2025ati} & $\checkmark$
+& 13.18 & 0.493 & 5.62 & 6.54 & 8.43
+& 15.93 & 0.582 & 4.25 & 16.94 & 5.87 \\
+
+WanMove~\cite{chu2025wanmove} & $\checkmark$
+& \textbf{13.91} & \textbf{0.521} & \textbf{4.12} & \textbf{3.56} & 8.05
+& \underline{16.42} & \underline{0.589} & 2.93 & 13.27 & 5.47 \\
+
+Ours & $\times$
+& 12.30 & 0.457 & \underline{4.55} & 4.61 & \textbf{7.64}
+& \textbf{16.44} & 0.594 & \underline{2.16} & \underline{10.11} & \underline{4.27} \\
+\bottomrule
+\end{tabular}
+}
+\end{table*}

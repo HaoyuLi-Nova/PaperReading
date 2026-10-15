@@ -1,0 +1,1085 @@
+{
+   "sources" : [
+      {
+         "usage" : "toplevel",
+         "filename" : "arxiv.tex"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "NVIDIA-Sans-Font-TTF/NVIDIASans_Bd.tfm"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "NVIDIA-Sans-Font-TTF/NVIDIASans_Bd.ttf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "NVIDIA-Sans-Font-TTF/NVIDIASans_BdIt.tfm"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "NVIDIA-Sans-Font-TTF/NVIDIASans_BdIt.ttf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "NVIDIA-Sans-Font-TTF/NVIDIASans_It.tfm"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "NVIDIA-Sans-Font-TTF/NVIDIASans_It.ttf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "NVIDIA-Sans-Font-TTF/NVIDIASans_Lt.tfm"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "NVIDIA-Sans-Font-TTF/NVIDIASans_Lt.ttf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "NVIDIA-Sans-Font-TTF/NVIDIASans_LtIt.tfm"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "NVIDIA-Sans-Font-TTF/NVIDIASans_LtIt.ttf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "NVIDIA-Sans-Font-TTF/NVIDIASans_Md.tfm"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "NVIDIA-Sans-Font-TTF/NVIDIASans_Md.ttf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "NVIDIA-Sans-Font-TTF/NVIDIASans_MdIt.tfm"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "NVIDIA-Sans-Font-TTF/NVIDIASans_MdIt.ttf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "NVIDIA-Sans-Font-TTF/NVIDIASans_Rg.tfm"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "NVIDIA-Sans-Font-TTF/NVIDIASans_Rg.ttf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "NVIDIA-Sans-Font-TTF/READ_ME_FIRST.rtf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "NVIDIA-Sans-Font-TTF/t1NVIDIASans.fd"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/0dad0910edf02720c0ad6ec976c1b21dd6b5fdccfd3786ce5e71b30347de0962_original/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/0dad0910edf02720c0ad6ec976c1b21dd6b5fdccfd3786ce5e71b30347de0962_original/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/0dad0910edf02720c0ad6ec976c1b21dd6b5fdccfd3786ce5e71b30347de0962_original/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/0dad0910edf02720c0ad6ec976c1b21dd6b5fdccfd3786ce5e71b30347de0962_original/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/0dad0910edf02720c0ad6ec976c1b21dd6b5fdccfd3786ce5e71b30347de0962_original/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/0dad0910edf02720c0ad6ec976c1b21dd6b5fdccfd3786ce5e71b30347de0962_straight_left/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/0dad0910edf02720c0ad6ec976c1b21dd6b5fdccfd3786ce5e71b30347de0962_straight_left/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/0dad0910edf02720c0ad6ec976c1b21dd6b5fdccfd3786ce5e71b30347de0962_straight_left/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/0dad0910edf02720c0ad6ec976c1b21dd6b5fdccfd3786ce5e71b30347de0962_straight_left/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/0dad0910edf02720c0ad6ec976c1b21dd6b5fdccfd3786ce5e71b30347de0962_straight_left/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/0dad0910edf02720c0ad6ec976c1b21dd6b5fdccfd3786ce5e71b30347de0962_straight_right/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/0dad0910edf02720c0ad6ec976c1b21dd6b5fdccfd3786ce5e71b30347de0962_straight_right/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/0dad0910edf02720c0ad6ec976c1b21dd6b5fdccfd3786ce5e71b30347de0962_straight_right/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/0dad0910edf02720c0ad6ec976c1b21dd6b5fdccfd3786ce5e71b30347de0962_straight_right/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/0dad0910edf02720c0ad6ec976c1b21dd6b5fdccfd3786ce5e71b30347de0962_straight_right/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/double_lift_cloth_1/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/double_lift_cloth_1/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/double_lift_cloth_1/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/double_lift_cloth_1/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/double_lift_cloth_1/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/double_lift_cloth_1_move_right/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/double_lift_cloth_1_move_right/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/double_lift_cloth_1_move_right/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/double_lift_cloth_1_move_right/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/double_lift_cloth_1_move_right/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/double_lift_cloth_1_zoom_in_poke/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/double_lift_cloth_1_zoom_in_poke/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/double_lift_cloth_1_zoom_in_poke/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/double_lift_cloth_1_zoom_in_poke/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/active_passive/double_lift_cloth_1_zoom_in_poke/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ati/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ati/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ati/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ati/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ati/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ati/4e097846-c17e-4cad-bf81-40942bc65883/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ati/4e097846-c17e-4cad-bf81-40942bc65883/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ati/4e097846-c17e-4cad-bf81-40942bc65883/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ati/4e097846-c17e-4cad-bf81-40942bc65883/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ati/4e097846-c17e-4cad-bf81-40942bc65883/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ati/a6ec1187-ae42-4e9a-8a75-37b6ff9bf4ca/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ati/a6ec1187-ae42-4e9a-8a75-37b6ff9bf4ca/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ati/a6ec1187-ae42-4e9a-8a75-37b6ff9bf4ca/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ati/a6ec1187-ae42-4e9a-8a75-37b6ff9bf4ca/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ati/a6ec1187-ae42-4e9a-8a75-37b6ff9bf4ca/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ours/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ours/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ours/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ours/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ours/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ours/4e097846-c17e-4cad-bf81-40942bc65883/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ours/4e097846-c17e-4cad-bf81-40942bc65883/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ours/4e097846-c17e-4cad-bf81-40942bc65883/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ours/4e097846-c17e-4cad-bf81-40942bc65883/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ours/4e097846-c17e-4cad-bf81-40942bc65883/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ours/a6ec1187-ae42-4e9a-8a75-37b6ff9bf4ca/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ours/a6ec1187-ae42-4e9a-8a75-37b6ff9bf4ca/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ours/a6ec1187-ae42-4e9a-8a75-37b6ff9bf4ca/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ours/a6ec1187-ae42-4e9a-8a75-37b6ff9bf4ca/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/ours/a6ec1187-ae42-4e9a-8a75-37b6ff9bf4ca/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/wan_move/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/wan_move/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/wan_move/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/wan_move/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/wan_move/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/wan_move/4e097846-c17e-4cad-bf81-40942bc65883/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/wan_move/4e097846-c17e-4cad-bf81-40942bc65883/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/wan_move/4e097846-c17e-4cad-bf81-40942bc65883/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/wan_move/4e097846-c17e-4cad-bf81-40942bc65883/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/wan_move/4e097846-c17e-4cad-bf81-40942bc65883/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/wan_move/a6ec1187-ae42-4e9a-8a75-37b6ff9bf4ca/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/wan_move/a6ec1187-ae42-4e9a-8a75-37b6ff9bf4ca/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/wan_move/a6ec1187-ae42-4e9a-8a75-37b6ff9bf4ca/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/wan_move/a6ec1187-ae42-4e9a-8a75-37b6ff9bf4ca/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/comparison/wan_move/a6ec1187-ae42-4e9a-8a75-37b6ff9bf4ca/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/01e63d8c-f5d8-421b-8d8d-e3baa02472d1/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/01e63d8c-f5d8-421b-8d8d-e3baa02472d1/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/01e63d8c-f5d8-421b-8d8d-e3baa02472d1/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/01e63d8c-f5d8-421b-8d8d-e3baa02472d1/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/01e63d8c-f5d8-421b-8d8d-e3baa02472d1/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/01e63d8c-f5d8-421b-8d8d-e3baa02472d1_gt_video/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/01e63d8c-f5d8-421b-8d8d-e3baa02472d1_gt_video/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/01e63d8c-f5d8-421b-8d8d-e3baa02472d1_gt_video/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/01e63d8c-f5d8-421b-8d8d-e3baa02472d1_gt_video/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/01e63d8c-f5d8-421b-8d8d-e3baa02472d1_gt_video/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/0f3eec08-4727-4e16-9d72-660bdf825803/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/0f3eec08-4727-4e16-9d72-660bdf825803/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/0f3eec08-4727-4e16-9d72-660bdf825803/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/0f3eec08-4727-4e16-9d72-660bdf825803/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/0f3eec08-4727-4e16-9d72-660bdf825803/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/0f3eec08-4727-4e16-9d72-660bdf825803_gt_video/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/0f3eec08-4727-4e16-9d72-660bdf825803_gt_video/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/0f3eec08-4727-4e16-9d72-660bdf825803_gt_video/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/0f3eec08-4727-4e16-9d72-660bdf825803_gt_video/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/0f3eec08-4727-4e16-9d72-660bdf825803_gt_video/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/a00fa6501338b10a0a72c94bf4d971571f5f44960245b0863fe319dfe8ce9ba1/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/a00fa6501338b10a0a72c94bf4d971571f5f44960245b0863fe319dfe8ce9ba1/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/a00fa6501338b10a0a72c94bf4d971571f5f44960245b0863fe319dfe8ce9ba1/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/a00fa6501338b10a0a72c94bf4d971571f5f44960245b0863fe319dfe8ce9ba1/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/a00fa6501338b10a0a72c94bf4d971571f5f44960245b0863fe319dfe8ce9ba1/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/a00fa6501338b10a0a72c94bf4d971571f5f44960245b0863fe319dfe8ce9ba1_gt_video/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/a00fa6501338b10a0a72c94bf4d971571f5f44960245b0863fe319dfe8ce9ba1_gt_video/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/a00fa6501338b10a0a72c94bf4d971571f5f44960245b0863fe319dfe8ce9ba1_gt_video/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/a00fa6501338b10a0a72c94bf4d971571f5f44960245b0863fe319dfe8ce9ba1_gt_video/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/a00fa6501338b10a0a72c94bf4d971571f5f44960245b0863fe319dfe8ce9ba1_gt_video/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/d79eb4e5-bdc3-4cf3-bc7e-f1ea4eda320d/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/d79eb4e5-bdc3-4cf3-bc7e-f1ea4eda320d/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/d79eb4e5-bdc3-4cf3-bc7e-f1ea4eda320d/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/d79eb4e5-bdc3-4cf3-bc7e-f1ea4eda320d/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/d79eb4e5-bdc3-4cf3-bc7e-f1ea4eda320d/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/d79eb4e5-bdc3-4cf3-bc7e-f1ea4eda320d_gt_video/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/d79eb4e5-bdc3-4cf3-bc7e-f1ea4eda320d_gt_video/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/d79eb4e5-bdc3-4cf3-bc7e-f1ea4eda320d_gt_video/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/d79eb4e5-bdc3-4cf3-bc7e-f1ea4eda320d_gt_video/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "src_figs/failures/d79eb4e5-bdc3-4cf3-bc7e-f1ea4eda320d_gt_video/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ATI/5ba877dff47d6d57a7c36df616851a032e4e16aa2bbf784ffc25379d86e02f14/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ATI/5ba877dff47d6d57a7c36df616851a032e4e16aa2bbf784ffc25379d86e02f14/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ATI/5ba877dff47d6d57a7c36df616851a032e4e16aa2bbf784ffc25379d86e02f14/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ATI/5ba877dff47d6d57a7c36df616851a032e4e16aa2bbf784ffc25379d86e02f14/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ATI/5ba877dff47d6d57a7c36df616851a032e4e16aa2bbf784ffc25379d86e02f14/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ATI/6e68609f-b587-40cc-baff-37e66947fdeb/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ATI/6e68609f-b587-40cc-baff-37e66947fdeb/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ATI/6e68609f-b587-40cc-baff-37e66947fdeb/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ATI/6e68609f-b587-40cc-baff-37e66947fdeb/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ATI/6e68609f-b587-40cc-baff-37e66947fdeb/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ATI/b98c53a1-d724-43f2-8771-cafcb9943b84/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ATI/b98c53a1-d724-43f2-8771-cafcb9943b84/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ATI/b98c53a1-d724-43f2-8771-cafcb9943b84/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ATI/b98c53a1-d724-43f2-8771-cafcb9943b84/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ATI/b98c53a1-d724-43f2-8771-cafcb9943b84/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/WanMove/5ba877dff47d6d57a7c36df616851a032e4e16aa2bbf784ffc25379d86e02f14/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/WanMove/5ba877dff47d6d57a7c36df616851a032e4e16aa2bbf784ffc25379d86e02f14/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/WanMove/5ba877dff47d6d57a7c36df616851a032e4e16aa2bbf784ffc25379d86e02f14/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/WanMove/5ba877dff47d6d57a7c36df616851a032e4e16aa2bbf784ffc25379d86e02f14/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/WanMove/5ba877dff47d6d57a7c36df616851a032e4e16aa2bbf784ffc25379d86e02f14/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/WanMove/6e68609f-b587-40cc-baff-37e66947fdeb/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/WanMove/6e68609f-b587-40cc-baff-37e66947fdeb/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/WanMove/6e68609f-b587-40cc-baff-37e66947fdeb/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/WanMove/6e68609f-b587-40cc-baff-37e66947fdeb/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/WanMove/6e68609f-b587-40cc-baff-37e66947fdeb/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/WanMove/b98c53a1-d724-43f2-8771-cafcb9943b84/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/WanMove/b98c53a1-d724-43f2-8771-cafcb9943b84/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/WanMove/b98c53a1-d724-43f2-8771-cafcb9943b84/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/WanMove/b98c53a1-d724-43f2-8771-cafcb9943b84/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/WanMove/b98c53a1-d724-43f2-8771-cafcb9943b84/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ours/5ba877dff47d6d57a7c36df616851a032e4e16aa2bbf784ffc25379d86e02f14/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ours/5ba877dff47d6d57a7c36df616851a032e4e16aa2bbf784ffc25379d86e02f14/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ours/5ba877dff47d6d57a7c36df616851a032e4e16aa2bbf784ffc25379d86e02f14/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ours/5ba877dff47d6d57a7c36df616851a032e4e16aa2bbf784ffc25379d86e02f14/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ours/5ba877dff47d6d57a7c36df616851a032e4e16aa2bbf784ffc25379d86e02f14/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ours/6e68609f-b587-40cc-baff-37e66947fdeb/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ours/6e68609f-b587-40cc-baff-37e66947fdeb/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ours/6e68609f-b587-40cc-baff-37e66947fdeb/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ours/6e68609f-b587-40cc-baff-37e66947fdeb/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ours/6e68609f-b587-40cc-baff-37e66947fdeb/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ours/b98c53a1-d724-43f2-8771-cafcb9943b84/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ours/b98c53a1-d724-43f2-8771-cafcb9943b84/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ours/b98c53a1-d724-43f2-8771-cafcb9943b84/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ours/b98c53a1-d724-43f2-8771-cafcb9943b84/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/comparison/ours/b98c53a1-d724-43f2-8771-cafcb9943b84/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_orbit_left_original/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_orbit_left_original/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_orbit_left_original/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_orbit_left_original/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_orbit_left_original/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_orbit_left_pull/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_orbit_left_pull/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_orbit_left_pull/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_orbit_left_pull/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_orbit_left_pull/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_orbit_left_push/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_orbit_left_push/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_orbit_left_push/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_orbit_left_push/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_orbit_left_push/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_in_original/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_in_original/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_in_original/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_in_original/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_in_original/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_in_pull/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_in_pull/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_in_pull/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_in_pull/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_in_pull/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_in_push/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_in_push/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_in_push/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_in_push/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_in_push/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_out_original/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_out_original/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_out_original/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_out_original/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_out_original/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_out_pull/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_out_pull/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_out_pull/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_out_pull/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_out_pull/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_out_push/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_out_push/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_out_push/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_out_push/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/control_gen/6d82d07b-755f-469c-a9fb-ea7a0d60116d_zoom_out_push/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/154ccbd9-507f-4596-8481-57c92c223b9e_move_down/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/154ccbd9-507f-4596-8481-57c92c223b9e_move_down/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/154ccbd9-507f-4596-8481-57c92c223b9e_move_down/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/154ccbd9-507f-4596-8481-57c92c223b9e_move_down/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/154ccbd9-507f-4596-8481-57c92c223b9e_move_down/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/154ccbd9-507f-4596-8481-57c92c223b9e_original/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/154ccbd9-507f-4596-8481-57c92c223b9e_original/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/154ccbd9-507f-4596-8481-57c92c223b9e_original/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/154ccbd9-507f-4596-8481-57c92c223b9e_original/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/154ccbd9-507f-4596-8481-57c92c223b9e_original/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/154ccbd9-507f-4596-8481-57c92c223b9e_push/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/154ccbd9-507f-4596-8481-57c92c223b9e_push/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/154ccbd9-507f-4596-8481-57c92c223b9e_push/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/154ccbd9-507f-4596-8481-57c92c223b9e_push/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/154ccbd9-507f-4596-8481-57c92c223b9e_push/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4_straight/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4_straight/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4_straight/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4_straight/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4_straight/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4_straight_left/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4_straight_left/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4_straight_left/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4_straight_left/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4_straight_left/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4_straight_up/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4_straight_up/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4_straight_up/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4_straight_up/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4_straight_up/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/fa6b5178-71e9-453b-b6b8-153b6216e903/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/fa6b5178-71e9-453b-b6b8-153b6216e903/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/fa6b5178-71e9-453b-b6b8-153b6216e903/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/fa6b5178-71e9-453b-b6b8-153b6216e903/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/fa6b5178-71e9-453b-b6b8-153b6216e903/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/fa6b5178-71e9-453b-b6b8-153b6216e903_move_down/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/fa6b5178-71e9-453b-b6b8-153b6216e903_move_down/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/fa6b5178-71e9-453b-b6b8-153b6216e903_move_down/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/fa6b5178-71e9-453b-b6b8-153b6216e903_move_down/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/fa6b5178-71e9-453b-b6b8-153b6216e903_move_down/step_04.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/fa6b5178-71e9-453b-b6b8-153b6216e903_move_right/step_00.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/fa6b5178-71e9-453b-b6b8-153b6216e903_move_right/step_01.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/fa6b5178-71e9-453b-b6b8-153b6216e903_move_right/step_02.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/fa6b5178-71e9-453b-b6b8-153b6216e903_move_right/step_03.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "supp_src_figs/interactive_motion/fa6b5178-71e9-453b-b6b8-153b6216e903_move_right/step_04.pdf"
+      }
+   ],
+   "spec_version" : 1,
+   "texlive_version" : "2025",
+   "process" : {
+      "compiler" : "pdflatex"
+   }
+}

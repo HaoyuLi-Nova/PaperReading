@@ -1,0 +1,33 @@
+\begin{figure}
+\centering
+\setlength{\tabcolsep}{1pt}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}c c|cccc@{}}
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize ATI}} &
+\visrow{comparison}{ati/a6ec1187-ae42-4e9a-8a75-37b6ff9bf4ca} \\[1pt]
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize WanMove}} &
+\visrow{comparison}{wan_move/a6ec1187-ae42-4e9a-8a75-37b6ff9bf4ca} \\[1pt]
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize \ours}} &
+\visrow{comparison}{ours/a6ec1187-ae42-4e9a-8a75-37b6ff9bf4ca}{} \\
+
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize ATI}} &
+\visrow{comparison}{ati/4e097846-c17e-4cad-bf81-40942bc65883} \\[1pt]
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize WanMove}} &
+\visrow{comparison}{wan_move/4e097846-c17e-4cad-bf81-40942bc65883} \\[1pt]
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize \ours}} &
+\visrow{comparison}{ours/4e097846-c17e-4cad-bf81-40942bc65883}{} \\
+
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize ATI}} &
+\visrow{comparison}{ati/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4} \\[1pt]
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize WanMove}} &
+\visrow{comparison}{wan_move/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4} \\[1pt]
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize \ours}} &
+\visrow{comparison}{ours/2ebb7163c3d607663c4a61d49479d4420abbde573877114f7fa0fd15fd4376c4} \\
+
+\end{tabular}%
+}
+\caption{
+\textbf{Qualitative comparison of ATI~\cite{wang2025ati}, WanMove~\cite{chu2025wanmove}, and \ours} on interactive motion generation with camera control.
+All methods use the same input image. ATI and WanMove rely on pixel-aligned per-frame tracks (top-left), which entangle camera and object motion and require privileged future tracks. In contrast, \ours uses only reprojected first-frame tracks. The first two rows show active motion reasoning, and the third row shows passive motion reasoning. Our model disentangles camera and object control and produces more coherent interactions.}
+\label{fig:qualitative_compare}
+\end{figure}

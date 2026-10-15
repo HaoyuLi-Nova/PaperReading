@@ -1,0 +1,50 @@
+\begin{table*}[t]
+\centering
+\caption{\textbf{Interactive motion generation on WISA~\cite{wang2025wisa} and Cooking.}
+We compare motion-conditioned video generation models on WISA and Cooking, evaluating video quality (FID, FVD) and motion realism (PC, SA). Prior methods require detailed motion captions with full interaction descriptions, while \ours uses only a single active motion description yet achieves comparable quality with stronger physical commonsense reasoning. All methods use the Wan2.1-14B backbone for fair comparison; * denotes models reimplemented and trained by us. Best and second-best results are marked in \textbf{bold} and \underline{underline}.}
+\label{tab:interactive_wisa_cooking}
+
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.12}
+\small
+
+\definecolor{motgray}{gray}{0.96}
+\adjustbox{width=0.88\textwidth}{
+\begin{tabular}{
+l c
+c c >{\columncolor{motgray}}c >{\columncolor{motgray}}c
+c c >{\columncolor{motgray}}c >{\columncolor{motgray}}c
+}
+\toprule
+& & \multicolumn{4}{c}{\textbf{WISA}} & \multicolumn{4}{c}{\textbf{Cooking}} \\
+\cmidrule(lr){3-6}\cmidrule(lr){7-10}
+Method
+& Full info
+& FID $\downarrow$
+& FVD $\downarrow$
+& \cellcolor{motgray}PC $\uparrow$
+& \cellcolor{motgray}SA $\uparrow$
+& FID $\downarrow$
+& FVD $\downarrow$
+& \cellcolor{motgray}PC $\uparrow$
+& \cellcolor{motgray}SA $\uparrow$ \\
+\midrule
+MP*~\cite{geng2024motionprompting} & $\checkmark$
+& \underline{57.29} & \underline{975.94} & 0.75 & \underline{0.82}
+& \underline{43.49} & \underline{759.53} & 0.87 & \underline{0.89} \\
+
+ATI~\cite{wang2025ati} & $\checkmark$
+& 69.80 & 990.82 & 0.75 & \textbf{0.83}
+& 55.80 & 881.94 & 0.85 & \textbf{0.90} \\
+
+WanMove~\cite{chu2025wanmove} & $\checkmark$
+& 61.34 & 1088.23 & 0.73 & \textbf{0.83}
+& 53.51 & 882.90 & 0.84 & 0.87 \\
+
+Ours & $\times$
+& \textbf{52.95} & \textbf{876.03} & \textbf{0.76} & \underline{0.82}
+& \textbf{39.94} & \textbf{730.46} & \textbf{0.88} & \underline{0.89} \\
+\bottomrule
+\end{tabular}
+}
+\end{table*}

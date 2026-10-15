@@ -216,18 +216,18 @@ H ← H + output
 
 交叉注意力一行对应一个视频格子：
 
-\[
+$$
 \mathrm{Attn}_i[q]=\sum_k A_i[q,k]\,V_i[k],\quad
 A_i[q,:]=\mathrm{softmax}(\text{第 }q\text{ 行分数})
-\]
+$$
 
 空间门只看 query 下标 $q$（这个格子在不在第 $i$ 张脸上）：
 
-\[
+$$
 \bigl(\mathrm{Attn}_i \odot M_i\bigr)[q]
 = M_i[q]\sum_k A_i[q,k]\,V_i[k]
 = \sum_k \bigl(A_i[q,k]\cdot M_i[q]\bigr)\,V_i[k]
-\]
+$$
 
 对注意力输出乘 $M_i$，等于对 softmax **之后**的整行权重乘同一个 $M_i[q]$，再去乘 $V$。框内（$M=1$）一行原封不动；框外（$M=0$）整行变成 $0$。
 
@@ -254,9 +254,9 @@ softmax 是 **按行** 做的。掐掉框外那些行，**不会**改变框内�
 
 **对单独一次第 $i$ 人的 CA**，把空间折进注意力掩码
 
-\[
+$$
 \texttt{attn\_mask}[q,k]=M_{\mathrm{temporal}}[q,k]\;\wedge\;(M_i[q]=1)
-\]
+$$
 
 再规定框外输出为 $0$，与输出门等价。AnyTalker 没这么写，主要是实现：时间规则所有人共用，空间规则每人一张。
 

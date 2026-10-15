@@ -11,7 +11,7 @@
 
 | 步骤                | 产出                             | 状态标记（`papers.yaml`）             |
 | ------------------- | -------------------------------- | --------------------------------------- |
-| 1. 下载 PDF/TeX     | `arxiv/<track>/<slug>/`        | `downloading` → `pending` 有源文件 |
+| 1. 下载 PDF/TeX     | `arxiv/<track>/<slug>/`        | `pending` → `downloading` |
 | 2. 全文中文译本     | `translations/.../paper_zh.md` | `reading`                           |
 | 3. 笔记三件套       | `notes/<track>/<slug>/{QA,critique,note}.md` | `notes_done`              |
 | 4. 横向对比（可选） | `comparisons/`                 | `mastered`（可选）                    |

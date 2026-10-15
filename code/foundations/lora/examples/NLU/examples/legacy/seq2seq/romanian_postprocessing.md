@@ -59,7 +59,3 @@ This will split out a new blue score and write a new fine called `test_generatio
 
 
 
-
-
-
-```

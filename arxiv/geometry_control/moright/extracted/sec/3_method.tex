@@ -1,0 +1,195 @@
+
+\section{Approach}
+\label{sec:approach}
+
+\input{figs/method}
+
+Given a single image $I$, we aim to generate a video of $T$ frames $\mathbf{x} \in \mathbb{R}^{T \times H \times W \times 3}$ that follows the user-defined motion of an object represented as pixel trajectories $\mathcal{T}$, and the specified camera motion sequence $\{C_i\}_{i=1}^{T}$. The generated video should be able to model the causality of motion and produce a coherent dynamics within the scene.
+To achieve this, we first present our approach for disentangled camera and object motion control in~\cref{sec:disentangle} and \cref{fig:model}, and then introduce motion causality modeling in~\cref{sec:interaction}.
+\cref{sec:data} describes our training data curation pipeline, and training details along with the inference pipeline are provided in~\cref{sec:training}.
+
+
+\subsection{Disentangled Camera-Object Motion Control}
+\label{sec:disentangle}
+Most existing approaches adopt pixel-wise trajectories as motion control signals. However, such representations inherently entangle object motion with viewpoint changes. The video model must implicitly reason how an object moves, and the camera changes, without explicit geometric cues, when conditioned on these signals.
+Our key insight is that object motion is intrinsically unambiguous when expressed in a canonical camera. Building on this observation, we decouple the motion signal from the viewpoint transformation through a dual-stream generation framework~\cite{bai2025recammaster, bai2024syncammaster}. The first stream synthesizes a canonical video in a static camera, where object motion can be directly and faithfully controlled. The second stream generates the target video with both camera and object motion. The two streams can interact with each other through self-attention as shown in \cref{fig:model}.
+By jointly denoising both streams, the model learns to transfer motion cues from canonical space to arbitrary camera poses, where the canonical stream serves as an anchor for motion control. This design resolves motion–camera entanglement at generation time while naturally supporting heterogeneous supervision—including motion-only, camera-only, and fully coupled data—as detailed in~\cref{sec:data}.
+
+\noindent\textbf{Preliminaries.}\quad
+We build upon a DiT-based~\cite{peebles2023scalable} latent video diffusion models~\cite{agarwal2025cosmos,wan2025wan}.
+A pretrained VAE encoder first encodes the video into a latent space
+$\mathbf{z}_0 = \mathcal{E}(\mathbf{x}) \in \mathbb{R}^{\hat{T} \times
+\hat{H} \times \hat{W} \times d}$.
+The diffusion model is trained in this latent space via flow matching~\cite{lipman2022flow}. Specifically, we first sample a noise from a Gaussian distribution: $\boldsymbol{\epsilon} \sim \mathcal{N}(0,\mathbf{I})$, and form $\mathbf{z}_t = (1{-}t)\,\mathbf{z}_0 + t\,\boldsymbol{\epsilon}$ for $t \in [0,1]$. The DiT $\mathcal{G}_\theta$  is trained to regress the velocity:
+\begin{equation}
+    \mathcal{L} = \mathbb{E}_{\mathbf{z}_0,\, t,\, \boldsymbol{\epsilon}} \left[\left\| \mathcal{G}_\theta(\mathbf{z}_t, t, \mathbf{c}) - (\boldsymbol{\epsilon} - \mathbf{z}_0) \right\|^2 \right],
+    \label{eq:flow_matching}
+\end{equation}
+where $\mathbf{c}$ denotes conditioning signals (\eg, text).
+At inference, an ODE solver~\cite{zhao2023unipc} integrates the learned
+velocity from a noise to a clean latent $\hat{\mathbf{z}_0}$,  from which a decoder reconstructs the original video $\hat{\mathbf{x}} = \mathcal{D}(\hat{\mathbf{z}_0})$.
+
+\noindent\textbf{Dual-stream generation.}\quad
+The user first provides the object motion $\{\boldsymbol{\tau}^{\text{can}}_i\}_{i=1}^T$ in the canonical frame. The first stream generates the videos only with object motion, and the second stream generates the videos with both object and camera motion.
+Concretely, the two streams receive their individual conditions:
+\begin{equation*}
+  \mathbf{c}^{\text{can}} = \bigl\{
+    I,\; C_1,\; \{\boldsymbol{\tau}^{\text{can}}_i\}
+  \bigr\},
+  \qquad
+  \mathbf{c}^{\text{tar}} = \bigl\{
+    I,\; \{C_i\},\; \emptyset
+  \bigr\},
+\end{equation*}
+where $C_1$ denotes the camera in the first image and is an identity matrix,  and $\emptyset$ denotes empty object motion.
+
+In the following, we assume we have the paired training data: one ground truth video $\mathbf{x}^{\text{can}}$  with object motion only, and the corresponding video $\mathbf{x}^{\text{tar}}$ with both object and camera motion. Extensions to other training data are described in~\cref{sec:data} and~\cref{sec:training}.
+We add independent noise with the same timestep $t$ to each stream and obtain $\mathbf{z}^{\text{can}}_t$ and $\mathbf{z}^{\text{tar}}_t$.
+We then concatenate two latents along the temporal
+dimension and jointly denoise them.
+We slightly modify the positional embedding to indicate the difference between the two streams, with details in the supplement.
+In this way, we reuse the same DiT weights for two streams, and the only difference is their input and conditioning. The two streams naturally exchange information in the self-attention layers of each transformer block.
+During inference, the two streams are jointly denoised, and we provide the output from the target stream  $\mathbf{x}=
+\mathcal{D}(\hat{\mathbf{z}}^{\text{tar}}_0)$ to the user, and the canonical stream serves as a ``virtual'' anchor.
+
+\noindent\textbf{Condition injection and motion transfer.}\quad
+We inject camera and motion conditions into the latents of DiT at every transformer block. Specifically:
+
+\emph{Camera encoding.} We follow Gen3C~\cite{zhang2023scenewiz3d} and warp the first image $I$  using the corresponding camera pose and estimated depth~\cite{lin2025depth}. We then encode the warped frames via encoder $\mathcal{E}$ from VAE and obtain the latent $\mathbf{z}^{\text{cam}} \in \mathbb{R}^{\hat{T}\times \hat{H}\times\hat{W} \times d}$. For the canonical stream, we use the identity matrix for warping.
+
+\emph{Motion encoding.} Following~\cite{geng2024motionprompting}, we build a per-pixel
+trajectory map where pixels along one trajectory share the same temporal-correspondence
+embedding. We then encode it via a lightweight encoder to obtain
+$\mathbf{e}^{\text{trk}} \in \mathbb{R}^{\hat{T} \times
+\hat{H}\times \hat{W} \times d}$. For the target stream, we simply set
+$\mathbf{e}^{\text{trk}} = \mathbf{0}$ since the condition is empty.
+
+\emph{Condition injection.} The camera and motion encodings are fused via learned linear projections and added into the latent feature at each transformer block. Let $\mathbf{f}$ denote the feature of one block:
+\begin{equation}
+  \mathbf{f}^{i} \leftarrow
+    \mathbf{f}^{i}
+    + W_{\text{cam}}\,\mathbf{z}^{i, \text{cam}}
+    + W_{\text{trk}}\,\mathbf{e}^{i, \text{trk}},
+  \quad i \in \{\text{can},\, \text{tar}\}.
+  \label{eq:cond_inject}
+\end{equation}
+The features from the two streams are then concatenated  and passed through the self-attention layer:
+\begin{equation}
+  \bigl[\,\mathbf{f}^{\text{can}};\;
+    \mathbf{f}^{\text{tar}}\,\bigr]
+  := \operatorname{SelfAttn}\!\bigl(
+    \bigl[\,\mathbf{f}^{\text{can}};\;
+      \mathbf{f}^{\text{tar}}\,\bigr]\bigr),
+  \label{eq:motion_sync}
+\end{equation}
+allowing target-view tokens to attend to motion-conditioned canonical tokens and vice versa, implicitly exchanging the motion information in latent space. This inject-then-synchronize repeats at every block, progressively transferring motion across views, as shown in \cref{fig:model}.
+
+\subsection{Motion Causality Modeling}
+\label{sec:interaction}
+
+\begin{wrapfigure}{r}{0.4\linewidth}
+\centering
+\vspace{-5em}
+\includegraphics[width=\linewidth]{src_figs/double_lift_cloth_1_seg_overlay.png}
+\caption{Active vs.\ passive motion. The \emph{active} object (hand) initiates the action, while the \emph{passive} object (cloth) responds.}
+\label{fig:example}
+\vspace{-2em}
+\end{wrapfigure}
+
+Disentangling the camera from motion alone is insufficient for realistic interactions: when a hand pushes a cup, the cup must slide; when a ball
+strikes a stack of blocks, the blocks must scatter. We term this as
+\emph{motion causality}: the ability to reason plausible consequences
+ from the given actions, and vice versa.
+
+To model this, we decompose the motion tracks of all foreground objects
+$\mathcal{T}=\{\boldsymbol{\tau}_i\}_{i=1}^{T}$ into two complementary components as shown in~\cref{fig:example}:
+$\boldsymbol{\tau}_i
+  = \boldsymbol{\tau}^{\text{act}}_i \cup \boldsymbol{\tau}^{\text{pas}}_i,
+$
+where $\boldsymbol{\tau}^{\text{act}}_i$ captures the \emph{active} (causal)
+motion---the intentional action applied to the scene (\eg, a hand
+pushing)---and $\boldsymbol{\tau}^{\text{pas}}_i$ captures the \emph{passive}
+(consequential) motion---the reaction from other objects (\eg, the pushed object sliding). Reasoning such causality is critical in applications such as embodied AI~\cite{bu2025agibot, hafner2019learning, finn2017deep}.
+
+The central mechanism to enable the causality modeling is through \emph{motion dropout}. Specifically,  during training, we
+randomly drop out one motion component from the input, and  supervise the model on the full video containing both active and passive motion:
+\begin{equation}
+  \tilde{\boldsymbol{\tau}}_i :=
+  \begin{cases}
+    \boldsymbol{\tau}^{\text{act}}_i, & \xi < p, \\[4pt]
+    \boldsymbol{\tau}^{\text{pas}}_i, & \text{otherwise},
+  \end{cases}
+  \label{eq:motion_dropout}
+\end{equation}
+where $\xi$ is sampled from a uniform distribution $\mathcal{U}(0,1)$, $p$ is the dropout probability and $\tilde{\boldsymbol{\tau}}_i$ is used as tracking condition to video model.
+
+In our model training, we do not distinguish active motion or passive motion when feeding them into the model, and only rely on the model's capability to reason the
+dropped component to generate plausible videos.
+During training, this asymmetric supervision encourages the video models to internalize the causal relationship between actions and their consequences, rather than simply replaying the provided trajectories.
+
+At inference, this learned causality enables two complementary applications:
+\emph{forward reasoning} (action $\to$ reaction), where users specify an
+action and the model generates the resulting consequences; and
+\emph{inverse reasoning} (reaction $\to$ action), where users prescribe a desired outcome and the model synthesizes a plausible action that drives it. We demonstrate these capabilities in~\cref{sec:exp_casual}.
+
+\input{figs/train_data}
+
+
+\subsection{Training Data Curation}
+\label{sec:data}
+Curating data to train our dual-stream model is challenging since most real-world videos are single-view and always entangle camera and object motion, while our model requires paired videos depicting the same dynamics under different viewpoints. We first describe our data annotation pipeline to extract the pixel trajectories,  camera poses, and active/passive motion, and provide details of our data curation for training afterwards. The overview of pipeline is shown in \cref{fig:data_pipeline}.
+
+\noindent\textbf{Motion extraction and canonicalization.}\quad
+Given a video $\mathbf{x}$, we estimate per-frame depth maps $\{D_i\}$, camera poses $\{C_i\}$, and intrinsics~$K$ using ViPE~\cite{huang2025vipe}, and extract dense pixel trajectories $\mathcal{T}=\{\boldsymbol{\tau}_i\}_{i=1}^{T}$ with AllTracker~\cite{harley2025alltracker}.
+Each trajectory is unprojected to 3D and reprojected into the first frame:
+\begin{equation}
+  \boldsymbol{\tau}^{\text{can}}_i
+  = \pi\!\bigl(
+    K,\, C_0\, C_u^{-1}\,
+    \pi^{-1}(K,\, \boldsymbol{\tau}_i,\, D_i)
+  \bigr),
+  \label{eq:reproject}
+\end{equation}
+where $\pi^{-1}$ lifts 2D points to 3D using depth and intrinsics, and
+$\pi$ projects onto the image plane of~$I_0$. We assume constant intrinsics across the video.
+
+\noindent\textbf{Active and passive motion decomposition.}\quad
+For the given video, we prompt a vision-language model (Qwen3~\cite{Qwen3-VL}) to identify the active and passive objects, then segment the first frame with SAM2~\cite{ravi2024sam2}, yielding masks $M^{\text{act}}$ and $M^{\text{pas}}$, for active and passive objects, respectively.
+Trajectories are assigned to each component by mask membership, producing $\boldsymbol{\tau}^{\text{can,act}}$ and $\boldsymbol{\tau}^{\text{can,pas}}$
+for the motion dropout training in~\cref{eq:motion_dropout}.
+We also generate per-video captions describing each motion component and only provide the caption of one component during training to prevent information leakage.
+
+\noindent\textbf{Synthetic data generation for paired two-view videos.}\quad
+We leverage a synthetic data generation pipeline to generate paired two-view videos for training. Specifically, we first curate the videos whose cameras are static by checking the displacement of camera poses estimated from ViPE~\cite{huang2025vipe}.
+We then synthesize corresponding moving-camera videos using a camera-control video-to-video model~\cite{fu2025plenoptic}, providing supervision for the second stream.
+To increase camera diversity, we further augment the data with basic camera operations (\eg, orbit, pan, zoom) as well as dynamic camera trajectories extracted from real videos.
+
+\noindent\textbf{Single-view real-world data for mixed-training.}\quad
+The generated paired videos inevitably contain visual artifacts. In our dual-stream mode, the abundant single-view real-world data can be leveraged for mixed-training. First, for the videos with static cameras (object motion only), we duplicate the video and treat it as the target video. In this case, the video model learns to exchange the motion condition from the first stream (with motion condition) into the target stream (without motion condition). Second, for the videos that exhibit both camera and object motion, we feed the condition into the video model as described in~\cref{sec:disentangle} and only supervise the second stream, leaving the loss at the first stream being zero. These two mixed-training strategies expose video models to real-world data with diverse camera and object motion, increasing the robustness and generalizability to various camera and motion configurations, while mitigating artifacts from synthetic data.
+
+\noindent\textbf{Rendered Graphics Data.}\quad
+We further incorporate synthetic data from SyncCamMaster~\cite{bai2024syncammaster} to expose our model to more camera diversity.
+
+
+\subsection{Training and Inference}
+\label{sec:training}
+We train the DiT using the flow matching loss from~\cref{eq:flow_matching}, and apply two complementary dropout strategies to encourage the model learn the motion causality.
+
+\noindent\textbf{Multi-granularity motion dropout.}\quad
+Per~\cref{eq:motion_dropout}, we randomly retain either
+$\boldsymbol{\tau}^{\text{act}}$ or $\boldsymbol{\tau}^{\text{pas}}$ to
+encourage causal reasoning. We further obtain multi-granularity trajectories by averaging per-pixel trajectories within each patch.
+During training, we randomly select the granularity, enabling the model to capture
+both fine-grained
+pixel control and object-level manipulation.
+
+\noindent\textbf{Occlusion and track dropout.}\quad
+For the obtained trajectory, we
+randomly mask a subset of it to simulate occlusion and tracking failures that can happen during inference,
+improving robustness to missing or unreliable tracks.
+
+\noindent\textbf{Inference.}\quad
+At test time, users first specify motion by drawing sparse trajectories (simple curves or strokes on the first image) to indicate the desired
+direction and magnitude of movement, along with an optional text prompt and target camera poses $\{C_i\}_{i=1}^{T}$.
+We further perform occlusion-aware masking by approximating visibility ordering from the first-frame depth.
+The model then jointly denoises both streams, with the second stream being presented to the user.

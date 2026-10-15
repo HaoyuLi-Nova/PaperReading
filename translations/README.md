@@ -18,7 +18,7 @@ translations/<track>/<slug>/paper_zh.md
 python scripts/figures_to_png.py arxiv/base_models/ldm/extracted/img/final_figure.pdf
 ```
 
-引用示例（从 `translations/<track>/<slug>/` 出发，三级回到仓库根）：
+引用示例（从 `translations/<track>/<slug>/` 出发，返回仓库根）：
 
 ```markdown
 ![图3：……](../../../arxiv/base_models/ldm/extracted/img/final_figure.png)

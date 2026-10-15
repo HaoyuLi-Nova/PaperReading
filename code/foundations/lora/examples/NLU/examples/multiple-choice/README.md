@@ -16,7 +16,7 @@ limitations under the License.
 
 ## Multiple Choice
 
-Based on the script [`run_swag.py`]().
+Based on the script [`run_swag.py`](run_swag.py).
 
 #### Fine-tuning on SWAG
 

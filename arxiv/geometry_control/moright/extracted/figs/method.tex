@@ -1,0 +1,6 @@
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth, trim=0 0 1em 0, clip]{src_figs/method_v2.pdf}
+\caption{\textbf{Model architecture.} Our model adopts a dual-stream architecture with shared weights to disentangle object motion from camera motion. The canonical stream encodes motion trajectories using a track encoder and learns motion in a fixed canonical view. The target stream encodes camera pose signals through a camera encoder. The resulting motion and camera conditions are injected into every attention block of the network. Cross-view self-attention connects the two streams, transferring motion learned in the canonical view to the target view and enabling disentangled camera–object motion generation.}
+\label{fig:model}
+\end{figure}

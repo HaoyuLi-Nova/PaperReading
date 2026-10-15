@@ -44,20 +44,20 @@
 
 预测时空软掩码 \(\mathbf{M}\)，展平为人物–视觉矩阵 \(\mathbf{A}^{\mathrm{cv}}\in\mathbb{R}^{n\times S}\)。音频–人物 \(\mathbf{A}^{\mathrm{ac}}\in\mathbb{R}^{n\times n}\) 单独给出（单位阵 = 第 \(i\) 路声对人 \(i\)）。音频–视觉路由：
 
-\[
+$$
 \mathbf{A}^{\mathrm{av}}=\mathbf{A}^{\mathrm{ac}}\,\mathbf{A}^{\mathrm{cv}}.
-\]
+$$
 
 重叠说话 = 两路 \(\mathbf{e}_a\) 同时在，乘到不同空间支撑集上。对调两路音频只改 \(\mathbf{A}^{\mathrm{ac}}\)，不必重训分割。
 
 注入分两步（先脸后声）：
 
-\[
+$$
 \mathbf{v}'=\mathbf{v}+\mathbf{A}^{\mathrm{cv}}\cdot\mathrm{FaceCrossAttn}(\mathbf{e}_c,\mathbf{v}),
-\]
-\[
+$$
+$$
 \mathbf{v}''=\mathbf{v}'+\mathbf{A}^{\mathrm{av}}_{\mathrm{inflate}}\cdot\mathrm{AudioCrossAttn}(\mathbf{e}_a,\mathbf{v}').
-\]
+$$
 
 ### 2.2 Intra-Denoise：去噪中途预测 3D mask
 
@@ -89,9 +89,9 @@
 
 默认分辨率（注释与硬编码一致）：RGB \(480\times 720\)、约 49 帧 → 3D VAE → latent \(T'=13,\ H'=60,\ W'=90\)；patch \(\tau=2\) → token 网格 \(30\times 45\)。
 
-\[
+$$
 S = 13\times 30\times 45 = 17550.
-\]
+$$
 
 条件怎么进：
 
@@ -277,9 +277,9 @@ hidden_states = hidden_states + local_face_scale * cat(mask_id_feats)
 
 格子 \(s\)：
 
-\[
+$$
 \mathbf{v}'[s]=\mathbf{v}[s]+\alpha\big(m_0[s]\,\mathrm{Face}_0[s]+m_1[s]\,\mathrm{Face}_1[s]\big).
-\]
+$$
 
 人 0 的脸上 \(M\approx[1,0]\) 只加自己的脸特征；背景 \([0,0]\) 两边都不加。
 

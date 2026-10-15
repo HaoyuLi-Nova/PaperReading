@@ -1,0 +1,235 @@
+\newcommand{\figdir}{src_figs}
+\newcommand{\visrow}[2]{%
+    \includegraphics[width=0.19\linewidth]{\figdir/#1/#2/step_00.pdf} &
+    \includegraphics[width=0.19\linewidth]{\figdir/#1/#2/step_01.pdf} &
+    \includegraphics[width=0.19\linewidth]{\figdir/#1/#2/step_02.pdf} &
+    \includegraphics[width=0.19\linewidth]{\figdir/#1/#2/step_03.pdf} &
+    \includegraphics[width=0.19\linewidth]{\figdir/#1/#2/step_04.pdf}%
+}
+
+
+\newcommand{\tree}{\bm{\Gamma}}
+
+\newcommand{\robotD}[0]{RoboArt\xspace}
+\newcommand{\sapiensD}[0]{Sapiens\xspace}
+\newcommand{\wim}[0]{WatchItMove\xspace}
+\newcommand{\mbs}[0]{MultiBodySync\xspace}
+\newcommand{\xpar}[1]{\noindent\textbf{#1}\ \ }
+\newcommand{\vpar}[1]{\vspace{3mm}\noindent\textbf{#1}\ \ }
+
+\newcommand{\sect}[1]{Section~\ref{#1}}
+\newcommand{\sects}[1]{Sections~\ref{#1}}
+\newcommand{\eqn}[1]{Equation~\ref{#1}}
+\newcommand{\eqns}[1]{Equations~\ref{#1}}
+\newcommand{\fig}[1]{Figure~\ref{#1}}
+\newcommand{\figs}[1]{Figures~\ref{#1}}
+\newcommand{\tab}[1]{Table~\ref{#1}}
+\newcommand{\tabs}[1]{Tables~\ref{#1}}
+
+\newcommand{\ignorethis}[1]{}
+\newcommand{\norm}[1]{\lVert#1\rVert}
+\newcommand{\fcseven}{$\mbox{fc}_7$}
+
+\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+
+
+\def\naive{na\"{\i}ve\xspace}
+\def\Naive{Na\"{\i}ve\xspace}
+
+\makeatletter
+\DeclareRobustCommand\onedot{\futurelet\@let@token\@onedot}
+\def\@onedot{\ifx\@let@token.\else.\null\fi\xspace}
+
+\def\iid{\emph{i.i.d}\onedot}
+\def\eg{\emph{e.g}\onedot} \def\Eg{\emph{E.g}\onedot}
+\def\ie{\emph{i.e}\onedot} \def\Ie{\emph{I.e}\onedot}
+\def\cf{\emph{c.f}\onedot} \def\Cf{\emph{C.f}\onedot}
+\def\etc{\emph{etc}\onedot} \def\vs{\emph{vs}\onedot}
+\def\wrt{w.r.t\onedot} \def\dof{d.o.f\onedot}
+\def\etal{\emph{et al}\onedot}
+\makeatother
+
+\definecolor{citecolor}{RGB}{34,139,34}
+\definecolor{mydarkblue}{rgb}{0,0.08,1}
+\definecolor{mydarkgreen}{rgb}{0.02,0.6,0.02}
+\definecolor{mydarkred}{rgb}{0.8,0.02,0.02}
+\definecolor{mydarkorange}{rgb}{0.40,0.2,0.02}
+\definecolor{mypurple}{RGB}{111,0,255}
+\definecolor{myred}{rgb}{1.0,0.0,0.0}
+\definecolor{mygold}{rgb}{0.75,0.6,0.12}
+\definecolor{myblue}{rgb}{0,0.2,0.8}
+\definecolor{mydarkgray}{rgb}{0.66,0.66,0.66}
+
+
+\newcommand{\myparagraph}[1]{\vspace{-6pt}\paragraph{#1}}
+
+\newcommand{\bbR}{{\mathbb{R}}}
+\newcommand{\bK}{\mathbf{K}}
+\newcommand{\bX}{\mathbf{X}}
+\newcommand{\bY}{\mathbf{Y}}
+\newcommand{\bk}{\mathbf{k}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\by}{\mathbf{y}}
+\newcommand{\bhy}{\hat{\mathbf{y}}}
+\newcommand{\bty}{\tilde{\mathbf{y}}}
+\newcommand{\bG}{\mathbf{G}}
+\newcommand{\bI}{\mathbf{I}}
+\newcommand{\bg}{\mathbf{g}}
+\newcommand{\bS}{\mathbf{S}}
+\newcommand{\bs}{\mathbf{s}}
+\newcommand{\bM}{\mathbf{M}}
+\newcommand{\bw}{\mathbf{w}}
+\newcommand{\eye}{\mathbf{I}}
+\newcommand{\bU}{\mathbf{U}}
+\newcommand{\bV}{\mathbf{V}}
+\newcommand{\bW}{\mathbf{W}}
+\newcommand{\bn}{\mathbf{n}}
+\newcommand{\bv}{\mathbf{v}}
+\newcommand{\bq}{\mathbf{q}}
+\newcommand{\bR}{\mathbf{R}}
+\newcommand{\bi}{\mathbf{i}}
+\newcommand{\bj}{\mathbf{j}}
+\newcommand{\bp}{\mathbf{p}}
+\newcommand{\bt}{\mathbf{t}}
+\newcommand{\bJ}{\mathbf{J}}
+\newcommand{\bu}{\mathbf{u}}
+\newcommand{\bB}{\mathbf{B}}
+\newcommand{\bD}{\mathbf{D}}
+\newcommand{\bz}{\mathbf{z}}
+\newcommand{\bP}{\mathbf{P}}
+\newcommand{\bC}{\mathbf{C}}
+\newcommand{\bA}{\mathbf{A}}
+\newcommand{\bZ}{\mathbf{Z}}
+\newcommand{\bff}{\mathbf{f}}
+\newcommand{\bF}{\mathbf{F}}
+\newcommand{\bo}{\mathbf{o}}
+\newcommand{\bc}{\mathbf{c}}
+\newcommand{\bT}{\mathbf{T}}
+\newcommand{\bQ}{\mathbf{Q}}
+\newcommand{\bL}{\mathbf{L}}
+\newcommand{\bl}{\mathbf{l}}
+\newcommand{\ba}{\mathbf{a}}
+\newcommand{\bE}{\mathbf{E}}
+\newcommand{\bH}{\mathbf{H}}
+\newcommand{\bd}{\mathbf{d}}
+\newcommand{\br}{\mathbf{r}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\bh}{\mathbf{h}}
+
+\newcommand{\btheta}{\bm{\theta}}
+
+\newcommand{\bhh}{\hat{\mathbf{h}}}
+\newcommand{\ci}{{\cal I}}
+\newcommand{\ct}{{\cal T}}
+\newcommand{\co}{{\cal O}}
+\newcommand{\ck}{{\cal K}}
+\newcommand{\cu}{{\cal U}}
+\newcommand{\cS}{{\cal S}}
+\newcommand{\cQ}{{\cal Q}}
+\newcommand{\cT}{{\cal S}}
+\newcommand{\cC}{{\cal C}}
+\newcommand{\cE}{{\cal E}}
+\newcommand{\cF}{{\cal F}}
+\newcommand{\cL}{{\cal L}}
+\newcommand{\X}{{\cal{X}}}
+\newcommand{\Y}{{\cal Y}}
+\newcommand{\cH}{{\cal H}}
+\newcommand{\cP}{{\cal P}}
+\newcommand{\cN}{{\cal N}}
+\newcommand{\cU}{{\cal U}}
+\newcommand{\cV}{{\cal V}}
+\newcommand{\cX}{{\cal X}}
+\newcommand{\cY}{{\cal Y}}
+\newcommand{\graph}{{\cal H}}
+\newcommand{\bayes}{{\cal B}}
+\newcommand{\cx}{{\cal X}}
+\newcommand{\cg}{{\cal G}}
+\newcommand{\cm}{{\cal M}}
+\newcommand{\cM}{{\cal M}}
+\newcommand{\cG}{{\cal G}}
+\newcommand{\cR}{\cal{R}}
+\newcommand{\R}{\cal{R}}
+\newcommand{\eig}{\mathrm{eig}}
+
+\newcommand{\D}{{\cal D}}
+\newcommand{\bfp}{{\bf p}}
+\newcommand{\bfd}{{\bf d}}
+
+
+\newcommand{\cv}{{\cal V}}
+\newcommand{\ce}{{\cal E}}
+\newcommand{\cy}{{\cal Y}}
+\newcommand{\cz}{{\cal Z}}
+\newcommand{\cb}{{\cal B}}
+\newcommand{\cq}{{\cal Q}}
+\newcommand{\cd}{{\cal D}}
+\newcommand{\bcf}{{\cal F}}
+\newcommand{\cI}{\mathcal{I}}
+
+\newcommand{\ut}{^{(t)}}
+\newcommand{\up}{^{(t-1)}}
+\newcommand{\yesmark}{\textcolor{green!70!black}{\ding{51}}}
+\newcommand{\nomark}{\textcolor{red!80!black}{\ding{55}}}
+
+\newcommand{\bpi}{\boldsymbol{\pi}}
+\newcommand{\bphi}{\boldsymbol{\phi}}
+\newcommand{\bPhi}{\boldsymbol{\Phi}}
+\newcommand{\bmu}{\boldsymbol{\mu}}
+\newcommand{\bSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bGamma}{\boldsymbol{\Gamma}}
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+\newcommand{\bomega}{\boldsymbol{\omega}}
+\newcommand{\blambda}{\boldsymbol{\lambda}}
+\newcommand{\bkappa}{\boldsymbol{\kappa}}
+\newcommand{\btau}{\boldsymbol{\tau}}
+\newcommand{\balpha}{\boldsymbol{\alpha}}
+\def\bgamma{\boldsymbol\gamma}
+
+\newcommand{\prox}{{\mathrm{prox}}}
+
+
+\newcommand{\pardev}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\dev}[2]{\frac{d #1}{d #2}}
+\newcommand{\dw}{\delta\bw}
+\newcommand{\lab}{\mathcal{L}}
+\newcommand{\unlab}{\mathcal{U}}
+\newcommand{\ind}{1{\hskip -2.5 pt}\hbox{I}}
+\newcommand{\ff}[2]{   \cf_{\prec (#1 \rightarrow #2)}}
+\newcommand{\vv}[2]{   \cv_{\prec (#1 \rightarrow #2)}}
+\newcommand{\dd}[2]{   \delta_{#1 \rightarrow #2}}
+\newcommand{\ld}[2]{   \lambda_{#1 \rightarrow #2}}
+\newcommand{\en}[2]{  \bD(#1|| #2)}
+\newcommand{\ex}[3]{  \bE_{#1 \sim #2}\left[ #3\right]}
+\newcommand{\exd}[2]{  \bE_{#1 }\left[ #2\right]}
+
+
+\newcommand{\se}[1]{\mathfrak{se}(#1)}
+\newcommand{\SE}[1]{\mathbb{SE}(#1)}
+\newcommand{\SO}[1]{\mathbb{SO}(#1)}
+
+
+\newcommand{\poselow}{\xi}
+\newcommand{\pose}{\bm{\poselow}}
+\newcommand{\linpose}{\pose^\ell}
+\newcommand{\cbpose}{\pose^c}
+\newcommand{\rateparam}{v_i}
+\newcommand{\bapose}{\bm{\poselow}_i}
+\newcommand{\trackingpose}{\bm{\poselow}}
+\newcommand{\rotlow}{\omega}
+\newcommand{\rot}{\bm{\rotlow}}
+\newcommand{\translow}{v}
+\newcommand{\trans}{\bm{\translow}}
+\newcommand{\hnorm}[1]{\left\lVert#1\right\rVert_{\gamma}}
+\newcommand{\lnorm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\barate}{v_i}
+\newcommand{\trackingrate}{v}
+\newcommand{\imgpt}{\mathbf{u}_{i,k,j}}
+\newcommand{\mappt}{\mathbf{X}_{j}}
+\newcommand{\timet}[1]{\bar{t}_{#1}}
+\newcommand{\mf}[1]{\text{MF}_{#1}}
+\newcommand{\kmf}[1]{\text{KMF}_{#1}}
+\newcommand{\Exp}{\text{Exp}}
+\newcommand{\Log}{\text{Log}}
+
+
+\newcommand{\ours}{MoRight\xspace}

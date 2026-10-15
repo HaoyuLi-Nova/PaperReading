@@ -27,6 +27,6 @@
 
 Sora 等闭源系统无 arXiv TeX，未入库。
 
-译本：[`translations/long_video/`](../../translations/long_video/)  
-阅读笔记：[`notes/long_video/<slug>/{QA,critique,note}.md`](../../notes/long_video/)  
+译本：待建立 `translations/long_video/<slug>/paper_zh.md`  
+阅读笔记：待建立 `notes/long_video/<slug>/{QA,critique,note}.md`  
 下载：`python scripts/download_catalog.py --track long_video --with-tex`

@@ -1,0 +1,21 @@
+\begin{figure}[h]
+\begin{tcolorbox}[colback=white]
+\footnotesize
+\textbf{System:} You are a video understanding specialist.  
+Follow all rules exactly and output only valid JSON.
+\begin{itemize}
+    \item \texttt{active\_dynamic}: objects that move by their own power or actuation (e.g., person, hand, animal, robot, drone, car, bus, train, boat, ship, airplane, motorcycle).
+    \item \texttt{passive\_dynamic}: objects that move only because of other objects or forces. If a person/hand is visible manipulating an item, that item is \texttt{passive\_dynamic}.
+\end{itemize}
+
+\textbf{User:} You are given a video. Identify all objects that actually move:
+
+\begin{itemize}
+    \item \texttt{active\_dynamic}: objects moving by their own power (or actuation).
+    \item \texttt{passive\_dynamic}: objects that move only because other objects or natural forces cause them to move.
+\end{itemize}
+\end{tcolorbox}
+\vspace{-1em}
+\caption{Prompt used for active and passive object identification for Qwen3~\cite{Qwen3-VL} in data curation pipeline.}
+\label{fig:supp_dynamic_prompt}
+\end{figure}

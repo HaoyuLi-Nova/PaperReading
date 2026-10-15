@@ -3,7 +3,7 @@
 CIFAR-10 + ResNet-18. 32×32 输入把 stem 改成 3×3、stride 1，并去掉 maxpool。
 
 ```bash
-cd paper_reading/code/mycode/image_cls
+cd Paper/code/mycode/image_cls
 /data1/lihaoyu/miniconda3/envs/videodiff/bin/python train.py
 ```
 

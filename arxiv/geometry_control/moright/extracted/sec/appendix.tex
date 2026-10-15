@@ -1,0 +1,71 @@
+
+\section{Implementation Details}
+\label{sec:supp_implement}
+
+\subsection{Network Architecture}
+Our model builds on the Wan2.1 I2V-14B~\cite{wan2025wan}. We first encode the two-view videos and then concatenate the tokens along the temporal dimension before feeding them into the model. The two streams share the same spatial RoPE~\cite{su2024roformer} embeddings but use different temporal indices. The object tracking condition, represented as a trajectory map, is encoded by a lightweight temporal encoder with RMSNorm, SiLU~\cite{elfwing2018sigmoid}, and two \(3\times1\times1\) Conv3D layers that downsample the temporal dimension by \(4\times\) to match the Wan latent resolution. For camera motion control, we follow Gen3C~\cite{ren2025gen3c} by warping the first frame with the camera trajectory and encoding it with the VAE, producing features in the same latent space and resolution.
+
+Both camera and tracking features are linearly projected to the Wan hidden dimension (5120) and added to the video tokens before the self-attention layer of each Wan2.1 transformer block. During training, we only train the lightweight temporal encoder and the self-attention layers together with the camera and tracking encoders in each block, and freeze other parts of the network.
+
+
+\subsection{Training Data Curation}
+In training data curation, we need to identify active and passive object and its motion in a given video. We first identify those objects by querying Qwen3-VL~\cite{Qwen3-VL} and use SAM2~\cite{ravi2024sam2} for video object segmentation. The system prompt to Qwen3-VL~\cite{Qwen3-VL} is shown in \cref{fig:supp_dynamic_prompt}. We further use Qwen3 to rewrite video captions by decomposing object motion into active or passive descriptions, ensuring that each rewritten caption contains only one type of motion. During training, the original caption and the rewritten caption are randomly sampled with equal probability, encouraging the model to infer plausible interaction consequences. To generate paired multi-view data, we select videos from our collected Internet videos with nearly static cameras using the camera poses provided by ViPE~\cite{huang2025vipe}, requiring a maximum rotation of $0.5^\circ$ and translation of $5\,\text{mm}$.
+
+\input{supp_figs/vlm_prompt}
+
+
+\subsection{Training}
+
+During training, we apply several data augmentations to improve robustness.
+For each sample, we randomly simplify the input trajectories with probability 0.5, where tracks are averaged per object such that all pixels of the same object share a single trajectory.
+To encourage the model to reason about motion causality, we randomly provide \emph{active} or \emph{passive} motion tracks with probabilities 0.8 and 0.2, respectively.
+We further apply motion dropout by randomly dropping visible tracks with probability 0.2 to simulate occlusion and tracking errors commonly observed in off-the-shelf trackers at inference time.
+In addition, we randomly truncate tracks after a sampled middle frame to simulate partial observations of motion.
+During training, we randomly sample between 500 and 2000 tracks per iteration.
+At inference time, we fix the number of input tracks to 1500 for all experiments to ensure consistent evaluation.
+Finally, since multi-view supervision is critical for learning camera--object disentanglement, we control the sampling ratio of multi-view and single-view training samples, ensuring that single-view data is sampled at a lower rate to prevent the model from overfitting to single-view motion patterns.
+
+\subsection{Inference}
+
+At inference time, users can freely select objects in the first frame and specify their motion trajectories.
+Motion control can be provided either in a coarse manner, where the entire object moves with a shared trajectory, or in a fine-grained manner using sparse point tracks.
+To facilitate interaction-driven editing, we also provide several simple motion primitives for hand interactions, such as push, pull (along a specified direction), and reach (toward a target location).
+For passive motion control, users can define arbitrary 2D trajectories; \cref{fig:supp_reasoning} illustrates an example using straight-line trajectories with different directions for inverse reasoning.
+
+To enable flexible control, we implement an interactive GUI as shown in \cref{fig:gradio_interface}.
+Starting from a single input image, users draw motion trajectories directly on the first frame while specifying camera motion independently through a sequence of camera poses (the first frame is treated as the identity pose).
+The interface supports trajectory visualization across time steps and occlusion checking using the first-frame depth estimated by MoGe~\cite{wang2024moge}, enabling intuitive editing of object dynamics and camera viewpoints during generation.
+
+\input{supp_figs/gradio_interface}
+
+
+\subsection{Evaluation}
+
+The \textbf{Cooking Benchmark} is constructed from real-world cooking videos collected from YouTube that contain rich hand–object interactions. These scenes involve diverse manipulation behaviors such as pushing, cutting, and picking, making them a suitable testbed for evaluating interactive motion reasoning. The benchmark contains 50 video clips covering a variety of kitchen environments and object interactions.
+
+For motion quality evaluation, we adopt \textbf{Physical Commonsense (PC)} and \textbf{Semantic Adherence (SA)}, from~\cite{bansal2024videophy, bansal2025videophy}. PC measures whether the generated video follows real-world physical behaviors. SA evaluates whether the generated video remains semantically consistent with the input text prompt. For SA, we use the original caption of each video as the evaluation prompt. We use the automatic evaluation rater provided to score the generated videos and report the resulting normalized scores across different methods.
+
+For human perceptual evaluation, the interface layout is shown in \cref{fig:user_study_interface}.
+
+\input{supp_figs/user_study_interface}
+
+
+
+\input{supp_figs/interactive_motion}
+\input{supp_figs/controllable}
+\input{supp_figs/compare}
+
+\section{More Qualitative Results}
+\label{sec:more_qualitative}
+
+\subsection{Interactive Motion Generation}
+We demonstrate the causal reasoning ability of our model in \cref{fig:supp_reasoning}. We generate videos and select the first-stream generation (static view) to visualize the interaction dynamics. The input motion tracks are overlaid on the generated frames, where colored tracks indicate either user actions (active motion) or passive trajectories. Our model supports both forward and inverse reasoning. In forward reasoning (first two samples), the model predicts plausible scene consequences given the specified active motion. In inverse reasoning (last sample), the model infers feasible driving actions that could lead to the observed passive outcomes. These examples highlight the model's ability to reason about causal interactions between actions and objects.
+
+
+\subsection{Disentangled Camera-Object Control}
+
+We present additional disentangled controllable generation results in \cref{fig:supp_control}. Object motion trajectories are overlaid on the input image. We demonstrate three different object motions and three different camera motions (orbit-left, zoom-in, and zoom-out), resulting in 9 generated videos in 3 group. Each group shares the same object motion while varying the camera viewpoint, highlighting the model's ability to maintain consistent object dynamics under different camera controls. Minor variations under the same object motion but different camera motions arise from the stochastic nature of interaction generation.
+
+\subsection{Qualitative Comparison}
+
+We provide additional qualitative comparisons with ATI~\cite{wang2025ati} and WanMove~\cite{chu2025wanmove} in \cref{fig:supp_qualitative_compare}. Both baselines rely on privileged 3D trajectories (with depth) projected to pixel-aligned per-frame tracks and take full interaction trajectories (active and passive) as input. In contrast, our method only requires 2D motion trajectories on the first frame, while camera motion is introduced in the second stream of our dual-stream architecture. Despite using weaker inputs, our approach achieves stronger controllability and produces more coherent interactions while maintaining disentangled camera–object motion.

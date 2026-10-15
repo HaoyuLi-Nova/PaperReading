@@ -1,0 +1,6 @@
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{src_figs/curation_v2.pdf}
+\caption{\textbf{Data curation pipeline.} Foundation models~\cite{harley2025alltracker, huang2025vipe, ravi2024sam2} extract depth, camera poses, and tracks from raw videos. A VLM~\cite{Qwen3-VL} segments tracks into active/passive regions. We further optionally use a video-to-video model~\cite{fu2026plenoptic} to generate paired videos with the same object motion but different camera motions.}
+\label{fig:data_pipeline}
+\end{figure}

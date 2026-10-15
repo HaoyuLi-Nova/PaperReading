@@ -1,0 +1,113 @@
+\vspace{-2mm}
+\section{Experiments}
+\label{exp}
+
+
+\subsection{Implementation Details}
+We build upon the pretrained Wan2.1-14B~\cite{wan2025wan} and fine-tune only the camera encoder, trajectory encoder, and self-attention layers.
+The trajectory embedding dim is 64, and the camera encoder uses 32 channels.
+We train the model with 15K iterations on 64 GPUs with a global batch size of 16, using AdamW~\cite{loshchilov2017decoupled} with a learning rate of $3\times10^{-5}$ and weight decay $0.001$.
+Trajectory dropout is set to 0.1 and text-conditioning dropout to 0.2.
+
+Following the data curation pipeline in~\cref{sec:data}, we build our training data from large-scale public video datasets, including Panda-70M~\cite{chen2024panda} and Wild-SDG-1M~\cite{huang2025vipe}. From these sources, we collect 76K static-view videos, from which we synthesize 43K paired dynamic-view videos using camera-controlled video-to-video generation, and 3.4K synthetic interaction videos from SyncMaster~\cite{bai2024syncammaster}.
+All videos are processed at 480p resolution.
+At inference, we sample 35 diffusion steps; generating one video takes approximately 15 minutes on a single A100 GPU. More implementation details are presented in \cref{sec:supp_implement}.
+
+
+\subsection{Experiment Settings}
+
+\noindent\textbf{Evaluation metrics.}
+We evaluate our model across four different aspects:
+\emph{Video quality}: PSNR and SSIM against reference videos, and FID~\cite{FID} and FVD~\cite{FVD} for distribution-level similarity.
+\emph{Camera accuracy}: rotation and translation errors~\cite{bai2025recammaster, bai2024syncammaster, cameractrl} between reference poses and poses estimated from generated videos using ViPE~\cite{huang2025vipe}; we report \textbf{median} errors across frames to mitigate estimation noise.
+\emph{Motion accuracy}: end-point error (EPE)~\cite{chu2025wanmove, geng2024motionprompting}, the $\ell_2$ distance between ground-truth object tracks and predicted tracks extracted with AllTracker; we report the \textbf{median} EPE to reduce the impact of outlier tracks.
+\emph{Motion realism}: Physical Commonsense (PC) and Semantic Adherence (SA) from VideoPhy~\cite{bansal2024videophy}, both 5-point scores normalized to $[0,1]$.
+All evaluations are conducted at 480p resolution.
+
+
+\noindent\textbf{Evaluation Datasets.}
+We evaluate on three datasets spanning diverse interaction scenarios.
+DynPose-100K~\cite{rockwell2025dynamic} is an in-the-wild dataset with highly dynamic camera motion; we manually select 50 videos exhibiting strong viewpoint changes and clear object interactions.
+WISA~\cite{wang2025wisa} is a large-scale physical-dynamics dataset; we select 50 videos from categories including collision, deformation, elasticity, liquid, and rigid-body motion.
+We further collect 50 real-world cooking videos, featuring complex hand-object interactions.
+
+
+\input{figs/controllable}
+\input{figs/compare}
+\input{tables/exp_comparison_1}
+\input{tables/exp_comparison_2}
+\input{figs/causal}
+\input{supp_figs/user_study}
+\input{tables/exp_ablation}
+\input{supp_figs/limitation}
+
+\subsection{Disentangled Camera-Object Motion Control}
+\label{sec:ctrl_generation}
+
+Existing works on controllable video generation typically focus on either camera or object motion in isolation. Motion-conditioned baselines~\cite{geng2024motionprompting,wang2025ati,chu2025wanmove} typically receive privileged signals of both foreground and background tracks of all the pixel trajectories for control, while our method only uses reprojected trajectories defined on the canonical frame, without access to future-frame pixel trajectories. We compare our method with state-of-the-art baselines to evaluate the quality in motion control and camera control. While challenging, this evaluation allows us to demonstrate our model's unique ability to generate faithful motion from disentangled controls—a task that is fundamentally more difficult than baselines.
+
+\noindent\textbf{Baselines and setup.}
+We compare with several controllable video generation methods.
+Wan2.1~\cite{wan2025wan} is our base model without motion control.
+Gen3C~\cite{ren2025gen3c} only supports camera control. Recent state-of-the-art motion-conditioned models (Motion Prompting (MP)~\cite{geng2024motionprompting}, ATI~\cite{wang2025ati} and
+WanMove~\cite{chu2025wanmove} all take dense pixel tracks as input.
+For a fair comparison, we retrain Gen3C and MP in our setup, and all methods share the same Wan2.1-14B backbone. Evaluation is conducted on DynPose-100K~\cite{rockwell2025dynamic} and Cooking dataset. Motion accuracy is evaluated in future-frame pixel space via EPE for all methods.
+
+\noindent\textbf{Results.}
+Quantitative results are provided in \cref{tab:ctrl_twodsets}, with  controllable results in \cref{fig:control}, qualitative comparisons in \cref{fig:qualitative_compare}.
+On DynPose-100K~\cite{rockwell2025dynamic}, WanMove~\cite{chu2025wanmove} achieves the best overall numbers.
+Our method is slightly behind under highly dynamic camera motion, where errors in camera pose estimation and trajectory reprojection can degrade the input control signals.
+Nevertheless, \ours attains comparable controllability to methods that rely on privileged future-frame tracking information and achieves the best EPE for object motion accuracy.
+We observe that ATI~\cite{wang2025ati} and WanMove~\cite{chu2025wanmove}, which couple camera and object motion in a single tracking signal, tend to favor the dominant motion mode in highly dynamic settings---sometimes sacrificing camera accuracy or object tracking fidelity.
+On the Cooking benchmark, our method achieves the best overall performance in both visual quality and motion control accuracy. More controllable generation results are shown in \cref{fig:supp_control}, and qualitative comparisons are provided in \cref{fig:supp_qualitative_compare}.
+
+
+\subsection{Motion Causality Modeling}
+\label{sec:exp_casual}
+
+\noindent\textbf{Setup.}
+We evaluate the causality of modeling motion on WISA~\cite{wang2025wisa} and Cooking, measuring both generation quality (FID, FVD) and motion realism (PC, SA).
+We compare with MP*~\cite{geng2024motionprompting}, ATI~\cite{wang2025ati}, and WanMove~\cite{chu2025wanmove}, all following the same input protocol as \cref{sec:ctrl_generation}.
+Every model receives \emph{active motion} representing the user-specified action (e.g., a hand pushing an object); the goal is to generate plausible interaction outcomes.
+Baseline methods use their original prompts containing both motion descriptions and expected consequences.
+Our model receives only the active motion description, without specifying passive outcomes, and must infer the resulting interactions.
+
+\noindent\textbf{Results.}
+Quantitative results are reported in \cref{tab:interactive_wisa_cooking}.
+\ours achieves the highest PC score on WISA, indicating strong physical commonsense, and the best video quality (FID, FVD) on both datasets.
+For SA, we rewrite the input prompt to remove passive motion descriptions and avoid information leakage; consequently, our score is slightly lower than methods that use full prompts containing both actions and outcomes, yet remains comparable.
+This confirms that \ours's generations stay semantically aligned with intended outcomes while demonstrating genuine causal motion reasoning rather than relying on prompt-supplied answers.
+Qualitative examples of both reasoning modes---\emph{forward} (action $\rightarrow$ reaction) and \emph{inverse} (reaction $\rightarrow$ action)---are shown in \cref{fig:active_passive}. Our model generates plausible reactions when providing the active motion, and can reason the meaningful active motion when providing passive motion. More qualitative visualizations are shown in \cref{fig:supp_reasoning}.
+
+
+\subsection{Human Perceptual Evaluation}
+\label{sec:human_eval}
+
+In addition to objective metrics, we conduct a human perceptual study to evaluate generation quality. ATI~\cite{wang2025ati} and WanMove~\cite{chu2025wanmove} rely on pixel-aligned per-frame tracks projected from privileged 3D trajectories, including both foreground/background and full interaction (active and passive) motion. In contrast, our method uses only first-frame active trajectories, requiring the model to infer interactions without privileged information.
+
+We randomly sample 30 examples from the combined test datasets. For each example, videos from different methods are presented in randomized order to avoid positional bias. Participants evaluate results based on three criteria: \emph{Controllability} (alignment with input object and camera motion), \emph{Motion Realism} (physical plausibility of interactions), and \emph{Photorealism} (visual quality). For each criterion, participants select the best result, with ties and a \textit{None} option allowed. After filtering unreliable submissions, we collect responses from 11 participants, yielding 330 evaluations per criterion (the evaluation interface is shown in \cref{fig:user_study_interface}).
+
+As shown in \cref{fig:user_study_results}, our method is preferred in the majority of cases, achieving 53.5\%, 54.6\%, and 55.9\% for controllability, motion realism, and photorealism, respectively. This outperforms ATI~\cite{wang2025ati} (18.8\%, 18.2\%, 17.4\%) and WanMove~\cite{chu2025wanmove} (25.0\%, 25.7\%, 23.1\%). Despite access to privileged 3D trajectories, baseline methods lack explicit interaction reasoning and entangle camera and object motion, leading to inferior performance. In contrast, our disentangled formulation enables more controllable and realistic video generation.
+
+
+\subsection{Ablation Studies}
+
+We ablate model design, training strategies, and input conditions on the Cooking dataset in~\cref{tab:ablation}.
+
+\noindent\textbf{Model design and training.}
+\emph{Cascaded pipeline} (row~1): a naive solution for disentangling camera-object motion is to first generate motion-controlled video under a static camera, followed by a Gen3C-style camera controller to move the camera. However, this approach introduces error accumulation between two stages, yielding larger control errors.
+\emph{W/o fixed-view branch} (row~2): we only train with dynamic camera views and jointly encode the reprojected tracks and camera embeddings, removing the canonical-view anchor.  The model struggles to disentangle camera and object motion, resulting in significantly worse camera and tracking accuracy.
+\emph{W/o motion reasoning} (row~3): we disable active/passive decomposition during training. This approach increases FID/FVD and reduces PC, indicating degraded interaction quality.
+\emph{W/o mixed supervision} (row~4): We only train the model on paired data. It slightly degrades camera accuracy, as the paired subset contains limited camera motion diversity.
+
+\noindent\textbf{Input conditions.}
+We vary the motion input configuration to evaluate the robustness of our models. Specifically, we evaluate with coarse segment-level trajectories vs.\ fine-grained pixel tracks, as well as active vs.\ passive motion inputs.
+Performance remains stable across all settings, confirming that \ours flexibly handles different motion granularities and types while maintaining strong controllability and causal reasoning capability.
+
+
+\subsection{Limitation Analysis}
+\label{sec:supp_limitation}
+
+Despite promising results, our method still exhibits several limitations, as illustrated in \cref{fig:supp_limitation}. First, the model may produce incorrect interaction reasoning, leading to implausible outcomes such as two kabobs merging into a single object. Second, unnatural motion can occur when the input trajectories become temporally sparse due to occlusion, making it difficult for the model to reliably infer the intended motion (e.g., the hand example). Third, the generated motion may violate physical consistency, such as objects disappearing during interaction (soccer example). Fourth, the model may occasionally hallucinate new content in later frames, such as an extra hand appearing during generation.
+
+In addition, our method has difficulty modeling very complex or fast camera motion (\eg, drastic egomotion). Our camera control is designed for common smooth camera trajectories, and when the input camera motion changes drastically, the predicted interaction dynamics may degrade.

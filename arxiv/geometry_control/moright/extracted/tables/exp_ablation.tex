@@ -1,0 +1,82 @@
+\begin{table*}[t]
+\centering
+\caption{\textbf{Ablation of motion controllability and reasoning on the Cooking benchmark.}
+We ablate architectural choices, causal reasoning, hybrid training, and different motion input granularities.
+Our full model achieves the best overall performance across photometric quality, controllability, and motion realism, while remaining robust to different motion granularities and input conditions (active and passive).}
+\label{tab:ablation}
+
+\setlength{\tabcolsep}{3.5pt}
+\renewcommand{\arraystretch}{1.12}
+\small
+
+\definecolor{ctrlgray}{gray}{0.96}
+\definecolor{motgray}{gray}{0.96}
+
+\adjustbox{width=0.9\textwidth}{
+\begin{tabular}{
+l
+c c c c
+>{\columncolor{ctrlgray}}c
+>{\columncolor{ctrlgray}}c
+>{\columncolor{ctrlgray}}c
+>{\columncolor{motgray}}c
+>{\columncolor{motgray}}c
+}
+\toprule
+& \multicolumn{4}{c}{\textbf{Photometric}}
+& \multicolumn{3}{c}{\cellcolor{ctrlgray}\textbf{Controllability}}
+& \multicolumn{2}{c}{\cellcolor{motgray}\textbf{Motion}} \\
+\cmidrule(lr){2-5}
+\cmidrule(lr){6-8}
+\cmidrule(lr){9-10}
+\textbf{Setting}
+& FID $\downarrow$
+& FVD $\downarrow$
+& PSNR $\uparrow$
+& SSIM $\uparrow$
+& \cellcolor{ctrlgray}Rot $\downarrow$
+& \cellcolor{ctrlgray}Trans $\downarrow$
+& \cellcolor{ctrlgray}EPE $\downarrow$
+& \cellcolor{motgray}PC $\uparrow$
+& \cellcolor{motgray}SA $\uparrow$ \\
+\midrule
+cascaded
+& 41.74 & \underline{728.80} & 15.98 & 0.569
+& 2.69 & 11.50 & 5.05
+& 0.87 & 0.89 \\
+
+w/o fixed view
+& 51.17 & 997.83 & 14.15 & 0.515
+& 3.36 & 14.57 & 14.30
+& 0.87 & 0.89 \\
+
+w/o reasoning
+& 44.04 & 784.19 & 15.55 & 0.562
+& 2.88 & 12.49 & 5.05
+& 0.87 & 0.88 \\
+
+w/o mixed training
+& 41.94 & 808.96 & 16.29 & 0.583
+& 2.22 & 12.80 & \textbf{4.09}
+& 0.87 & 0.89 \\
+
+\midrule
+ours (coarse)
+& \textbf{39.83} & \textbf{725.88} & \textbf{16.45} & \textbf{0.594}
+& \underline{2.21} & \underline{10.98} & 4.37
+& \textbf{0.88} & 0.88 \\
+
+ours (passive)
+& 44.20 & 838.67 & 15.99 & 0.588
+& \underline{2.21} & 11.04 & 7.27
+& 0.87 & 0.88 \\
+
+ours (active)
+& \underline{39.94} & 730.46 & \underline{16.44} & \underline{0.594}
+& \textbf{2.16} & \textbf{10.11} & \underline{4.27}
+& \textbf{0.88} & 0.89 \\
+
+\bottomrule
+\end{tabular}
+}
+\end{table*}

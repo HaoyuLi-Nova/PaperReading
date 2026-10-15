@@ -1,0 +1,30 @@
+\begin{figure}
+\centering
+\setlength{\tabcolsep}{1.5pt}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}c c|cccc@{}}
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize Ours}} &
+\visrow{failures}{0f3eec08-4727-4e16-9d72-660bdf825803} \\
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize GT}} &
+\visrow{failures}{0f3eec08-4727-4e16-9d72-660bdf825803_gt_video} \\
+
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize Ours}} &
+\visrow{failures}{01e63d8c-f5d8-421b-8d8d-e3baa02472d1} \\
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize GT}} &
+\visrow{failures}{01e63d8c-f5d8-421b-8d8d-e3baa02472d1_gt_video} \\
+
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize Ours}} &
+\visrow{failures}{a00fa6501338b10a0a72c94bf4d971571f5f44960245b0863fe319dfe8ce9ba1} \\
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize GT}} &
+\visrow{failures}{a00fa6501338b10a0a72c94bf4d971571f5f44960245b0863fe319dfe8ce9ba1_gt_video} \\
+
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize Ours}} &
+\visrow{failures}{d79eb4e5-bdc3-4cf3-bc7e-f1ea4eda320d} \\
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize GT}} &
+\visrow{failures}{d79eb4e5-bdc3-4cf3-bc7e-f1ea4eda320d_gt_video} \\
+
+\end{tabular}
+}
+\caption{\textbf{Limitation analysis.} Input tracks are overlaid on the first frame as in previous figures. (1) Incorrect interaction reasoning may lead to implausible outcomes (two kabobs merging). (2) Unnatural motion can occur when input tracks become temporally sparse due to occlusion (hand example). (3) Physically unrealistic dynamics may appear, such as objects disappearing during motion (soccer ball). (4) Hallucinated content may emerge in later frames (extra hand).}
+\label{fig:supp_limitation}
+\end{figure}

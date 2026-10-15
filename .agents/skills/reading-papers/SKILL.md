@@ -11,7 +11,7 @@ Produce a rigorous, critical reading note for one paper. The goal is not to summ
 
 - **Language**: 中英双语。正文用简体中文叙述，关键术语 / 方法名 / 指标保留英文（如 attention、ablation、SOTA）。
 - **Format**: 结构化 Markdown 阅读笔记，保存为文件。
-- **Filename / 落盘**（本仓库 `Paper_Reading` / 项目里的 `paper_reading/`）：
+- **Filename / 落盘**（本仓库 `Paper`）：
   - 六维精读笔记 → `notes/<track>/<slug>/critique.md`（**不要覆盖译本**）
   - 全文译本 → `translations/<track>/<slug>/paper_zh.md`（仅在用户明确要求翻译时撰写）
   - arXiv 原文 → `arxiv/<track>/<slug>/`

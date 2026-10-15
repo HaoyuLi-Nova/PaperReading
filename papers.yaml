@@ -6,7 +6,7 @@
 # priority: P0 (must) | P1 (important) | P2 (context)
 
 version: 1
-updated: 2026-10-08
+updated: 2026-10-10
 
 tracks:
   foundations:
@@ -600,6 +600,20 @@ papers:
     github: https://github.com/ali-vilab/Wan-Move
     code: code/geometry_control/wan_move/
     one_liner: 沿点轨迹搬运首帧潜特征，不改 Wan-I2V 结构做细粒度运动控制
+
+  - id: moright
+    track: geometry_control
+    slug: moright
+    title: "MoRight: Motion Control Done Right"
+    venue: ECCV
+    year: 2026
+    arxiv: "2604.07348"
+    status: pending
+    priority: P1
+    deps: [wan]
+    tags: [trajectory, camera, causality, dual_stream, wan, i2v]
+    project: https://research.nvidia.com/labs/sil/projects/moright/
+    one_liner: 双流把物体轨迹锁在静态规范视角，再迁到任意相机；只给主动或被动轨迹，补全另一侧因果运动
 
   # ---------- multi_view ----------
   - id: zero123

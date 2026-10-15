@@ -1,0 +1,101 @@
+\documentclass[10pt,logo,copyright]{nvidiatechreport}
+\linespread{1.15}
+
+\usepackage[numbers, sort]{natbib}
+\definecolor{citecolor}{HTML}{0071BC}
+\definecolor{linkcolor}{HTML}{ED1C24}
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{bbm}
+\usepackage{bm}
+\usepackage{pifont}
+\usepackage{cuted}
+\usepackage{colortbl}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{xifthen}
+\usepackage{wrapfig}
+\usepackage{comment}
+\usepackage{multirow}
+\usepackage[percent]{overpic}
+\usepackage{adjustbox}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+
+\newcommand{\cmark}{\ding{51}}%
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\definecolor{Gray}{rgb}{0.92,0.92,0.92}
+\definecolor{NvidiaGreen}{RGB}{118, 185, 0}
+
+\usepackage{mathtools, nccmath}
+\DeclarePairedDelimiter{\nint}\lfloor\rceil
+
+\usepackage[capitalize]{cleveref}
+\crefname{section}{Sec.}{Secs.}
+\Crefname{section}{Section}{Sections}
+\Crefname{table}{Table}{Tables}
+\crefname{table}{Tab.}{Tabs.}
+
+\title{MoRight: Motion Control Done Right}
+
+\author{
+\textbf{Shaowei Liu}\textsuperscript{1,2*} \quad
+\textbf{Xuanchi Ren}\textsuperscript{1} \quad
+\textbf{Tianchang Shen}\textsuperscript{1} \quad
+\textbf{Huan Ling}\textsuperscript{1} \quad
+\textbf{Saurabh Gupta}\textsuperscript{2} \quad
+\textbf{Shenlong Wang}\textsuperscript{2} \quad
+\textbf{Sanja Fidler}\textsuperscript{1} \quad
+\textbf{Jun Gao}\textsuperscript{1} \\
+
+\small \textsuperscript{1}NVIDIA \quad
+\textsuperscript{2}University of Illinois Urbana-Champaign \\
+\small *Work done during an internship at NVIDIA. \\
+{\small
+\url{https://research.nvidia.com/labs/sil/projects/moright}}
+}
+
+\begin{abstract}
+\normalfont\mdseries
+\input{sec/0_abs}
+\end{abstract}
+
+\begin{document}
+
+\include{macros}
+\maketitle
+
+\input{figs/teaser}
+\abscontent
+
+
+\input{sec/1_intro}
+\input{sec/2_related}
+\input{sec/3_method}
+\input{sec/4_exp}
+\input{sec/5_con}
+
+\renewcommand{\figdir}{supp_src_figs}
+\appendix
+\clearpage
+
+\title{Appendix}
+\author{}
+\maketitle
+\vspace{-4em}
+\input{sec/appendix}
+
+\clearpage
+{
+\small
+\bibliographystyle{abbrv}
+\bibliography{arxiv}
+}
+
+\end{document}

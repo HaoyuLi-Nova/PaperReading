@@ -91,7 +91,7 @@ python scripts/figures_to_png.py arxiv/base_models/ldm/extracted/img/bar.jpg
 
 **4. 更新进度**
 
-编辑 [`papers.yaml`](papers.yaml) 的 `status`：`pending` → `reading` → `notes_done` → `mastered`。
+编辑 [`papers.yaml`](papers.yaml) 的 `status`：`pending` → `downloading` → `reading` → `notes_done` → `mastered`。
 译本路径写在 `translation:`；阅读笔记写在 `notes:`（指向该 slug 目录或其中某件，如 `critique.md`）。
 
 **5. 放入官方代码（可选）**

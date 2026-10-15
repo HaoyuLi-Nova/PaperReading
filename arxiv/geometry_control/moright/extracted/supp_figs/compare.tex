@@ -1,0 +1,37 @@
+\begin{figure}
+\centering
+\setlength{\tabcolsep}{1pt}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}c c|cccc@{}}
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize ATI}} &
+\visrow{comparison}{ATI/5ba877dff47d6d57a7c36df616851a032e4e16aa2bbf784ffc25379d86e02f14} \\[1pt]
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize WanMove}} &
+\visrow{comparison}{WanMove/5ba877dff47d6d57a7c36df616851a032e4e16aa2bbf784ffc25379d86e02f14} \\[1pt]
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize \ours}} &
+\visrow{comparison}{ours/5ba877dff47d6d57a7c36df616851a032e4e16aa2bbf784ffc25379d86e02f14}{} \\
+
+\midrule
+
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize ATI}} &
+\visrow{comparison}{ATI/6e68609f-b587-40cc-baff-37e66947fdeb} \\[1pt]
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize WanMove}} &
+\visrow{comparison}{WanMove/6e68609f-b587-40cc-baff-37e66947fdeb} \\[1pt]
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize \ours}} &
+\visrow{comparison}{ours/6e68609f-b587-40cc-baff-37e66947fdeb}{} \\
+
+\midrule
+
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize ATI}} &
+\visrow{comparison}{ATI/b98c53a1-d724-43f2-8771-cafcb9943b84} \\[1pt]
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize WanMove}} &
+\visrow{comparison}{WanMove/b98c53a1-d724-43f2-8771-cafcb9943b84} \\[1pt]
+\raisebox{1.5em}{\rotatebox[origin=c]{90}{\scriptsize \ours}} &
+\visrow{comparison}{ours/b98c53a1-d724-43f2-8771-cafcb9943b84}{} \\
+
+\end{tabular}%
+}
+\caption{\footnotesize
+\textbf{Additional qualitative comparison} with ATI~\cite{wang2025ati}, WanMove~\cite{chu2025wanmove}, and \ours.
+ATI and WanMove rely on privileged 3D trajectories (with depth) projected to pixel-aligned per-frame tracks and take full interaction trajectories (active and passive) as input. In contrast, \ours uses only first-frame active tracks without privileged information and infers plausible interactions.}
+\label{fig:supp_qualitative_compare}
+\end{figure}

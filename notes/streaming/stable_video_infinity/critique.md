@@ -100,23 +100,23 @@
 
 普通 flow matching 的输入是：
 
-\[
+$$
 X_t=tX_{\mathrm{vid}}+(1-t)X_{\mathrm{noi}},
-\]
+$$
 
 普通训练假设 \(X_{\mathrm{vid}}\)、\(X_{\mathrm{noi}}\)、\(X_{\mathrm{img}}\) 都是干净的。SVI 改为：
 
-\[
+$$
 \tilde X_\star=X_\star+\mathbb I_\star E_\star,
 \qquad
 \tilde X_t=t\tilde X_{\mathrm{vid}}+(1-t)\tilde X_{\mathrm{noi}},
-\]
+$$
 
 但监督目标仍指向干净视频：
 
-\[
+$$
 V_t^{\mathrm{rcy}}=X_{\mathrm{vid}}-\tilde X_{\mathrm{noi}}.
-\]
+$$
 
 一句话解释：**让模型看到“带有自己历史错误的状态”，却学习“回到干净目标的方向”。**
 
