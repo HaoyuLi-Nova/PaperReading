@@ -28,7 +28,7 @@ rm -rf code/<track>/<slug>/.git
 | 论文 | 路径 | 运行 |
 |------|------|------|
 | LDM | [`base_models/ldm/`](base_models/ldm/) | `python base_models/ldm/featuremap_to_sequence.py` |
-| Wan | [`base_models/wan/`](base_models/wan/) | 官方推理代码；笔记见 `notes/base_models/wan2.1/` |
+| Wan | [`base_models/Wan2.1/`](base_models/Wan2.1/)、[`base_models/Wan2.2/`](base_models/Wan2.2/) | 官方推理代码；训练代码阅读路线见 [`mycode/wan2.1/README.md`](mycode/wan2.1/README.md) |
 | Ovi | [`base_models/ovi/`](base_models/ovi/) | 官方推理代码；见目录内 `README.md` / `README_LOCAL.md` |
 
 ## Audio driven
