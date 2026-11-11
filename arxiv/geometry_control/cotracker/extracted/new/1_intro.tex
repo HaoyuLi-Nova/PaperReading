@@ -1,0 +1,44 @@
+\section{Introduction}%
+\label{sec:intro}
+
+We are interested in estimating point correspondences in videos containing dynamic objects and a moving camera.
+Establishing point correspondences is an important problem in computer vision with many applications~\cite{agarwal2011building, teed2021droid, jiang2018super, yang2022banmo}.
+There are two variants of this problem.
+In \emph{optical flow}, the goal is to estimate the velocities of all points within a video frame.
+This estimation is performed jointly for all points, but the motion is only predicted at an infinitesimal distance.
+In \emph{point tracking}, the goal is to estimate the motion of points over an extended period of time.
+For efficiency, trackers usually focus on a sparse set of points and treat them as statistically independent.
+This is the case even for recent techniques such as TAPIR~\cite{doersch2023tapir} and PIPs++~\cite{zheng2023pointodyssey}, which employ modern architectures such as transformers and can track points even in the presence of occlusions.
+However, points often have strong statistical dependencies (\eg, because they belong to the same object), which offers an opportunity for improvement.
+
+We hypothesise that accounting for the dependency between tracked points can significantly improve tracking performance.
+To explore this idea, we introduce \method, a new tracker that supports joint estimation of a very large number of tracks simultaneously, utilizing a transformer-based architecture and attention between tracks.
+As we show in ablations, tracking points jointly significantly improves the tracking accuracy, especially when points are occluded.
+In fact, we find that we can improve tracking quality further by adding \emph{more} points to the tracker than required by the user.
+These additional \emph{support points} expand the context of the tracker, porting to point tracking the idea of using context, common in visual object tracking~\cite{jia2012visual, li2015reliable, song2017crest}.
+
+In addition to joint tracking, \method incorporates additional architectural design innovations.
+The network is a transformer operating in a sliding window fashion on a two-dimensional token representation, where dimensions are time and the set of tracked points~\cite{gberta_2021_ICML}.
+Via suitable self-attention operators, the transformer considers each track as a whole for the duration of a window and can exchange information between tracks, thus exploiting their dependencies.
+However, attention can be expensive when there are many tracks.
+Hence, we introduce the concept of proxy tokens to point tracking that act similarly to registers~\cite{darcet2023vision, jaegle22perceiver, nagrani2021attention} while also reducing the memory complexity.
+These tokens are processed as if they were a small number of additional tracks and allow the switch from expensive self-attention between tracks to efficient cross-attention between tracks and proxies.
+In this way, \method can jointly track a \emph{near-dense set of tracks} on a single GPU\@ at inference.
+
+\method is designed as an online tracker that operates on relatively short windows of frames.
+Within a window, the tracks are initialized with queried points, and the network is tasked with progressively refining these initial estimations through iterative applications of the transformer.
+The windows partially overlap and communicate, similar to a recurrent network.
+Each subsequent overlapping window starts with refined predictions of the previous window and updates tracks for the new frames.
+We optimize the recurrent application of the network via unrolled training, porting this concept from recurrent networks and visual object tracking~\cite{held2016learning, girshick2015deformable} to point tracking.
+In this way,
+\method achieves \emph{excellent long-term tracking performance} as well; in particular, joint and recurrent tracking allows points to be tracked through long occlusions.
+
+We train \method on the synthetic TAP-Vid-Kubric~\cite{tapvid} and evaluate it on  TAP-Vid-\{DAVIS, RGB-Stacking\}, PointOdyssey~\cite{zheng2023pointodyssey} and DynamicReplica~\cite{karaev2023dynamicstereo}.
+Our architecture works well for tracking single points and excels for groups of points, obtaining state-of-the-art tracking performance in several benchmarks compared to prior trackers.
+In summary, our contributions are the following:
+(i) we introduce the concept of \emph{joint point tracking} by sharing information between tracked points through an attention mechanism;
+(ii) we propose to use \emph{support points} to provide additional context for point tracking;
+(iii) we \emph{reduce the model's memory complexity} with proxy tokens; and
+(iv) we propose an \emph{unrolled model training strategy}, which further improves tracking and occlusion accuracy.
+
+\input{plot_single_joint}

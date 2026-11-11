@@ -1,0 +1,264 @@
+\begin{thebibliography}{32}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Ardino et~al.(2021)Ardino, De~Nadai, Lepri, Ricci, and
+  Lathuili{\`e}re]{ardinoClickMoveControlling2021}
+Pierfrancesco Ardino, Marco De~Nadai, Bruno Lepri, Elisa Ricci, and
+  St{\'e}phane Lathuili{\`e}re.
+\newblock Click {{To Move}}: {{Controlling Video Generation With Sparse
+  Motion}}.
+\newblock In \emph{Proceedings of the {{IEEE}}/{{CVF International Conference}}
+  on {{Computer Vision}}}, pp.\  14749--14758, 2021.
+
+\bibitem[Bain et~al.(2021)Bain, Nagrani, Varol, and
+  Zisserman]{bainFrozenTimeJoint2021}
+Max Bain, Arsha Nagrani, G{\"u}l Varol, and Andrew Zisserman.
+\newblock Frozen in time: {{A}} joint video and image encoder for end-to-end
+  retrieval.
+\newblock In \emph{Proceedings of the {{IEEE}}/{{CVF International Conference}}
+  on {{Computer Vision}}}, pp.\  1728--1738, 2021.
+
+\bibitem[Blattmann et~al.(2021{\natexlab{a}})Blattmann, Milbich, Dorkenwald,
+  and Ommer]{blattmannIpokePokingStill2021}
+Andreas Blattmann, Timo Milbich, Michael Dorkenwald, and Bj{\"o}rn Ommer.
+\newblock Ipoke: {{Poking}} a still image for controlled stochastic video
+  synthesis.
+\newblock In \emph{Proceedings of the {{IEEE}}/{{CVF International Conference}}
+  on {{Computer Vision}}}, pp.\  14707--14717, 2021{\natexlab{a}}.
+
+\bibitem[Blattmann et~al.(2021{\natexlab{b}})Blattmann, Milbich, Dorkenwald,
+  and Ommer]{blattmannUnderstandingObjectDynamics2021}
+Andreas Blattmann, Timo Milbich, Michael Dorkenwald, and Bjorn Ommer.
+\newblock Understanding {{Object Dynamics}} for {{Interactive Image-to-Video
+  Synthesis}}.
+\newblock In \emph{Proceedings of the {{IEEE}}/{{CVF Conference}} on {{Computer
+  Vision}} and {{Pattern Recognition}}}, pp.\  5171--5181, 2021{\natexlab{b}}.
+
+\bibitem[Chan et~al.(2019)Chan, Ginosar, Zhou, and
+  Efros]{chanEverybodyDanceNow2019}
+Caroline Chan, Shiry Ginosar, Tinghui Zhou, and Alexei~A. Efros.
+\newblock Everybody {{Dance Now}}.
+\newblock In \emph{Proceedings of the {{IEEE}}/{{CVF International Conference}}
+  on {{Computer Vision}}}, pp.\  5933--5942, 2019.
+
+\bibitem[Chen et~al.(2023)Chen, Lin, Tseng, Lin, and
+  Yang]{chenMotionConditionedDiffusionModel2023}
+Tsai-Shien Chen, Chieh~Hubert Lin, Hung-Yu Tseng, Tsung-Yi Lin, and Ming-Hsuan
+  Yang.
+\newblock Motion-{{Conditioned Diffusion Model}} for {{Controllable Video
+  Synthesis}}.
+\newblock \emph{arXiv preprint arXiv:2304.14404}, 2023.
+
+\bibitem[Chiappa et~al.(2016)Chiappa, Racaniere, Wierstra, and
+  Mohamed]{chiappaRecurrentEnvironmentSimulators2016}
+Silvia Chiappa, S{\'e}bastien Racaniere, Daan Wierstra, and Shakir Mohamed.
+\newblock Recurrent {{Environment Simulators}}.
+\newblock In \emph{International {{Conference}} on {{Learning
+  Representations}}}, November 2016.
+
+\bibitem[Esser et~al.(2023)Esser, Chiu, Atighehchian, Granskog, and
+  Germanidis]{esserStructureContentguidedVideo2023}
+Patrick Esser, Johnathan Chiu, Parmida Atighehchian, Jonathan Granskog, and
+  Anastasis Germanidis.
+\newblock Structure and content-guided video synthesis with diffusion models.
+\newblock \emph{arXiv preprint arXiv:2302.03011}, 2023.
+
+\bibitem[Hao et~al.(2018)Hao, Huang, and
+  Belongie]{haoControllableVideoGeneration2018}
+Zekun Hao, Xun Huang, and Serge Belongie.
+\newblock Controllable {{Video Generation With Sparse Trajectories}}.
+\newblock In \emph{Proceedings of the {{IEEE Conference}} on {{Computer
+  Vision}} and {{Pattern Recognition}}}, pp.\  7854--7863, 2018.
+
+\bibitem[Ho et~al.(2022)Ho, Chan, Saharia, Whang, Gao, Gritsenko, Kingma,
+  Poole, Norouzi, and Fleet]{hoImagenVideoHigh2022}
+Jonathan Ho, William Chan, Chitwan Saharia, Jay Whang, Ruiqi Gao, Alexey
+  Gritsenko, Diederik~P. Kingma, Ben Poole, Mohammad Norouzi, and David~J.
+  Fleet.
+\newblock Imagen video: {{High}} \textasciitilde video generation with
+  diffusion models.
+\newblock \emph{arXiv preprint arXiv:2210.02303}, 2022.
+
+\bibitem[Hong et~al.(2022)Hong, Ding, Zheng, Liu, and
+  Tang]{hongCogVideoLargescalePretraining2022}
+Wenyi Hong, Ming Ding, Wendi Zheng, Xinghan Liu, and Jie Tang.
+\newblock {{CogVideo}}: {{Large-scale Pretraining}} for {{Text-to-Video
+  Generation}} via {{Transformers}}.
+\newblock \emph{arXiv preprint arXiv:2205.15868}, 2022.
+
+\bibitem[Hu et~al.(2022)Hu, Luo, and Chen]{huMakeItMove2022}
+Yaosi Hu, Chong Luo, and Zhenzhong Chen.
+\newblock Make {{It Move}}: {{Controllable Image-to-Video Generation With Text
+  Descriptions}}.
+\newblock In \emph{Proceedings of the {{IEEE}}/{{CVF Conference}} on {{Computer
+  Vision}} and {{Pattern Recognition}}}, pp.\  18219--18228, 2022.
+
+\bibitem[Kingma \& Ba(2014)Kingma and Ba]{kingmaAdamMethodStochastic2014}
+Diederik~P. Kingma and Jimmy Ba.
+\newblock Adam: {{A}} method for stochastic optimization.
+\newblock \emph{arXiv preprint arXiv:1412.6980}, 2014.
+
+\bibitem[Li et~al.(2023)Li, Li, Savarese, and
+  Hoi]{liBLIP2BootstrappingLanguageImage2023}
+Junnan Li, Dongxu Li, Silvio Savarese, and Steven Hoi.
+\newblock {{BLIP-2}}: {{Bootstrapping Language-Image Pre-training}} with
+  {{Frozen Image Encoders}} and {{Large Language Models}}.
+\newblock \emph{arXiv preprint arXiv:2301.12597}, 2023.
+
+\bibitem[Liang et~al.(2017)Liang, Lee, Dai, and Xing]{liangDualMotionGAN2017}
+Xiaodan Liang, Lisa Lee, Wei Dai, and Eric~P. Xing.
+\newblock Dual {{Motion GAN}} for {{Future-Flow Embedded Video Prediction}}.
+\newblock In \emph{Proceedings of the {{IEEE International Conference}} on
+  {{Computer Vision}}}, pp.\  1744--1752, 2017.
+
+\bibitem[Lotter et~al.(2016)Lotter, Kreiman, and
+  Cox]{lotterDeepPredictiveCoding2016}
+William Lotter, Gabriel Kreiman, and David Cox.
+\newblock Deep {{Predictive Coding Networks}} for {{Video Prediction}} and
+  {{Unsupervised Learning}}.
+\newblock In \emph{International {{Conference}} on {{Learning
+  Representations}}}, November 2016.
+
+\bibitem[Radford et~al.(2021)Radford, Kim, Hallacy, Ramesh, Goh, Agarwal,
+  Sastry, Askell, Mishkin, and Clark]{radfordLearningTransferableVisual2021a}
+Alec Radford, Jong~Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh,
+  Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, and Jack
+  Clark.
+\newblock Learning transferable visual models from natural language
+  supervision.
+\newblock In \emph{International {{Conference}} on {{Machine Learning}}}, pp.\
+  8748--8763. {PMLR}, 2021.
+
+\bibitem[Rombach et~al.(2022)Rombach, Blattmann, Lorenz, Esser, and
+  Ommer]{rombachHighResolutionImageSynthesis2022}
+Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Bj{\"o}rn
+  Ommer.
+\newblock High-{{Resolution Image Synthesis With Latent Diffusion Models}}.
+\newblock In \emph{Proceedings of the {{IEEE}}/{{CVF Conference}} on {{Computer
+  Vision}} and {{Pattern Recognition}}}, pp.\  10684--10695, 2022.
+
+\bibitem[Singer et~al.(2022)Singer, Polyak, Hayes, Yin, An, Zhang, Hu, Yang,
+  Ashual, Gafni, Parikh, Gupta, and
+  Taigman]{singerMakeAVideoTexttoVideoGeneration2022}
+Uriel Singer, Adam Polyak, Thomas Hayes, Xi~Yin, Jie An, Songyang Zhang, Qiyuan
+  Hu, Harry Yang, Oron Ashual, Oran Gafni, Devi Parikh, Sonal Gupta, and Yaniv
+  Taigman.
+\newblock Make-{{A-Video}}: {{Text-to-Video Generation}} without {{Text-Video
+  Data}}, September 2022.
+
+\bibitem[Srivastava et~al.(2015)Srivastava, Mansimov, and
+  Salakhudinov]{srivastavaUnsupervisedLearningVideo2015}
+Nitish Srivastava, Elman Mansimov, and Ruslan Salakhudinov.
+\newblock Unsupervised {{Learning}} of {{Video Representations}} using
+  {{LSTMs}}.
+\newblock In \emph{Proceedings of the 32nd {{International Conference}} on
+  {{Machine Learning}}}, pp.\  843--852. {PMLR}, June 2015.
+
+\bibitem[Villegas et~al.(2022)Villegas, Babaeizadeh, Kindermans, Moraldo,
+  Zhang, Saffar, Castro, Kunze, and Erhan]{villegasPhenakiVariableLength2022}
+Ruben Villegas, Mohammad Babaeizadeh, Pieter-Jan Kindermans, Hernan Moraldo,
+  Han Zhang, Mohammad~Taghi Saffar, Santiago Castro, Julius Kunze, and Dumitru
+  Erhan.
+\newblock Phenaki: {{Variable Length Video Generation}} from {{Open Domain
+  Textual Descriptions}}.
+\newblock In \emph{{{ICLR}}}, September 2022.
+
+\bibitem[Walker et~al.(2017)Walker, Marino, Gupta, and
+  Hebert]{walkerPoseKnowsVideo2017}
+Jacob Walker, Kenneth Marino, Abhinav Gupta, and Martial Hebert.
+\newblock The {{Pose Knows}}: {{Video Forecasting}} by {{Generating Pose
+  Futures}}.
+\newblock In \emph{Proceedings of the {{IEEE International Conference}} on
+  {{Computer Vision}}}, pp.\  3332--3341, 2017.
+
+\bibitem[Wang et~al.(2021)Wang, Sun, Cheng, Jiang, Deng, Zhao, Liu, Mu, Tan,
+  Wang, Liu, and Xiao]{wangDeepHighResolutionRepresentation2021}
+Jingdong Wang, Ke~Sun, Tianheng Cheng, Borui Jiang, Chaorui Deng, Yang Zhao,
+  Dong Liu, Yadong Mu, Mingkui Tan, Xinggang Wang, Wenyu Liu, and Bin Xiao.
+\newblock Deep {{High-Resolution Representation Learning}} for {{Visual
+  Recognition}}.
+\newblock \emph{IEEE Transactions on Pattern Analysis and Machine
+  Intelligence}, 43\penalty0 (10):\penalty0 3349--3364, October 2021.
+\newblock ISSN 1939-3539.
+\newblock \doi{10.1109/TPAMI.2020.2983686}.
+
+\bibitem[Wang et~al.(2019)Wang, Liu, Tao, Liu, Kautz, and
+  Catanzaro]{wangFewshotVideotovideoSynthesis2019}
+Ting-Chun Wang, Ming-Yu Liu, Andrew Tao, Guilin Liu, Jan Kautz, and Bryan
+  Catanzaro.
+\newblock Few-shot video-to-video synthesis.
+\newblock In \emph{Proceedings of the 33rd {{International Conference}} on
+  {{Neural Information Processing Systems}}}, pp.\  5013--5024, {Red Hook, NY,
+  USA}, December 2019. {Curran Associates Inc.}
+
+\bibitem[Wang et~al.(2023)Wang, Yuan, Zhang, Chen, Wang, Zhang, Shen, Zhao, and
+  Zhou]{wangVideoComposerCompositionalVideo2023}
+Xiang Wang, Hangjie Yuan, Shiwei Zhang, Dayou Chen, Jiuniu Wang, Yingya Zhang,
+  Yujun Shen, Deli Zhao, and Jingren Zhou.
+\newblock {{VideoComposer}}: {{Compositional Video Synthesis}} with {{Motion
+  Controllability}}, June 2023.
+
+\bibitem[Wichers et~al.(2018)Wichers, Villegas, Erhan, and
+  Lee]{wichersHierarchicalLongtermVideo2018}
+Nevan Wichers, Ruben Villegas, Dumitru Erhan, and Honglak Lee.
+\newblock Hierarchical {{Long-term Video Prediction}} without {{Supervision}}.
+\newblock In \emph{Proceedings of the 35th {{International Conference}} on
+  {{Machine Learning}}}, pp.\  6038--6046. {PMLR}, July 2018.
+
+\bibitem[Wu et~al.(2021)Wu, Huang, Zhang, Li, Ji, Yang, Sapiro, and
+  Duan]{wuGODIVAGeneratingOpenDomaIn2021}
+Chenfei Wu, Lun Huang, Qianxi Zhang, Binyang Li, Lei Ji, Fan Yang, Guillermo
+  Sapiro, and Nan Duan.
+\newblock {{GODIVA}}: {{Generating Open-DomaIn Videos}} from {{nAtural
+  Descriptions}}.
+\newblock \emph{arXiv:2104.14806 [cs]}, April 2021.
+
+\bibitem[Wu et~al.(2022)Wu, Liang, Ji, Yang, Fang, Jiang, and
+  Duan]{wuUWAVisualSynthesis2022}
+Chenfei Wu, Jian Liang, Lei Ji, Fan Yang, Yuejian Fang, Daxin Jiang, and Nan
+  Duan.
+\newblock N\textbackslash "{{UWA}}: {{Visual Synthesis Pre-training}} for
+  {{Neural visUal World creAtion}}.
+\newblock In \emph{Proceedings of the {{European Conference}} on {{Computer
+  Vision}} ({{ECCV}})}, 2022.
+
+\bibitem[Wu et~al.(2020)Wu, Gao, Park, and Chen]{wuFutureVideoSynthesis2020}
+Yue Wu, Rongrong Gao, Jaesik Park, and Qifeng Chen.
+\newblock Future {{Video Synthesis With Object Motion Prediction}}.
+\newblock In \emph{Proceedings of the {{IEEE}}/{{CVF Conference}} on {{Computer
+  Vision}} and {{Pattern Recognition}}}, pp.\  5539--5548, 2020.
+
+\bibitem[Xu et~al.(2023)Xu, Zhang, Cai, Rezatofighi, Yu, Tao, and
+  Geiger]{xu2023unifying}
+Haofei Xu, Jing Zhang, Jianfei Cai, Hamid Rezatofighi, Fisher Yu, Dacheng Tao,
+  and Andreas Geiger.
+\newblock Unifying flow, stereo and depth estimation.
+\newblock \emph{IEEE Transactions on Pattern Analysis and Machine
+  Intelligence}, 2023.
+
+\bibitem[Yin et~al.(2023)Yin, Wu, Yang, Wang, Wang, Ni, Yang, Li, Liu, and
+  Yang]{yinNUWAXLDiffusionDiffusion2023}
+Shengming Yin, Chenfei Wu, Huan Yang, Jianfeng Wang, Xiaodong Wang, Minheng Ni,
+  Zhengyuan Yang, Linjie Li, Shuguang Liu, and Fan Yang.
+\newblock {{NUWA-XL}}: {{Diffusion}} over {{Diffusion}} for {{eXtremely Long
+  Video Generation}}.
+\newblock \emph{arXiv preprint arXiv:2303.12346}, 2023.
+
+\bibitem[Zhang et~al.(2020)Zhang, Xu, Liu, Wang, Wu, Liu, and
+  Jiang]{zhangDTVNetDynamicTimeLapse2020}
+Jiangning Zhang, Chao Xu, Liang Liu, Mengmeng Wang, Xia Wu, Yong Liu, and
+  Yunliang Jiang.
+\newblock {{DTVNet}}: {{Dynamic Time-Lapse Video Generation}} via {{Single
+  Still Image}}.
+\newblock In Andrea Vedaldi, Horst Bischof, Thomas Brox, and Jan-Michael Frahm
+  (eds.), \emph{Computer {{Vision}} \textendash{} {{ECCV}} 2020}, Lecture
+  {{Notes}} in {{Computer Science}}, pp.\  300--315, {Cham}, 2020. {Springer
+  International Publishing}.
+\newblock ISBN 978-3-030-58558-7.
+\newblock \doi{10.1007/978-3-030-58558-7_18}.
+
+\end{thebibliography}

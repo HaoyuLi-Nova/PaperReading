@@ -1,0 +1,7 @@
+\section{Conclusion and Discussion}\label{sec:conclusion}
+
+In this work, we show that a properly designed 3D representation is crucial for solving the long-standing challenge of dense and long-range motion estimation in videos. Motion naturally occurs in 3D and tracking motion in 3D allows us to better leverage its regularity in 3D, e.g., the ARAP constraint. We proposed a novel framework that estimates 3D trajectories using triplane representations with a learnable ARAP constraint that identifies the rigid groups in the scene and enforces rigidity within each group. Experiments demonstrated the superior performance of our method compared to existing baselines and its applicability to challenging real-world scenarios. 
+
+Our current model relies on off-the-shelf monocular depth estimators whose accuracy may affect the final tracking performance as shown in Tab. \ref{table:ablatio_depth}. However, we anticipate that advancements in monocular reconstruction will enhance the performance of motion estimation. We expect a closer interplay between these two problems, benefiting each other in the near future.
+
+

@@ -1,0 +1,64 @@
+\begin{abstract}
+\vspace{-0.5em}
+
+Recovering dense and long-range pixel motion in videos is a challenging problem. Part of the difficulty arises from the 3D-to-2D projection process, leading to occlusions and discontinuities in the 2D motion domain. While 2D motion can be intricate, we posit that the underlying 3D motion can often be simple and low-dimensional. In this work, we propose to estimate point trajectories in 3D space to mitigate the issues caused by image projection. Our method, named \emph{SpatialTracker}, lifts 2D pixels to 3D using monocular depth estimators, represents the 3D content of each frame efficiently using a triplane representation, and performs iterative updates using a transformer to estimate 3D trajectories. Tracking in 3D allows us to leverage as-rigid-as-possible (ARAP) constraints while simultaneously learning a rigidity embedding that clusters pixels into different rigid parts. Extensive evaluation shows that our approach achieves state-of-the-art tracking performance both qualitatively and quantitatively, particularly in challenging scenarios such as out-of-plane rotation. And our project page is available at \url{https://henry123-boy.github.io/SpaTracker/}. 
+
+% this is the original version  
+% Recovering dense and long-range motion in videos is a challenging problem. We argue that the difficulty primarily arises from the 3D-to-2D projection. For instance, the self-rotation of an object is simply a 3DoF motion in 3D space, but after 2D projection, resulting in different flows for each pixel as well as severe self-occlusion. In this work, we propose to $\textbf{estimate point trajectories directly in 3D space}$, fundamentally avoiding the difficulty caused by projection. For this purpose, our model lifts all pixels to 3D using monocular depth estimators, represents them by triplane feature maps, and estimates their 3D trajectories using an iterative Transformer with an as-rigid-as-possible (ARAP) constraint, which does not hold after 2D projection.  Our model also unsupervisely learns to cluster pixels into different rigid parts to better enforce the ARAP constraint.   Extensive qualitative and quantitative results demonstrate that our approach outperforms state-of-the-art methods by tracking points with better precision and longer time under various challenging movements ($\textit{e.g.}$, out-of-plane rotation). Code will be made publicly available.
+
+\iffalse
+%%%% Second draft by Yujun
+%
+% Tracking points in monocular videos usually faces the challenge of occlusion, which is mainly caused by 3D-to-2D projection. %3D points onto 2D frames.
+Recovering dense and long-range motion in videos is a challenging problem. We argue that a large part of the difficulty arises from the lack of 3D information as the result of 3D-to-2D projection. 
+% Motion takes place in the 3D space and perserves For instance, the self-rotation of an object is simply a 3DoF motion in 3D space, but after 2D projection, resulting in different flows for each pixel as well as severe self-occlusion.
+%
+% Unlike existing attempts that strive to alleviate the occlusion effect in 2D space, we propose to \textbf{estimate the point trajectory in 3D space}, fundamentally avoiding the occlusion issue.
+In this work, we propose to \textbf{estimate point trajectories in 3D space}, alleviating the issues caused by image projection.
+%
+% For this purpose, our system simply requires the initial depth value of the points to be tracked, which can be easily obtained in practice.
+For this purpose, our method lifts 2D pixels to 3D using monocular depth estimators, represents the 3D content of each frame using triplane feature maps, and estimates 3D trajectories using a transformer through iterative updates. Tracking in 3D allows us to leverage an as-rigid-as-possible (ARAP) constraint which can only be defined in 3D space. 
+Our model also learns a rigid embedding that can cluster pixels into different rigid parts. 
+% to better enforce the ARAP constraint. 
+%
+% Benefiting from the dimension lift, we can predict 3D motion of each point and thereby introduce the as-rigid-as-possible (ARAP) regularity \tocheck{for affinity learning}.
+%
+% Concretely, ARAP asks for local rigidity (\textit{i.e.}, neighbouring points tend to share similar motion in the 3D space), which does not hold anymore after 2D projection.
+%
+Extensive qualitative and quantitative results demonstrate that our approach outperforms state-of-the-art methods by tracking points with better precision and longer time under various challenging motions (\textit{e.g.}, out-of-plane rotation).
+%
+% Code will be made publicly available.
+\fi
+
+
+\iffalse
+%%%% First draft by Yujun
+%
+Tracking points in monocular videos usually faces the challenge of occlusion, which is likely caused by overlapped objects or out-of-plane movements.
+%
+Recent attempts have made great breakthrough by estimating long-range trajectories at the pixel level but deliver barely satisfactory results on tracking heavily occluded points (see \cref{fig:teaser}).
+%
+In this work, we argue that solving the occlusion problem in 2D space is far from trivial due to the ambiguity in 3D-to-2D projection, and instead propose a brand-new pipeline that \textbf{estimates the point trajectory in 3D space}.
+%
+What we need is simply the initial depth value of the points to be tracked, which can be easily obtained in practice.  % (\textit{e.g.}, predicting the depth map of the first video frame).
+%
+Benefiting from the dimension lift, our pipeline is naturally aware of the object relationship along the depth axis as well as 3D motions, and hence manages to handle challenging cases like yaw rotation.
+%
+From the technical perspective, our approach is supported by as-rigid-as-possible (ARAP) regularity that asks for rigidity (\textit{i.e.}, similar motion) within local areas.
+%
+Concretely, we introduce an rigidity prediction module to help determine whether two points belong to a same rigid part.
+%
+It turns out that, even learned with labeled synthetic data, our model shows strong generalizability on complex real scenes and achieves sufficiently better performance over existing alternatives both visually and quantitatively.
+%
+Code will be made publicly available.
+\fi
+
+
+\iffalse
+Motion tracking from video is a long-existing and hard-core problem in computer vision. Recently, long-range 2D pixel-level tracking has brought the marginal break through for this problem. However, estimating dense pixel trajectory in 2D will inevitably suffer from the occlusion and projection overlap, resulting in tracking lost and failures. In this paper, we introduce a novel method named as SpatialTracker, which lifts the 2D pixel tracking into the 3D space. We first leverage the monocular depth estimation to splat the 2D image features into a tri-plane representation for encoding any 3D location in the trajectory. Owing to the tri-plane representation, the 3D trajectory estimation can be decomposed into the all-pairs correlation in the three feature planes respectively. Meanwhile, we propose a neural ARAP (as rigid as possible) predictor by using the spatial and temporal awared attention features.  And all estimated 3D trajectories can be regularized with the learned arap priors. Beneficial from 3D lifting and neural ARAP regularization, our method is not only robust to the occlusion but long-range stable as well.               
+\fi
+
+
+\vspace{-4mm}
+\end{abstract}
+% \vspace{-10pt}

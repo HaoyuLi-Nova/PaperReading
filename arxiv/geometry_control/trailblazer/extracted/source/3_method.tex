@@ -1,0 +1,202 @@
+%  __  __      _   _               _
+% |  \/  | ___| |_| |__   ___   __| |
+% | |\/| |/ _ \ __| '_ \ / _ \ / _` |
+% | |  | |  __/ |_| | | | (_) | (_| |
+% |_|  |_|\___|\__|_| |_|\___/ \__,_|
+\section{Method}
+
+
+\label{sec:method}
+
+TrailBlazer is based on the open-source pre-trained model ZeroScope \cite{zeroscope}. This is a fine-tuned version of ModelScope \cite{luo2023videofusion}, known for its ability to generate high-quality videos without significant temporal flickering. It is noteworthy that TrailBlazer preserves this desirable temporal coherence effect achieved in their work.  TrailBlazer does not require any training, optimization, or low-level control signals (e.g., edge, depth maps with ControlNet \cite{controlnet}).  On the contrary, all that is required from the user is the prompt and an approximate bounding box (bbox) of the subject. Bboxes and corresponding prompts can be specified at several points in the video, and these are treated as \emph{keyframes} and interpolated to smoothly control both the motion and prompt content. 
+
+% new paragraph
+We use the following notation: Bold capital letters (e.g., $\MM$) denote a matrix or a tensor depending on the context, vectors are represented with bold lowercase letters (e.g., $\mm$), and  scalars are denoted as lowercase letters (e.g., $m$). We use superscripts to denote an indexed tensor slice (e.g., $\MM^{(i)}$).  A synthesized video is composed of a number of images ordered in time. The individual images will be referred to as \emph{frames}, and the collection of corresponding times is the \emph{timeline}.
+Spatial or temporal attention will be informally referred to as \emph{correlation}.
+
+Similar to the work in \cite{ma2023directed}, our method draws significant inspiration from visual inspection of cross-attention maps. Consider
+the final cross-attention result depicted in \FigRef{fig:mot}, generated from the prompt ``an astronaut walking on the moon''. The spatial cross attention, denoted as \SAttn, associated with the prompt word ``astronaut'' is highlighted at the left of the second row, showcasing the overall position of the subject. Furthermore, we visualize the attention map from the temporal module in the pre-trained model. The right in the first row displays ``self-frame'' temporal attention maps, denoted as \TAttnSelf, which consistently align with \SAttn.
+
+The right in the second row of \FigRef{fig:mot} presents the visualization of cross-frame temporal attention maps, denoted as \TAttnCross, illustrating the attention between the first frame and subsequent frames in the video. As the distance between frames increases, the attention becomes less correlated in the subject area and becomes more correlated in the background area. This observation aligns with the reconstructed video shown in the left of the first row, where the background remains nearly static while the astronaut's position varies frame by frame. We will consider the temporal attention in detail in  \SecRef{ssec:tattn}.
+
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\linewidth]{assets/mot-3.pdf}
+    \caption{\textbf{Basis of our method.} We draw inspiration from inspection of the spatial (SA) and temporal (TA) attention maps viewed with self-frame attention (Self) and cross-frame attention (Cross). Thus, \TAttnSelf and \TAttnCross denote the self- and cross-frame attention map, respectively. \SAttn is the spatial cross-attention map with the prompt word ``astronaut''. The symbol ``$\text{Attn(i,j)}$'' denotes the temporal attention map between frame $i$ and frame $j$. The Recons subfigure shows reconstructions sampled from frames 1, 4, 16, and 24, respectively. In the \TAttnCross, the frame number were manually chosen to best illustrate the cross-frame attention between the astronaut and the background. Please refer to the main text for more details.}
+    \label{fig:mot}
+    \vspace{-1em}
+\end{figure}
+
+
+%  ____  _            _ _
+% |  _ \(_)_ __   ___| (_)_ __   ___
+% | |_) | | '_ \ / _ \ | | '_ \ / _ \
+% |  __/| | |_) |  __/ | | | | |  __/
+% |_|   |_| .__/ \___|_|_|_| |_|\___|
+%         |_|
+\subsection{Pipeline}
+\label{ssec:pipe}
+
+
+
+
+
+\begin{figure*}
+  \centering
+  \includegraphics[width=\textwidth]{assets/pipeline-3.pdf}
+  \caption{\textbf{Pipeline Overview.} Our pipeline highlights the central components of spatial cross-attention editing (left, in the blanched almond-colored section) and temporal cross-frame attention editing (right, in the blue section). This operation is exclusively applied during the denoising process in the early stage. The objective is to alter the attention map (e.g., $\bAA_s, \bAA_m$) using a Gaussian weighting within a user-specified bbox. This example uses one prompt word AttnMap and two trailing AttnMaps for guidance as highlighted in red.}
+  \label{fig:pipe}
+\end{figure*}
+
+
+As mentioned above, keyframing \cite{keyframe} is a technique that defines properties of images at particular frames (keys) in a timeline and then automatically interpolates these values to achieve a smooth transition between the keys. It is widely used in the movie animation and visual effects industries since it reduces the artist's work while simultaneously producing temporally smooth motion that would be hard to achieve if the artist directly edited every image.
+%because the artists generally work on a very long sequence of a movie clip, and keyframing can automatically interpolate the animation between the keys with reduced effort.
+Our system takes % (no "the")
+advantage of this principle, and asks the user to specify several keys, consisting of bboxes and the associated prompts, describing the subject location and appearance or behavior at the particular times. For instance, as shown in \FigRef{fig:teaser} (Middle-right), the video of the cat initially sitting on the left, then running to the right, is achieved simply by placing keys at three frames only. Specifically, the sitting cat in the first part of the video is obtained with two identically positioned bboxes on the left, with the keyframes at the beginning and middle of the timeline and the prompt word ``sitting'' associated with both. A third keyframe is placed at the end of the video, with the bbox positioned on the right together with the prompt changing to ``running''. This results in the cat smoothly transitioning from sitting to running in the second part of the video.
+
+% Specifically, the initial two keyframes hold the cat sitting on the ground to the left, maintaining by the same bounding boxes and prompt containing ``sitting''. With the introduction of the third keyframe, featuring a bounding box to the right and a prompt change to ``running'', the cat in the video sequence between the second and third keyframes smoothly transitions from left to right.
+
+We use the pre-trained ZeroScope model \cite{zeroscope} in all our experiments with no neural network training, finetuning, or optimization at inference time. Our pipeline is shown in \FigRef{fig:pipe}. The spatial cross attention and the temporal attention is discussed in detail in the \SecRef{ssec:sattn} and \SecRef{ssec:tattn}, respectively. % following is right grammar
+All spatial and temporal editing is performed in the early steps $t \in \{T,...,T-N_S\}$, and $t \in \{T,...,T-N_M\}$ of the backward denoising process, where $T$ is the total number of denoising time steps, and $N_S$, and $N_M$ are hyperparameters specifying the number of steps of spatial and temporal attention editing. The parameter settings are detailed in our supplementary material.
+
+In the subsequent sections we describe how our algorithm is implemented by modifying the spatial and temporal attention in a pre-trained diffusion model. Please refer to \cite{RombachStablediffusion21, DDIM, hoDDPM20, blogLillog} for background on overall diffusion model architectures.
+
+% We note that we have excluded details pertaining to \FigRef{fig:pipe} and subsequent sections elucidating the operation of the denoising diffusion model. Only components directly tied to spatial and temporal attention mechanisms have been retained. For more comprehensive insights, we point to the earlier works \cite{RombachStablediffusion21, DDIM, hoDDPM20}, on this subject, and to the overview of SD in \SD \cite{blogLillog}.
+
+Our system processes a set of keyframes, encompassing associated bbox regions $\RRR_f$ and prompts $\PPP_f$ at frame $f$, where $f$ denotes the frame index within the range $f \in \{1,...,N_F\}$. The users are required to specify a minimum of two keyframes: one at the start and one at the end of the video sequence.
+The information in these keyframes is linearly interpolated, such as the bbox $\BBB_f$ and the prompt text embedding $y(\PPP_f)$ through the text encoder $y(\cdot)$. To enhance readability, we omit the subscript $f$ and the linearly blended video sequence between the keyframes when discussing the core method.
+
+A region $\RRR$ is characterized by a set of parameters $\RRR = \{\BBB, \III, \TTT\}$: a set of bbox positions (e.g., $\BBB$), the indices of the subject we would like to constrain (e.g., $\III$), and the indices of the trailing maps (e.g., $\TTT$) to enhance the controllability. The subject indices $\III \subset \{ i | i \in \mathbb{N}, 1 \leq i \leq |\PPP| \}$, are 1-indexed with the associated word in the prompt. For example, $\III = \{1,2\}$ is associated with ``a'', ``cat'' in the prompt ``a cat sitting on the car''. 
+% The trailing attention indices $\TTT$ and the bbox $\BBB$ are defined as below.
+
+The trailing attention maps indices $\TTT \subset \{ i | i \in \mathbb{N}, |\PPP| < i \leq N_P \}$ is the set of indices corresponding to the cross-attention maps generated without a prompt word association, where $N_P$ denotes the maximum prompt length that a tokenizer model can take, which is $N_P=77$ when CLIP is used \cite{CLIP}. The trailing attention maps serve as a means of controlling the spatial location of the synthesized subject and its attributes. A larger trailing indices set $|\mathcal{T}|$ provides greater controllability but comes with the risk of failed reconstruction \cite{ma2023directed}.
+
+A bbox $\BBB = \bigl\{ (x, y) \,| \, b_{\text{left}} \times w \leq x \leq b_{\text{right}} \times w, \; b_{\text{top}} \times h \leq y \leq b_{\text{bottom}} \times h \bigl\}$, is a set of all pixel coordinates inside the bbox of resolution $w \times h$. In our implementation, $\BBB$ is produced by a tuple of the four scalars representing the boundary of the bbox $\bb = (b_{\text{left}}, b_{\text{top}}, b_{\text{right}}, b_{\text{bottom}})$, where $b_{\text{left}}, b_{\text{top}}, b_{\text{right}}, b_{\text{bottom}} \in [0,1]$ specify the bbox relative to the synthesis resolution. The height $h$ and width $w$, are defined by the resolution of the UNet intermediate representation \cite{RombachStablediffusion21}.
+
+
+% (attn.heads, dim, dim, self.num_frames, self.num_frames)
+% x \in 24, 4, 64, 64
+
+
+%  ____              _   _       _
+% / ___| _ __   __ _| |_(_) __ _| |
+% \___ \| '_ \ / _` | __| |/ _` | |
+%  ___) | |_) | (_| | |_| | (_| | |
+% |____/| .__/ \__,_|\__|_|\__,_|_|
+%       |_|
+\subsection{Spatial Cross Attention Guidance}
+\label{ssec:sattn}
+
+The spatial cross attention modules are implemented in the denoising UNet module of \cite{RombachStablediffusion21}. This module finds the cross attention between the query representation $\QQ_s \in \Reals^{N_F \times d_{h} \times d}$ obtained from the SD latent $\zz_t$, and the representations $\KK_s, \VV_s \in \Reals^{N_F \times |W| \times d}$ of the $|W|$ prompt words from the text model, where $d$ is the feature dimension of the keys and queries. Usually $|W| \equiv 77$  when the text embedding model is CLIP \cite{CLIP}. The cross attention map \cite{PromptToPrompt} is then defined as $\bAA_s = \text{Softmax}(\QQ_s\KK_s^{T}/\sqrt{d}) \in \Reals^{N_F \times d_h \times |W|}$,\footnote{Note that this is a ``batch'' matrix multiplication (e.g., the method torch.bmm in PyTorch \cite{paszke2019pytorch}), that is $\CC = \bAA \BB \in \Reals^{b \times m \times n}$, where $\bAA \in \Reals^{b \times m \times p}$, and $\BB \in \Reals^{b \times p \times n}$. Similarly, the transpose operation is $\bAA^\top \in \Reals^{b \times p \times m}.$} where $d_h \equiv w \times h$, defined by the spatial resolution height and width at the specific layer. For simplicity we omit the batch size and the number of %the 
+attention heads \cite{allyouneedattn} in our definition.
+
+As illustrated in the blanched almond-colored section in \FigRef{fig:pipe}, we guide the denoising path by editing the spatial cross attention (e.g., \cite{ma2023directed}) for the attention maps $\bAA_s^{(i)} \in \Reals^{N_F \times d_h}$ associated with a particular prompt word and trailing indices $i \in \III \cup \TTT$. Given $\BBB$, our spatial attention editing is defined by
+
+% \begin{tabularx}{\linewidth}{@{}XX@{}}
+% \begin{align*}
+%   \text{W}_s(x,y) =
+%     \left\{\begin{matrix}
+%         c_w, \quad (x, y) \in \BBB' \\
+%         1, \quad \text{otherwise},
+%     \end{matrix}\right.
+% \end{align*}
+% &
+% \begin{align*}
+%   \text{S}_s(x,y) =
+%     \left\{\begin{matrix}
+%         c_s\ g(x, y), \quad (x, y) \in \BBB \\
+%         0, \quad \text{otherwise},
+%     \end{matrix}\right.
+% \end{align*}
+% \end{tabularx}
+
+\begin{equation}
+    \text{S}_s(x,y) =
+    \left\{\begin{matrix}
+        c_s\ g(x, y), \quad (x, y) \in \BBB \\
+        0, \quad \text{otherwise},
+    \end{matrix}\right.
+    \qquad
+    \text{W}_s(x,y) =
+    \left\{\begin{matrix}
+        c_w, \quad (x, y) \in \BBB' \\
+        1, \quad \text{otherwise},
+    \end{matrix}\right. 
+\end{equation}
+
+\noindent where $x, y$ are are the spatial location indices of the attention map and $\BBB'$ is the complement of $\BBB$. $\text{S}_s(\BBB)$ uses a function $g(\cdot,\cdot)$ that ``injects'' attention inside $\BBB$, as illustrated in the gray box in \FigRef{fig:pipe}. The parameters  $c_w \leq 1$, $c_s > 0$ attenuate the attention outside of $\BBB$ and strengthen it inside. We define $g(\cdot,\cdot)$ as a Gaussian window of size $\sigma_x = b_w/2, \sigma_y = b_h/2$, where $b_w = \text{ceil}((b_\text{right} - b_\text{left}) \times w), b_h = \text{ceil}((b_\text{top} - b_\text{bottom}) \times h)$ are the width and the height of $\BBB$. In contrast, $\text{W}_s(\cdot)$ attenuates the attention outside $\BBB$. The bbox $\BBB$ is extended across the entire video sequence through linear interpolation of the keyframes. For example, $\BBB_f = (1 - a) \times \BBB_b + a \times \BBB_e$, where $a = \frac{f}{N_F}$, and $\BBB_b$, $\BBB_e$ denotes the bbox for the beginning and the end of keyframe.
+
+Given the set of indices of subject prompt words $\III$ and trailing maps $\TTT$, each cross-activation component at location $(x,y)$ in $\bAA_s$ is modified as follows:
+\begin{equation}
+    \bAA_s^{(i)}(x,y) \coloneqq \bAA_s^{(i)}(x,y) \odot \text{W}_s(x,y) + \text{S}_s(x,y),\ \forall i \in \III \cup \TTT,
+\label{eq:sa}
+\end{equation}
+% always capitalize people's names: Gauss(ian), Hadamard, Frechet...
+where $\odot$ denotes the Hadamard (element-wise) product that scales the $x,y$ element of the cross-attention map $\bAA_s$ by the corresponding weight in $\text{W}_s(\cdot)$. The result is that the attention in the cross-attention map for the particular prompt word as well as the trailing maps, is stronger in the user-specified bbox region.
+
+%  _____                                    _
+% |_   _|__ _ __ ___  _ __   ___  _ __ __ _| |
+%   | |/ _ \ '_ ` _ \| '_ \ / _ \| '__/ _` | |
+%   | |  __/ | | | | | |_) | (_) | | | (_| | |
+%   |_|\___|_| |_| |_| .__/ \___/|_|  \__,_|_|
+%                    |_|
+\subsection{Temporal Cross-Frame Attention Guidance}
+\label{ssec:tattn}
+
+To capture the temporal correlation in the video clip during training, a prevalent approach involves reshaping the latent tensor. This involves shifting the spatial information to the first dimension, a technique employed in VideoLDM \cite{blattmann2023videoldm}. The reshaping is done before passing the hidden activation into the temporal layers, allowing the model to learn about the ``correlation'' of spatial components through the convolutional layers. As shown in blue section in \FigRef{fig:pipe}, the temporal attention map is obtained by $\bAA_m = \text{Softmax}(\QQ_m\KK_m^{T}/\sqrt{d}) \in \Reals^{d_h \times N_F \times N_F}$, where $d_h$ is the spatial dimensions of this tensor,  $\QQ_m \in \Reals^{d_{h} \times N_F \times d}$, and $\KK_m \in \Reals^{d_{h} \times N_F \times d}$.   %, respectively.  %save space
+
+What is different from the spatial counterpart is that now $\bAA_m$ learns about the relation between the correlated components across all frames. For instance, $\bAA_m^{(x,y,i,j)}$ denotes the correlation at location $(x,y)$ between frame $i$ and frame $j$. We denote such tensors as $\bAA_m^{(i,j)}(x,y)$ to keep the notation consistent. As seen in our visual investigation (\FigRef{fig:mot}, Right), the background attention is higher when the cross frame attention compares the frames that are temporally far from each other, and the foreground attention is higher when the frames are temporally closer in the video sequence.
+
+To achieve this pattern of activations under user control we design an approach similar to \EqRef{eq:sa} but considering the normalized video temporal distance $d = \frac{|i - j|}{N_F}, i,j \in \{1,...,N_F\}$, the temporal injection function is defined as,
+\[
+\text{S}_m(x,y) =
+    \left\{\begin{matrix}
+        (1 - d) \ g(x, y) - d \ g(x, y),\ (x, y) \in \BBB, \\
+        0, \quad \text{otherwise}.
+    \end{matrix}\right.
+\]
+Here the normalized video temporal distance $d$ determines the level of the weight injection as a triangular window in time. Values $d \approx 0$ increase the activation inside the bbox. In contrast, when $d \approx 1$, the activation inside the box is \emph{reduced}, approximating the temporal ``anti-correlation'' effect seen in \FigRef{fig:mot}.  The editing by $\text{S}_m(\cdot)$ is performed during the initial $N_M$ steps of the denoising process. 
+% See \FigRef{fig:abl_temp} and section \ref{sec:ablation} for an ablation on this parameter.
+
+Then, similarly to \EqRef{eq:sa}, the temporal cross-frame attention map editing is,
+\begin{equation}
+    \bAA_m^{(i,j)}(x,y) \coloneqq \bAA_m^{(i,j)}(x,y) \odot \text{W}_m(x,y) + \text{S}_m(x,y),
+\label{eq:ma}
+\end{equation}
+where $\text{W}_m(\cdot)$ is defined the same as $\text{W}_s(\cdot)$.
+
+
+%  ____                       ____
+% / ___|  ___ ___ _ __   ___ / ___|___  _ __ ___  _ __
+% \___ \ / __/ _ \ '_ \ / _ \ |   / _ \| '_ ` _ \| '_ \
+%  ___) | (_|  __/ | | |  __/ |__| (_) | | | | | | |_) |
+% |____/ \___\___|_| |_|\___|\____\___/|_| |_| |_| .__/
+%                                                |_|
+\subsection{Scene compositing}
+\label{ssec:comp}
+
+The problem space becomes more complicated for video synthesis with more than one moving subject. Although the parameters $c_s, c_w$ in \EqRef{eq:sa} are specific to a particular subject, they indirectly affect the entire scene through the global denoising. Thus, the choice of these parameters for different subjects might interact and require a parameter search in the number of subjects to find the best synthesis. If the prompt $\PPP$ and bbox $\BBB$ are in conflict then the result might be poor. For instance, a user may specify motion of $\BBB$ from left to right associated with the prompt word ``dog'', while $\PPP$ is given as ``a dog is sitting on the road''. In fact, the dog moves in accordance with the configured bbox, either walking or running.
+
+Considering the reasons above, we follow work such as \cite{ma2023directed, multidiffusion} that combine multiple subjects, each with their own prompt, during the latent denoising. The latents $\zz^{(r)}_t$ for the $r$-th subject are then composited into an overall image latent $\zz_t$ under the control of a ``composed'' prompt, as illustrated in \FigRef{fig:sccomp} and formulated as,
+
+\begin{figure}[tp]
+  \centering
+  % \includegraphics[width=\linewidth]{assets/scenecomp.jpg}
+  \includegraphics[width=\linewidth]{assets/scenecomp-3.pdf}
+  \vspace{-1em}
+  \caption{\textbf{Scene Compositing.} Given the set of latents generated from our system using a single bbox denoted as $\zz^{(\text{ball})}_{t}$ and $\zz^{(\text{dog})}_{t}$ for the case of prompts related to ball and dog. Then, the scene compositor (SC) produces a synthesis of multiple subjects with the complete prompt and the single subject latents. We refer reader to our supplementary video to view the implemented speed control of the dog.}
+  \label{fig:sccomp}
+\end{figure}
+
+% the composited latent is reconstructed with the latent $\zz_t$ of the composed prompt linear interpolated latents with $N_C$ subjects $(\zz_r)_t$ in the early denoising backward process:
+\begin{equation}
+    \zz_t(x,y) \coloneqq \frac{1}{R} \sum_{r=0}^{N_R} w \, \zz_t(x,y) + (1{-}w) \, \zz^{(r)}_t\!(x,y),
+    \label{eq:compositing}
+\end{equation}
+where $\forall t \in \{T,...,T{-}N_C\}, \quad (x,y) \in \BBB_r$, where $w \in [0,1]$ determines the weight of linear interpolation between the specific subject latent $\zz^{(r)}_t$ and the composed latent $\zz_t$. %produced from the complete (``composed'') prompt (pink box in \FigRef{fig:sccomp}).
+It is formulated by considering the ratio of the current denoising timestep between $N_C$ and $T$, such that $w = 1 - \big(N_C - (T-t)\big)/N_C$.
+% \[
+%     w = 1 - \frac{\big(N_C - (T-t)\big)}{N_C}.
+% \]
+At the beginning of the denoising process (so at $t=T$), the compositing fully prioritizes the subject latent $\zz^{(r)}_t$ in each local region in the associated bbox $\BBB_r$. As $t$ decreases, $w$ gradually increases, giving higher priority to composed latent $\zz_t$. This process concludes when $t=T-N_C$, resulting in $w = 1$, which stops using the subject latent in the remaining denoising steps.

@@ -1,0 +1,169 @@
+\backcite {lowe2004distinctive}{{1}{1}{section.1}}
+\backcite {lucas1981iterative}{{1}{1}{section.1}}
+\backcite {shi1994good}{{1}{1}{section.1}}
+\backcite {tomasi1991detection}{{1}{1}{section.1}}
+\backcite {beauchemin1995computation}{{1}{1}{section.1}}
+\backcite {horn1981determining}{{1}{1}{section.1}}
+\backcite {teed2020raft}{{1}{1}{section.1}}
+\backcite {rubinstein2012towards}{{2}{1}{section.1}}
+\backcite {PartVid}{{2}{1}{section.1}}
+\backcite {PartVid}{{2}{1}{section.1}}
+\backcite {tap-vid}{{2}{1}{section.1}}
+\backcite {Tapir}{{2}{1}{section.1}}
+\backcite {pips}{{2}{1}{section.1}}
+\backcite {cotracker}{{2}{1}{section.1}}
+\backcite {kubric}{{2}{1}{section.1}}
+\backcite {zheng2023pointodyssey}{{2}{1}{section.1}}
+\backcite {ZoeDepth}{{2}{1}{section.1}}
+\backcite {quiroga2014dense}{{2}{1}{section.1}}
+\backcite {raft3D}{{2}{1}{section.1}}
+\backcite {chan2022efficient}{{2}{1}{section.1}}
+\backcite {tap-vid}{{2}{1}{section.1}}
+\backcite {BADJA}{{2}{1}{section.1}}
+\backcite {zheng2023pointodyssey}{{2}{1}{section.1}}
+\backcite {beauchemin1995computation}{{2}{2}{section*.3}}
+\backcite {black1993framework}{{2}{2}{section*.3}}
+\backcite {brox2009large}{{2}{2}{section*.3}}
+\backcite {horn1981determining}{{2}{2}{section*.3}}
+\backcite {weinzaepfel2013deepflow}{{2}{2}{section*.3}}
+\backcite {zach2007duality}{{2}{2}{section*.3}}
+\backcite {fischer2015flownet}{{2}{2}{section*.3}}
+\backcite {hui2018liteflownet}{{2}{2}{section*.3}}
+\backcite {ilg2017flownet}{{2}{2}{section*.3}}
+\backcite {sun2018pwc}{{2}{2}{section*.3}}
+\backcite {xu2017accurate}{{2}{2}{section*.3}}
+\backcite {teed2020raft}{{2}{2}{section*.3}}
+\backcite {huang2022flowformer}{{2}{2}{section*.3}}
+\backcite {jaegle2021perceiver}{{2}{2}{section*.3}}
+\backcite {shi2023flowformer++}{{2}{2}{section*.3}}
+\backcite {zhao2022global}{{2}{2}{section*.3}}
+\backcite {brox2009large}{{2}{2}{section*.3}}
+\backcite {weinzaepfel2013deepflow}{{2}{2}{section*.3}}
+\backcite {irani1999multi}{{2}{2}{section*.3}}
+\backcite {janai2018unsupervised}{{2}{2}{section*.3}}
+\backcite {kennedy2015optical}{{2}{2}{section*.3}}
+\backcite {ren2019fusion}{{2}{2}{section*.3}}
+\backcite {volz2011modeling}{{2}{2}{section*.3}}
+\backcite {PartVid}{{2}{2}{section*.4}}
+\backcite {rubinstein2012towards}{{2}{2}{section*.4}}
+\backcite {pips}{{2}{2}{section*.4}}
+\backcite {bian2023context}{{2}{2}{section*.4}}
+\backcite {tap-vid}{{2}{2}{section*.4}}
+\backcite {Tapir}{{2}{2}{section*.4}}
+\backcite {neoral2023mft}{{2}{2}{section*.4}}
+\backcite {wang2023tracking}{{2}{2}{section*.4}}
+\backcite {zheng2023pointodyssey}{{2}{2}{section*.4}}
+\backcite {Tapir}{{2}{2}{section*.4}}
+\backcite {cotracker}{{3}{2}{section*.4}}
+\backcite {kasten2021layered}{{3}{2}{section*.4}}
+\backcite {sevilla2016optical}{{3}{2}{section*.4}}
+\backcite {sun2010layered}{{3}{2}{section*.4}}
+\backcite {ye2022deformable}{{3}{2}{section*.4}}
+\backcite {wang2023tracking}{{3}{2}{section*.4}}
+\backcite {pons2007multi}{{3}{2}{section*.5}}
+\backcite {vedula1999three}{{3}{2}{section*.5}}
+\backcite {zhang20013d}{{3}{2}{section*.5}}
+\backcite {huguet2007variational}{{3}{2}{section*.5}}
+\backcite {hadfield2011kinecting}{{3}{2}{section*.5}}
+\backcite {herbst2013rgb}{{3}{2}{section*.5}}
+\backcite {hornacek2014sphereflow}{{3}{2}{section*.5}}
+\backcite {jaimez2015primal}{{3}{2}{section*.5}}
+\backcite {quiroga2014dense}{{3}{2}{section*.5}}
+\backcite {raft3D}{{3}{2}{section*.5}}
+\backcite {wang2020flownet3d++}{{3}{2}{section*.5}}
+\backcite {ma2019deep}{{3}{2}{section*.5}}
+\backcite {menze2015object}{{3}{2}{section*.5}}
+\backcite {bozic2021neuraldeformationgraphs}{{3}{2}{section*.5}}
+\backcite {gu2019hplflownet}{{3}{2}{section*.5}}
+\backcite {lei2022cadex}{{3}{2}{section*.5}}
+\backcite {liu2019flownet3d}{{3}{2}{section*.5}}
+\backcite {niemeyer2019occupancy}{{3}{2}{section*.5}}
+\backcite {wu2020pointpwc}{{3}{2}{section*.5}}
+\backcite {vogel20113d}{{3}{2}{section*.5}}
+\backcite {vogel2013piecewise}{{3}{2}{section*.5}}
+\backcite {raft3D}{{3}{2}{section*.5}}
+\backcite {keller2013real}{{3}{2}{section*.5}}
+\backcite {lin2022occlusionfusion}{{3}{2}{section*.5}}
+\backcite {newcombe2011kinectfusion}{{3}{2}{section*.5}}
+\backcite {dynamicfusion}{{3}{2}{section*.5}}
+\backcite {vaswani2017attention}{{4}{3.1}{subsection.3.1}}
+\backcite {softsplat}{{4}{3.1}{subsection.3.1}}
+\backcite {chan2022efficient}{{4}{3.1}{subsection.3.1}}
+\backcite {peng2020convolutional}{{4}{3.1}{subsection.3.1}}
+\backcite {wang2023alto}{{4}{3.1}{subsection.3.1}}
+\backcite {cotracker}{{4}{3.2}{subsection.3.2}}
+\backcite {scikit-learn}{{5}{3.3}{equation.3.4}}
+\backcite {von2007tutorial}{{5}{3.3}{equation.3.4}}
+\backcite {tap-vid}{{5}{3.5}{subsection.3.5}}
+\backcite {kubric}{{5}{3.5}{subsection.3.5}}
+\backcite {ZoeDepth}{{5}{3.5}{subsection.3.5}}
+\backcite {ZoeDepth}{{5}{4}{section.4}}
+\backcite {kinetics}{{6}{\caption@xref {??}{ on input line 29}}{table.caption.8}}
+\backcite {davis}{{6}{\caption@xref {??}{ on input line 29}}{table.caption.8}}
+\backcite {rgb-stacking}{{6}{\caption@xref {??}{ on input line 29}}{table.caption.8}}
+\backcite {tap-vid}{{6}{\caption@xref {??}{ on input line 29}}{table.caption.8}}
+\backcite {pips}{{6}{\caption@xref {??}{ on input line 29}}{table.caption.8}}
+\backcite {wang2023tracking}{{6}{\caption@xref {??}{ on input line 29}}{table.caption.8}}
+\backcite {Tapir}{{6}{\caption@xref {??}{ on input line 29}}{table.caption.8}}
+\backcite {cotracker}{{6}{\caption@xref {??}{ on input line 29}}{table.caption.8}}
+\backcite {kinetics}{{6}{1}{table.caption.8}}
+\backcite {davis}{{6}{1}{table.caption.8}}
+\backcite {rgb-stacking}{{6}{1}{table.caption.8}}
+\backcite {tap-vid}{{6}{4.1}{subsection.4.1}}
+\backcite {BADJA}{{6}{4.1}{subsection.4.1}}
+\backcite {zheng2023pointodyssey}{{6}{4.1}{subsection.4.1}}
+\backcite {tap-vid}{{6}{4.1}{subsection.4.1}}
+\backcite {pips}{{6}{4.1}{subsection.4.1}}
+\backcite {wang2023tracking}{{6}{4.1}{subsection.4.1}}
+\backcite {Tapir}{{6}{4.1}{subsection.4.1}}
+\backcite {cotracker}{{6}{4.1}{subsection.4.1}}
+\backcite {tap-vid}{{6}{4.1}{section*.9}}
+\backcite {davis}{{6}{4.1}{section*.9}}
+\backcite {kinetics}{{6}{4.1}{section*.9}}
+\backcite {rgb-stacking}{{6}{4.1}{section*.9}}
+\backcite {tap-vid}{{6}{4.1}{section*.9}}
+\backcite {cotracker}{{6}{4.1}{section*.9}}
+\backcite {BADJA}{{6}{4.1}{section*.12}}
+\backcite {tap-vid}{{6}{\caption@xref {??}{ on input line 8}}{table.caption.10}}
+\backcite {pips}{{6}{\caption@xref {??}{ on input line 9}}{table.caption.10}}
+\backcite {Tapir}{{6}{\caption@xref {??}{ on input line 10}}{table.caption.10}}
+\backcite {wang2023tracking}{{6}{\caption@xref {??}{ on input line 11}}{table.caption.10}}
+\backcite {cotracker}{{6}{\caption@xref {??}{ on input line 12}}{table.caption.10}}
+\backcite {BADJA}{{6}{2}{table.caption.10}}
+\backcite {tap-vid}{{6}{\caption@xref {??}{ on input line 8}}{table.caption.11}}
+\backcite {zheng2023pointodyssey}{{6}{\caption@xref {??}{ on input line 10}}{table.caption.11}}
+\backcite {cotracker}{{6}{\caption@xref {??}{ on input line 11}}{table.caption.11}}
+\backcite {ZoeDepth}{{6}{\caption@xref {??}{ on input line 12}}{table.caption.11}}
+\backcite {zheng2023pointodyssey}{{6}{3}{table.caption.11}}
+\backcite {zheng2023pointodyssey}{{6}{4.1}{section*.14}}
+\backcite {zheng2023pointodyssey}{{6}{4.1}{section*.14}}
+\backcite {ZoeDepth}{{6}{4.1}{section*.14}}
+\backcite {cotracker}{{7}{\caption@xref {??}{ on input line 7}}{figure.caption.13}}
+\backcite {cotracker}{{7}{\caption@xref {??}{ on input line 28}}{figure.caption.13}}
+\backcite {cotracker}{{7}{\caption@xref {??}{ on input line 59}}{figure.caption.13}}
+\backcite {cotracker}{{7}{\caption@xref {??}{ on input line 79}}{figure.caption.13}}
+\backcite {cotracker}{{7}{3}{figure.caption.13}}
+\backcite {cotracker}{{7}{4.1}{section*.15}}
+\backcite {davis}{{7}{4.1}{section*.15}}
+\backcite {raft3D}{{7}{4.2}{subsection.4.2}}
+\backcite {cotracker}{{7}{4.2}{subsection.4.2}}
+\backcite {zheng2023pointodyssey}{{7}{4.2}{subsection.4.2}}
+\backcite {raft3D}{{8}{\caption@xref {??}{ on input line 8}}{table.caption.16}}
+\backcite {cotracker}{{8}{\caption@xref {??}{ on input line 9}}{table.caption.16}}
+\backcite {ranftl2021vision}{{8}{\caption@xref {??}{ on input line 11}}{table.caption.17}}
+\backcite {birkl2023midas}{{8}{\caption@xref {??}{ on input line 12}}{table.caption.17}}
+\backcite {ZoeDepth}{{8}{\caption@xref {??}{ on input line 13}}{table.caption.17}}
+\backcite {ZoeDepth}{{8}{5}{table.caption.17}}
+\backcite {birkl2023midas}{{8}{5}{table.caption.17}}
+\backcite {ranftl2021vision}{{8}{5}{table.caption.17}}
+\backcite {MIFDB16}{{8}{4.2}{table.caption.17}}
+\backcite {tap-vid}{{8}{4.3}{section*.18}}
+\backcite {pont20172017}{{8}{4.3}{section*.18}}
+\backcite {ZoeDepth}{{8}{4.3}{section*.20}}
+\backcite {birkl2023midas}{{8}{4.3}{section*.20}}
+\backcite {ranftl2021vision}{{8}{4.3}{section*.20}}
+\backcite {tap-vid}{{8}{4.3}{section*.20}}
+\backcite {pont20172017}{{8}{4.3}{section*.20}}
+\backcite {ZoeDepth}{{8}{4.3}{section*.20}}
+\backcite {birkl2023midas}{{8}{4.3}{section*.20}}
+\backcite {ranftl2021vision}{{8}{4.3}{section*.20}}

@@ -1,0 +1,285 @@
+\newpage
+\section{Code}
+
+TrailBlazer is mostly developed using the open source library \textsf{diffusers}. The core of TrailBlazer is the attention processor, whose implementation is shown in \SecRef{sec:routine} below (see  \texttt{diffusers.models.attention\_processor.AttnProcessor}). In addition,  subject morphing is achieved by modifying the forward function in \texttt{diffusers.models.unet\_3d\_condition.UNet3DConditionModel} to allow interpolated prompt embeddings as conditioning. We omit irrelevant code in order to simplify this section.
+
+\subsection{Fundamental}
+\label{sec:fund}
+The code snippets in this section illustrate how TrailBlazer employs 2D Gaussian weights to generate the injection attention in the spatial and temporal attention editing steps.
+
+
+\begin{tiny}
+\begin{minted}{python}
+def get_weight_map(
+    res: int, bbox_ratios: List[float], attention_probs: torch.tensor
+) -> (torch.tensor, BoundingBox):
+    """To get guassian weight map associated to specific dimension, normalized
+    by the maximum of the current cross attention map
+
+    Args:
+        res(int): the resolution of this weight map
+        bbox_ratios(List[float]): a list of four numbers for bbox
+        attention_probs(torch.tensor): the cross attention map from the base class
+    Returns:
+        (torch.tensor, BoundingBox): the gaussian patch for injection and its bbox
+    """
+    bbox = BoundingBox(res, bbox_ratios)
+    x = torch.linspace(0, bbox.height, bbox.height)
+    y = torch.linspace(0, bbox.width, bbox.width)
+    x, y = torch.meshgrid(x, y, indexing="ij")
+    noise_patch = gaussian_2d(
+        x,
+        y,
+        mx=int(bbox.height / 2.),
+        my=int(bbox.width / 2.),
+        sx=float(bbox.height),
+        sy=float(bbox.width),
+    )
+    noise_patch.mul_(attention_probs.max())
+    return noise_patch, bbox
+
+\end{minted}
+\end{tiny}
+
+
+
+\begin{tiny}
+\begin{minted}{python}
+def localized_spatial_weight_map(
+    attention_probs_4d: torch.tensor, token_inds, bboxes_per_frame: List[List[float]]
+):
+    """Using guassian 2d distribution to generate weight patch as described in
+    the equation (1), (2) in our main text.
+
+    Args:
+        attention_probs_4d(torch.tensor): the cross attention in the shape of (#heads, height, width, 77)
+        token_inds(List[int]): the set of prompt word and trailing indices from user
+        bboxes_per_frame(List[float]): a list of bbox ratios at frame
+    Returns:
+        (torch.tensor): the weight map for spatial injection
+
+    """
+    dim = int(attention_probs_4d.size()[1])
+    weight_map = torch.zeros_like(attention_probs_4d).half()
+    attn_head_size = attention_probs_4d.shape[0] // len(bboxes_per_frame)
+    for i in range(len(bboxes_per_frame)):
+        weight_patch = (
+            get_weight_map(
+                res=dim,
+                bbox_ratios=bboxes_per_frame[i],
+                attention_probs=attention_probs_4d,
+            )
+            # to match dimension
+            .unsqueeze(0)
+            .unsqueeze(-1)
+            .repeat(attn_head_size, 1, 1, len(token_inds))
+        )
+        b_idx = attn_head_size * i
+        e_idx = attn_head_size * (i + 1)
+        bbox.sliced_tensor_in_bbox(weight_map)[
+            b_idx:e_idx, ..., token_inds
+        ] = weight_patch
+    return weight_map
+\end{minted}
+\end{tiny}
+
+
+
+
+
+\begin{tiny}
+\begin{minted}{python}
+
+def localized_temporal_weight_map(
+    attention_probs_5d: torch.tensor, bboxes_per_frame: List[List[float]]
+):
+    """To generate the gaussian weight map matching the temporal attention
+    dimensions. The Sm(x,y) in the equation (3) in TrailBlazer main text.
+
+    Args:
+        attention_probs_5d(torch.tensor): the cross attention in the shape of (#heads, height, width, #frames, #frames)
+        bboxes_per_frame(List[float]): a list of four numbers determining the bbox corners
+    """
+    dim = int(attention_probs_5d.size()[1])
+    f = attention_probs_5d.shape[-1]
+    max_val = attention_probs_5d.max()
+    weight_map = torch.zeros_like(attention_probs_5d).half()
+    def get_patch(
+        i: int, j: int, bbox_at_frame: List[float], bboxes_per_frame: List[List[float]]
+    ):
+        """To calculate the weight patch with distance function desbribed in
+        Sm(x,y) in the paper
+        Args:
+            i(int): frame index
+            j(int): frame index
+            bbox_at_frame(List[float]): list of four numbers for bbox
+            bboxes_per_frame(List[List[float]]): all bboxes per frame
+        Returns:
+            (torch.tensor): the weight map for temporal injection
+        """
+        weight_map = (
+            get_weight_map(
+                res=dim,
+                bbox_ratios=bboxes_per_frame,
+                attention_probs=attention_probs_5d,
+            )
+            # NOTE: to match dimension at layer
+            .unsqueeze(0).repeat(attention_probs_5d.shape[0], 1, 1)
+        )
+        noise_patch.mul_(attention_probs_5d.max())
+        inv_noise_patch = noise_patch - noise_patch.max()
+        # NOTE: distance is large when
+        dist = (float(abs(j - i))) / len(bboxes_per_frame)
+        final_patch = inv_noise_patch * dist + noise_patch * (1.0 - dist)
+        return final_patch, bbox
+    # NOTE: To form the weight patch for each pair of bboxes of frames
+    for j in range(len(bboxes_per_frame)):
+        for i in range(len(bboxes_per_frame)):
+            patch_i, bbox_i = get_patch(bboxes_per_frame[i], i, j, bboxes_per_frame)
+            patch_j, bbox_j = get_patch(bboxes_per_frame[j], i, j, bboxes_per_frame)
+            bbox_i.sliced_tensor_in_bbox(weight_map)[..., i, j] = patch_i
+            bbox_j.sliced_tensor_in_bbox(weight_map)[..., i, j] = patch_j
+
+    return weight_map
+
+\end{minted}
+\end{tiny}
+
+\subsection{Main routine}
+\label{sec:routine}
+\begin{tiny}
+\begin{minted}{python}
+class InjecterProcessor():
+    """The similar implementation as in
+    diffusers.models.attention_processor.AttnProcessor from the open source
+    project diffusers
+
+    """
+    def __init__(
+        self,
+        bundle: BundleType,
+        bbox_per_frame: List[BoundingBox],
+        strengthen_scale: float = 0.0,
+        weaken_scale: float = 1.0,
+    ):
+        super().__init__(bundle)
+        self.strengthen_scale = strengthen_scale
+        self.weaken_scale = weaken_scale
+        self.bundle = bundle
+        self.bbox_per_frame = bbox_per_frame
+
+    def __call__(
+        self,
+        attn: diffusers.models.attention_processor.Attention,
+        hidden_states: torch.tensor,
+        encoder_hidden_states: torch.tensor,
+    ):
+        """ The caller of attention prosessor
+        Args:
+            attn(Attention): the attention with
+            hidden_states(torch.tensor): the latents from previous layer
+            encoder_hidden_states(torch.tensor): text condition embeddings
+        Returns:
+        """
+        batch_size, sequence_length, _ = hidden_states.shape
+        # NOTE: To Q,K,V from latent and embeddings
+        query = attn.to_q(hidden_states)
+        key = attn.to_k(encoder_hidden_states)
+        value = attn.to_v(encoder_hidden_states)
+        query = attn.head_to_batch_dim(query)
+        key = attn.head_to_batch_dim(key)
+        value = attn.head_to_batch_dim(value)
+        attention_probs = attn.get_attention_scores(query, key)
+
+        # NOTE: To modify the spatial cross attention
+        if (
+            attention_probs.shape[-1] == CrossAttnProcessorBase.MAX_LEN_CLIP_TOKENS
+            and self.use_spatial_editing
+        ):
+            dim = int(np.sqrt(attention_probs.shape[1]))
+            attention_probs_4d = attention_probs.view(
+                attention_probs.shape[0], dim, dim, attention_probs.shape[-1]
+            )
+            #
+            attention_probs_4d = self.dd_core(attention_probs_4d)
+            attention_probs = attention_probs_4d.reshape(
+                attention_probs_4d.shape[0], dim * dim, attention_probs_4d.shape[-1]
+            )
+        # NOTE: To modify temporal cross frame attention
+        elif attention_probs.shape[-1] == self.num_frames and (self.use_temporal_editing):
+            dim = int(np.sqrt(attention_probs.shape[0] // attn.heads))
+            attention_probs_5d = attention_probs.view(
+                attn.heads, dim, dim, self.num_frames, self.num_frames,
+            )
+            attention_probs_5d = self.dd_core(attention_probs_5d)
+            attention_probs = attention_probs_5d.view(
+                (attn.heads * dim * dim, self.num_frames, self.num_frames),
+            )
+
+        hidden_states = torch.bmm(attention_probs, value)
+        hidden_states = attn.batch_to_head_dim(hidden_states)
+        # linear projection
+        hidden_states = attn.to_out[0](hidden_states)
+        # dropout
+        hidden_states = attn.to_out[1](hidden_states)
+        return hidden_states
+
+    def dd_core(self, attention_probs: torch.Tensor):
+        """
+        Args:
+            attention_probs(torch.tensor): A tensor either in 4d or 5d to
+                trigger spatial or temporal attention editing, respectively.
+        Returns:
+            (torch.tensor): modified attention map
+
+        """
+        attention_probs_modified = attention_probs.detach().clone()
+
+        # NOTE: Spatial cross attention editing
+        if len(attention_probs.size()) == 4:
+            # NOTE: token_inds is for specific prompt word
+            token_inds = self.bundle.get("token_inds")
+            # NOTE: trailing_inds is generated by the length determined by user
+            trailing_length = self.bundle.get("trailing_length")
+            trailing_inds = list(
+                range(self.len_prompt + 1, self.len_prompt + trailing_length + 1)
+            )
+            all_tokens_inds = list(set(token_inds).union(set(trailing_inds)))
+            # NOTE: To generate stengthen mask Ss(x,y) in Equation (1)
+            strengthen_map = localized_weight_map(
+                attention_probs_modified,
+                token_inds=all_tokens_inds,
+                bbox_per_frame=self.bbox_per_frame,
+            )
+            # NOTE: To generate weakening mask Ws(x,y) in Equation (1)
+            weaken_map = torch.ones_like(strengthen_map)
+            zero_indices = torch.where(strengthen_map == 0)
+            weaken_map[zero_indices] = self.weaken_scale
+            # NOTE: weakening in Equation (2)
+            attention_probs_modified[..., all_tokens_inds] *= weaken_map[
+                ..., all_tokens_inds
+            ]
+            # NOTE: strengthen in Equation (2)
+            attention_probs_modified[..., all_tokens_inds] += (
+                self.strengthen_scale * strengthen_map[..., all_tokens_inds]
+            )
+        # NOTE: Temporal cross attention editing
+        elif len(attention_probs.size()) == 5:
+            # NOTE: To generate stengthen mask in Equation (3)
+            strengthen_map = localized_temporal_weight_map(
+                attention_probs_modified,
+                bbox_per_frame=self.bbox_per_frame,
+            )
+            # NOTE: To generate weakening mask as in spatial attention
+            weaken_map = torch.ones_like(strengthen_map)
+            zero_indices = torch.where(strengthen_map == 0)
+            weaken_map[zero_indices] = self.weaken_scale
+            # NOTE: weakening in Equation (3)
+            attention_probs_modified *= weaken_map
+            # NOTE: strengthen in Equation (3)
+            attention_probs_modified += self.strengthen_scale * strengthen_map
+
+        return attention_probs_modified
+
+\end{minted}
+\end{tiny}

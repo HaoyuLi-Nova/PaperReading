@@ -1,0 +1,87 @@
+\section{Introduction}
+\label{sec:intro}
+
+\input{figtabs/teaser}
+
+
+
+In video generation, motion is paramount. It can elevate a video from the uncanny valley to realistic or from amateur to professional. Motion guides attention, enhances storytelling, and defines visual style. Skilled filmmakers, like Kubrick and Kurosawa, masterfully use motion to create captivating, immersive experiences.
+Achieving realistic and expressive motion, coupled with granular control, is essential for generating compelling video. While text remains the main control signal for generation, its limitations become apparent when focusing on motion.
+Although effective for describing static scenes in images or high level actions, text struggles to convey the subtleties of motion:
+\eg, a prompt like ``a bear quickly turns its head'' could be interpreted in countless ways. How quick is ``quickly''? What is the exact trajectory? Should it accelerate? 
+Even detailed descriptions fail to capture nuances like ease-in-ease-out timing or synchronized movements.
+These nuances are often better conveyed through the motion itself. 
+
+
+
+Motivated by this, we explore motion as a powerful, complementary control scheme to text. Our first observation is that in order to fully harness the expressiveness of motion, we require a representation that can encode \emph{any} type of motion.
+To this end, we identify spatio-temporally sparse \emph{or} dense motion trajectories~\cite{sand2008particle, harley2022particle} as an ideal candidate. Motion trajectories, a.k.a.~particle video or point tracks, track the movement and visibility of a set of points throughout a video, offering a highly expressive encoding of motion. This representation can capture the trajectories of any number of points, represent object-specific or global scene motion, and even handle temporally sparse motion constraints.
+Furthermore, recent advances in point track estimation have yielded robust and efficient algorithms \cite{doersch2023tapir, doersch2024bootstap,karaev23cotracker,karaev2024cotracker3} that are capable of processing diverse real-world videos to generate constraints for training. 
+Given the comprehensive and flexible nature of this motion representation, akin to text, we designate our motion conditioning as \emph{motion prompts}. 
+We then train a motion trajectory ControlNet~\cite{zhang2023adding} on top of a pre-trained video diffusion model~\cite{bar2024lumiere} to accept the motion prompt conditioning.
+
+
+While these motion prompts can define any type of video motion, what is less clear is how a user would generate them in practice. 
+Sparse trajectories, which give the rough direction of a few pixels or patches, may be easy to specify with mouse drags, but do not sufficiently constrain the generation process and fall short with respect to fine-grained control. Conversely, dense trajectories, though offering precise control, are impractical to design manually. 
+To address this, our second observation is that we can often translate high level user requests (\eg, ``move the camera around the $xz$ plane'', ``rotate the head of the cat'') into detailed motion trajectories through computer vision signals. We denote this process as \emph{motion prompt expansion} due to its similarities to prompt expansion~\cite{datta2023prompt} or rewriting~\cite{betker2023improving} for text in image generation. This method is intended to bridge the gap between user goals and our  motion representation. 
+
+
+
+
+
+We identify several instances where motion prompt expansion can be an effective tool including (\cref{fig:teaser}): converting user mouse drags into semi-dense motion trajectories allowing users to ``interact'' with an image by manipulating hair or sand (\cref{sec:interacting});  simultaneously specifying camera and object motion (\cref{sec:composition}); performing motion transfer where motion from a given video is applied to a different first frame (\cref{sec:transfer}); and performing drag-based image editing (\cref{sec:interacting}). While these results are not yet real time or causal, they strongly hint at how users may interact with generative world models, and allows us to probe the video prior of the generator to understand the aspects of physics and general world knowledge it has learned.
+
+
+
+Finally we present quantitative results and human studies against baselines, indicating that our model performs well. We also present ablations to validate our design choices and give insight. In summary, our contributions are:
+
+\begin{itemize}
+    \item We focus on motion as a conditioning signal and identify spatio-temporally sparse \emph{or} dense motion tracks as a flexible motion representation that can accomplish many aspects of motion control. We train a ControlNet to accept these \emph{motion prompts} as conditioning.
+    \item We propose \emph{motion prompt expansion}, a process which takes simple user input and produces more complex motion tracks, which allow for more fine-grained control. 
+    \item We then apply our approach to a wide range of tasks, such as object control, camera control, motion transfer, or drag-based image editing. 
+    \item We also show emergent behavior, such as physics, which suggests that these motion prompts may be used to probe video models or interact with future world models.
+    \item We evaluate our method against baselines with quantitative metrics and a human study, showing that our model performs well compared to baselines.
+\end{itemize}
+
+\ignore{
+Current video generation models may be conditioned on any text prompt, but motion conditioning is limited to specific kinds of motion. For example, some models enable only sparse trajectory control, while others train for camera motion, and still others allow a user to move bounding boxes around. We propose to unify all motion conditioning under a single model, trained to be conditioned on any motion in general. 
+
+
+In order to do this, we propose using {\it point tracks}~\cite{harley2022particle,doersch2023tapir,wang2023omnimotion}, as a general representation for motion. This representation is attractive because it is highly expressive -- we can use it to encode the trajectories of single points, or thousands of points at once. We can encode the motion of specific objects, or of a global scene. And we can encode temporally sparse motion, and represent occlusions. Moreover, recent work in point track estimators~\cite{doersch2023tapir,doersch2024bootstap,harley2022particle,zheng2023point,karaev23cotracker,karaev2024cotracker3,wang2023omnimotion} means that we can simply apply off-the-shelf models to large datasets of videos and obtain enough tracks to train our model at scale.
+
+We first present a simple architecture for conditioning a video model on point tracks, as well as an initial frame. The architecture is specifically designed to handle anywhere from just a single conditioning track to thousands of tracks, as well as occlusions, and the absence of tracks. We focus on making the architecture and training recipe as simple and scalable as possible. 
+
+The resulting model is powerful and flexible, and subsumes prior models trained for very specific classes of motion conditioning, but also requires care to control. We therefore propose {\it motion prompting}. Just as a person can design language prompts to induce certain behaviors from a language model, we find that by designing specific {\it motion prompts} we can induce a wide range of capabilities from our motion conditioned model. 
+
+For example, one simple motion prompt involves translating user mouse drags and motion into tracks. These tracks can then be fed to the model to get sparse motion control of sampled videos (\cref{sec:sparse}). This allows a user to move an object in a video, but can also result in more complex behavior, such as ``interaction" with hair or sand physics (\cref{fig:sparse}). In effect, this kind of motion prompting lets us probe the video prior of the model, and allows us to investigate what aspects of physics and general world knowledge the model has and has not learned. Moreover, these motion prompts can be seen as a way to interact with the underlying world model of these video generators.
+
+Beyond just sparse trajectories, we can use mouse motions to manipulate tracks on geometric primitives, such as spheres (\cref{sec:primitives}). By placing these tracks over an entity with approximately the same geometry, we can effect more precise control over an object.
+
+Another kind of motion prompt enables precise camera control (\cref{sec:depth}). We do this by using an off-the-shelf depth estimator to obtain tracks for a given trajectory of camera poses. As opposed to prior work, our model is not trained specifically for camera control, nor is it conditioned specifically on camera poses. This capability emerges from our large scale training on {\it general} motions, indicating that such motion specific training is not necessary.
+
+We also show that motion prompts can be composed. For example, we can combine tracks that give us camera control which tracks that give us object control, leading to manipulation of both simultaneously (\cref{sec:composition}). Again, prior work presents complex training pipelines to achieve this, whereas we find that this ability simply emerges from training on general motions and prompting correctly.
+
+In addition, we can construct motion prompts for specific applications. For example, drag-based image editing~\cite{pan2023drag,shi2023dragdiffusion,mou2023dragondiffusion,geng2024motion} can be viewed as a video generation problem, where the drags are just tracks (\cref{sec:drag}). We can also perform motion transfer, in which motion from a given video is applied to a different first frame image (\cref{sec:transfer}). Here, we find that our model is surprisingly robust, and is able to transfer motions to highly out-of-domain first frames.
+
+We note that video diffusion models require text prompts as input as well, and the influence of these vs motion prompts is not well understood. In this work, we show that our approach is robust to input text prompt, and these can be given coarsely on the video level while still generating different motion types. 
+
+Finally we present quantitative results and human studies against baselines, indicating that our model is more effective and flexible. We also present ablations to validate our design choices and give insight to our model. In summary, our contributions are:
+
+\begin{itemize}
+    \item We propose training video models to be conditioned on {\it any} motion, unifying prior work that conditions on specific motions.
+    \item Towards this goal, we propose point trajectories as a {\it general} representation of motion, and design and train a simple but flexible model for this conditioning signal.
+    \item We show how to {\it prompt} our resulting model to induce different capabilities, such as object control, camera control, motion transfer, or drag-based editing.    
+    \item We offer numerous qualitative results, demonstrating that our method can perform a wide range of tasks. 
+    \item In addition, we show emergent behavior through motion prompting, such as physics, which suggests that we may use these prompts to probe video models.
+    \item We propose a benchmark for motion-conditioned video generation, and evaluate our method against baselines with quantitative metrics and a human study, showing that our model is effective and flexible.
+\end{itemize}
+
+
+}
+
+
+
+
+
+
+

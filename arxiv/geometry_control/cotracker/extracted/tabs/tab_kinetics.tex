@@ -1,0 +1,15 @@
+\begin{tabular}{cccc}
+\toprule
+ \multirow{2}{*}{Stride} &  \multicolumn{3}{c}{Kinetics First} \\
+\cmidrule(lr){2-4}
+                         &  AJ                                 &  $\delta^{vis}_{avg}$ &  OA           \\
+\midrule
+PIPs++                   &  ---                                &  58.5                 &  ---          \\
+TAPIR                    &  \textbf{49.6}                      &  64.2                 &  85.0         \\
+CoTracker (Ours)         &  48.8                               &  \textbf{64.5}        &  \textbf{85.8}
+                         \\ \bottomrule
+\end{tabular}
+\caption{
+\textbf{Evaluation on TAP-Vid-Kinetics}. Kinetics contains videos with multiple shots, which does not satisfy the assumptions of most trackers, including CoTracker. The results of CoTracker and TAPIR are comparable, even though TAPIR is an offline method with a specifically designed matching module.
+}\label{tab_kinetics}
+\vspace{2em}

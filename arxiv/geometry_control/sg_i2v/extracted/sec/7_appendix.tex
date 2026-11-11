@@ -1,0 +1,125 @@
+\section{Experimental Setup Details}
+\textbf{Details of FVD.} As mentioned in \cref{sec:exp_setup}, we resize generated videos to $320 \times 576$ before feeding them into the evaluation scripts to ensure a fair comparison. For FVD computation, we further resize all videos to $256 \times 256$, following DragAnything~\citep{wu2024draganything}.\\
+
+\textbf{Details of ObjMC.} Following DragAnything~\citep{wu2024draganything}, we compute ObjMC to evaluate motion fidelity. ObjMC is defined as the framewise average distance between the generated and ground truth trajectories, where the ground truth trajectories are reused from DragAnything, and the generated trajectories are estimated using Co-Tracker v2~\citep{cotracker}. Since the VIPSeg dataset contains videos with varying resolutions (e.g., $480 \times 800$, $1440 \times 2560$), we resize all videos to a uniform resolution (as specified in \cref{tab:baseline}) before feeding them into the models.
+
+Unlike DragAnything, which resizes generated videos back to their original resolutions for ObjMC computation, we resize all videos to a fixed resolution of $320 \times 576$. Additionally, we exclude ground truth trajectory points that fall outside the image space due to objects moving out of frame. We also omit short videos with fewer than 14 frames from the evaluation.
+
+\textbf{Details of zero-shot adopted methods.} Due to the unavailability of zero-shot trajectory-controlled image-to-video generation methods, we adopt techniques from text-to-image and text-to-video methods to establish new baselines in \cref{tab:baseline}.
+
+\textit{FreeTraj$^\dagger$} incorporates the noise initialization technique (called \textit{trajectory injection}) from \citep{qiu2024freetraj}. This work has shown that introducing motion bias into the initial noise—by copy-pasting the noise from the first frame to other frames along the trajectory—can influence motion in the generated videos of text-to-video diffusion models. However, we did not observe similar effects in image-to-video diffusion models. Instead, we found that this approach degraded visual quality, likely because the modified input latents fell out of distribution.
+
+\textit{DragDiffusion$^\dagger$} is inspired by the image editing technique in~\citep{shi2024dragdiffusion}, which utilizes feature maps extracted from the outputs of upsampling blocks to guide the generation process. Specifically, we optimize on the feature maps output by the second and third upsampling blocks at the middle resolution level. Although the original DragDiffusion does not include high-frequency preserved post-processing, we incorporate it in our baseline to enhance visual quality. We use the same hyperparameters as in our method.
+
+\textit{MOFT$^\dagger$} is similar to \textit{DragDiffusion$^\dagger$} but optimizes feature maps derived from \textit{Content Correlation Removal}, as proposed by \citet{MOFT}. Specifically, we optimize on the outputs of the upsampling layers subtracted by their mean features averaged across frames. These feature maps are well-suited for reference-guided motion generation because they are motion-consistent (i.e., pixels with similar motion exhibit similar feature vectors), enabling direct comparison with reference motion feature maps. However, they are less sensitive to semantic information and, therefore, ineffective for our optimization, where reference motion is unavailable.
+
+\section{Additional Qualitative Results}
+We strongly encourage readers to refer to our project website: \url{https://kmcode1.github.io/Projects/SG-I2V} for more visualizations in video format, where we have released \href{https://kmcode1.github.io/Projects/SG-I2V\#obj-motion-results}{qualitative results with various trajectories}, \href{https://kmcode1.github.io/Projects/SG-I2V/gallery_VIPSeg.html}{qualitative results on VIPSeg dataset}, qualitative comparisons with \href{https://kmcode1.github.io/Projects/SG-I2V\#baseline-comparison}{supervised} and \href{https://kmcode1.github.io/Projects/SG-I2V/gallery_zero.html}{zero-shot} baselines, and qualitative analysis for ablation study.
+
+\section{Additional Results for Ablation Study}
+In this subsection, we provide full results for our ablation analysis.
+
+\textbf{Inference time.} Our method generates $14$ frames videos at a resolution of $576 \times 1024$ with $T=50$ sampling steps. Optimization is performed from the timestep $45$ to the timestep $30$ with $5$ iterations per timestep, totaling $75$ optimization iterations. The runtime depends on the number of trajectory conditions, with an average runtime of $305$ seconds on the VIPSeg dataset with A6000 48GB. Due to the need of backpropagation, the peak GPU memory usage amounts to around $30$ GB.
+
+\textbf{PCA visualization.} \cref{fig:correspondence_full} and \cref{fig:correspondence_full_feature} present the visual results of our PCA analysis on feature maps extracted from various layers of SVD across different timesteps (corresponding to \cref{sec:motion_estimation}). 
+We can confirm that our modified self-attention consistently produces semantically aligned feature maps throughout the denoising process.
+
+\textbf{Feature map selection.} \cref{fig:results_attn} presents the visual results of ablating feature maps for optimization. 
+Performing optimization with feature maps naively extracted from original self/temporal attention or upsampling blocks fails to follow the input trajectory due to the weak semantic alignment across frames. 
+In contrast, performing optimization with our modified self-attention features successfully produces videos consistent with the input trajectory.
+This highlights the importance of extracting semantically aligned feature maps for our optimization. 
+
+\textbf{U-Net layer.} 
+Consistent with the quantitative results 
+(\cref{tab:results_layer}), \cref{fig:figure_layer} has qualitatively confirmed that optimizing with feature maps extracted from the middle layers of the upward path produces plausible videos consistent with the input trajectory.
+
+\textbf{Denoising timesteps.} 
+Continuing from the main paper, we further analyze the effect of extracting feature maps from different timesteps.
+\cref{fig:results_timesteps} qualitatively demonstrates the effect of optimizing latent at individual denoising timesteps.  
+Consistent with the quantitative results demonstrated in \cref{tab:results_timesteps}, performing optimization at later stage of denoising steps (i.e. $t=10, 20$) severely introduces artifacts in the generated videos.
+Next, we examine the effects of performing optimization for multiple timesteps by fixing the total number of iterations for optimization.
+As summarized in \cref{tab:results_timesteps_range}, we observe similar trends as optimizing individual timesteps, where performing optimization at the later stage of the denoising process significantly degrades visual quality, while performing optimization up to timestep $40$ is not enough for motion control. 
+Overall, running optimization for multiple timesteps performs better than running optimization only at a single timestep, and hence we adapt continuous timesteps for our experiments. 
+
+\textbf{Gaussian weighting.} Following DragAnything, we weigh the feature difference using a Gaussian heatmap during the loss computation in \cref{sec:motion_optimization}. This accounts for potential errors in placing bounding boxes, where the bounding box may include background pixels around the object that are not intended to be moved. As shown in our ablation on the VIPSeg dataset (\cref{tab:gaussian_ablation}), Gaussian weighting results in small but consistent improvement across all metrics.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\textwidth]{imgs/correspondence_full_labeled.jpg}
+\caption{\textbf{Semantic correspondences in video diffusion models across timesteps.}
+Output feature maps of upsampling blocks have limited semantic correspondences across frames.
+In contrast, our modified self-attention layers produce semantically aligned feature maps across all the timesteps.
+}
+\label{fig:correspondence_full}
+\end{figure}
+
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\textwidth]{imgs/correspondence_full_feature_labeled.jpg}
+\caption{\textbf{Semantic correspondences of different features in video diffusion models.}
+We find features from self-attention layers to be more semantically aligned than that of temporal attention layers and upsampling layers, while our modified self-attention layer produces the most aligned results due to its explicit formulation to attend to the first frame.
+}
+\label{fig:correspondence_full_feature}
+\end{figure}
+
+
+
+
+\begin{figure}[!t]
+\centering
+
+\includegraphics[width=\textwidth]{imgs/figure_fet_full_labeled.jpg}
+\caption{\textbf{Ablation on U-Net feature maps.}
+Applying loss on feature maps extracted from original self/temporal-attention layers or upsampling blocks fails to follow the trajectory due to the semantic misalignment across frames.
+In contrast, performing optimization with our modified self-attention layers can produce videos consistent with the input trajectory, indicating the importance of using semantically aligned feature maps.
+Please see \href{https://kmcode1.github.io/Projects/SG-I2V\#ablation-unet-featuremap}{\textit{our project page}} for more qualitative results.}
+\label{fig:results_attn}
+\end{figure}
+
+
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\textwidth]{imgs/figure_layer_labeled.jpg}
+\caption{\textbf{Ablation on U-Net layer to extract feature maps.} Consistent with the quantitative results in \cref{tab:results_layer}, feature maps extracted from the middle resolution level are most useful for trajectory guidance. Optimizing on other feature maps may generate unrealistic videos with low motion fidelity.}
+\label{fig:figure_layer}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\textwidth]{imgs/figure_time_labeled.jpg}
+\caption{\textbf{Visual comparison of different denoising timesteps.}
+Here we show the \emph{last} frame of the generated video. Optimizing latent at later denoising process leads to severe artifacts.
+}
+\label{fig:results_timesteps}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\textwidth]{imgs/ablation_range.pdf}
+\caption{\textbf{Effect of optimizing latent at multiple denoising timesteps.}
+Here we perform optimization on multiple denoising timesteps ($t=50$ corresponds to standard Gaussian noise).
+Similar to performing individual timestep~\cref{tab:results_timesteps},  performing optimization up to middle timesteps (e.g. $50-30$) achieves the best motion fidelity while maintaining visual quality.
+}
+\label{tab:results_timesteps_range}
+\end{figure}
+
+\begin{table*}[!t]
+\caption{
+\textbf{Ablation on Gaussian weighting on the VIPSeg dataset.}
+Using a Gaussian heatmap in loss computation consistently improves the results across all metrics.
+}
+\label{tab:gaussian_ablation}
+\begin{center}
+    \resizebox{0.5\textwidth}{!}{
+    \begin{tabular}{lcccc}
+        \toprule
+        \textit{Mask shape}  & FID ($\downarrow$) & FVD ($\downarrow$) & ObjMC ($\downarrow$)  \\
+        \midrule
+        Gaussian weighting &28.87 & 298.10 & 14.43 \\
+        Identity weighting & 28.88 & 300.20 & 14.72 \\
+        \bottomrule
+    \end{tabular}}
+    \end{center}
+\end{table*}

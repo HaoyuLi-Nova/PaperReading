@@ -1,0 +1,1378 @@
+@InProceedings{OWLViTlarge,
+author="Minderer, Matthias
+and Gritsenko, Alexey
+and Stone, Austin
+and Neumann, Maxim
+and Weissenborn, Dirk
+and Dosovitskiy, Alexey
+and Mahendran, Aravindh
+and Arnab, Anurag
+and Dehghani, Mostafa
+and Shen, Zhuoran
+and Wang, Xiao
+and Zhai, Xiaohua
+and Kipf, Thomas
+and Houlsby, Neil",
+editor="Avidan, Shai
+and Brostow, Gabriel
+and Ciss{\'e}, Moustapha
+and Farinella, Giovanni Maria
+and Hassner, Tal",
+title="Simple Open-Vocabulary Object Detection",
+booktitle="Computer Vision -- ECCV 2022",
+year="2022",
+publisher="Springer Nature Switzerland",
+address="Cham",
+pages="728--755",
+abstract="Combining simple architectures with large-scale pre-training has led to massive improvements in image classification. For object detection, pre-training and scaling approaches are less well established, especially in the long-tailed and open-vocabulary setting, where training data is relatively scarce. In this paper, we propose a strong recipe for transferring image-text models to open-vocabulary object detection. We use a standard Vision Transformer architecture with minimal modifications, contrastive image-text pre-training, and end-to-end detection fine-tuning. Our analysis of the scaling properties of this setup shows that increasing image-level pre-training and model size yield consistent improvements on the downstream detection task. We provide the adaptation strategies and regularizations needed to attain very strong performance on zero-shot text-conditioned and one-shot image-conditioned object detection. Code and models are available on GitHub github.com/google-research/scenic/tree/main/scenic/projects/owl{\_}vit.",
+isbn="978-3-031-20080-9"
+}
+
+
+@InProceedings{
+    Ng_2022_CVPR,
+    author    = {Ng, Xun Long and Ong, Kian Eng and Zheng, Qichen and Ni, Yun and Yeo, Si Yong and Liu, Jun},
+    title     = {Animal Kingdom: A Large and Diverse Dataset for Animal Behavior Understanding},
+    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+    month     = {June},
+    year      = {2022},
+    pages     = {19023-19034}
+ }
+
+@article{cifar10,
+title= {CIFAR-10 (Canadian Institute for Advanced Research)},
+journal= {},
+author= {Alex Krizhevsky and Vinod Nair and Geoffrey Hinton},
+year= {},
+url= {http://www.cs.toronto.edu/~kriz/cifar.html},
+abstract= {The CIFAR-10 dataset consists of 60000 32x32 colour images in 10 classes, with 6000 images per class. There are 50000 training images and 10000 test images. 
+
+The dataset is divided into five training batches and one test batch, each with 10000 images. The test batch contains exactly 1000 randomly-selected images from each class. The training batches contain the remaining images in random order, but some training batches may contain more images from one class than another. Between them, the training batches contain exactly 5000 images from each class. },
+keywords= {Dataset},
+terms= {}
+}
+
+
+@misc{obukhov2020torchfidelity,
+  author={Anton Obukhov and Maximilian Seitzer and Po-Wei Wu and Semen Zhydenko and Jonathan Kyl and Elvis Yu-Jing Lin},
+  year=2020,
+  title={High-fidelity performance metrics for generative models in PyTorch},
+  url={https://github.com/toshas/torch-fidelity},
+  publisher={Zenodo},
+  version={v0.3.0},
+  doi={10.5281/zenodo.4957738},
+  note={Version: 0.3.0, DOI: 10.5281/zenodo.4957738}
+}
+
+@inproceedings{FID,
+ author = {Heusel, Martin and Ramsauer, Hubert and Unterthiner, Thomas and Nessler, Bernhard and Hochreiter, Sepp},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {I. Guyon and U. Von Luxburg and S. Bengio and H. Wallach and R. Fergus and S. Vishwanathan and R. Garnett},
+ pages = {},
+ publisher = {Curran Associates, Inc.},
+ title = {GANs Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium},
+ url = {https://proceedings.neurips.cc/paper_files/paper/2017/file/8a1d694707eb0fefe65871369074926d-Paper.pdf},
+ volume = {30},
+ year = {2017}
+}
+
+@inproceedings{allyouneedattn,
+ author = {Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N and Kaiser, \L ukasz and Polosukhin, Illia},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {I. Guyon and U. Von Luxburg and S. Bengio and H. Wallach and R. Fergus and S. Vishwanathan and R. Garnett},
+ pages = {},
+ publisher = {Curran Associates, Inc.},
+ title = {Attention is All you Need},
+ url = {https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf},
+ volume = {30},
+ year = {2017}
+}
+
+
+@misc{paszke2019pytorch,
+      title={PyTorch: An Imperative Style, High-Performance Deep Learning Library}, 
+      author={Adam Paszke and Sam Gross and Francisco Massa and Adam Lerer and James Bradbury and Gregory Chanan and Trevor Killeen and Zeming Lin and Natalia Gimelshein and Luca Antiga and Alban Desmaison and Andreas Köpf and Edward Yang and Zach DeVito and Martin Raison and Alykhan Tejani and Sasank Chilamkurthy and Benoit Steiner and Lu Fang and Junjie Bai and Soumith Chintala},
+      year={2019},
+      eprint={1912.01703},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG}
+}
+
+
+__     ___     _            ____  _  __  __           _             
+\ \   / (_) __| | ___  ___ |  _ \(_)/ _|/ _|_   _ ___(_) ___  _ __  
+ \ \ / /| |/ _` |/ _ \/ _ \| | | | | |_| |_| | | / __| |/ _ \| '_ \ 
+  \ V / | | (_| |  __/ (_) | |_| | |  _|  _| |_| \__ \ | (_) | | | |
+   \_/  |_|\__,_|\___|\___/|____/|_|_| |_|  \__,_|___/_|\___/|_| |_|
+
+@misc{yang2022diffusion,
+      title={Diffusion Probabilistic Modeling for Video Generation}, 
+      author={Ruihan Yang and Prakhar Srivastava and Stephan Mandt},
+      year={2022},
+      eprint={2203.09481},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+
+@inproceedings{voleti2022MCVD,
+ author = {Voleti, Vikram and Jolicoeur-Martineau, Alexia and Pal, Christopher},
+ title = {MCVD: Masked Conditional Video Diffusion for Prediction, Generation, and Interpolation},
+ url = {https://arxiv.org/abs/2205.09853},
+ booktitle = {(NeurIPS) Advances in Neural Information Processing Systems},
+ year = {2022}
+}
+
+@misc{Infilling2022,
+doi = {10.48550/ARXIV.2206.07696},
+ url = {https://arxiv.org/abs/2206.07696},
+author = {Höppe, Tobias and Mehrjou, Arash and Bauer, Stefan and Nielsen, Didrik and Dittadi, Andrea},
+title = {Diffusion Models for Video Prediction and Infilling},
+publisher = {arXiv},
+year = {2022},
+copyright = {arXiv.org perpetual, non-exclusive license}
+}
+
+ @article{nvidianoiseprior,
+              title={Preserve Your Own Correlation: 
+                A Noise Prior for Video Diffusion Models},
+              author={Songwei Ge and Seungjun Nah and Guilin Liu 
+                and Tyler Poon and Andrew Tao and Bryan Catanzaro 
+                and David Jacobs and Jia-Bin Huang and 
+                Ming-Yu Liu and Yogesh Balaji},
+              journal={Proceedings of the IEEE/CVF International 
+                Conference on Computer Vision 2023},
+              year={2023}
+            }
+          
+
+@misc{harvey2022flexible,
+      title={Flexible Diffusion Modeling of Long Videos}, 
+      author={William Harvey and Saeid Naderiparizi and Vaden Masrani and Christian Weilbach and Frank Wood},
+      year={2022},
+      eprint={2205.11495},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+
+@article{Esser2023StructureAC,
+  title={Structure and Content-Guided Video Synthesis with Diffusion Models},
+  author={Patrick Esser and Johnathan Chiu and Parmida Atighehchian and Jonathan Granskog and Anastasis Germanidis},
+  journal={ArXiv},
+  year={2023},
+  volume={abs/2302.03011},
+  url={https://api.semanticscholar.org/CorpusID:256615582}
+}
+
+@inproceedings{wu2023tune,
+  title={Tune-a-video: One-shot tuning of image diffusion models for text-to-video generation},
+  author={Wu, Jay Zhangjie and Ge, Yixiao and Wang, Xintao and Lei, Stan Weixian and Gu, Yuchao and Shi, Yufei and Hsu, Wynne and Shan, Ying and Qie, Xiaohu and Shou, Mike Zheng},
+  booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
+  pages={7623--7633},
+  year={2023}
+}
+
+@misc{ho2022video,
+      title={Video Diffusion Models}, 
+      author={Jonathan Ho and Tim Salimans and Alexey Gritsenko and William Chan and Mohammad Norouzi and David J. Fleet},
+      year={2022},
+      eprint={2204.03458},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+
+@misc{keyframe,
+  title = {keyframe},
+  author = {wiki},
+  url = {https://en.wikipedia.org/wiki/Key-frame},
+  note = {Accessed: 2023-10-01},
+  year = {2023},
+}
+
+
+@misc{zeroscope,
+  title = {zeroscope-v2-576w},
+  author = {cerspense},
+  url = {https://huggingface.co/cerspense/zeroscope-v2-576w},
+  note = {Accessed: 2023-10-01},
+  year = {2023},
+}
+
+@misc{modelscope,
+      title={ModelScope Text-to-Video Technical Report}, 
+      author={Jiuniu Wang and Hangjie Yuan and Dayou Chen and Yingya Zhang and Xiang Wang and Shiwei Zhang},
+      year={2023},
+      eprint={2308.06571},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+
+@misc{luo2023videofusion,
+      title={VideoFusion: Decomposed Diffusion Models for High-Quality Video Generation}, 
+      author={Zhengxiong Luo and Dayou Chen and Yingya Zhang and Yan Huang and Liang Wang and Yujun Shen and Deli Zhao and Jingren Zhou and Tieniu Tan},
+      year={2023},
+      eprint={2303.08320},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+
+@misc{yan2023magicprop,
+      title={MagicProp: Diffusion-based Video Editing via Motion-aware Appearance Propagation}, 
+      author={Hanshu Yan and Jun Hao Liew and Long Mai and Shanchuan Lin and Jiashi Feng},
+      year={2023},
+      eprint={2309.00908},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+
+@article{Ho2022ImagenVH,
+  title={Imagen Video: High Definition Video Generation with Diffusion Models},
+  author={Jonathan Ho and William Chan and Chitwan Saharia and Jay Whang and Ruiqi Gao and Alexey A. Gritsenko and Diederik P. Kingma and Ben Poole and Mohammad Norouzi and David J. Fleet and Tim Salimans},
+  journal={ArXiv},
+  year={2022},
+  volume={abs/2210.02303},
+  url={https://api.semanticscholar.org/CorpusID:252715883}
+}
+
+@inproceedings{blattmann2023videoldm,
+    title={Align your Latents: High-Resolution Video Synthesis with Latent Diffusion Models},
+    author={Blattmann, Andreas and Rombach, Robin and Ling, Huan and Dockhorn, Tim and Kim, Seung Wook and Fidler, Sanja and Kreis, Karsten},
+    booktitle={IEEE Conference on Computer Vision and Pattern Recognition ({CVPR})},
+    year={2023}
+}
+
+@article{qi2023fatezero,
+      title={FateZero: Fusing Attentions for Zero-shot Text-based Video Editing}, 
+      author={Chenyang Qi and Xiaodong Cun and Yong Zhang and Chenyang Lei and Xintao Wang and Ying Shan and Qifeng Chen},
+      year={2023},
+      journal={arXiv:2303.09535},
+}
+
+@article{text2video-zero,
+    title={Text2Video-Zero: Text-to-Image Diffusion Models are Zero-Shot Video Generators},
+    author={Khachatryan, Levon and Movsisyan, Andranik and Tadevosyan, Vahram and Henschel, Roberto and Wang, Zhangyang and Navasardyan, Shant and Shi, Humphrey},
+    journal={arXiv preprint arXiv:2303.13439},
+    year={2023}
+}
+
+@misc{jain2023peekaboo,
+      title={PEEKABOO: Interactive Video Generation via Masked-Diffusion}, 
+      author={Yash Jain and Anshul Nasery and Vibhav Vineet and Harkirat Behl},
+      year={2023},
+      eprint={2312.07509},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+
+@misc{lian2023llmgrounded,
+      title={LLM-grounded Video Diffusion Models}, 
+      author={Long Lian and Baifeng Shi and Adam Yala and Trevor Darrell and Boyi Li},
+      year={2023},
+      eprint={2309.17444},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+
+@misc{yang2024directavideo,
+      title={Direct-a-Video: Customized Video Generation with User-Directed Camera Movement and Object Motion}, 
+      author={Shiyuan Yang and Liang Hou and Haibin Huang and Chongyang Ma and Pengfei Wan and Di Zhang and Xiaodong Chen and Jing Liao},
+      year={2024},
+      eprint={2402.03162},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+
+@misc{wang2024boximator,
+      title={Boximator: Generating Rich and Controllable Motions for Video Synthesis}, 
+      author={Jiawei Wang and Yuchen Zhang and Jiaxin Zou and Yan Zeng and Guoqiang Wei and Liping Yuan and Hang Li},
+      year={2024},
+      eprint={2402.01566},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+
+@misc{trailblazerpreprint,
+      title={Omitted for anonymous review}, 
+      year={2023},
+      howpublished={arXiv},
+}
+
+@misc{chen2023controlavideo,
+        title={Control-A-Video: Controllable Text-to-Video Generation with Diffusion Models}, 
+        author={Weifeng Chen and Jie Wu and Pan Xie and Hefeng Wu and Jiashi Li and Xin Xia and Xuefeng Xiao and Liang Lin},
+        year={2023},
+        eprint={2305.13840},
+        archivePrefix={arXiv},
+        primaryClass={cs.CV}
+    }
+
+@article{FVD,
+  author       = {Thomas Unterthiner and
+                  Sjoerd van Steenkiste and
+                  Karol Kurach and
+                  Rapha{\"{e}}l Marinier and
+                  Marcin Michalski and
+                  Sylvain Gelly},
+  title        = {Towards Accurate Generative Models of Video: {A} New Metric {\&}
+                  Challenges},
+  journal      = {CoRR},
+  volume       = {abs/1812.01717},
+  year         = {2018},
+  url          = {http://arxiv.org/abs/1812.01717},
+  eprinttype    = {arXiv},
+  eprint       = {1812.01717},
+  timestamp    = {Sat, 23 Jan 2021 01:13:48 +0100},
+  biburl       = {https://dblp.org/rec/journals/corr/abs-1812-01717.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
+
+
+
+@article{paszke2017automatic,
+  title={Automatic differentiation in PyTorch},
+  author={Paszke, Adam and Gross, Sam and Chintala, Soumith and Chanan, Gregory and Yang, Edward and DeVito, Zachary and Lin, Zeming and Desmaison, Alban and Antiga, Luca and Lerer, Adam},
+  year={2017}
+}
+
+@misc{huggingface,
+  title = {Stable Diffusion 1 Demo},
+  author = {Huggingface},
+  url = {https://huggingface.co/spaces/stabilityai/stable-diffusion-1},
+  note = {Accessed: 2023-01-01},
+  year = {2023},
+}
+
+@online{promptmarketplaces,
+  title = {Best Stable Diffusion Prompts for AI Art; Top 5 List Marketplaces},
+  author = {Marketplaces},
+  url = {https://csform.com/best-prompt-marketplaces-for-ai-art},
+  year = {2023}
+  }
+
+@online{diffusers,
+  key={Diffusers},
+  year = 2023,
+  url = {https://github.com/huggingface/diffusers},
+  title = {Diffusers library},
+}
+
+@online{latentguide,
+  year = 2022,
+  author = {E. Smith},
+  title = {A Traveler's Guide to the Latent Space},
+  url = {https://www.notion.so/A-Traveler-s-Guide-to-the-Latent-Space-85efba7e5e6a40e5bd3cae980f30235f},
+}
+
+@online{BeginnerFilmLanguage,
+  Xcitekey={learnaboutfilm.com},
+  author = {https://www.learnaboutfilm.com/},
+  title = {Telling Your Story: Film Language for Beginner Filmmakers},
+  year = 2023,
+  url = {https://www.learnaboutfilm.com/film-language},
+  urldate = {2023-01-15}
+}
+
+@book{FilmGrammar,
+  author = {Arijon, Daniel},
+  year = {1976},
+  title = {Grammar of the Film Language},
+  Xlocation = {London},
+  publisher = {Focal Press},
+}
+
+@Book{IllusionOfLife,
+author = { Thomas, Frank and Johnston, Ollie },
+title = { Disney animation : the illusion of life },
+edition = { 1st ed. },
+isbn = { 0896592332 0896592324 },
+publisher = { Abbeville Press New York },
+Xpages = { 575 p. : },
+year = { 1981 },
+Xtype = { Book },
+Xlanguage = { English },
+Xsubjects = { Walt Disney Productions.; Walt Disney Productions.; Animated films -- United States -- History and criticism. },
+Xlife-dates = { 1981 -  },
+}
+
+FUNDAMENTAL MODELS-----------------------
+
+@article{hu2023animateanyone,
+  title={Animate Anyone: Consistent and Controllable Image-to-Video Synthesis for Character Animation},
+  author={Li Hu and Xin Gao and Peng Zhang and Ke Sun and Bang Zhang and Liefeng Bo},
+  journal={arXiv preprint arXiv:2311.17117},
+  website={https://humanaigc.github.io/animate-anyone/},
+  year={2023}
+}
+
+@inproceedings{DevlinCLT19,
+  author    = {Jacob Devlin and
+               Ming{-}Wei Chang and
+               Kenton Lee and
+               Kristina Toutanova},
+  editor    = {Jill Burstein and
+               Christy Doran and
+               Thamar Solorio},
+  title     = {{BERT:} Pre-training of Deep Bidirectional Transformers for Language
+               Understanding},
+  booktitle = {Proceedings of the 2019 Conference of the North American Chapter of
+               the Association for Computational Linguistics: Human Language Technologies,
+               {NAACL-HLT} 2019, Minneapolis, MN, USA, June 2-7, 2019, Volume 1 (Long
+               and Short Papers)},
+  pages     = {4171--4186},
+  publisher = {Association for Computational Linguistics},
+  year      = {2019},
+  url       = {https://doi.org/10.18653/v1/n19-1423},
+  doi       = {10.18653/v1/n19-1423},
+  timestamp = {Mon, 26 Sep 2022 12:21:55 +0200},
+  biburl    = {https://dblp.org/rec/conf/naacl/DevlinCLT19.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+
+@inproceedings{sohldickstein15,
+  title={Deep unsupervised learning using nonequilibrium thermodynamics},
+  author={Sohl-Dickstein, Jascha and Weiss, Eric and Maheswaranathan, Niru and Ganguli, Surya},
+  booktitle={International Conference on Machine Learning},
+  Xpages={2256--2265},
+  year={2015},
+  Xorganization={PMLR},
+}
+
+@article{hoDDPM20,
+  title={Denoising diffusion probabilistic models},
+  author={Ho, Jonathan and Jain, Ajay and Abbeel, Pieter},
+  journal={Advances in Neural Information Processing Systems},
+  volume={33},
+  Xpages={6840--6851},
+  year={2020},
+}
+
+@inproceedings{songScorematching19,
+  title={Generative modeling by estimating gradients of the data distribution},
+  author={Song, Yang and Ermon, Stefano},
+  booktitle={NeurIPS},
+  Xjournal={Advances in Neural Information Processing Systems},
+  volume={32},
+  year={2019}
+}
+
+@article{Saharia2022PhotorealisticTD,
+  title={Photorealistic Text-to-Image Diffusion Models with Deep Language Understanding},
+  author={Chitwan Saharia and William Chan and Saurabh Saxena and Lala Li and Jay Whang and Emily L. Denton and Seyed Kamyar Seyed Ghasemipour and Burcu Karagol Ayan and Seyedeh Sara Mahdavi and Raphael Gontijo Lopes and Tim Salimans and Jonathan Ho and David J. Fleet and Mohammad Norouzi},
+  journal={ArXiv},
+  year={2022},
+  volume={abs/2205.11487},
+  url={https://api.semanticscholar.org/CorpusID:248986576}
+}
+
+@inproceedings{Palette,
+author = {Saharia, Chitwan and Chan, William and Chang, Huiwen and Lee, Chris and Ho, Jonathan and Salimans, Tim and Fleet, David and Norouzi, Mohammad},
+title = {Palette: Image-to-Image Diffusion Models},
+year = {2022},
+isbn = {9781450393379},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3528233.3530757},
+doi = {10.1145/3528233.3530757},
+abstract = {This paper develops a unified framework for image-to-image translation based on conditional diffusion models and evaluates this framework on four challenging image-to-image translation tasks, namely colorization, inpainting, uncropping, and JPEG restoration. Our simple implementation of image-to-image diffusion models outperforms strong GAN and regression baselines on all tasks, without task-specific hyper-parameter tuning, architecture customization, or any auxiliary loss or sophisticated new techniques needed. We uncover the impact of an L2 vs. L1 loss in the denoising diffusion objective on sample diversity, and demonstrate the importance of self-attention in the neural architecture through empirical studies. Importantly, we advocate a unified evaluation protocol based on ImageNet, with human evaluation and sample quality scores (FID, Inception Score, Classification Accuracy of a pre-trained ResNet-50, and Perceptual Distance against original images). We expect this standardized evaluation protocol to play a role in advancing image-to-image translation research. Finally, we show that a generalist, multi-task diffusion model performs as well or better than task-specific specialist counterparts. Check out https://diffusion-palette.github.io/ for an overview of the results and code.},
+booktitle = {ACM SIGGRAPH 2022 Conference Proceedings},
+articleno = {15},
+numpages = {10},
+keywords = {Generative models, Diffusion models., Deep learning},
+location = {Vancouver, BC, Canada},
+series = {SIGGRAPH '22}
+}
+
+@misc{nichol2021improved,
+      title={Improved Denoising Diffusion Probabilistic Models}, 
+      author={Alex Nichol and Prafulla Dhariwal},
+      year={2021},
+      eprint={2102.09672},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG}
+}
+
+@InProceedings{DDIM,
+  author       = {Jiaming Song and Chenlin Meng and Stefano Ermon},
+  title	       = {Denoising Diffusion Implicit Models},
+  year	       = 2021,
+  booktitle    = {9th International Conference on Learning
+                  Representations, {ICLR} 2021, Virtual Event,
+                  Austria, May 3-7, 2021},
+  Xurl	       = {https://openreview.net/forum?id=St1giarCHLP},
+  Xcrossref     = {DBLP:conf/iclr/2021},
+  Xtimestamp    = {Wed, 23 Jun 2021 17:36:39 +0200},
+  Xbiburl       = {https://dblp.org/rec/conf/iclr/SongME21.bib},
+  Xbibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+@article{dhariwal2021diffusion,
+  title={Diffusion models beat gans on image synthesis},
+  author={Dhariwal, Prafulla and Nichol, Alexander},
+  journal={Advances in Neural Information Processing Systems},
+  volume={34},
+  pages={8780--8794},
+  year={2021}
+}
+
+@inproceedings{hoClassifierfree21,
+  title={Classifier-free diffusion guidance},
+  author={Ho, Jonathan and Salimans, Tim},
+  booktitle={NeurIPS 2021 Workshop on Deep Generative Models and Downstream Applications},
+  year={2021}
+}
+@misc{hu2023videocontrolnet,
+      title={VideoControlNet: A Motion-Guided Video-to-Video Translation Framework by Using Diffusion Model with ControlNet}, 
+      author={Zhihao Hu and Dong Xu},
+      year={2023},
+      eprint={2307.14073},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+
+@inproceedings{Karras2022edm,
+  author    = {Tero Karras and Miika Aittala and Timo Aila and Samuli Laine},
+  title     = {Elucidating the Design Space of Diffusion-Based Generative Models},
+  booktitle = {Proc. NeurIPS},
+  year      = {2022}
+}
+
+@misc{kdiffusion,
+  author = {Katherine Crowson},
+  title = {k-diffusion},
+  year = {2022},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/crowsonkb/k-diffusion}},
+  commit = {v0.0.14}
+}
+
+
+@InProceedings{RombachStablediffusion21Dummy,
+  author       = {Robin Rombach and Andreas Blattmann and Dominik
+                  Lorenz and Patrick Esser and Bj{\"{o}}rn Ommer},
+  title	       = {High-Resolution Image Synthesis with Latent
+                  Diffusion Models},
+  year	       = 2022,
+  booktitle    = {CVPR},
+  Xbooktitle    = {{IEEE/CVF} Conference on Computer Vision and Pattern
+                  Recognition, {CVPR} 2022, New Orleans, LA, USA, June
+                  18-24, 2022},
+  Xpages	       = {10674-10685},
+  Xdoi	       = {10.1109/CVPR52688.2022.01042},
+  Xurl	       = {https://doi.org/10.1109/CVPR52688.2022.01042},
+  Xcrossref     = {DBLP:conf/cvpr/2022},
+  Xtimestamp    = {Wed, 05 Oct 2022 16:31:19 +0200},
+  Xbiburl       = {https://dblp.org/rec/conf/cvpr/RombachBLEO22.bib},
+  Xbibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+@InProceedings{RombachStablediffusion21,
+    author    = {Rombach, Robin and Blattmann, Andreas and Lorenz, Dominik and Esser, Patrick and Ommer, Bj\"orn},
+    title     = {High-Resolution Image Synthesis With Latent Diffusion Models},
+    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+    month     = {June},
+    year      = {2022},
+    pages     = {10684-10695}
+}
+
+@InProceedings{GLIDE,
+  author       = {Alexander Quinn Nichol and Prafulla Dhariwal and
+                  Aditya Ramesh and Pranav Shyam and Pamela Mishkin
+                  and Bob McGrew and Ilya Sutskever and Mark Chen},
+  title	       = {{GLIDE:} Towards Photorealistic Image Generation and
+                  Editing with Text-Guided Diffusion Models},
+  year	       = 2022,
+  booktitle     = {ICML},
+  Xbooktitle    = {International Conference on Machine Learning, {ICML}
+                  2022, 17-23 July 2022, Baltimore, Maryland, {USA}},
+  Xpages	       = {16784-16804},
+  Xurl	       = {https://proceedings.mlr.press/v162/nichol22a.html},
+  Xcrossref     = {DBLP:conf/icml/2022},
+  Xtimestamp    = {Tue, 12 Jul 2022 17:36:52 +0200},
+  Xbiburl       = {https://dblp.org/rec/conf/icml/NicholDRSMMSC22.bib},
+  Xbibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+@Article{IMAGEN,
+  author       = {Chitwan Saharia and William Chan and Saurabh Saxena
+                  and Lala Li and Jay Whang and Emily Denton and Seyed
+                  Kamyar Seyed Ghasemipour and Burcu Karagol Ayan and
+                  S. Sara Mahdavi and Rapha Gontijo Lopes and Tim
+                  Salimans and Jonathan Ho and David J. Fleet and
+                  Mohammad Norouzi},
+  title	       = {Photorealistic Text-to-Image Diffusion Models with
+                  Deep Language Understanding},
+  journal      = {CoRR},
+  year	       = 2022,
+  volume       = {abs/2205.11487},
+  Xdoi	       = {10.48550/arXiv.2205.11487},
+  Xeprint       = {2205.11487},
+  Xeprinttype   = {arXiv},
+  Xurl	       = {https://doi.org/10.48550/arXiv.2205.11487},
+  Xtimestamp    = {Mon, 30 May 2022 15:47:29 +0200},
+  Xbiburl       =
+                  {https://dblp.org/rec/journals/corr/abs-2205-11487.bib},
+  Xbibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+
+@Article{DALLE2,
+  author       = {Aditya Ramesh and Prafulla Dhariwal and Alex Nichol
+                  and Casey Chu and Mark Chen},
+  title	       = {Hierarchical Text-Conditional Image Generation with
+                  {CLIP} Latents},
+  journal      = {CoRR},
+  year	       = 2022,
+  volume       = {abs/2204.06125},
+  Xdoi	       = {10.48550/arXiv.2204.06125},
+  eprint       = {2204.06125},
+  eprinttype   = {arXiv},
+  Xurl	       = {https://doi.org/10.48550/arXiv.2204.06125},
+  Xtimestamp    = {Tue, 19 Apr 2022 17:11:58 +0200},
+  Xbiburl       =
+                  {https://dblp.org/rec/journals/corr/abs-2204-06125.bib},
+  Xbibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+@InProceedings{CLIP,
+  author       = {Alec Radford and Jong Wook Kim and Chris Hallacy and
+                  Aditya Ramesh and Gabriel Goh and Sandhini Agarwal
+                  and Girish Sastry and Amanda Askell and Pamela
+                  Mishkin and Jack Clark and Gretchen Krueger and Ilya
+                  Sutskever},
+  title	       = {Learning Transferable Visual Models From Natural
+                  Language Supervision},
+  year	       = 2021,
+  booktitle     = {Proc.~ICML},
+  Xbooktitle    = {Proceedings of the 38th International Conference on
+                  Machine Learning, {ICML} 2021, 18-24 July 2021,
+                  Virtual Event},
+  Xpages	       = {8748-8763},
+  Xurl	       = {http://proceedings.mlr.press/v139/radford21a.html},
+  Xcrossref     = {DBLP:conf/icml/2021},
+  Xtimestamp    = {Wed, 25 Aug 2021 17:11:17 +0200},
+  Xbiburl       =
+                  {https://dblp.org/rec/conf/icml/RadfordKHRGASAM21.bib},
+  Xbibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+@inproceedings{CLIPScore,
+  title={{CLIPScore:} A Reference-free Evaluation Metric for Image Captioning},
+  author={Hessel, Jack and Holtzman, Ari and Forbes, Maxwell and Bras, Ronan Le and Choi, Yejin},
+  booktitle={EMNLP},
+  year={2021}
+}
+
+
+DIFFUSION POSITION GUIDANCE ---------------------
+
+
+@Article{ediffI,
+  author       = {Yogesh Balaji and Seungjun Nah and Xun Huang and
+                  Arash Vahdat and Jiaming Song and Karsten Kreis and
+                  Miika Aittala and Timo Aila and Samuli Laine and
+                  Bryan Catanzaro and Tero Karras and Ming{-}Yu Liu},
+  title	       = {eDiff-I: Text-to-Image Diffusion Models with an
+                  Ensemble of Expert Denoisers},
+  journal      = {CoRR},
+  year	       = 2022,
+  volume       = {abs/2211.01324},
+  doi	       = {10.48550/arXiv.2211.01324},
+  eprint       = {2211.01324},
+  eprinttype   = {arXiv},
+  Xurl	       = {https://doi.org/10.48550/arXiv.2211.01324},
+  timestamp    = {Wed, 09 Nov 2022 08:10:53 +0100},
+  Xbiburl       =
+                  {https://dblp.org/rec/journals/corr/abs-2211-01324.bib},
+  Xbibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+@Article{GLIGEN,
+  author       = {Yuheng Li and Haotian Liu and Qingyang Wu and
+                  Fangzhou Mu and Jianwei Yang and Jianfeng Gao and
+                  Chunyuan Li and Yong Jae Lee},
+  title	       = {{GLIGEN:} Open-Set Grounded Text-to-Image
+                  Generation},
+  journal      = {CoRR},
+  year	       = 2023,
+  volume       = {abs/2301.07093},
+  Xdoi	       = {10.48550/arXiv.2301.07093},
+  eprint       = {2301.07093},
+  eprinttype   = {arXiv},
+  Xurl	       = {https://doi.org/10.48550/arXiv.2301.07093},
+  timestamp    = {Thu, 19 Jan 2023 15:40:01 +0100},
+  Xbiburl       =
+                  {https://dblp.org/rec/journals/corr/abs-2301-07093.bib},
+  Xbibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+@Article{Spatext,
+  author       = {Omri Avrahami and Thomas Hayes and Oran Gafni and
+                  Sonal Gupta and Yaniv Taigman and Devi Parikh and
+                  Dani Lischinski and Ohad Fried and Xi Yin},
+  title	       = {SpaText: Spatio-Textual Representation for
+                  Controllable Image Generation},
+  journal      = {CoRR},
+  year	       = 2022,
+  volume       = {abs/2211.14305},
+  doi	       = {10.48550/arXiv.2211.14305},
+  eprint       = {2211.14305},
+  eprinttype   = {arXiv},
+  Xurl	       = {https://doi.org/10.48550/arXiv.2211.14305},
+  timestamp    = {Tue, 29 Nov 2022 17:41:18 +0100},
+  Xbiburl       =
+                  {https://dblp.org/rec/journals/corr/abs-2211-14305.bib},
+  Xbibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+
+@article{mou2023t2i,
+  title={T2i-adapter: Learning adapters to dig out more controllable ability for text-to-image diffusion models},
+  author={Mou, Chong and Wang, Xintao and Xie, Liangbin and Wu, Yanze and Zhang, Jian and Qi, Zhongang and Shan, Ying and Qie, Xiaohu},
+  journal={arXiv preprint arXiv:2302.08453},
+  year={2023}
+}
+
+@Article{multidiffusion,
+  author       = {Omer Bar{-}Tal and Lior Yariv and Yaron Lipman and
+                  Tali Dekel},
+  title	       = {MultiDiffusion: Fusing Diffusion Paths for
+                  Controlled Image Generation},
+  journal      = {CoRR},
+  year	       = 2023,
+  volume       = {abs/2302.08113},
+  Xdoi	       = {10.48550/arXiv.2302.08113},
+  eprint       = {2302.08113},
+  eprinttype   = {arXiv},
+  Xurl	       = {https://doi.org/10.48550/arXiv.2302.08113},
+  timestamp    = {Mon, 20 Feb 2023 14:27:28 +0100},
+  Xbiburl       =
+                  {https://dblp.org/rec/journals/corr/abs-2302-08113.bib},
+  Xbibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+@misc{ma2023directed,
+      title={Directed Diffusion: Direct Control of Object Placement through Attention Guidance}, 
+      author={Wan-Duo Kurt Ma and J. P. Lewis and Avisek Lahiri and Thomas Leung and W. Bastiaan Kleijn},
+      year={2023},
+      eprint={2302.13153},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+
+@Article{boxdiff,
+  author       = {Jinheng Xie and Yuexiang Li and Yawen Huang and
+                  Haozhe Liu and Wentian Zhang and Yefeng Zheng and
+                  Mike Zheng Shou},
+  title	       = {BoxDiff: Text-to-Image Synthesis with Training-Free
+                  Box-Constrained Diffusion},
+  journal      = {CoRR},
+  year	       = 2023,
+  volume       = {abs/2307.10816},
+  Xdoi	       = {10.48550/arXiv.2307.10816},
+  eprint       = {2307.10816},
+  eprinttype   = {arXiv},
+  Xurl	       = {https://doi.org/10.48550/arXiv.2307.10816},
+  timestamp    = {Wed, 26 Jul 2023 15:34:01 +0200},
+  Xbiburl       =
+                  {https://dblp.org/rec/journals/corr/abs-2307-10816.bib},
+  Xbibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+@misc{controlnet,
+  title={Adding Conditional Control to Text-to-Image Diffusion Models}, 
+  author={Lvmin Zhang and Maneesh Agrawala},
+  year={2023},
+  eprint={2302.05543},
+  archivePrefix={arXiv},
+  primaryClass={cs.CV}
+}
+
+ALTERNATIVES GAN/AR/TRANSFORMER ---------------------
+
+@Article{layout2im,
+  author       = {Bo Zhao and Weidong Yin and Lili Meng and Leonid
+                  Sigal},
+  title	       = {Layout2image: Image Generation from Layout},
+  journal      = {Int. J. Comput. Vis.},
+  year	       = 2020,
+  volume       = 128,
+  number       = 10,
+  pages	       = {2418-2435},
+  doi	       = {10.1007/s11263-020-01300-7},
+  url	       = {https://doi.org/10.1007/s11263-020-01300-7},
+  timestamp    = {Tue, 02 Mar 2021 11:26:11 +0100},
+  biburl       = {https://dblp.org/rec/journals/ijcv/ZhaoYMS20.bib},
+  bibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+% gan-based L2I
+@article{L2Igan,
+  title={Learning Layout and Style Reconfigurable GANs for Controllable Image Synthesis},
+  author={Wei Sun and Tianfu Wu},
+  journal={TPAMI},
+  year={2022},
+  volume={44},
+  pages={5070-5087}
+}
+
+
+% transformer-based L2I
+@article{L2Ixformer,
+  title={Modeling Image Composition for Complex Scene Generation},
+  author={Zuopeng Yang and Daqing Liu and Chaoyue Wang and J. Yang and Dacheng Tao},
+  journal={CVPR},
+  year={2022},
+  pages={7754-7763}
+}
+
+
+@inproceedings{StyleCLIP,
+  title={Styleclip: Text-driven manipulation of stylegan imagery},
+  author={Patashnik, Or and Wu, Zongze and Shechtman, Eli and Cohen-Or, Daniel and Lischinski, Dani},
+  booktitle={ICCV},
+  year={2021}
+}
+
+@online{PARTI,
+  author = {Jiahui Yu and Yuanzhong Xu and Jing Yu Koh and Thang Luong and Gunjan Baid and Zirui Wang and Vijay Vasudevan and Alexander Ku and Yinfei Yang and Burcu Karagol Ayan and Ben Hutchinson and Wei Han and Zarana Parekh and Xin Li and Han Zhang and Jason Baldridge and Yonghui Wu},
+  title = {Parti: Pathways Autoregressive Text-to-Image model},
+  url = {https://github.com/google-research/parti},
+  year = {2022}
+}
+
+@Article{MUSE,
+  author       = {Huiwen Chang and Han Zhang and Jarred Barber and
+                  Aaron Maschinot and Jos{\'{e}} Lezama and Lu Jiang
+                  and Ming{-}Hsuan Yang and Kevin Murphy and William
+                  T. Freeman and Michael Rubinstein and Yuanzhen Li
+                  and Dilip Krishnan},
+  title	       = {Muse: Text-To-Image Generation via Masked Generative
+                  Transformers},
+  journal      = {CoRR},
+  year	       = 2023,
+  volume       = {abs/2301.00704},
+  Xdoi	       = {10.48550/arXiv.2301.00704},
+  Xeprint       = {2301.00704},
+  Xeprinttype   = {arXiv},
+  Xurl	       = {https://doi.org/10.48550/arXiv.2301.00704},
+  Xtimestamp    = {Thu, 12 Jan 2023 14:29:18 +0100},
+  Xbiburl       =
+                  {https://dblp.org/rec/journals/corr/abs-2301-00704.bib},
+  Xbibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+GPT related ------------------------------
+
+@article{hong2023large,
+  title={Large Language Models are Frame-level Directors for Zero-shot Text-to-Video Generation},
+  author={Hong, Susung and Seo, Junyoung and Hong, Sunghwan and Shin, Heeseong and Kim, Seungryong},
+  journal={arXiv preprint arXiv:2305.14330},
+  year={2023}
+}
+
+
+
+
+
+IMAGE EDITING METHODS ----------------------------
+
+@article{kawar2022imagic,
+      title={Imagic: Text-Based Real Image Editing with Diffusion Models}, 
+      author={Kawar, Bahjat and Zada, Shiran and Lang, Oran and Tov, Omer and Chang, Huiwen and Dekel, Tali and Mosseri, Inbar and Irani, Michal},
+      year={2022},
+      journal={arXiv preprint arXiv:2210.09276}
+}
+
+@misc{ShapeGuided,
+  doi = {10.48550/ARXIV.2212.00210},
+  url = {https://arxiv.org/abs/2212.00210},
+  
+  author = {Park, Dong Huk and Luo, Grace and Toste, Clayton and Azadi, Samaneh and Liu, Xihui and Karalashvili, Maka and Rohrbach, Anna and Darrell, Trevor},
+  
+  keywords = {Computer Vision and Pattern Recognition (cs.CV), Artificial Intelligence (cs.AI), Machine Learning (cs.LG), FOS: Computer and information sciences, FOS: Computer and information sciences},
+  
+  title = {Shape-Guided Diffusion with Inside-Outside Attention},
+  
+  publisher = {arXiv},
+  
+  year = {2022},
+  
+  copyright = {arXiv.org perpetual, non-exclusive license}
+}
+
+
+@InProceedings{SDEdit,
+  author       = {Chenlin Meng and Yutong He and Yang Song and Jiaming
+                  Song and Jiajun Wu and Jun{-}Yan Zhu and Stefano
+                  Ermon},
+  title	       = {SDEdit: Guided Image Synthesis and Editing with
+                  Stochastic Differential Equations},
+  year	       = 2022,
+  booktitle     = {Int. Conf. on Learning Representations ({ICLR})},
+  Xbooktitle    = {The Tenth International Conference on Learning
+                  Representations, {ICLR} 2022, Virtual Event, April
+                  25-29, 2022},
+  Xurl	       = {https://openreview.net/forum?id=aBsCjcPu\_tE},
+  Xcrossref     = {DBLP:conf/iclr/2022},
+  Xtimestamp    = {Sat, 20 Aug 2022 01:15:42 +0200},
+  Xbiburl       = {https://dblp.org/rec/conf/iclr/MengHSSWZE22.bib},
+  Xbibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+
+@inproceedings{BlendedDiffusion,
+  title={Blended Diffusion for Text-driven Editing of Natural Images},
+  author={Omri Avrahami and Dani Lischinski and Ohad Fried},
+  booktitle={CVPR},
+  year={2022}
+}
+
+@Article{BlendedLatent,
+  author       = {Omri Avrahami and Ohad Fried and Dani Lischinski},
+  title	       = {Blended Latent Diffusion},
+  journal      = {CoRR},
+  year	       = 2022,
+  volume       = {abs/2206.02779},
+  Xdoi	       = {10.48550/arXiv.2206.02779},
+  eprint       = {2206.02779},
+  eprinttype   = {arXiv},
+  Xurl	       = {https://doi.org/10.48550/arXiv.2206.02779},
+  Xtimestamp    = {Tue, 14 Jun 2022 16:41:43 +0200},
+  Xbiburl       =
+                  {https://dblp.org/rec/journals/corr/abs-2206-02779.bib},
+  Xbibsource    = {dblp computer science Xbibliography,
+                  https://dblp.org}
+}
+
+
+@article{valevski2022unitune,
+  title={UniTune: Text-Driven Image Editing by Fine Tuning an Image Generation Model on a Single Image},
+  author={Valevski, Dani and Kalman, Matan and Matias, Yossi and Leviathan, Yaniv},
+  journal={arXiv preprint arXiv:2210.09477},
+  year={2022}
+}
+
+
+@Article{Magicmix,
+  author       = {Jun Hao Liew and Hanshu Yan and Daquan Zhou and
+                  Jiashi Feng},
+  title	       = {MagicMix: Semantic Mixing with Diffusion Models},
+  journal      = {CoRR},
+  year	       = 2022,
+  volume       = {abs/2210.16056},
+  Xdoi	       = {10.48550/arXiv.2210.16056},
+  Xeprint       = {2210.16056},
+  Xeprinttype   = {arXiv},
+  Xurl	       = {https://doi.org/10.48550/arXiv.2210.16056},
+  Xtimestamp    = {Wed, 02 Nov 2022 17:35:48 +0100},
+  Xbiburl       =
+                  {https://dblp.org/rec/journals/corr/abs-2210-16056.bib},
+  Xbibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+
+@Article{PaintByExample,
+  author       = {Binxin Yang and Shuyang Gu and Bo Zhang and Ting
+                  Zhang and Xuejin Chen and Xiaoyan Sun and Dong Chen
+                  and Fang Wen},
+  title	       = {Paint by Example: Exemplar-based Image Editing with
+                  Diffusion Models},
+  journal      = {CoRR},
+  year	       = 2022,
+  volume       = {abs/2211.13227},
+  Xdoi	       = {10.48550/arXiv.2211.13227},
+  eprint       = {2211.13227},
+  eprinttype   = {arXiv},
+  Xurl	       = {https://doi.org/10.48550/arXiv.2211.13227},
+  Xtimestamp    = {Tue, 29 Nov 2022 17:41:18 +0100},
+  Xbiburl       =
+                  {https://dblp.org/rec/journals/corr/abs-2211-13227.bib},
+  Xbibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+
+@InProceedings{LiuCompositional22,
+  author       = {Nan Liu and Shuang Li and Yilun Du and Antonio
+                  Torralba and Joshua B. Tenenbaum},
+  title	       = {Compositional Visual Generation with Composable
+                  Diffusion Models},
+  year	       = 2022,
+  booktitle     = {ECCV},
+  Xbooktitle    = {Computer Vision - {ECCV} 2022 - 17th European
+                  Conference, Tel Aviv, Israel, October 23-27, 2022,
+                  Proceedings, Part {XVII}},
+  Xpages	       = {423-439},
+  Xdoi	       = {10.1007/978-3-031-19790-1\_26},
+  Xurl	       = {https://doi.org/10.1007/978-3-031-19790-1\_26},
+  Xcrossref     = {DBLP:conf/eccv/2022-17},
+  Xtimestamp    = {Sun, 13 Nov 2022 17:52:08 +0100},
+  Xbiburl       = {https://dblp.org/rec/conf/eccv/LiuLDTT22.bib},
+  Xbibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+
+@Online{pan-autoregressivestory-22,
+  author       = {Xichen Pan AND Pengda Qin AND Yuhong Li AND Hui Xue
+                  AND Wenhu Chen},
+  title	       = {{Synthesizing Coherent Story with Auto-Regressive
+                  Latent Diffusion Models}},
+  year	       = 2022,
+  eprint       = {2211.10950v1},
+  primaryclass = {cs.CV},
+  archiveprefix= {arXiv}
+}
+
+
+@article{PromptToPrompt,
+  title = {Prompt-to-Prompt Image Editing with Cross Attention Control},
+  author = {Hertz, Amir and Mokady, Ron and Tenenbaum, Jay and Aberman, Kfir and Pritch, Yael and Cohen-Or, Daniel},
+  journal = {arXiv preprint arXiv:2208.01626},
+  year = {2022},
+  Xjournal      = {CoRR},
+  Xvolume       = {abs/2208.01626},
+  Xdoi	       = {10.48550/arXiv.2208.01626},
+}
+
+
+@Article{Dreambooth,
+  author       = {Nataniel Ruiz and Yuanzhen Li and Varun Jampani and
+                  Yael Pritch and Michael Rubinstein and Kfir Aberman},
+  title	       = {DreamBooth: Fine Tuning Text-to-Image Diffusion
+                  Models for Subject-Driven Generation},
+  journal      = {CoRR},
+  year	       = 2022,
+  volume       = {abs/2208.12242},
+  Xdoi	       = {10.48550/arXiv.2208.12242},
+  Xeprint       = {2208.12242},
+  Xeprinttype   = {arXiv},
+  Xurl	       = {https://doi.org/10.48550/arXiv.2208.12242},
+  Xtimestamp    = {Tue, 30 Aug 2022 13:48:55 +0200},
+  Xbiburl       =
+                  {https://dblp.org/rec/journals/corr/abs-2208-12242.bib},
+  Xbibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+@Article{Textualinversion,
+  author       = {Rinon Gal and Yuval Alaluf and Yuval Atzmon and Or
+                  Patashnik and Amit H. Bermano and Gal Chechik and
+                  Daniel Cohen{-}Or},
+  title	       = {An Image is Worth One Word: Personalizing
+                  Text-to-Image Generation using Textual Inversion},
+  journal      = {CoRR},
+  year	       = 2022,
+  volume       = {abs/2208.01618},
+  Xdoi	       = {10.48550/arXiv.2208.01618},
+  Xeprint       = {2208.01618},
+  Xeprinttype   = {arXiv},
+  Xurl	       = {https://doi.org/10.48550/arXiv.2208.01618},
+  Xtimestamp    = {Tue, 09 Aug 2022 17:15:58 +0200},
+  Xbiburl       =
+                  {https://dblp.org/rec/journals/corr/abs-2208-01618.bib},
+  Xbibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+@misc{whatTheDAAM,
+      title={What the DAAM: Interpreting Stable Diffusion Using Cross Attention}, 
+      author={Raphael Tang and Linqing Liu and Akshat Pandey and Zhiying Jiang and Gefei Yang and Karun Kumar and Pontus Stenetorp and Jimmy Lin and Ferhan Ture},
+      year={2022},
+      eprint={2210.04885},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+
+@Article{TrainingFreeStructuredDiffusion,
+  author       = {Weixi Feng and Xuehai He and Tsu{-}Jui Fu and Varun
+                  Jampani and Arjun R. Akula and Pradyumna Narayana
+                  and Sugato Basu and Xin Eric Wang and William Yang
+                  Wang},
+  title	       = {Training-Free Structured Diffusion Guidance for
+                  Compositional Text-to-Image Synthesis},
+  journal      = {CoRR},
+  year	       = 2022,
+  volume       = {abs/2212.05032},
+  Xdoi	       = {10.48550/arXiv.2212.05032},
+  Xeprint       = {2212.05032},
+  Xeprinttype   = {arXiv},
+  Xurl	       = {https://doi.org/10.48550/arXiv.2212.05032},
+  Xtimestamp    = {Mon, 02 Jan 2023 15:09:55 +0100},
+  Xbiburl       =
+                  {https://dblp.org/rec/journals/corr/abs-2212-05032.bib},
+  Xbibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+
+BACKGROUND ---------------------
+
+@article{Perceiver21,
+  author    = {Andrew Jaegle and
+               Felix Gimeno and
+               Andrew Brock and
+               Andrew Zisserman and
+               Oriol Vinyals and
+               Jo{\~{a}}o Carreira},
+  title     = {Perceiver: General Perception with Iterative Attention},
+  journal   = {CoRR},
+  volume    = {abs/2103.03206},
+  year      = {2021},
+  url       = {https://arxiv.org/abs/2103.03206},
+  eprinttype = {arXiv},
+  eprint    = {2103.03206},
+  timestamp = {Sun, 02 Oct 2022 15:32:10 +0200},
+  biburl    = {https://dblp.org/rec/journals/corr/abs-2103-03206.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+
+@Article{hyvarinen,
+  author       = {Aapo Hyv{\"{a}}rinen},
+  title	       = {Estimation of Non-Normalized Statistical Models by
+                  Score Matching},
+  journal      = {J.~Mach.~Learning Research},
+  year	       = 2005,
+  volume       = 6,
+  pages	       = {695-709},
+  Xurl	       = {http://jmlr.org/papers/v6/hyvarinen05a.html},
+  Xtimestamp    = {Wed, 10 Jul 2019 15:28:00 +0200},
+  Xbiburl       = {https://dblp.org/rec/journals/jmlr/Hyvarinen05.bib},
+  Xbibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+@article{kingmaVAE2013,
+  title={Auto-encoding variational bayes},
+  author={Kingma, Diederik P and Welling, Max},
+  journal={arXiv preprint arXiv:1312.6114},
+  year={2013}
+}
+
+@InProceedings{childHVAE,
+  author       = {Rewon Child},
+  title	       = {Very Deep VAEs Generalize Autoregressive Models and
+                  Can Outperform Them on Images},
+  year	       = 2021,
+  booktitle     = {Int.~Conf.~Learning Representations ({ICLR})},
+  Xbooktitle    = {9th International Conference on Learning
+                  Representations, {ICLR} 2021, Virtual Event,
+                  Austria, May 3-7, 2021},
+  Xurl	       = {https://openreview.net/forum?id=RLRXCV6DbEJ},
+  Xcrossref     = {DBLP:conf/iclr/2021},
+  Xtimestamp    = {Wed, 23 Jun 2021 17:36:39 +0200},
+  Xbiburl       = {https://dblp.org/rec/conf/iclr/Child21.bib},
+  Xbibsource    = {dblp computer science bibliography,
+                  https://dblp.org}
+}
+
+@proceedings{DBLP:conf/iclr/2021,
+  title     = {9th International Conference on Learning Representations, {ICLR} 2021,
+               Virtual Event, Austria, May 3-7, 2021},
+  publisher = {OpenReview.net},
+  year      = {2021},
+  url       = {https://openreview.net/group?id=ICLR.cc/2021/Conference},
+  timestamp = {Tue, 24 Jan 2023 06:00:21 +0100},
+  biburl    = {https://dblp.org/rec/conf/iclr/2021.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@misc{blogLillog,
+  author = {Lilian Weng},
+  title = {What are diffusion models?},
+  year = {2021},
+  url = {https://lilianweng.github.io/posts/2021-07-11-diffusion-models/}
+ }
+
+@article{szabo-centeredobjects-21,
+  author       = {Gergely Szab{\'{o}} and
+                  Andr{\'{a}}s Horv{\'{a}}th},
+  title        = {Mitigating the Bias of Centered Objects in Common Datasets},
+  journal      = {CoRR},
+  volume       = {abs/2112.09195},
+  year         = {2021},
+  url          = {https://arxiv.org/abs/2112.09195},
+  eprinttype    = {arXiv},
+  eprint       = {2112.09195},
+  Xtimestamp    = {Mon, 03 Jan 2022 15:45:35 +0100},
+  Xbiburl       = {https://dblp.org/rec/journals/corr/abs-2112-09195.bib},
+  Xbibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+CROSSREFS--------------------
+
+@proceedings{DBLP:conf/cvpr/2022,
+  title     = {{IEEE/CVF} Conference on Computer Vision and Pattern Recognition,
+               {CVPR} 2022, New Orleans, LA, USA, June 18-24, 2022},
+  publisher = {{IEEE}},
+  year      = {2022},
+  Xurl       = {https://doi.org/10.1109/CVPR52688.2022},
+  Xdoi       = {10.1109/CVPR52688.2022},
+  Xisbn      = {978-1-6654-6946-3},
+  Xtimestamp = {Mon, 23 Jan 2023 06:34:51 +0100},
+  Xbiburl    = {https://dblp.org/rec/conf/cvpr/2022.bib},
+  Xbibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@proceedings{DBLP:conf/icml/2022,
+  editor    = {Kamalika Chaudhuri and
+               Stefanie Jegelka and
+               Le Song and
+               Csaba Szepesv{\'{a}}ri and
+               Gang Niu and
+               Sivan Sabato},
+  title     = {International Conference on Machine Learning, {ICML} 2022, 17-23 July
+               2022, Baltimore, Maryland, {USA}},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {162},
+  publisher = {{PMLR}},
+  year      = {2022},
+  url       = {http://proceedings.mlr.press/v162/},
+  timestamp = {Mon, 23 Jan 2023 07:02:11 +0100},
+  biburl    = {https://dblp.org/rec/conf/icml/2022.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@proceedings{DBLP:conf/icml/2021,
+  editor    = {Marina Meila and
+               Tong Zhang},
+  title     = {Proceedings of the 38th International Conference on Machine Learning,
+               {ICML} 2021, 18-24 July 2021, Virtual Event},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {139},
+  publisher = {{PMLR}},
+  year      = {2021},
+  url       = {http://proceedings.mlr.press/v139/},
+  timestamp = {Mon, 23 Jan 2023 07:10:43 +0100},
+  biburl    = {https://dblp.org/rec/conf/icml/2021.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@proceedings{DBLP:conf/iclr/2021,
+  title     = {9th International Conference on Learning Representations, {ICLR} 2021,
+               Virtual Event, Austria, May 3-7, 2021},
+  publisher = {OpenReview.net},
+  year      = {2021},
+  url       = {https://openreview.net/group?id=ICLR.cc/2021/Conference},
+  timestamp = {Mon, 23 Jan 2023 20:46:44 +0100},
+  biburl    = {https://dblp.org/rec/conf/iclr/2021.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@proceedings{DBLP:conf/eccv/2022-17,
+  editor    = {Shai Avidan and
+               Gabriel J. Brostow and
+               Moustapha Ciss{\'{e}} and
+               Giovanni Maria Farinella and
+               Tal Hassner},
+  title     = {Computer Vision - {ECCV} 2022 - 17th European Conference, Tel Aviv,
+               Israel, October 23-27, 2022, Proceedings, Part {XVII}},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {13677},
+  publisher = {Springer},
+  year      = {2022},
+  url       = {https://doi.org/10.1007/978-3-031-19790-1},
+  doi       = {10.1007/978-3-031-19790-1},
+  isbn      = {978-3-031-19789-5},
+  timestamp = {Tue, 24 Jan 2023 05:04:48 +0100},
+  biburl    = {https://dblp.org/rec/conf/eccv/2022-17.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@proceedings{DBLP:conf/iclr/2022,
+  title     = {The Tenth International Conference on Learning Representations, {ICLR}
+               2022, Virtual Event, April 25-29, 2022},
+  publisher = {OpenReview.net},
+  year      = {2022},
+  url       = {https://openreview.net/group?id=ICLR.cc/2022/Conference},
+  timestamp = {Tue, 24 Jan 2023 05:48:44 +0100},
+  biburl    = {https://dblp.org/rec/conf/iclr/2022.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+@String(PAMI = {IEEE Trans. Pattern Anal. Mach. Intell.})
+@String(IJCV = {Int. J. Comput. Vis.})
+@String(CVPR= {IEEE Conf. Comput. Vis. Pattern Recog.})
+@String(ICCV= {Int. Conf. Comput. Vis.})
+@String(ECCV= {Eur. Conf. Comput. Vis.})
+@String(NIPS= {Adv. Neural Inform. Process. Syst.})
+@String(ICPR = {Int. Conf. Pattern Recog.})
+@String(BMVC= {Brit. Mach. Vis. Conf.})
+@String(TOG= {ACM Trans. Graph.})
+@String(TIP  = {IEEE Trans. Image Process.})
+@String(TVCG  = {IEEE Trans. Vis. Comput. Graph.})
+@String(TMM  = {IEEE Trans. Multimedia})
+@String(ACMMM= {ACM Int. Conf. Multimedia})
+@String(ICME = {Int. Conf. Multimedia and Expo})
+@String(ICASSP=	{ICASSP})
+@String(ICIP = {IEEE Int. Conf. Image Process.})
+@String(ACCV  = {ACCV})
+@String(ICLR = {Int. Conf. Learn. Represent.})
+@String(IJCAI = {IJCAI})
+@String(PR   = {Pattern Recognition})
+@String(AAAI = {AAAI})
+@String(CVPRW= {IEEE Conf. Comput. Vis. Pattern Recog. Worksh.})
+@String(CSVT = {IEEE Trans. Circuit Syst. Video Technol.})
+
+@String(SPL	= {IEEE Sign. Process. Letters})
+@String(VR   = {Vis. Res.})
+@String(JOV	 = {J. Vis.})
+@String(TVC  = {The Vis. Comput.})
+@String(JCST  = {J. Comput. Sci. Tech.})
+@String(CGF  = {Comput. Graph. Forum})
+@String(CVM = {Computational Visual Media})
+
+
+@String(PAMI  = {IEEE TPAMI})
+@String(IJCV  = {IJCV})
+@String(CVPR  = {CVPR})
+@String(ICCV  = {ICCV})
+@String(ECCV  = {ECCV})
+@String(NIPS  = {NeurIPS})
+@String(ICPR  = {ICPR})
+@String(BMVC  =	{BMVC})
+@String(TOG   = {ACM TOG})
+@String(TIP   = {IEEE TIP})
+@String(TVCG  = {IEEE TVCG})
+@String(TCSVT = {IEEE TCSVT})
+@String(TMM   =	{IEEE TMM})
+@String(ACMMM = {ACM MM})
+@String(ICME  =	{ICME})
+@String(ICASSP=	{ICASSP})
+@String(ICIP  = {ICIP})
+@String(ACCV  = {ACCV})
+@String(ICLR  = {ICLR})
+@String(IJCAI = {IJCAI})
+@String(PR = {PR})
+@String(AAAI = {AAAI})
+@String(CVPRW= {CVPRW})
+@String(CSVT = {IEEE TCSVT})
+

@@ -1,0 +1,302 @@
+\section{Experiments}
+\label{sec:experiments}
+
+\subsection{Datasets}
+
+We assemble a heterogeneous corpus of paired videos
+and 3D point trajectories spanning simulated and real-world
+interactions.
+The training corpus contains approximately 1.44 million
+object-level samples, equivalent to 1,224 hours of
+standardized 49-frame sequences at 16 FPS.
+The data are organized into four collections:
+\begin{itemize}
+    \raggedright
+    \item \textbf{Sim7} combines seven simulation datasets:
+    ManiSkill~\citep{tao2024maniskill3},
+    MIKASA~\citep{cherepanov2026memory},
+    MetaWorld~\citep{yu2020meta},
+    MetaFold~\citep{chen2025metafold},
+    RLBench~\citep{james2020rlbench},
+    RoboCasa~\citep{nasiriany2024robocasa}, and
+    RoboTwin~\citep{mu2025robotwin},
+    covering diverse robotic interactions and manipulation tasks.
+
+    \item \textbf{Real3} comprises
+    AgiBot World~\citep{bu2025agibot},
+    EPIC-KITCHENS~\citep{damen2018epickitchens}, and
+    Something-Something V2~\citep{goyal2017something},
+    covering real-world robot and human interactions.
+
+    \item \textbf{SpatialCog} is our self-collected dataset
+    of tabletop and household interactions, with an emphasis
+    on spatial relations in instruction-conditioned motion.
+
+    \item \textbf{MolmoMotion-1M}~\citep{zhang2026molmomotion}
+    contributes curated 3D motion annotations from six sources:
+    EgoDex~\citep{hoque2025egodex},
+    Xperience~\citep{ropedia2026xperience},
+    YT-VIS~\citep{Yang_2019_ICCV},
+    Stereo4D~\citep{Jin_2025_CVPR},
+    DROID~\citep{khazatsky2024droid}, and
+    MolmoSpaces~\citep{kim2026molmospaces}.
+\end{itemize}
+
+\paragraph{Annotation and standardization.}
+For Sim7 and Real3, we generate captions with
+Gemini-2.5 Pro~\citep{comanici2025gemini}, obtain object
+masks with SAM 2~\citep{ravi2024sam2}, and extract 3D
+point trajectories using Track4World~\citep{lu2026track4world}.
+SpatialCog pairs manually annotated captions with
+Track4World trajectories.
+For MolmoMotion-1M, we reuse the released motion
+annotations, apply source-specific geometry, scale,
+and trajectory-validity checks, and standardize the
+retained sequences into 49-frame clips.
+All collections use a shared representation consisting
+of video, a language instruction, initial 3D query points,
+and frame-to-frame 3D displacements.
+Additional processing details and per-source statistics
+are provided in the supplementary material.
+
+\paragraph{Evaluation split.}
+We introduce WorldFlowBench, a benchmark comprising
+1,678 held-out evaluation samples: 396 from Sim7,
+882 from Real3, and 400 from SpatialCog.
+The three subsets cover simulated interactions,
+real-world motion, and spatial-relation reasoning,
+respectively.
+All evaluation samples are excluded from training.
+
+\subsection{Training Configuration and Strategy}
+
+\paragraph{Implementation details.}
+We train on 49-frame clips at $288\times480$ resolution
+with $N=64$ query points.
+The video VAE uses temporal and spatial compression
+factors of $q_t=4$ and $q_s=16$, followed by
+$2\times2$ latent patchification ($p_s=2$).
+Each clip therefore contains a $13\times9\times15$
+video-token grid and $48\times64$ flow tokens.
+Training uses 64 NVIDIA H800 GPUs across eight nodes,
+with a per-GPU batch size of two and no gradient
+accumulation, yielding a global batch size of 128.
+
+\paragraph{Training strategy.}
+We adopt a two-stage training schedule.
+The first stage initializes the model from pretrained
+Cosmos-Nano checkpoints and trains on the SpatialCog
+training split for 32,000 steps.
+The learning rate follows linear warmup and cosine decay,
+with a peak of $10^{-4}$.
+The resulting exponential moving average (EMA) weights
+initialize the second stage.
+
+The second stage trains on the heterogeneous data mixture
+for 51,100 steps across three curriculum phases:
+simulation-focused training, mixed real-world adaptation,
+and refinement on the SpatialCog training split.
+During real-world adaptation, sampling gradually shifts
+from MolmoMotion to Real3.
+Each phase prioritizes its target domain while retaining
+cross-domain replay, with smooth transitions between
+sampling distributions.
+After warmup, the learning rate reaches $10^{-4}$,
+transitions to an $8\times10^{-5}$ plateau during
+real-world adaptation, and decays through late adaptation
+and final refinement.
+
+We expand task prompts into structured instructions
+specifying data origin, camera motion, actor type,
+and environment.
+For classifier-free guidance, text conditioning is
+dropped with probability $0.1$, while visual and
+geometric conditioning is retained.
+At inference, we use 40 rectified-flow sampling steps
+with a guidance scale of $2$.
+
+
+
+\subsection{Flow Benchmark}
+
+\subsubsection{Evaluation Metrics}
+We evaluate 3D point trajectories in metric coordinates.
+Average displacement error (ADE) measures the mean
+Euclidean position error across query points and future
+frames, while final displacement error (FDE) measures
+the mean position error at the final frame.
+Both are reported in meters.
+PWT measures the fraction of point--frame pairs whose
+position error falls within a given distance threshold.
+We report its average over thresholds of 1, 2, and 5~cm
+to assess trajectory accuracy at fine spatial scales.
+
+\subsubsection{Quantitative Evaluation on WorldFlowBench}
+\label{sec:worldflowbench_eval}
+
+We evaluate all learning-based methods under a single-frame
+protocol, where one RGB observation and a language instruction
+are provided to forecast a common future horizon without motion
+history. All predictions are converted into metric 3D point
+trajectories in the initial camera coordinate system. We
+additionally report a Static reference that predicts zero flow
+and therefore keeps every query point at its initial position
+throughout the prediction horizon.
+
+We compare against two families of learned baselines. The
+video-generation-then-tracking family includes
+NovaFlow~\citep{li2025novaflow}, as well as pipelines built on
+Cosmos3-Nano~\citep{nvidia2026cosmos3} or
+LingBot-Video-MoE~\citep{robbyant2026lingbotworld}, paired with
+Track4World (T4W)~\citep{lu2026track4world} or
+4RC~\citep{luo20264rc} for 3D tracking. The direct flow-generation
+family includes MolmoMotion-AR-H1~\citep{zhang2026molmomotion},
+$\mu_0$~\citep{lee2026mu_0}, and
+EgoWAM~\citep{li2026egowam}.
+
+As shown in Table~\ref{tab:worldflowbench}, \method{} achieves
+the lowest ADE and FDE among all evaluated learning-based methods
+on all three subsets. Relative to the strongest external learned
+baseline on each subset, it reduces ADE by approximately
+46.9\% on Sim7, 4.7\% on Real3, and 54.2\% on SpatialCog.
+It also achieves the highest PWT among learning-based methods
+on Sim7 and SpatialCog. On Real3, \method{} obtains a PWT of
+0.311, compared with the best value of 0.332, while still
+delivering the lowest ADE and FDE. These results demonstrate
+consistent improvements in trajectory accuracy across simulated
+interactions, real-world motion, and spatial-reasoning tasks.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth]{figures/qualitative_comparison.pdf}
+    \caption{
+        \textbf{Qualitative comparison on diverse real and simulated scenes.}
+        We visualize predicted 3D query-point trajectories from $\mu_0$, MolmoMotion, and \method{} across SpatialCog, AgiBot, DROID, Stereo4D, Meta-World, RLBench, RoboTwin, and MetaFold.
+        The trajectories are projected onto the corresponding input frames for visualization.
+    }
+    \label{fig:qualitative-comparison}
+\end{figure}
+
+
+\input{tables/worldflowbench}
+
+\subsubsection{Ablation Studies}
+
+\paragraph{Flow-only versus joint generation.}
+To evaluate the benefit of jointly modeling 3D motion
+and visual evolution, we compare \method{} with a
+flow-only variant using the same backbone, training data,
+and optimization recipe.
+The variant predicts only 3D flow, whereas the full model
+jointly generates video and flow.
+The full model reduces ADE by 48.5\%, 19.8\%, and 55.9\%
+on Sim7, Real3, and SpatialCog, respectively, with lower
+FDE on all three subsets.
+On SpatialCog, FDE decreases from $0.248$ to
+$0.078\,\mathrm{m}$, a 68.5\% reduction.
+PWT also improves on Sim7 and SpatialCog, with a small
+decrease on Real3.
+These results support the value of complementary visual
+supervision for learning accurate 3D motion.
+
+\paragraph{Direct flow generation versus post-hoc tracking.}
+To evaluate flow as an explicit generative modality,
+we compare directly generated trajectories with those
+recovered by Track4World and 4RC from videos produced
+by the same \method{} checkpoint.
+This comparison holds the video generator and conditioning
+inputs fixed, contrasting explicit motion generation
+with motion recovery from generated pixels.
+Direct flow generation achieves lower ADE and FDE
+and higher PWT than both tracking pipelines on all
+three subsets.
+On SpatialCog, it achieves an ADE of $0.060\,\mathrm{m}$,
+compared with $0.083\,\mathrm{m}$ for Track4World and
+$0.098\,\mathrm{m}$ for 4RC.
+These results support incorporating explicit 3D flow
+into the world model's generative output rather than
+recovering motion through a separate tracking stage.
+
+\paragraph{Auxiliary motion supervision.}
+We compare the full model with a variant trained without
+auxiliary motion objectives.
+These objectives supervise displacement, cumulative
+motion direction, and trajectory endpoints through
+the reconstructed clean flow.
+Adding them improves ADE, FDE, and PWT on all three
+subsets, with the largest ADE reduction on Sim7,
+from $0.063$ to $0.051\,\mathrm{m}$ (19.0\%).
+PWT increases from 0.527 to 0.564 on Sim7,
+from 0.299 to 0.311 on Real3, and from 0.436 to 0.449
+on SpatialCog.
+These consistent improvements indicate that explicit
+supervision of clean motion complements the primary
+flow-matching objective.
+
+% \subsubsection{PointMotionBench}
+
+% We additionally evaluate \method{} on PointMotionBench
+% under its established evaluation protocol.
+% Table~\ref{tab:motion_prediction} includes the baseline
+% groups and published results from MolmoMotion,
+% alongside our evaluation of \method{}.
+% Published results are distinguished from
+% our own evaluations.
+
+% \input{tables/pointmotionbench}
+
+\subsection{Flow-Guided Robotic Manipulation}
+\label{sec:real_robot}
+
+\paragraph{Execution pipeline.}
+We evaluate \method{} as an object-motion predictor within
+a modular manipulation pipeline using a 7-DoF xArm,
+an XHand dexterous hand, and a ZED Mini RGB-D camera.
+Given an RGB-D observation and a language instruction,
+we use Qwen3.8-27B~\citep{qwen38} to ground the target object and
+obtain its mask. The mask and depth image are then used
+to extract the target object's 3D point cloud, which
+provides query points for \method{} to predict object
+trajectories.
+T(R,O) Grasp~\citep{fei2025t} generates the initial
+dexterous grasp pose. Following
+Dream2Flow~\citep{dharmarajan2025dream2flow}, a local
+patch fitting optimizer fits a locally rigid region
+near the grasp to the predicted object trajectories,
+producing an arm trajectory that moves the grasped
+object toward its predicted final position.
+Thus, \method{} specifies object motion, while the grasp
+and control modules translate it into robot execution.
+
+\paragraph{Evaluation and results.}
+We evaluate 12 tasks spanning pick and place, stacking,
+and relative placement, with three randomized trials
+per task and 36 executions per method. We evaluate flow
+prediction and robot execution independently. Flow
+prediction is considered successful if the predicted
+object motion is reasonable for the given instruction,
+while robot execution is considered successful if the
+full manipulation pipeline completes the task on the
+physical robot.
+We select $\mu_0$~\citep{lee2026mu_0} as the baseline
+based on its competitive offline trajectory prediction
+performance among the reproducible direct flow prediction
+methods evaluated in our benchmark. For each paired
+trial, we replace only the flow predictor, keeping
+initial layouts, instructions, grasp results, and
+control settings identical.
+
+As shown in Table~\ref{tab:real_robot}, \method{} achieves
+a flow prediction success rate of 97.2\% (35/36),
+compared with 25.0\% (9/36) for $\mu_0$. Its robot
+execution success rate is 66.7\% (24/36), compared with
+11.1\% (4/36) for $\mu_0$. The gap between flow
+prediction and execution success for \method{} reflects
+additional challenges in the manipulation pipeline,
+including grasp failures, trajectory optimization
+failures, and unstable placement during stacking.
+These results show that \method{} provides more reliable
+motion references and improves task completion within
+the shared manipulation pipeline.
+
+\input{tables/real_robot}

@@ -1,0 +1,14 @@
+\subsection{Trajectory Control in Image-to-Video Generation} %
+\label{sec:3_task}
+The goal of our work is to build a zero-shot framework that takes an input image $\mathbf{I} \in \mathbb{R}^{H \times W \times 3}$ (with height $H$, width $W$) and generates a video with $N$ frames, where elements in the input image move in a user-specified fashion.
+Inspired by DragAnything~\citep{wu2024draganything}, we further assume that a user provides a set of $B$ input bounding box trajectories $\{\mathcal{B}_b\}_{b=1}^B$, each parameterized by a height $h_b$ and width $w_b$, as well as center point coordinates  for each output video frame: $\mathbf{c}_{b, n}\in\mathbb{R}^2, 1\leq n \leq N$.
+For simplicity, we assume bounding boxes cannot extend outside the image, and we denote the $b$-th bounding box in the $n$-th frame as $\mathcal{B}_{b, n} = \{h_b, w_b, \mathbf{c}_{b,n}\}$. 
+
+Our aim is to constrain regions of the input image falling within a bounding box to follow the trajectory of the same bounding box in the output video.
+Thus, the motion of dynamic foreground objects can be controlled by placing bounding boxes around them and specifying the desired trajectory.
+On the other hand, camera motion can be specified by placing bounding boxes on static background regions and specifying a trajectory opposite to the desired camera movement. %
+Further, we can also set the bounding box trajectory to the zero vector to keep the region static.
+Overall, this formulation provides intuitive and unified control over object and camera motion, which are sometimes treated separately in previous controllable image-to-video frameworks~\citep{MotionCtrl, DirectAVideo, li2024image}.
+
+
+

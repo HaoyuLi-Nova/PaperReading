@@ -1,0 +1,39 @@
+\newpage
+\section{Further comparison with Peekaboo}
+\label{supp:sec:peek}
+
+This section provides a comprehensive comparison between \textit{TrailBlazer} and Peekaboo. In \FigRef{fig:extreme}, we explore additional experiments encompassing various scenarios related to bbox size, location, and their combinations under extreme conditions. From top row to bottom: 1) Extremely fast motion by the timing of the second keyframe; 2) Rapid size changes along the bbox trajectory; 3) Zigzag trajectory; 4) Extremely fast motion through numerous keyframes;  and 5) Extremely small bbox. \textbf{Please refer to our the supplementary video to examine the motion for each of the following figures.} 
+
+\begin{figure*}
+  \centering
+  \includegraphics[width=\textwidth]{assets/supp-comp.pdf}
+  \caption{\textbf{Extreme comparison: Various conditions.} \TitleLong (left) and Peekaboo (right) use identical bboxes, while T2V-Zero uses the corresponding motion vector instead. The same prompt is used across each method. The five prompts used from top: An \textbf{elephant} walking on the moon; a photorealistic \textbf{whale} jumping out of water while smoking a cigar; A \textbf{horse} galloping fast on a street; A \textbf{dog} is running on the grass;  A \textbf{clownfish} swimming in a coral reef. The first column at left displays the bbox, and its trajectory. For the sequences with complex motion (2nd, 3rd, 4th row), the frames shown in the figure are denoted by the red dots along the trajectory in the first column. The orange bbox in the first row represents the starting motion of the elephant running to the right near the end of video clip. For additional details, please refer to the accompanying text.}
+  \label{fig:extreme}
+\end{figure*}
+
+
+As depicted in \FigRef{fig:extreme}, TrailBlazer excels in most extreme scenarios for the synthesized subject's location, motion speed, and identity. For example, our representation of an elephant maintains a stationary position for the initial 75\% of the video before initiating movement then runs to the right. The whale gracefully descends into the ocean during the latter part of its jumping motion. The horse accurately follows a zigzag path, simulating a galloping motion. Remarkably, the dog seamlessly follows a large number of keyframes (8 keyframes) within a 24-frame video clip, covering the distance from one boundary to the opposite in approximately 2 frames. The clownfish fits into a tiny bbox. These successes are generally not evident in the Peekaboo \cite{jain2023peekaboo} method.
+
+The metrics presented in Table.~\ref{tab:extreme} are derived from the analysis of experiments shown in \FigRef{fig:extreme} using the AnimalKingdom dataset \cite{Ng_2022_CVPR}, as described in our main text. The mIoU and FID in TrailBlazer surpasses Peekaboo, indicating that our method excels at effectively generating the subject in extreme conditions. Notably, as shown in Table.~\ref{tab:extreme}, our mIoU is approximately twice the value of Peekaboo. As mentioned in the main text, we believe the FVD in TrailBlazer is worse than Peekaboo in this section because the AnimalKingdom dataset does not contain the varied and extreme motion that we used in our experiments.
+
+
+\begin{table}
+    % x $\pm$ x
+  \centering
+  \begin{tabular}{c c c c c c c}
+    \toprule
+    Method & FID($\downarrow$) & FVD($\downarrow$) & IS($\uparrow$) & KID($\downarrow$) & mIoU($\uparrow$) & CLIPSim($\uparrow$)\\
+    \midrule
+    Peekaboo \cite{jain2023peekaboo} 
+        & 258.34 & \textbf{2863.77} & 1.25 $\pm$ 0.24 & 6.71\% & 0.19 & \textbf{30.89} \\
+    \TitleLong 
+        & \textbf{215.37} & 3416.41 & \textbf{1.47} $\pm$ 0.58 & \textbf{5.08}\% & \textbf{0.39} & 29.41 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Quantitative results for static bbox.}
+  %on Cifar10 dataset} % jp it compares to cifar10, but I think saying "on cifar10" might be confusing
+  \label{tab:extreme}
+  \vspace{-2em}
+\end{table}
+
+%In the upcoming sections, we expanded upon the experiments depicted in \FigRef{fig:extreme} to investigate diverse settings under specific conditions and validate the performance of TrailBlazer.

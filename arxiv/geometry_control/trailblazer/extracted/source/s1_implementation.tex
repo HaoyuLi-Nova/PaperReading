@@ -1,0 +1,115 @@
+
+%  ___                 _
+% |_ _|_ __ ___  _ __ | |
+%  | || '_ ` _ \| '_ \| |
+%  | || | | | | | |_) | |
+% |___|_| |_| |_| .__/|_|
+%               |_|
+
+% \setcounter{page}{1}
+% \setcounter{section}{0}
+\section{Implementation}
+\label{sec:impl}
+
+In this section we describe details of  implementation in \textit{TrailBlazer}, including the core library, hyperparameters, and other pertinent information. Our method is developed using PyTorch 2.01 \cite{paszke2019pytorch}, and the Diffusers library version 0.21.4 from Huggingface \cite{huggingface}. We override the Diffusers pipeline \texttt{TextToVideoSDPipeline} to produce our implementation.
+
+Parameters are selected as follows: We use classifier-free guidance with a strength of 9, conduct 40 denoising steps, and maintain a video resolution of 512x512 for the conventional stable diffusion backward denoising process. For all the comparisons with Peekaboo \cite{jain2023peekaboo} we use their official repository\footnote{\href{https://github.com/microsoft/Peekaboo}{https://github.com/microsoft/Peekaboo}} at the commit 6564274 (12 Feb 2024). In our comparisions we utilize a resolution of 576x320 as employed in the Peekaboo code to ensure fair assessment.
+
+Regarding the parameters specific to our proposed method, the majority of our results are generated using the default values outlined as follows: We execute 5 editing steps for both spatial and temporal attention, denoted as $N_S \equiv N_M \equiv 5$. The editing coefficients $c_w \equiv 0.001$ and $c_s \equiv 0.1$ are used in both spatial and temporal attention in most cases. The number of trailing attention maps $|\TTT|$ is the only parameter that needs to be tuned. Generally, $10 \leq |\TTT| \leq 20$ yields satisfactory results in practice and we set $|\TTT| \equiv 15$ for our paper results.
+
+% slightly edited here: originally it said something like "our foundation t2v model", which might sound like zeroscope was trained by us rather than pre-trained
+As highlighted in \SecRef{sec:intro}. in the main text, we adapt the pre-trained ZeroScope\footnote{\cite{huggingface}:cerspense/zeroscope\_v2\_576w} \cite{zeroscope} T2V model. This model is fine-tuned from the initial weights of ModelScope \cite{luo2023videofusion}\footnote{\cite{huggingface}:damo-vilab/modelscope-damo-text-to-video-synthesis} utilizing nearly ten thousand clips, each comprising 24 frames as training data. Consequently, we adhere to the recommended practice of setting the length of the synthesized sequence to 24 frames, drawing insights from user experiences shared in relevant blogs. \footnote{\href{https://zeroscope.replicate.dev/}{https://zeroscope.replicate.dev/}}
+
+Spatial attention editing is performed at several resolutions with a module with the following architecture:
+\begin{footnotesize}
+\begin{small}\begin{verbatim}
+    transformer_in.transformer_blocks.0.attn2
+    down_blocks.0.attentions.0.transformer_blocks.0.attn2
+    down_blocks.0.attentions.1.transformer_blocks.0.attn2
+    down_blocks.1.attentions.0.transformer_blocks.0.attn2
+    down_blocks.1.attentions.1.transformer_blocks.0.attn2
+    down_blocks.2.attentions.0.transformer_blocks.0.attn2
+    down_blocks.2.attentions.1.transformer_blocks.0.attn2
+    up_blocks.1.attentions.0.transformer_blocks.0.attn2
+    up_blocks.1.attentions.1.transformer_blocks.0.attn2
+    up_blocks.1.attentions.2.transformer_blocks.0.attn2
+    up_blocks.2.attentions.0.transformer_blocks.0.attn2
+    up_blocks.2.attentions.1.transformer_blocks.0.attn2
+    up_blocks.2.attentions.2.transformer_blocks.0.attn2
+    up_blocks.3.attentions.0.transformer_blocks.0.attn2
+    up_blocks.3.attentions.1.transformer_blocks.0.attn2
+    up_blocks.3.attentions.2.transformer_blocks.0.attn2
+\end{verbatim}\end{small}
+\end{footnotesize}
+
+%Similarly, we apply the temporal attention editing on the following temporal attention layer:
+For temporal attention editing, we found that a multiple-resolution approach was not necessary and produced unpredictable results. Instead, temporal attention editing uses a single layer:
+\begin{footnotesize}
+\begin{verbatim}
+    mid_block.attentions.0.transformer_blocks.0.attn2
+\end{verbatim}
+\end{footnotesize}
+
+
+Following \cite{jain2023peekaboo}, the following prompt set is used for the experiments in our quantitative comparison in \SecRef{ssec:quant} in the main text. We include it here only for completeness. The prompt word(s) in bold case is the subject for positioning: 
+
+\begin{itemize}
+    \item A \textbf{woodpecker} climbing up a tree trunk.
+    \item A \textbf{squirrel} descending a tree after gathering nuts.
+    \item A \textbf{bird} diving towards the water to catch fish.
+    \item A \textbf{frog} leaping up to catch a fly.
+    \item A \textbf{parrot} flying upwards towards the treetops.
+    \item A \textbf{squirrel} jumping from one tree to another.
+    \item A \textbf{rabbit} burrowing downwards into its warren.
+    \item A \textbf{satellite} orbiting Earth in outer space.
+    \item A \textbf{skateboarder} performing tricks at a skate park.
+    \item A \textbf{leaf} falling gently from a tree.
+    \item A \textbf{paper plane} gliding in the air.
+    \item A \textbf{bear} climbing down a tree after spotting a threat.
+    \item A \textbf{duck} diving underwater in search of food.
+    \item A \textbf{kangaroo} hopping down a gentle slope.
+    \item An \textbf{owl} swooping down on its prey during the night.
+    \item A \textbf{hot air balloon} drifting across a clear sky.
+    \item A \textbf{red double-decker bus} moving through London streets.
+    \item A \textbf{jet plane} flying high in the sky.
+    \item A \textbf{helicopter} hovering above a cityscape.
+    \item A \textbf{roller coaster} looping in an amusement park.
+    \item A \textbf{streetcar} trundling down tracks in a historic district.
+    \item A \textbf{rocket} launching into space from a launchpad.
+    \item A \textbf{deer} standing in a snowy field.
+    \item A \textbf{horse} grazing in a meadow.
+    \item A \textbf{fox} sitting in a forest clearing.
+    \item A \textbf{swan} floating gracefully on a lake.
+    \item A \textbf{panda} munching bamboo in a bamboo forest.
+    \item A \textbf{penguin} standing on an iceberg.
+    \item A \textbf{lion} lying in the savanna grass.
+    \item An \textbf{owl} perched silently in a tree at night.
+    \item A \textbf{dolphin} just breaking the ocean surface.
+    \item A \textbf{camel} resting in a desert landscape.
+    \item A \textbf{kangaroo} standing in the Australian outback.
+    \item A colorful \textbf{hot air balloon} tethered to the ground.
+\end{itemize}
+
+
+% Nevertheless, instability emerges when applying our objective to the subsequent denoising UNet layers \cite{luo2023videofusion}. In future work, we plan to assess how our approach impacts result quality when applied to these layers.
+
+% \begin{footnotesize}
+% \begin{verbatim}
+%         down_blocks.0.temp_attentions.0.transformer_blocks.0.attn2
+%         down_blocks.0.temp_attentions.1.transformer_blocks.0.attn2
+%         down_blocks.1.temp_attentions.0.transformer_blocks.0.attn2
+%         down_blocks.1.temp_attentions.1.transformer_blocks.0.attn2
+%         down_blocks.2.temp_attentions.0.transformer_blocks.0.attn2
+%         down_blocks.2.temp_attentions.1.transformer_blocks.0.attn2
+%         up_blocks.1.temp_attentions.0.transformer_blocks.0.attn2
+%         up_blocks.1.temp_attentions.1.transformer_blocks.0.attn2
+%         up_blocks.1.temp_attentions.2.transformer_blocks.0.attn2
+%         up_blocks.2.temp_attentions.0.transformer_blocks.0.attn2
+%         up_blocks.2.temp_attentions.2.transformer_blocks.0.attn2
+%         up_blocks.3.temp_attentions.0.transformer_blocks.0.attn2
+%         up_blocks.3.temp_attentions.1.transformer_blocks.0.attn2
+%         up_blocks.3.temp_attentions.2.transformer_blocks.0.attn2
+%         mid_block.temp_attentions.0.transformer_blocks.0.attn2
+% \end{verbatim}
+% \end{footnotesize}
+

@@ -1,0 +1,81 @@
+%     _    _     _       _   _
+%    / \  | |__ | | __ _| |_(_) ___  _ __
+%   / _ \ | '_ \| |/ _` | __| |/ _ \| '_ \
+%  / ___ \| |_) | | (_| | |_| | (_) | | | |
+% /_/   \_\_.__/|_|\__,_|\__|_|\___/|_| |_|
+
+\subsection{Ablations}
+\label{sec:ablation}
+
+We conduct ablation experiments on the number of trailing attention maps, and the number of temporal steps.
+
+%  _____          _ _ _
+% |_   _| __ __ _(_) (_)_ __   __ _
+%   | || '__/ _` | | | | '_ \ / _` |
+%   | || | | (_| | | | | | | | (_| |
+%   |_||_|  \__,_|_|_|_|_| |_|\__, |
+%                             |___/
+
+\textbf{Trailing attention maps.} \FigRef{fig:abl_trailings} shows an ablation varying the number of trailing attention maps used in our spatial cross attention process, where the top row shows our method without trailing attention maps (e.g, $|\TTT|=0$) to $|\TTT|=30$. The guided bbox is identical to our earlier experiments in \FigRef{fig:main_static}. It is observed that the astronaut remains static at the image center without the trailing attention maps. In contrast, the synthesis with a large number of trailing attentions can lead to failed results such as a flag rather than the intended astronaut. A good number of edited trailing attention maps is between $|\TTT|=10$ and $|\TTT|=20$.
+
+
+% \begin{figure}[tp]
+%   \centering
+%   % \includegraphics[width=\linewidth]{assets/ablation_trailings.jpg}
+%   \includegraphics[width=\linewidth]{assets/ablation_trailings-2.pdf}
+%   \caption{\textbf{Ablation: Trailing maps.}
+%   % Varied trailing maps used in spatial cross attention map editing. save space, is said in the main text
+%   The rows from top to bottom show the video synthesis with 0 (no trailing maps), 10, 20, and 30 trailing maps. Prompt: ``The \textbf{astronaut} walking on the moon'', where ``astronaut'' is the directed subject. The number of temporal edit steps is five  in all cases.}
+%   \label{fig:abl_trailings}
+%   \vspace{-2em}
+% \end{figure}
+
+
+
+%  _____
+% |_   _|__ _ __ ___  _ __
+%   | |/ _ \ '_ ` _ \| '_ \
+%   | |  __/ | | | | | |_) |
+%   |_|\___|_| |_| |_| .__/
+%                    |_|
+
+\textbf{Temporal attention editing.} We further show an ablation test in \FigRef{fig:abl_temp} with varied number of temporal attention editing steps. We take the case of the astronaut from \FigRef{fig:abl_trailings} with $|\TTT|=10$, and set $N_M = 0$ (no editing steps), and $N_M = 10$. The result with $N_M = 0$ shows a red blob moving from left to right. The value $N_M = 10$ gives satisfactory result on the astronaut, but the background along the bbox path is missing. From these results we see that a reasonable balance between spatial and the temporal attention editing must be maintained, while extreme values of either produce poor results. An intermediate value such as $N_M=5$ (used in most of our experiments) produces the desired result of an astronaut moving over a moon background.
+
+% \begin{figure}[tp]
+%   \centering
+%   % \includegraphics[width=\linewidth]{assets/ablation_temp_steps.jpg}
+%   \includegraphics[width=\linewidth]{assets/ablation_temporal.pdf}
+%   \vspace{-0.3em}
+%   \caption{\textbf{Ablation: Temporal edits.} Following up the experiments in \FigRef{fig:abl_trailings}, the ablation test on the temporal attention editing with varied number of steps of the first and last frame of video reconstruction, shown at the left/right of each set of experiments. (Left/Right): No temporal attention editing, and 10 steps editing, respectively. The number of trailing is 10 for the two cases.}
+%   \label{fig:abl_temp}
+% \end{figure}
+
+
+\begin{figure}[tp]
+  \centering
+  \includegraphics[width=\linewidth]{assets/ablation_temp_trailing.pdf}
+  \vspace{-0.3em}
+  \caption{\textbf{Ablation: Temporal edits.} Following up the experiments in \FigRef{fig:abl_trailings}, the ablation test on the temporal attention editing with varied number of steps of the first and last frame of video reconstruction, shown at the left/right of each set of experiments. (Left/Right): No temporal attention editing, and 10 steps editing, respectively. The number of trailing is 10 for the two cases.}
+  \label{fig:abl_temp}
+\end{figure}
+
+
+\subsection{Limitations}
+\label{ssec:limits}
+% jp previously said assign attribute e.g color, *size*, but size is controlled by the bbox
+%Our method has several limitations at the certain level which inherits all possible shortages from the SD, and the ZeroScope.
+Our method shares and inherits  common failure cases of the underlying diffusion model. Notably, at the time of writing, models based on CLIP and Stable Diffusion sometimes generate deformed objects and struggle to generate multiple objects and correctly assign attributes (e.g.~color) to objects. 
+% We show some failures in \FigRef{fig:limit}. For instance, we requested a red jeep driving on the road but the synthesis shows it sinking into a mud road. The panda example shows the camera moving instead of the panda itself. The red car has implausible deformation, and Darth Vader's light saber turns into a surf board. The length of the resulting video clips is restricted to that produced by the pre-trained model (24 images in the case of ZeroScope). 
+This is not a crucial limitation, as movies are commonly (with some exceptions!) composed of short ``shots'' of several seconds each.  The bounding box guides object placement without precisely constraining it. This is an advantage as well, however, since otherwise the user would have to specify the correct x-y aspect ratio for objects, a complicated task for non-artists.
+
+
+% \begin{figure}[tp]
+%   \centering
+%   % \includegraphics[width=\linewidth]{assets/limitation.jpg }
+%   \includegraphics[width=\linewidth]{assets/limitation.pdf}
+%   \vspace{-0.5em}
+%   \caption{\textbf{Failure cases.} %Several limitations depending on the context.
+%   Prompts used from (a) to (d): ``\textbf{A red jeep} driving on the road'', ``\textbf{A red car} driving on the highway'', ``\textbf{a panda} eating bamboo'', and ``\textbf{Darth Vader} surfing in waves'', where the bold prompt word is the directed subject.}
+%   \label{fig:limit}
+% \vspace{-1em}
+% \end{figure}

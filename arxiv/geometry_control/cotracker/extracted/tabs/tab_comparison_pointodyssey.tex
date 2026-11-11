@@ -1,0 +1,48 @@
+\begin{table}[t]
+\begin{minipage}{.54\linewidth}
+\centering
+\setlength\tabcolsep{0.9pt}
+\begin{tabular}{lcccc}
+\toprule
+\multirow{2}{*}{Method} & \multicolumn{4}{c}{PointOdyssey} \\
+\cmidrule(lr){2-5}
+                                              & \davg\ua      & \davgvis\ua   & \davgocc\ua   & Survival \ua  \\
+\midrule
+TAP-Net~\cite{tapvid}                         & 28.4          & ---           & ---           & 18.3          \\
+PIPs~\cite{harley22particle}                  & 27.3          & ---           & ---           & 42.3          \\
+PIPs++$^\dagger$~\cite{zheng2023pointodyssey} & 29.0          & 32.4          & 18.8          & 47.0          \\
+\midrule
+CoTracker (Ours)                              & \textbf{30.2} & \textbf{32.7} & \textbf{24.2} & \textbf{55.2} \\
+\bottomrule
+\end{tabular}
+\caption{
+\textbf{PointOdyssey}.
+All methods are trained on PointOdyssey.
+$^\dagger$ results for~\cite{zheng2023pointodyssey} obtained using released code and model.}%
+\label{tab:tab_comparison_pointodyssey}
+\end{minipage}%
+~~~~%
+\begin{minipage}{0.42\linewidth}
+\centering
+\setlength\tabcolsep{1pt}
+\begin{tabular}{lccc}
+\toprule
+\multirow{2}{*}{Method} & \multicolumn{3}{c}{Dynamic Replica}\\
+\cmidrule(lr){2-4}
+                                    & \davg\ua      & \davgvis\ua   & \davgocc\ua   \\
+\midrule
+TAP-Net~\cite{tapvid}               & 45.5          & 53.3          & 20.0          \\
+PIPs~\cite{harley22particle}        & 41.0          & 47.1          & 21.0          \\
+
+PIPs++~\cite{zheng2023pointodyssey} & 55.5          & 64.0          & 28.5          \\
+TAPIR~\cite{doersch2023tapir}       & 56.8          & 66.1          & 27.2          \\
+\midrule
+CoTracker (Ours)                    & \textbf{61.6} & \textbf{68.9} & \textbf{37.6} \\
+\bottomrule
+\end{tabular}
+\caption{
+\textbf{Dynamic Replica}.
+The gap between \method and other methods in tracking occluded points' accuracy \davgocc is higher than \davgvis.}%
+\label{tab:tab_comparison_dr}
+\end{minipage}
+\end{table}

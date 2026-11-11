@@ -1,0 +1,9 @@
+
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=0.95\linewidth]{figures/pipeline_v3_compressed.png}
+    % \vspace{-10pt}
+    \caption{\textbf{Overview of Our Pipeline.} We first encode each frame into a triplane representation (\textbf{a}) using a triplane encoder (\textbf{b}). We then initialize and iteratively update point trajectories in the 3D space using a transformer with features extracted from these triplanes as input (\textbf{c}). The 3D trajectories are trained with ground truth annotations and are regularized by an as-rigid-as-possible (ARAP) constraint with learned rigidity embedding (\textbf{d}). The ARAP constraint enforces that 3D distances between points with similar rigidity embeddings remain constant over time. Here $d_{ij}$ represents the distance between points $i$ and $j$, while $s_{ij}$ denotes the rigid similarity. Our method produces accurate long-range motion tracks even under fast movements and severe occlusion (\textbf{e}). }
+    \vspace{-4mm}
+    \label{fig:pipeline}
+\end{figure*}

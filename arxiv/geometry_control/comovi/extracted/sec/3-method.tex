@@ -1,0 +1,127 @@
+\section{Method}
+\label{sec:method}
+
+\subsection{Overview}
+Our goal is to co-generate 3D human motion $\left\{\bm{m}_i\in \mathbb{R}^{J\times 3}\right\}_{i=0}^F$ and RGB video $\left\{\bm{s}_i\in \mathbb{R}^{H\times W\times 3}\right\}_{i=0}^F$ sequence in $F$ frames given a starting image $\bm{s}_0$ and a text description $\bm{p}$. In which $J$ is the number of body joints defined by SMPL~\cite{loper2023smpl}, and $H\times W$ is the resolution of generated videos. As illustrated in Fig.~\ref{fig:pipeline}, we first estimate the 3D human motion $\bm{m}_0$ of $\bm{s}_0$ using CameraHMR~\cite{patel2025camerahmr} and render the 3D SMPL mesh posed in $\bm{m}_0$ as our 2D human motion representation $\bm{k}_0\in \mathbb{R}^{H\times W\times 3}$ according to vertex normals and body part semantics (Sec.~\ref{sec:morep}). Then, $\bm{s}_0$ and $\bm{k}_0$ are zero-padded to $F$ frames and fed into each branch of our dual-branch diffusion model, together with $\bm{m}_0$ and $\bm{p}$ to generate human video $\left\{\bm{s}_i\right\}_{i=0}^F$, 2D motion map $\left\{\bm{k}_i\right\}_{i=0}^F$, and 3D human motion $\left\{\bm{m}_i\right\}_{i=0}^F$ sequence synchronously (Sec.~\ref{sec:comovi}). Our training data is prepared as introduced by Sec.~\ref{sec:dataset}.
+
+\begin{figure*}[t!]
+    \centering
+    \includegraphics[width=\textwidth]{figure/pipeline.png}
+    \vspace{-20pt}
+    \caption{Pipeline overview of CoMoVi. Our method consists of an effective 2D human motion representation (Sec.~\ref{sec:morep}) to encode 3D motion information in pixel space, and a dual-branch diffusion model extended from Wan2.2-I2V-5B to coordinate 2D motion and RGB video sequence denoising process with 3D-2D cross-attention modules to concurrently generate 3D human motion (Sec.~\ref{sec:comovi}).}
+    \label{fig:pipeline}
+\vspace{-15pt}
+\end{figure*}
+
+\subsection{2D Human Motion Representation}
+\label{sec:morep}
+
+In this section, we aim to design a 2D motion representation composed of normal and semantic maps for the co-generation, which not only carries rich 3D information but also aligns with the 2D video. Existing works~\cite{zhu2024champ} treat normal and semantic maps as separate conditions. This leads to inherent limitations: normal maps lack the semantic information necessary to distinguish between different body parts, while semantic maps are devoid of 3D structural cues. To address this limitation, we propose an improved motion representation that cohesively integrates both types of information.
+
+\begin{wrapfigure}{r}{0.42\textwidth}
+    \centering
+    \vspace{-25pt}
+    \includegraphics[width=0.4\textwidth]{figure/representation.png}
+    \vspace{-10pt}
+    \caption{We integrate normals and body part semantics of 3D SMPL meshes into a single representation.}
+    \label{fig:representation}
+    \vspace{-20pt}
+\end{wrapfigure}
+To be specific, given the $i$-th vertex $\bm{ve}_i=\left(ve_x,ve_y,ve_z\right)$ of SMPL mesh, the vertex normal $\bm{vn}_i=\left(vn_x,vn_y,vn_z\right)$ satisfies
+\begin{equation}
+    vn_z = \pm\sqrt{1-vn_x^2-vn_y^2},
+\end{equation}
+providing that $vn_x$ and $vn_y$ are known and only $\operatorname{sign}(vn_z)$ is undetermined. Thus, we can combine this sign with body part semantics and encode both into a single vertex color channel. As illustrated in Fig.~\ref{fig:representation}, we first encode $vn_x$ and $vn_y$ as the Blue and Green channels, respectively. Then, suppose that SMPL can be segmented into $R$ body parts, we define a color list containing $2R$ candidate values uniformly sampled in the range $\left[0,1\right]$ for the Red channel. The Red channel value for $\bm{ve}_i$ of part $r$ is assigned as
+\begin{equation}
+    \mathrm{Red}(\bm{ve}_i) =
+    \begin{cases}
+        \mathrm{RedList[r]} & \text{if } \operatorname{sign}(vn_z) \geq 0 \\
+        \mathrm{RedList[r+1]} & \text{if } \operatorname{sign}(vn_z) < 0\ .
+    \end{cases}
+\end{equation}
+This strategy enables effective compression of 3D surface normals and body part semantics into a single RGB image, which preserves essential 3D structural information and can also be embedded in the latent space of VDMs seamlessly.
+
+\subsection{Co-Generation of Human Motion and Video}
+\label{sec:comovi}
+
+To achieve co-generation of human motion and video, we adopt a dual-branch diffusion architecture and train it in multiple stages progressively. In the following, we use $\bm{x}_t^\text{motion}$ and $\bm{x}_t^\text{video}$ to represent the latents of $\mathcal{D^{\text{motion}}}$ and $\mathcal{D^{\text{video}}}$ at noise level $t$, and the clean latents are $\bm{x}_0^\text{motion}$ and $\bm{x}_0^\text{video}$ respectively.
+
+\vspace{-2mm}
+\paragraph{\bf Adapt Pre-trained VDM to 2D Motion Domain.}
+\begin{wrapfigure}{r}{0.42\textwidth}
+    \centering
+    \vspace{-20pt}
+    \includegraphics[width=0.4\textwidth]{figure/appearance_shift.png}
+    \vspace{-10pt}
+    \caption{We observe that significant appearance shifts occur when directly applying pretrained VDM on our 2D motion representation.}
+    \label{fig:appearance_shift}
+    \vspace{-15pt}
+\end{wrapfigure}
+
+Our first training stage is to finetune $\mathcal{D^{\text{motion}}}$ to adapt its weights from the RGB video to our 2D motion representation domain. This is necessary because significant appearance shifts occur when directly applying the pre-trained VDM to our 2D motion representation sequence (see Fig.~\ref{fig:appearance_shift}), corrupting the essential color patterns that encompass rich 3D information. In this stage, only $\mathcal{D^{\text{motion}}}$ is tunable, which learns to denoise $\bm{x}_t^\text{motion}$ to $\bm{x}_0^\text{motion}$ conditioning on the text prompt and the starting frame.
+
+\vspace{-2mm}
+\paragraph{\bf Couple Motion and Video Generation Process.} In the second training stage, we introduce mutual feature interactions between dual branches to guide human video generation, and 3D-2D cross-attention module to output 3D human motion from video latents. Only $\mathcal{D^{\text{video}}}$ is freezed in this stage.
+
+\vspace{-2mm}
+\paragraph{Mutual Feature Interactions.} For the $i$-th diffusion block, we insert a group of two zero-linear modules after it between dual branches to obtain
+\begin{align}
+    \bm{x}_t^\text{fused} &= \bm{x}_t^\text{motion} + \operatorname{ZeroLinear}_{i}(\bm{x}_t^\text{video}) \notag \\
+    \bm{x}_t^\text{video} &= \bm{x}_t^\text{video} + \operatorname{ZeroLinear}_{i+1}(\bm{x}_t^\text{motion}).
+\label{eq:fuse}
+\end{align}
+Then, we pass $\bm{x}_t^\text{motion}$ and $\bm{x}_t^\text{video}$ to the next $(i+1)$-th diffusion block of $\mathcal{D}^{\text{motion}}$ and $\mathcal{D}^{\text{video}}$ respectively. The fused latent $\bm{x}_t^\text{fused}$ will serve as the key and value in our 3D-2D cross-attention module.
+
+\vspace{-2mm}
+\paragraph{3D-2D Cross-Attention Module.} To generate 3D human motion synchronously, we propose a 3D-2D cross-attention module $\mathcal{A}$ composed of 6 layers of self-attention, cross-attention, and feed-forward network combination. We first initialize all $F$-frame SMPL poses with the known initial pose $\bm{m}_0$, and apply a linear SMPL embedding layer to project them into $F$-frame embeddings $\bm{q}\in\mathbb{R}^{F\times C}$. Subsequently, these initial pose embeddings are used as 3D queries going through self-attention layers as
+\begin{equation}
+    \bm{q} = \operatorname{SelfAttention}(\bm{q}).
+\end{equation}
+Then $\bm{q}$ will interact with $\bm{x}_t^{\text{fused}}$ to generate human poses for all frames.
+Since $\bm{x}_t^{\text{fused}}$ is derived from 2D video latents which are compressed along temporal axis by the VAE encoder $\mathcal{E}$ with compression ratio as 4~\cite{wan2025wan}, 1 frame of $\bm{x}_t^{\text{fused}}$ corresponds to 4 frames of $\bm{q}$. Therefore, we re-organize $\bm{q}$ per 4 frames to get $\bm{q}'\in\mathbb{R}^{\frac{F-1}{4}\times4\times C}$ and apply 3D-2D cross attention as
+\begin{equation}
+    \bm{q} = \operatorname{CrossAttention}(\bm{q}',\bm{x}_t^{\text{fused}}).
+\end{equation}
+Finally, our model generates 3D human motion $\left\{\bm{m}_i\right\}_{i=1}^F$ by a feed-forward network and a final output projection layer to map $\bm{q}$ back to SMPL parametric dimension.
+
+\vspace{-2mm}
+\paragraph{\bf Losses.}
+Our total training loss is defined as
+\begin{equation}
+    \mathcal{L}^{\text{total}} = \mathcal{L}^{\text{motion}} + \mathcal{L}^{\text{video}} + \mathcal{L}^{\text{smpl}},
+\end{equation}
+where $\mathcal{L}^{\text{motion}}$ and $\mathcal{L}^{\text{video}}$ have the same flow matching objective formulation~\cite{lipman2022flowmatching}
+\begin{equation}
+    \mathcal{L} = \mathbb{E}_{\bm{x}_0,\epsilon,t,\bm{p}}\left[ \left\Vert \mathcal{D}(\bm{x}_t,t,\bm{p}) - \bm{v}_t \right\Vert_2^2 \right],
+\end{equation}
+and $\mathcal{L}^{\text{smpl}}$ is defined as
+\begin{equation}
+    \mathcal{L}^{\text{smpl}} = \frac{1}{F-1}\sum_{i=1}^{F-1}\left\Vert\bm{m}_i-\operatorname{GT}(\bm{m}_i)\right\Vert_2^2.
+\end{equation}
+During training, the gradients from $\mathcal{L}^{\text{smpl}}$ backpropagate to the 2D motion branch $\mathcal{D}^{\text{motion}}$ and eventually update the information injected to RGB video branch $\mathcal{D}^{\text{rgb}}$. While in the inference phase, the primary function of $\mathcal{A}$ is to generate 3D human motion from the latents of VDM, which does not iteratively guide the denoising process.
+
+\begin{table*}[t!]
+    \centering
+    \scriptsize
+    \setlength{\tabcolsep}{22.2pt}
+    \begin{tabular}{lccc}
+        \toprule
+        Dataset & Clips & Motion Type & Resolution\\
+        \midrule
+        Motion-X++~\cite{lin2023motionx} & 120,500 & 3D SMPL & -\\
+        HumanVid*~\cite{wang2024humanvid} & 19,688 & 2D Pose & 1080P+\\
+        MotionVid~\cite{wang2025humandreamer} & 1.2M & 2D Pose & -\\
+        % ViMoGen-228K*~\cite{lin2025vimogen} & 41,971 & 3D SMPL & 720P+\\
+        \cellcolor{lightgray!30}CoMoVi-Dataset & \cellcolor{lightgray!30}54,053 & \cellcolor{lightgray!30}3D SMPL & \cellcolor{lightgray!30}720P+\\
+        \bottomrule
+    \end{tabular}
+    \vspace{2pt}
+    \caption{Comparison of CoMoVi-Dataset with existing datasets. ``*": We only count real-world data.}
+    \label{tab:dataset}
+    \vspace{-20pt}
+\end{table*}
+
+\subsection{CoMoVi-Dataset}
+\label{sec:dataset}
+
+Training our co-generative framework requires a high-quality dataset of triplets containing human videos, 3D human motions, and text annotations. Different from previous datasets that focus on single-modality taks such as motion-only or video-only generation, we collect real-world videos paired with 3D motion for the co-generation task. Concurrent works~\cite{lin2025vimogen,yang2025echomotion} also make efforts and reveal the promising prospects of this research direction. As reported in Tab.~\ref{tab:dataset}, existing datasets~\cite{lin2023motionx,wang2024humanvid,wang2025humandreamer,lin2025vimogen,ren2023lip,zhao2024imhoi} fail to simultaneously meet our demands for high-quality video and sufficient 3D motion. Therefore, we curate such a dataset called CoMoVi-Dataset. Specifically, we source high-resolution human videos from Koala-36M~\cite{wang2025koala}, HumanVid~\cite{wang2024humanvid}, and publicly available Internet videos, and employ a carefully designed filtering pipeline to select clips featuring single-person motion based on Qwen3~\cite{qwen3}, Qwen2.5-VL~\cite{qwen2.5} and YOLO~\cite{redmon2016yolo}. For 3D human motion annotations, we obtain pseudo-labels using SoTA in-camera human mesh recovery method CameraHMR~\cite{patel2025camerahmr} for the best re-projection alignment. A smoothing post-processing procedure is tailored to further refine the frame-wise annotations. For text descriptions, we utilize the advanced Gemini-2.5-Pro to generate precise motion captions for each video. More details about our data filtering hierarchy and prompts are provided in the supplementary material.

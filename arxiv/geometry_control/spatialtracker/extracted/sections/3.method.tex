@@ -1,0 +1,426 @@
+\section{Method} \label{sec:method}
+
+% Video processing
+% 1. Monocular depth estimation
+% 2. Lift RGB-D video to featured Pseudo 3D points via orthographic projection
+
+% 3D tracking module
+% 1. 3D Volume Encoding with Tri plane encoder. ->> 参考 convolutional occupancy network
+% 2. Low Rank SE3 Motion Basis
+% 3. Track update & Temporal and Spatial Transformer
+% 4. Rigid part segmentation
+
+% Training
+% 1. Loss functions
+
+% \yx{Describe our task as the 3D tracking. And introduce the formulation and modules designs here.}{}
+
+% \noindent\textbf{Overview.}
+
+% Overview -> Tracking any pixels in 3D space 
+% 1. Our task: input (video) and output (2D tracking, 3D tracking, and rigid part segmentation)
+% 2. Our modules: video processing, 3D tracking module, training
+
+% We formulate motion estimation from a monocular video as follows:
+% \sd{Too many unused symbols, which make it difficult to read. So I remove them}{}
+
+% Given a monocular RGB video, our goal is to estimate dense and long range 3D trajectories for arbitrary pixels.
+Given a monocular video as input, our method tracks any given query pixels across the entire video. Different from prior methods that establish correspondences solely in the 2D space, we lift pixels to 3D using an off-the-shelf monocular depth estimator and perform tracking in a 3D space with richer and more spatially meaningful 3D contextual information, thereby enhancing the overall tracking performance.
+% \qw{todo: should emphasize more somewhere that we only have \emph{pseudo} 3D trajectories when the input is only RGB video}
+% Given a monocular RGB video $V$ comprised of $\{\mathbf{I}_1, \mathbf{I}_2, ..., \mathbf{I}_n\}$, our goal is to estimate a dense and long range 3D trajectories $\mathcal{F}_{i}$ for arbitrary pixels $\mathbf{P}_{i}\in \mathbb{R}^{2}, i=1...N$.
+% For this input video, we will first use a MOE (monocular estimation) model $\mathcal{M}$ to estimate the depths map $\mathcal{M}(V)=\{\mathbf{D}_1,\mathbf{D}_2,...,\mathbf{D}_n\}$.
+% Our 3D tracker algorithm $\mathcal{T}$ takes the video, depth maps and selected pixel as input and output a consistent 3D trajectory for the tracked pixels $\mathcal{T}: (V, \mathcal{M}(V), \mathbf{P}_{i}) \rightarrow \mathcal{F}_{i}$.
+% Here, the $\mathcal{F}_i=\{\hat{\mathbf{P}}_{i}^{t}, \hat{\mathbf{P}}_{i}^{t}\in \mathbb{R}^{3},t=t_i, ..., T, i=0,...N\}$ is a sequence of 3D locations of tracked pixels where $t_i$ is start time of $\mathbf{P}_{i}$ tracking. 
+% And to avoid the ambiguity during tracking~\tocite{}, the start tracked pixel $\mathbf{P}_{i}$ should be a physical visible point on the object surface, and its corresponded 3D point $\hat{\mathbf{P}}_{i}^{t_i}$ are attained by the querying the pixel depth from $\mathcal{M}(V)$.  
+
+\cref{fig:pipeline} presents the overview of our proposed pipeline. 
+% We follow the sliding windows fashion~\cite{pips,cotracker}, which construct the sliding windows online and propagation the trajectories with the rolling structure (Sec.~\ref{sec:Iterative}).
+% And during each window, 
+% We first estimate the depth for each frame using an off-the-shelf monocular depth estimator, and encode the appearance and 3D information of each frame onto a triplane representation~(Sec.~\ref{sec:fte}).
+We first encode the appearance and geometry information of each frame into a triplane representation~(Sec.~\ref{sec:fte}).
+Then we perform iterative prediction of trajectories in the 3D space using these triplanes in a sliding window fashion~(Sec.~\ref{sec:Iterative}). We leverage the as-rigid-as-possible (ARAP) 3D motion prior during training to facilitate tracking especially in challenging scenarios of occlusion and large motion~(Sec.~\ref{sec:arap}). 
+Finally, we describe our training strategy in Sec.~\ref{sec:training}.
+
+% \nan{The method description seems like a technical improvement over cotracker by using monocular depth and additional ARAP loss, decreasing the significance of this project.} \qw{suggestions to make it better?}
+% \sd{Too many details here. Difficult to describe all details here, so it is easy to confuse readers. Describe more concisely. Put the task of describe technical details in Sec. 3.1, 3.2, and 3.3.}{}
+% To solve the problem formulated above, our approach contains the three main modules (Seen in Fig.~\todo{}) which will be discussed in the following sections:
+% \begin{itemize}
+%     \item \textbf{Splatted Triplane Encoding for 3D Volume.} This module introduces a splatting based triplane encoding which transfers RGBD features into three orthogonal features plane, as described in Sec.~\ref{sec:fte}.
+%     \sd{We do not need to describe correlation here. Removing this sentence is safe.}{And we construct the all pairs correlation between the queried points and triplane for efficient 3D correlation look-up. (Seen in Sec.~\ref{sec:fte}) \yx{Not clear on the 3D correlation. Need more polishment.}{}}
+    
+%     \item \textbf{Low Rank Motion Basis Tokenization.}\yx{The name need to be considered carefully, low rank motion or partial rigid part prediction}{}
+%     This module introduces differential low rank SE3 motion learning method, which can not only acquire the rigid affinity between any pairs of the pixels and discover the potential clusters of the rigid part in the scenes.
+    
+%     \item \textbf{Iterative Transformer Updating.}
+%     Based on the low-rank motion basis, our iterative transformer module will aggregate the tracked 3D point features in both temporal windows and spatially first.
+%     Another query-based cross and self-attention module will interact the features between the points and low-rank motion tokens, which outputs the updates of trajectories and the all-pairs affinity matrix.
+% \end{itemize}
+
+
+
+% Note here, if the input is RGB video comprised of $\{\mathbf{I}_1, \mathbf{I}_2, ..., \mathbf{I}_n\}$, we will first use a MOE (monocular estimation) model $\mathcal{M}$ to estimate the depths map $\mathcal{M}(V)=\{\mathbf{D}_1,\mathbf{D}_2,...,\mathbf{D}_n\}$. 
+
+% comprised of $\{I_1, I_2, ..., I_n\}$
+
+% Different from the priors video tracking approach, we reformulate the problem in the 3D space. Specifically, given a monocular video $V$, our goal is to estimate a dense and long range pseudo 3D feature tracks $\mathcal{F}_{i}$ for arbitrary pixels $P_{i}\in \mathbb{R}^{3}, i=1...N$. Here, $\mathcal{F}_{i}$ is a sequence of temporal locations $\mathcal{F}_{i}=\{({x_{i}}(t), {y_{i}}(t), {z_{i}}(t)), t=t_i,...T\}$ starting from time $t_i$. And similar to the 2D tracking~\tocite{}, we require that the starting point $P_{i}=( {x_{i}}({t_i}), {y_{i}}({t_i}), {z_{i}}({t_i}))$ must be visible, and the time $t_i$ can range from $1$ to $T$ covering the whole video. To lift the tracking into pseudo 3D space, we propose several significant modules design in 3D encoding, iterative 3D tracks update and training. As seen in Fig.~\tocite{}, our models contains these three main modules:
+% \begin{itemize}[leftmargin=10pt]
+% \setlength{\itemsep}{0pt}
+% \setlength{\parsep}{0pt}
+% \setlength{\parskip}{0pt}
+% \setlength{\itemindent}{0pt}
+% \item $\textbf{Featured Triplane Encoding}$. In this module, the input video are transferred into an 3D aware triplane representation, which decompose the continuous 3D space into three orthogonal planes: $\mathbf{XY}, \mathbf{YZ}, \mathbf{XZ}$. 
+
+
+% \item $\textbf{Iterative Tracks Update}$. In this section...In this section...In this section...In this section...In this section...In this section...
+
+
+% \item $\textbf{Neural ARAP}$. In this section...In this section...In this section...In this section...
+% \end{itemize}
+% Compared to 2D tracking, this new formulation brings more challenges. Firstly, extracting a 3D-aware features from monocular image 
+
+% In the subsequent sections, we will introduce 
+
+% Our model designs are based on the above discussions (Seen in Fig.~\tofinish{}), which contains the three main modules, \ie $\textbf{Featured Triplane Encoding}$(Sec.~\tocite{}), $\textbf{Iterative Tracks Update}$(Sec.~\tocite{}) and $\textbf{Neural ARAP}$(Sec.~\tocite{}). Those modules will be introduced in the subsequent sections. 
+
+% \qw{Need to mention somewhere important preliminary details like the sliding window strategy. Otherwise readers may always have a question mark in their heads about how long of a video we can handle.}
+% \yx{Have added sliding windows into this part.}{}
+
+\subsection{Triplane Encoding of Input Video Frames}
+\label{sec:fte}
+
+To perform tracking in the 3D space, we need to lift 2D pixels into 3D and construct a 3D representation that encodes the feature for each 3D location. To this end, we propose to use triplane features as the 3D scene representation for each frame detailed below.
+
+To start with, for each frame, we obtain its monocular depth map using a pretrained monocular depth estimator, alongside multi-scale feature maps generated by a convolutional neural network (CNN). Subsequently, 2D pixels are unprojected into a set of 3D point clouds, where each 3D point is associated with a feature vector. This feature vector is a concatenation of the corresponding image feature and a positional embedding~\cite{vaswani2017attention} of its 3D location.
+ 
+While this featured point cloud captures both geometry and appearance information, it is incomplete and only covers visible regions (2.5D). Additionally, its irregular and unordered nature poses challenges for effective learning. One simple solution involves voxelizing the point cloud into a 3D feature volume and completing it with 3D convolutions. Yet, this approach is memory and computationally intensive. To obtain 3D features densely and efficiently, we propose to use triplane feature maps, which are obtained by orthographically projecting and average splatting~\cite{softsplat} the featured point cloud onto three orthogonal 2D planes, as illustrated in Fig.~\ref{fig:pipeline}(b).
+% Specifically, 
+% \qw{mention how you normalized the depth maps}  
+% \yx{We simply normalize the depth map with the max and min values in a sliding windows, and}{}
+% \qw{this is not clear. Did you normalize it to [0,1]? Did you compute a single min and max for the whole sliding window? We haven't introduced the sliding window yet. Maybe it's better to move it to the implementation details.}
+% we orthographically project the featured point cloud on each of the triplanes and apply average splatting~\cite{softsplat} to obtain the feature map on each plane. 
+Finally, additional convolutional layers are applied to process and complete each feature map. This triplane feature encoding process is applied to each video frame. Since we do not assume access to camera poses, each triplane is defined within the camera coordinate frame of its respective frame.
+
+This triplane representation is compact and enables us to efficiently represent the 3D feature for any given 3D point within the field of view. This process involves projecting the point onto three feature planes, extracting its corresponding feature vectors through bilinear interpolation, and fusing them via simple addition.
+
+Note that while similar concepts of triplanes are explored in related fields~\cite{peng2020convolutional,wang2023alto,chan2022efficient}, our focus here is distinct. Rather than learning a triplane to represent the 3D scene from scratch, we directly leverage monocular depth priors to obtain a triplane where the primary objective is to facilitate tracking in the 3D space, introducing a novel perspective to the field of pixel tracking.
+
+% where the $H, W$ are the height and weight of original image and $D$ is the resolution along the $z$ axis.
+% And specifically, the splatting operation (as seen in Fig.~\tocite{}) just project the dense feature points into the dual planes and aggregate them simply using the average.
+
+% And for any location $(u, v)$ in $\mathbf{F}_{\text{yz}}$ or $\mathbf{F}_{\text{xz}}$:
+% \begin{equation}
+%     \begin{aligned}
+%         &\mathbf{F}_{\text{yz}}(u, v) = \frac{\sum_{\mathbf{P}_a\in \Omega}\mathbf{F}_{\text{xy}}(\mathbf{P}_a)}{N}, \\
+%         &\Omega = \{(u_x, v_y)|\mathcal{M}(V)(u_x, v_y)=v\},
+%     \end{aligned}
+% \end{equation}
+% here $u=0,...\frac{H}{4}, v=0,...,D$, and $\mathbf{F}_{\text{xz}}$ is calculated in the same way. 
+
+% The splatting is followed with two small convolutional layers to enhance the features in dual planes.
+
+% Meanwhile, due to the huge domain gap between the training dataset and real data, we observe that the neural networks have better be only used in representative learning for image features extraction.
+
+\subsection{Iterative Trajectory Prediction}
+\label{sec:Iterative}
+Given a set of query pixels in the query frame, Sec.~\ref{sec:fte} allows us to obtain their 3D locations and their corresponding triplane features. We now describe the process to estimate their 3D trajectories across the entire video. 
+
+Following CoTracker~\cite{cotracker}, we partition the video into overlapping windows of length $\ts$. In each window, we iteratively estimate 3D trajectories for query points over $M$ steps using a transformer.  The final 3D trajectories are then propagated to the next window and updated, and this process continues until the end of the video.
+
+\vspace{-1em}
+\paragraph{Iterative prediction.} We now focus on the iterative prediction of 3D trajectories within the first temporal window. Given the 3D location $\xq\in\Rthree$ of a query pixel in the first frame, our goal is to predict its 3D corresponding locations~(or in other words, its 3D trajectory) in subsequent frames $\{\xt\}_{t=2}^{\ts}$, where $t$ is the frame index.
+
+Because we adopt an iterative updating strategy to estimate the 3D trajectories, we further denote the prediction at the $m$-th step as $\{\xtm\}_{t=2}^{\ts}$. To start with, we initialize $\{\xt^0\}_{t=2}^{\ts}$ to be all equal to $\xq$, and then we iteratively update the 3D trajectory using a transformer $\Psi$.
+
+Specifically, for the point $\xtm$ at the $m$-th iteration, we define its input feature $\Gtm$ to the transformer as:
+\begin{equation}
+    \Gtm = [\gamma(\xtm), \Ftm, \Ctm, \gamma(\xtm - \xq)] \in \mathbb{R}^D,
+    \label{eq:input_feature}
+\end{equation}
+where $\gamma$ is the positional encoding function and $\Ftm$ is the feature of point $\xtm$. At the first iteration, $\Ftone$ is extracted from the triplane of frame $t$ at $\xt^0$.
+For later iterations, $\Ftm$ is a direct output of the transformer from the previous iteration. $\Ctm$ denotes correlation features, which are computed by comparing $\Ftm$ and local triplane features around $\xtm$ at frame $t$.
+More details of correlation features can be found in the supplementary material.
+
+For each update, the transformer takes as input the features for the trajectories of all query points across the entire window. We denote this set of features at the $m$-th iteration as $\Gm \in \mathbb{R}^{N\times\ts\times D}  = \{\Gitm \ | \ i=1, ..., N; t=1, ..., T_s\}$, where $i$ is the query point index and $N$ is the number of query points. $\Psi$ then takes $\Gm$ as input and predicts the new set of point positions and features:
+\begin{equation}
+    \mathcal{X}^{m+1}, \mathcal{F}^{m+1} = \Psi(\Gm), 
+\end{equation}
+where $\mathcal{X}^{m+1}$ denotes the set of updated point positions, and $\mathcal{F}^{m+1}$ denotes the set of updated point features. New $\Gmplusone$ can then be defined according to Eq.~\ref{eq:input_feature}, and the same process is repeated $M$ times to obtain the final 3D trajectories for all query points $\mathcal{X}^M=\{\bm{X}_{i,t}^M\}$.
+% Based on $\mathcal{X}^{m+1}$ and $\mathcal{F}^{m+1}$, we construct the set of track features $\mathcal{G}^{m+1}$ according to Eq.~\eqref{eq:track_feature}.
+% Our approach iteratively updates 3D trajectories by $M$ times.
+The 2D correspondence predictions can be computed by simply projecting $\{\xitM\}$ back onto the 2D image plane.
+% The specific network architecture can be found in the supplementary material.
+
+As query pixels may not have corresponding pixels at some frames due to occlusions, we additionally predict the visibility for each point of the 3D trajectories at the final iteration $M$. Specifically, for each point $\xitM$, we employ an MLP network that takes the feature $\FitM$ as input and predicts a visibility score $\vit$.
+
+
+\paragraph{Handling long videos.}
+% 1. motivation：为了处理长视频，构造sliding windows
+% 2. 怎么根据上一个sliding window初始化下一个sliding window
+To track points across a long video, we utilize overlapping sliding windows where each pair of adjacent windows has half of their frames overlapped.
+Given the results from the previous window, we initialize trajectories of the first $\frac{\ts}{2}$ frames of the current window by copying the results of the last $\frac{\ts}{2}$ frames from the previous window.
+The trajectories of the last $\frac{\ts}{2}$ frames in the current window are initialized by copying the result of the frame $\frac{\ts}{2}$.
+
+
+% \qw{I edited and simplified Sec 3.2; the original version is below (commented) but please feel free to uncomment}\\
+
+\iffalse
+% 1. 描述任务: initial 3D trajectories -> a 3d tracker iteratively updates the trajectories
+% Given a set of queried pixels at a particular video frame, our 3D tracker is designed to predict their 3D trajectories. \tomerge{} 
+% Given a set of query pixels in a specific video frame, our method aims to predict their correspondences in other frames.
+% Based on the estimated depth maps, we first lift query pixels into 3D space, then initialize 3D trajectories across video frames, and finally iteratively update trajectories using a transformer network and encoded triplane representations.
+Given a set of query pixels, we first lift them into 3D space, then initialize 3D trajectories across video frames, and finally iteratively update trajectories using a transformer network and encoded triplane representations.
+In order to handle long videos, inspired by CoTracker~\cite{cotracker}, we construct the rolled sliding windows and propagate the trajectories between different windows.
+\qw{\sd{Do not know the mearning.}{need to add transition in the end}. For example, we can say we first introduce the prediction of a single sliding window $T_s$ first and then introduce how to propagate across multiple windows }
+% ~\qw{what do you mean by online?}  
+% \yx{Theoretical, we can handle online(not real time), and I agree to delete online to avoid some misunderstanding.}{}
+
+% \qw{To this end, we first initialize 3D trajectories by copying the 3D locations of the query pixels, and then iteratively update the 3D trajectories using a transformer. The input tokens to the transformer consist of ... and features sampled from the triplane representation.}
+% To this end, we first initialize 3D trajectories and then construct input tokens for tracked points based on the triplane representation in Sec.~\tocite{}.
+% Finally, a transformer network is used to iteratively update 3D trajectories.\tomerge{}
+% \yx{Within one window, we first initialize 3D trajectories by copying the 3D locations of the query pixels, and then iteratively update the 3D trajectories using a transformer. And for trajectory propagation, we roll the next window and the current via overlapping half of their frames, \ie the last half frames will be the first half frames for next window. The technical details will be sequentially introduced below.}{}
+
+% 1. 3d trajectory的初始化
+\paragraph{Initialization of 3D trajectories.}
+% 1. 将target pixel用inverse orthographic projection得到3D points
+% \qw{TODO: This only explains how we get the 3D locations for the `target` pixels but not the initialization of the 3D trajectories.}
+% For target pixels, we leverage the estimated depth map to lift them to 3D points through the inverse orthographic projection model.
+% 2. 初始化3D trajectories
+% \sd{Do not know technical details of the initialization of 3D trajectories.}{}
+For query pixels at a particular frame, we first obtain their 3D positions by unprojecting them into the 3D space using the predicted depth map.
+We then initialize the corresponding 3D trajectories by copying the locations of query 3D points to other video frames.
+
+% In the current sliding window $\mathbf{S}_{k}: \{t^{\mathbf{S}_{k}},...t^{\mathbf{S}_{k}}+S\}$, we initialize the 3D trajectories via copying the locations of started point $\{\mathbf{P}_{i}^{t}=\mathbf{P}_{i}^{t^{\mathbf{S}_{k}}}, t\in\mathbf{S}_{k}\}$.
+% And we assign the initial features for points as the same with their starting points to ensure the consistent tracking.
+% After one window inference, the last trajectories in the previous window also are taken as the initialization for the next window.
+
+% 2. input tokens
+% 3. 基于transformer的预测
+% 4. 引入ARPR的约束
+% 5. 基于point token和motion token的预测
+
+\paragraph{Iterative prediction.}
+% 1. overview: we use a transformer to update 3D trajectories based on the triplane representations.
+% 2. 怎么构造transformer input
+% 3. 用transformer输出updated position and point feature
+We use a transformer network to iteratively update 3D trajectories based on the triplane representations.
+Specifically, during the $m$-th iteration, we define the track feature for point $\mathbf{p}^{t, m}$ at frame $t$ as:
+\begin{equation}
+    \mathbf{G}^{t, m} = (\gamma(\mathbf{p}^{t, m}), \mathbf{Q}^{t, m}, \mathbf{C}^{t, m}, \gamma(\mathbf{p}^{t, m} - \mathbf{p}^{1, 1})),
+    \label{eq:track_feature}
+\end{equation}
+where $\gamma$ is the positional encoding function, and $\mathbf{Q}^{t, m}$ is the feature of point $\mathbf{p}^{t, m}$.
+At the first iteration, the point feature $\mathbf{Q}^{t, 1}$ is obtained from the triplane representation at the video frame $t$.
+For point feature $\mathbf{Q}^{t, m}$ at latter iterations, it is produced from the transformer network.
+% 2. 每个feature怎么构造的
+$\mathbf{C}^{t, m}$ means the correlation feature, which is computed by comparing $\mathbf{Q}^{t, m}$ and 2D features of orthogonal planes at frame $t$ around the projection of point $\mathbf{p}^{t, m}$.
+More details of calculating correlation features are presented in the supplementary material.
+
+\label{para:motionToken}
+% 用transformer network更新3D trajectories的point positions and features
+
+We denote the set of track features of all trajectories during the $m$-th iteration as $\mathcal{G}^{m} = \{\mathbf{G}_i^{t, m} | t=1, ..., T_s; i=1, ..., N\}$, where $T_s$ is the number of frames within the sliding window and $N$ is the number of 3D trajectories.
+A transformer network $\Psi$ is designed to take $\mathcal{G}^m$ as input and update the point positions and features:
+\begin{equation}
+    \mathcal{P}^{m+1}, \mathcal{Q}^{m+1} = \Psi(\mathcal{G}^m), 
+\end{equation}
+where $\mathcal{P}^{m+1}$ means the set of updated point positions, and $\mathcal{Q}^{m+1}$ means the set of updated point features.
+Based on $\mathcal{P}^{m+1}$ and $\mathcal{Q}^{m+1}$, we construct the set of track features $\mathcal{G}^{m+1}$ according to Eq.~\eqref{eq:track_feature}.
+Our approach iteratively updates 3D trajectories by $M$ times.
+In all experiments, $M$ is set to 6.
+The specific network architecture can be found in the supplementary material.
+
+% 1. 过了M iterations，我们有最终的point positions and point features
+% 2. 根据point features，给最终的point预测visibility
+In practice, query pixels may not have corresponding pixels in some video frames due to the occlusion.
+To handle this issue, we additionally predict the visibility for points at 3D trajectories.
+Specifically, we have update point positions $\mathcal{P}^M$ and point features $\mathcal{Q}^M$ after $M$ iterations.
+For each point in $\mathcal{P}^M$, an MLP network takes its corresponding point feature as input and predicts its visibility.
+
+% 1. Motivated by this,
+% \yx{Compared to the 2D space, the motions in 3D require higher degree of freedom. 
+% However, the realistic motions happened in 3D are inherently low rank, cause many of them are composed of several rigid motions or just obey the hypothesis of "as rigid as possible" in the local region. 
+% With the help of lifting, we can utilize "the low rank" nature to regularize the motions in 3D. 
+% Inspired by the low rank learning method~\cite{VQ_VAE,percevier}, we propose to use low rank motion tokens to implicitly compress the degree of freedom. 
+% Specifically, the input tokens are firstly enhanced with self and cross attentions to aggregate the spatial and temporal information.
+% Then the enhanced features are interacted with the low rank motion tokens $\mathbf{C}_{\text{code}}^{m}$ by cross attention.
+% Here we simplify above attention operations as $\Psi$:
+% \begin{equation}
+%     \begin{aligned}
+%         \mathbf{F}_{\text{tri}}^{m+1}, \mathbf{P}_{\mathbf{S}_k}^{m+1},  \mathbf{C}_{\text{code}}^{m+1}, so3^{m+1} = \Psi (\mathbf{G}^{m}, \mathbf{C}_{\text{code}}^{m}),
+%     \end{aligned}
+%     \label{equ:iterative}
+% \end{equation}
+% where $\mathbf{F}_{\text{tri}}^{m+1}, \mathbf{P}_{\mathbf{S}_k}^{m+1}, \mathbf{C}_{\text{code}}^{m+1}$ are taken as the new input tokens in next iteration via Equation.~\ref{equ:input_token} and $so3^{m+1}$ are the predicted lie algebra for rotation~\tocite{} (details seen the Sec.~\ref{sec:ARAP}). 
+% }{} 
+
+% Once the input tokens are acquired, we first enhance it with several temporal and spatial cross attention layers as in CoTracker~\tocite{}.
+% Then, the enhanced features are interacted with the low rank motion tokens $\mathbf{C}_{\text{code}}^{m}$ by a set of iterative cross and self attentions $\Psi$:
+% \sd{Do not know the technical details.}{}
+% \begin{equation}
+%     \begin{aligned}
+%         \mathbf{F}_{\text{traj}}^{m+1}, \hat{\mathbf{P}}^{m+1},  \mathbf{C}_{\text{code}}^{m+1} = \Psi (\mathbf{G}^{m}, \mathbf{C}_{\text{code}}^{m}), 
+%     \end{aligned}
+% \end{equation}
+% where the $m=0,1,...M$ is the index of the iterations and $M$ is the maximum iteration number. 
+
+\paragraph{Construction of sliding windows.}
+% 1. motivation：为了处理长视频，构造sliding windows
+% 2. 怎么根据上一个sliding window初始化下一个sliding window
+To track points across a long video, we split the video into a series of sliding windows, and any two adjacent windows have half the number of frames overlapped.
+For the first sliding window, our approach initializes 3D trajectories based on query pixels and then iteratively update the trajectories.
+For the next sliding window, we initialize trajectories of its first $\frac{T_s}{2}$ frames by copying the results of the last $\frac{T_s}{2}$ frames at the previous sliding window, where $T_s$ is the number of frames within a sliding window.
+The trajectories of the last $\frac{T_s}{2}$ frames are initialized by copying the result of the frame $\frac{T_s}{2}$.
+\sd{Maybe we should use the floor or ceil of $\frac{T_s}{2}$}{}.
+
+% \yx{To make the discussion more clear, we focus on discussing a fixed length $T$ video $V$.
+% And we split the video into a series of rolled sliding windows $\{\mathbf{S_1, S_2,...,S_N}\}$.
+% Each sliding window has a fixed length of $S$ in this paper, and any two adjacent windows with have half frames overlapped. 
+% Specifically, the last $\frac{S}{2}$ frames in previous window will be the first $\frac{S}{2}$ frames in the 
+% next. And the last estimated trajectories are propagated into the next as the initial positions.
+% }{}
+\fi
+
+
+
+\subsection{As Rigid As Possible Constraint}
+\label{sec:arap}
+
+% Motivation: 3D有约束
+% 具体做法：预测每个trajectory的embedding，然后算N个query pixels的affinity matrix
+% 算Loss：distance、affinity matrix
+
+An advantage of tracking points in 3D is that we can enforce an as-rigid-as-possible~(ARAP) constraint, which enhances spatial consistency and facilitates the prediction of motion especially during occlusions.
+% 1. 给定T x N x D的point features，沿着temporal dimension做averaging，并对每个feature做normalization，得到N x D的aggregated features
+% 2. 对aggregated features做内积，得到affinity matrix
+
+Enforcing proper ARAP constraints requires identifying if two points belong to the same rigid part.
+To this end, at each iteration $m$, we additionally compute a rigidity embedding $\Eim$ for each trajectory by aggregating its features $\{\Gitm\}_{t=1}^{T_s}$ across time. Then, the rigidity affinity $\smij$ between any two trajectories $i$ and $j$ can be calculated as:
+\begin{equation}
+    \smij = \text{sim}(\Eim, \Ejm),
+\end{equation}
+where $\text{sim}(\cdot, \cdot)$ is the cosine similarity measure.
+
+
+By the definition of rigidity, the distances between points that are rigidly moving together should be preserved over time. Therefore, we formulate our ARAP loss as follows, encouraging the distances between pairs of points exhibiting high rigidity to remain constant over time:
+\begin{equation}
+\resizebox{0.95\hsize}{!}{
+    $\mathcal{L}_{\text{arap}} = \sum\limits_{m=1}^M
+    \sum\limits_{t=1}^{T_s}
+    \sum\limits_{\Omega_{ij}} w^m
+    \smij ||d(\xitm, \xjtm) - d(\xqi, \xqj)||_1$,
+\label{eq:arap}
+
+}
+\end{equation}
+where $\Omega_{ij}$ is the set of all pairwise indices and $d(\cdot, \cdot)$ is the Euclidean distance function, and $w^m = 0.8^{M-m}$ is the weight for the $m$-th step. This ARAP loss provides gradients for learning both the 3D trajectories and the rigidity embeddings.
+
+Based on the affinity score between any two points, we can perform spectral clustering~\cite{von2007tutorial,scikit-learn} to obtain the segmentation of query pixels.
+Experiments in Sec.~\ref{sec:exp} show that our method can generate meaningful segmentation of rigid parts.
+
+\iffalse
+we first predict the probability of any two points belonging to the same rigid part.
+We average the track features $\Gm$ along the temporal dimension to obtain the aggregated features for each track $\mathbf{F} \in \mathbb{R}^{N \times D}$.
+Then, the similarity among any two feature vectors is calculated using dot product:
+\begin{equation}
+    \mathbf{S}(i, j) = F_i F_j^T,
+\end{equation}
+where $i$ and $j$ are indices of trajectories.
+We take the feature similarity as the probability if the two points belong to the same rigid part.
+
+For 3D points belonging to the same rigid part, we assume that the distance between these 3D points should not change with the motion.
+Motivated by this, we design the ARAP loss as:
+\begin{equation}
+
+\resizebox{0.95\hsize}{!}{
+    $\mathcal{L}_{\text{arap}} = \sum\limits_{(i, j) \in \mathcal{O}} \sum\limits_{t=1}^{T_s} \mathbf{S}(i, j) ||\text{Dist}(\mathbf{p}_i^{1,1}, \mathbf{p}_j^{1,1}) - \text{Dist}(\mathbf{p}_i^{t,M}, \mathbf{p}_j^{t,M})||$,
+}
+\end{equation}
+where $\mathcal{O}$ is the set of index pairs, $\mathbf{p}_i^{t,M}$ is the $i$-th point at frame $t$ during the $M$-th iteration, and $\text{Dist}$ is a function calculating the Euclidean distance between two 3D points.
+
+Based on the affinity score between any two points, we perform the spectral clustering~\tocite{} to obtain the segmentation of query pixels.
+Experiments in Sec.~\tocite{} show that our approach can produce coarse segmentation of rigid parts for moving objects.
+\fi
+% \qw{need to mention the arap loss is also used to update the 3d trajectories (in addition to the rigid embedding itself), otherwise it is not clear.}
+% \qw{need to mention to get 2d trajectories, we project them back into 2d}
+
+\subsection{Training}
+\label{sec:training}
+% 1. Overview
+% 2. 描述各个objective function
+% 3. The total loss
+% 4. unrolled learning
+
+In addition to the ARAP loss, we supervise the predicted trajectories using ground truth 3D trajectories at each iteration, which is defined as:
+\begin{equation}
+    \mathcal{L}_{\text{traj}} = \sum_{m=1}^{M} \sum_{i=1}^{N} \sum_{t=1}^{T_s} w^m ||\xitm -\xitmhat||_1,
+\end{equation}
+where $\xitm$ and $\xitmhat$ are the predicted and ground-truth 3D corresponding locations, respectively, and $w^m$ is the weight for the $m$-th step, identical to that in Eq.~\ref{eq:arap}.
+
+The predicted visibilities are supervised using:
+\begin{equation}
+    \mathcal{L}_{\text{vis}} = \sum_{i=1}^{N}\sum_{t=1}^{T_s} \text{CE}(\vit, \vithat),
+\end{equation}
+where $\vit$ and $\vithat$ denote the predicted and ground-truth visibility, respectively.
+$\text{CE}$ represents the cross entropy loss.
+
+The total loss function for training is defined as:
+\begin{equation}
+    \mathcal{L}_{\text{total}} = \mathcal{L}_{\text{traj}} + \alpha\mathcal{L}_{\text{vis}} + \beta\mathcal{L}_{\text{arap}},
+\end{equation}
+where $\alpha$ and $\beta$ are weighting coefficients.
+In practice, they are set as $10$ and $0.1$, respectively.
+
+% \qw{unclear what this sentence means}
+% We follow the unrolled learning strategy proposed in CoTracker~\cite{cotracker} to supervise the semi-overlapped sliding windows.
+
+\subsection{Implementation Details}
+We train our model on the TAP-Vid-Kubric dataset~\cite{tap-vid,kubric}. Our training data contains 11,000 24-frame RGBD sequences with full-length 3D trajectory annotations. During training, we use ground truth depth maps and camera intrinsics to unproject pixels into 3D space. In cases where the depth map and intrinsics are unavailable at inference, we use ZoeDepth~\cite{ZoeDepth} to predict the metric depth map for each video frame, and simply set the focal length to be the same as the image width. To generate triplane feature maps, we discretize the depth values into $d=256$ bins.
+The resolutions of the triplane feature maps are $h\times w$, $w\times d$, $h\times d$ for XY, XZ, and YZ planes, respectively, where $h, w$ are the image height and width. The number of channels of the triplane features is $128$.
+
+% For both training and inference, the depth maps are normalized into $[0, 1]$ and split into 256 bins for triplane splatting 
+
+\input{table/TAP_Vid}
+
+% And we clamp the depth map with the near and far distance of 0.1 and 65 meters.
+% And we normalize the depth map for each sequence by their max-min to normalize the depth into [0,1]. And in triplane encoding, the z axis of depth are split into 256 bins for triplane splating and sampling. Besides,
+We train our model with eight 80GB A100 GPUs for 200k iterations. The total training time is around 6 days. The iteration steps $M$ and sliding window length $T_s$ are set to $6$ and $8$ respectively. In each training batch, we sample $N=256$ query points. The transformer $\Psi$ consists of six blocks, each comprising both spatial and temporal attention layers. For more details, please refer to the supplementary material.
+% \sd{Need inference speed analysis on a specific setting.}{}
+% \qw{TODO: depth normalization/point cloud unprojection details, training details (GPU, time, etc), ...}
+% \qw{need to define the feature dimension $d$ of $\mathbf{Q}$, $\mathbf{C}$, positional encoding somewhere}
+
+% \subsection{Neural As Rigid As Possible}
+% \label{sec:ARAP}
+% \tomerge{}
+% \yx{As mentioned in the Sec.~\ref{sec:Iterative}, ARAP can help regularize the 3D motions. This regularization brings the constrain across the queried points, and guide the motions of invisible points with its rigid neighbourhood(Fig.~\tocite{}). However, different from the traditional ARAP~\tocite{} which construct the connectivity only by the euclidean distance, we propose to use the neural network to extract the high level relations among the queried points. Because the rigid relations are relevant to not only the semantics but motion as well. Therefore, we assume the rigid connectivity keeps the same only in a sliding window, and we leverage the features $\mathbf{F}_{\text{tri}}^{m+1}$ gotten in Equation.~\ref{equ:iterative} to predict a affinity matrix. Specifically, we first calculate the similarity of the normalized features via dot product:
+% \begin{equation}
+%     \begin{aligned}
+%         &\mathbf{F}_{\text{A}}^{m+1} = \sum_{k=0}^{S-1}\mathbf{F}_{\text{tri}}^{m+1}, \mathbf{F}_{\text{A}}^{m+1} \in \mathbb{R}^{N\times C'}, \\ 
+%         &\mathbf{M}_{\text{A}}^{m+1} = \frac{\mathbf{F}_{\text{A}}^{m+1}}{||\mathbf{F}_{\text{A}}^{m+1}||_2} {\frac{{\mathbf{F}_{\text{A}}^{m+1}}^{T}}{||\mathbf{F}_{\text{A}}||_2}}, \mathbf{M}_{\text{A}}^{m+1} \in \mathbb{R}^{N\times N},
+%     \end{aligned}
+% \end{equation}   
+% here $\mathbf{M}_{\text{A}}^{m+1}$ is the affinity matrix in step $m+1$ which depict the rigidity probability between any pixel pairs.
+% }{}
+
+% To let the neural network heuristically learn to discover the potential rigid part within the inference, we propose a low rank motion tokenization methods. 
+% Inspired by the VQ-VAE~\tocite{}, we leverage a fixed size motion tokens, denoted as $\mathbf{C}_{\text{code}}, \mathbf{C}_{\text{code}}\in \mathbb{R}^{K\times C}$.
+% Here, $K$ is the number of the code primitives and $C$ is the dimension for the latent tokens.
+% And to represent the motion in the video, the most naive way is the free translation vectors for each $N$ queried points.
+% In order to discover the potential low rank motions, we first introduce the rigid affinity matrix prediction among the trajectories in a sliding window.
+% The trajectories features $\mathbf{F}_{\text{traj}} \in \mathbb{R}^{S\times N \times C'}$ are extracted with the temporal and spatial attention modules (details seen in Sec.~\ref{sec:Iterative}), where $S$ refers to the length of a sliding window, and $N$ is the number of queried points.
+% To compress the trajectories information, we first aggregate each trajectory features along with the windows:
+% \begin{equation}
+%     \begin{aligned}
+%         &\mathbf{F}_{\text{A}} = \sum_{k=0}^{S-1}\mathbf{F}_{\text{traj}}^{k}, \mathbf{F}_{\text{A}} \in \mathbb{R}^{N\times C'}, \\ 
+%         &\mathbf{M}_{\text{A}} = \frac{\mathbf{F}_{\text{A}}}{||\mathbf{F}_{\text{A}}||_2} {\frac{\mathbf{F}_{\text{A}}^{T}}{||\mathbf{F}_{\text{A}}||_2}}, \mathbf{M}_{\text{A}} \in \mathbb{R}^{N\times N},
+%     \end{aligned}
+% \end{equation}   
+% here the $\mathbf{M}_{\textbf{A}}$ is the affinity matrix to depict the probability of rigid between any pairs of motions. Therefore, the predicted matrix can used to regularize the trajectories to satisfy the arap constrains.
+
+
+% And this problem can be easily formulated as: Recovering a long range 2d feature tracks $\mathcal{F}_{i}=\{(t_{0}, {x_{i}}^{0}, {y_{i}}^{0}), (t_{1}, {x_{i}}^{1}, {y_{i}}^{1}), ..., ), (t_{n}, {x_{i}}^{n}, {y_{i}}^{n})\}$. 
+
+% For an selected pixels $(x_{i}, y_{i})$, the estimated long 2d trajectory can be represented as the a sequences of 2d feature tracks, i.e. $\mathcal{F}_{i}=\{(t_{0}, {x_{i}}^{0}, {y_{i}}^{0}), (t_{1}, {x_{i}}^{1}, {y_{i}}^{1}), ..., ), (t_{n}, {x_{i}}^{n}, {y_{i}}^{n})\}$. 
+
+
+% We propose a novel approach to lift the 2d pixels tracking into 3D space. Specifically, given a video $V$ comprised of frames $\{I_1, I_2,..., I_N\}$, our goal is to recover a long-range 3D trajectory 
+

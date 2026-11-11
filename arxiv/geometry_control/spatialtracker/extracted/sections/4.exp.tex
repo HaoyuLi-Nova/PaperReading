@@ -1,0 +1,162 @@
+\section{Experiments}\label{sec:exp}
+
+At inference, our method can operate in two different modalities. The first modality (and the primary focus of this paper) is long-range 2D pixel tracking. In this modality, the input is an RGB video without known depth or camera intrinsics, and we rely on ZoeDepth~\cite{ZoeDepth} to estimate the depth maps. Due to the lack of precise depth and intrinsics information, we only evaluate the 2D projection of the 3D trajectories onto the image plane, i.e., 2D pixel trajectories. When RGBD videos and camera intrinsics are available, our method can be used in the second modality to predict long-range 3D trajectories.
+We evaluate our method for both 2D and 3D tracking performance in Sec~\ref{sec:2d tracking eval} and Sec~\ref{sec:3d tracking eval}, respectively, and then conduct ablation studies in Sec.~\ref{sec: ablation}.
+
+% For 2D tracking, we evaluate on three datasets from the TAP-Vid benchmark~\cite{tap-vid} which are DAVIS~\cite{davis}, Kinetics\cite{kinetics} and RGB-Stacking~\cite{rgb-stacking}, as well as BADJA~\cite{BADJA} and PointOdyssey~\cite{zheng2023pointodyssey}. For the evaluation of 3D tracking in RGBD videos, we evaluate our method on PointOdyssey\cite{zheng2023pointodyssey}, where we take ground-truth depth and intrinsics as input to our method.
+
+
+
+
+% Our model is trained on the synthetic dataset, kubric~\cite{kubric}, where we take the RGBD data as input and supervise the model with the generated 3D point trajectories. For evaluation of 2D tracking performance, we conduct experiments on the real-data benchmarks: DAVIS~\cite{tap-vid}, TAP-Vid-Kinetics\cite{tap-vid}, BADJA~\cite{BADJA}, and FastCapture\cite{FastCapture}. Note that those benchmarks only provide RGB data, and we utilize the off-the-shelf depth estimator, ZoeDepth~\cite{ZoeDepth} to acquire the depth maps. For evaluation of 3D tracking in RGBD videos, we test our method on the challenging synthetic dataset, PointOdyssey\cite{zheng2023pointodyssey}, where we take ground-truth depth as input to our model and evaluate the estimated 3D trajectories.
+% \qw{suggest breaking 2d and 3d tracking into two sections. Introduce in each section the datasets, metrics, and results.
+% }
+
+
+\subsection{2D Tracking Evaluation}
+\label{sec:2d tracking eval}
+
+We conduct our evaluation on three long-range 2D tracking benchmarks: TAP-Vid~\cite{tap-vid}, BADJA~\cite{BADJA} and 
+PointOdyssey~\cite{zheng2023pointodyssey}. Our method is compared with baseline 2D tracking methods, namely TAP-Net~\cite{tap-vid}, PIPs~\cite{pips}, OmniMotion~\cite{wang2023tracking},  TAPIR~\cite{Tapir} and CoTracker~\cite{cotracker}.
+The evaluation protocols and comparison results on each of the benchmarks are represented below. 
+
+\vspace{-1em}
+% We conduct our experiments in main stream 2D tracking datasets. And we compare our method with the our baseline, Cotracker~\cite{cotracker} and other current SOTA approaches.
+
+% \noindent{\textbf{Training Dataset.}} For fair comparison, we follow our baseline, Cotracker~\cite{cotracker}, to train our model in \textbf{TAP-Vid-Kubric}~\cite{tap-vid}. \textbf{TAP-Vid-Kubric} contains 24-frame sequences rendered from the 3D scenes with dynamic objects. And the points are randomly selected from the different frames in the video, and the selected points number is set to 256.   
+
+\paragraph{TAP-Vid Benchmark~\cite{tap-vid}}
+contains a few datasets: TAP-Vid-DAVIS~\cite{davis} (30 real videos of about 34-104 frames), TAP-Vid-Kinetics~\cite{kinetics} (1144 real videos of 250 frames) and RGB-Stacking~\cite{rgb-stacking}~(50 synthetic videos of 250 frames). Each video in the benchmark is annotated with ground truth 2D trajectories and occlusions spanning the entire video duration for well-distributed points.
+% These benchmarks have the annotations of the ground truth 2d trajectories and occlusions for the well-distributed points. 
+We evaluate performance using the same metrics as the TAP-Vid benchmark~\cite{tap-vid}: average position accuracy~($\deltaavg$), Average Jaccard~(AJ), and Occlusion Accuracy (OA). Please refer to the supplement for more details. We follow the ``queried first'' evaluation protocol in CoTracker~\cite{cotracker}. Specifically, we use the first frame as the query frame and predict the 2D locations of query pixels from this frame in all subsequent frames. 
+% ensure the queried points are input once. And we utilize the metrics same to prior methods: Occulusion Accuracy (OA), $<\delta_{\text{avg}}^{x}$ (average accuracy rate across different thresholds \ie 1,2,4,8,16) and Average Jaccard(AJ). 
+The quantitative comparisons are reported in Tab.~\ref{table:Tracking2D}, which shows our method consistently outperforms all baselines except Omnimotion across all three datasets, demonstrating the benefits of tracking in the 3D space. Omnimotion also performs tracking in 3D and obtains the best results on RGB-Stacking by optimizing all frames at once, but it requires very costly test-time optimization.
+% In average, our method improve the baseline from 56.9 to 57.7 in (AJ), from 71.9 to 73.1 in $(\delta_{\text{avg}})$ and from 87.6 to 88.0 in (OA). 
+% The quantitative results in show that our method is more robust in those cases thanks to tracking those points in 3D space. 
+\input{table/BADJA}
+
+\vspace{-1em}
+\input{table/PointOdyssey_pixel}
+
+\paragraph{\textbf{BADJA}~\cite{BADJA}} is a benchmark containing seven videos of moving animals with annotated keypoints. The metrics used in this benchmark include segment-based accuracy (segA) and 3px accuracy ($\delta^{\text{3px}}$). The predicted keypoint positions are deemed accurate when its distance from the ground truth keypoint is less than $0.2\sqrt{A}$, where $A$ is the summation of the area of the segmentation mask. $\delta^{\text{3px}}$ depicts the percentage of the correct keypoints whose distances from their ground truth are within three pixels. As shown in Tab.~\ref{table:BADJA}, our method demonstrates competitive performance in terms of $\delta^{\text{3px}}$ and surpasses all baseline methods by a large margin in segment-based accuracy.
+
+% \qw{explain why $\delta^{\text{3px}}$ is worse?}
+
+\input{figures/figure_comp}
+
+
+% \vspace{-1em}
+
+\paragraph{\textbf{PointOdyssey}~\cite{zheng2023pointodyssey}} is a large-scale synthetic dataset featuring diverse animated characters ranging from humans to animals, placed within diverse 3D environments.
+% And the diversity comes from randomizing character appearance, motions, materials and environment lighting. 
+We evaluate our method on PointOdyssey's test set which contains 12 videos with complex motion, each spanning approximately 2000 frames.
+% Therefore, this dataset have the extremely long ground truth trajectories for some complex motions. For the evaluation here, 
+We adopt the evaluation metrics proposed in PointOdyssey~\cite{zheng2023pointodyssey} which are designed for evaluating very long trajectories. These metrics include the Median Trajectory Error (MTE), $\deltaavg$ (consistent with TAP-Vid), and the survival rate. The survival rate is defined as the average number of frames until tracking failure over the video length. Tracking failure is identified when the L2 error exceeds 50 pixels at a resolution of $256\times256$. In Tab.~\ref{table:PointOdyssey_2d}, we report results for baseline methods as well as our method using depths from  ZoeDepth~\cite{ZoeDepth}~(default) and GT depth annotations.
+Our method consistently outperforms the baselines across all metrics by a noticeable margin. In particular, we demonstrate that with access to more accurate ground truth depth, our performance can be further enhanced. This suggests the potential of our method to continue improving alongside advancements in monocular depth estimation.
+
+\vspace{-1em}
+\paragraph{\textbf{Qualitative Results.}}
+% Besides quantitative comparisons on public benchmarks, 
+We present qualitative comparisons with CoTracker~\cite{cotracker} on challenging videos from DAVIS~\cite{davis} and Internet footage in Fig.~\ref{fig:exp}.
+Our method outperforms CoTracker in handling complex human motion with self-occlusions,  achieves a better understanding of rigid groups, and can effectively track small, rapidly moving objects even in the presence of occlusions. Please refer to the supplementary video for more results and better visualizations.
+% We show more results of dense tracking on the surface of various objects, 
+% \ie human body, soccer ball etc. 
+% \qw{describe the qualitative results}
+% The results demonstrate how the arap constraint contribute to more accurate tracking for those complex motions in the real world. 
+
+% \qw{metric on pointodyssey is not defined here but later in the results section; should reorganize}
+
+
+
+
+
+
+\subsection{3D Tracking Evaluation}
+\label{sec:3d tracking eval}
+
+% \begin{figure}
+% \centering
+% \includegraphics[width=0.3\linewidth]{figures/rigid-robot/clustering_4.png}
+% \includegraphics[width=0.3\linewidth]{figures/rigid-robot/clustering_8.png}
+% \includegraphics[width=0.3\linewidth]{figures/rigid-robot/clustering_12.png}
+
+% \includegraphics[width=0.3\linewidth]{figures/rigid-car/clustering_0_car.png}
+% \includegraphics[width=0.3\linewidth]{figures/rigid-car/clustering_8_car.png}
+% \includegraphics[width=0.3\linewidth]{figures/rigid-car/clustering_12_car.png}
+% \caption{Two cases of rigid part estimation using the learned rigid embeddings. 
+% % by learning with rigid-as-possible constraint during tracking.
+% }
+% \label{fig:asap-rigid-seg}
+% \end{figure}
+% \noindent{\textbf{2D tracking}}
+% We evaluate our method on the main stream datasets quantitatively and also report more qualitative comparisons in some internet videos to illustrate the efficiency of our method. \qw{todo: add reference}
+% For the evaluation in TAP-Vid-Benchmark, we adopt the "first protocol" evaluation protocol in TAP-Vid-Benchmark which tracks the points only once queried. Besides the points selection problem discussed in Cotracker~\cite{cotracker}, we keep the same setting which sample extra $6\times6$ global grid points as the supportive points to get the final tracking results. As shown in Table.~\ref{table:Tracking2D}, our method outperform our baseline by a clear margin. 
+% \qw{no need to repeat the number here} Specifically, our method beats the SOTA methods, Cotracker with 50.1 vs 48.7 in AJ, 65.9 vs 64.3 in $\delta_{\textbf{avg}}$ and 86.9 vs 86.5 in occlusion accuracy in Kinetics Dataset. And as shown in Figure.~\todo{}, we show the clear qualitative comparison between our method and Cotracker with cases including complex motion and heavy occlusion. Our method show its robustness in handling the motions with complex 3D rotations or occlusions thanks to tracking those points in 3D space. 
+% \qw{we should also briefly talk about the baselines somewhere. this sentence about cotracker reimplementation appears too late. You have already finished talking about the results and now you are introducing a baseline}
+% And in order to alleviate the influence of the hare-ware devices, we also report our re-implemented Cotracker training in 8 NVIDIA A100 GPUs.
+Given an RGBD video (with known depth and intrinsics) as input, our method can estimate true 3D trajectories. Since no baseline method can directly be used for long-range 3D tracking, we construct our baselines by composing existing methods. Our first baseline is chained RAFT-3D~\cite{raft3D}. RAFT-3D is designed for pairwise scene flow estimation, so to obtain long-range scene flow, we chain its scene flow prediction of consecutive frames. Our second baseline is to directly lift the predicted 2D trajectories from CoTracker~\cite{cotracker} using the input depth maps. 
+
+We evaluate our method and baselines on the PointOdyssey~\cite{zheng2023pointodyssey} dataset. We create $231$ testing sequences from the test set, each consisting of 24 frames and with a reduced frame rate set at one-fifth of the original. We use three evaluation metrics, namely $\rm{ATE}_{3D}$, $\delta_{0.1}$, and $\delta_{0.2}$. $\rm{ATE}_{3D}$ is the average trajectory error in 3D space.
+$\delta_{0.1}$ and $\delta_{0.2}$ measure the percentage of points whose distances are within $0.1$m and $0.2$m from the ground truth, respectively.
+\input{table/PointOdyssey}
+\input{table/ablation_depth}
+
+% We compare our methods with baseline methods for scene flow estimation. 
+% \paragraph{Baseline Implemented with 2D Tracker} When ground trueh depth maps are provided, the 3D correspondences are easily acquired via 2d correspondences when no occlusion exists. Therefore, in order to demonstrate and highlight the necessity of our work in 3D tracking. We implement the naive baseline by using the cotracker to find the long range 2D correspondences and accquire the depth by the interpolation directly.
+
+% \paragraph{Results on PointOdyssey}We evaluate our method on the PointOdyssey dataset, which consists of a series of challenging synthetic videos.
+% For scene flow estimation, we choose RAFT-3D and CoTracker (2D flow backprojected) as our baselines. 
+% We adopt the pretrained RAFT-3D model and its default parameters.
+% For CoTracker (2D flow backprojected), we use the pretrained model and backproject the 2D flow to 3D flow through the ground truth depth map.
+% In the following, we abbreviate CoTracker (2D flow backprojected) as CoTracker. To be consistent with CoTracker, our model is only trained on Kubric. We apply our model directly to PointOdyssey dataset without any parameter tuning.
+% Due to the unclear definition of atmospheric volume depth, we confine our tests to scenarios devoid of atmospheric volume. We reduce the frame rates of the videos to one-fifth of their original rates and organize them into sets of 24 frames each.
+% We use three metrics to evaluate our method, namely $ATE_{3d}$, $\delta_{0.1}$ and $\delta_{0.2}$. $ATE_{3d}$ is the average trajectory error in 3D space.
+% $\delta_{0.1}$ and $\delta_{0.2}$ are threshold metrics, which represent the proportion of distances within a given threshold from the ground truth.
+
+The results are shown in Tab.~\ref{table:PointOdyssey}.
+Our method outperforms both ``Chained 
+RAFT-3D'' and ``Lifted CoTracker'' consistently on all three metrics by a large margin. We found that RAFT-3D, trained on FlyingThings~\cite{MIFDB16},  generalizes poorly on PointOdyssey, possibly due to the fact that its dense-SE3 module is sensitive to domain gaps. In contrast, also trained on a different dataset (Kubric), our method exhibits strong generalization to PointOdyssey, affirming the efficacy of our design for 3D trajectory prediction. In addition, both baselines cannot handle occlusion and will lose track of points once they become occluded, hurting the performance significantly.
+
+
+
+\subsection{Ablation and Analysis}
+\label{sec: ablation}
+
+\paragraph{Effectiveness of ARAP loss and rigidity embedding.} We ablate the ARAP loss and report the result ``Ours \emph{w/o} ARAP'' on the TAP-Vid-DAVIS~\cite{pont20172017,tap-vid} dataset in Tab.~\ref{table:ablatio_depth}. Without the ARAP loss, the performance drops substantially, verifying the effectiveness of the ARAP constraint. We additionally showcase qualitative results of the rigid part segmentation, utilizing our learned rigidity embeddings in Fig.~\ref{fig:asap-rigid-seg}, demonstrating their effectiveness.
+\begin{figure}[t]
+    \centering
+ 
+    \includegraphics[width=0.3\linewidth]{figures/rigid_owls/00001.png}
+    \includegraphics[width=0.3\linewidth]{figures/rigid_owls/00015.png}
+    \includegraphics[width=0.3\linewidth]{figures/rigid_owls/00035.png}
+
+    
+    \includegraphics[width=0.3\linewidth]{figures/rigid_newton/00001.png}
+    \includegraphics[width=0.3\linewidth]{figures/rigid_newton/00010.png}
+    \includegraphics[width=0.3\linewidth]{figures/rigid_newton/00020.png}
+    
+    % \includegraphics[width=]{}
+    \vspace{-5pt}    
+    \caption{\textbf{Rigid Part Segmentation.} We utilize spectral clustering on the rigidity embedding to determine rigid groups. Each color represents a distinct rigid group.}
+    \vspace{-4mm}
+    \label{fig:asap-rigid-seg}
+\end{figure}
+
+\vspace{-0.5em}
+\paragraph{Analysis on monocular depth estimators.}
+To study the influence of different monocular depth estimation methods on our model, we evaluate our method with three monocular depth models: ZoeDepth~\cite{ZoeDepth}~(default), MiDaS~\cite{birkl2023midas}, and DPT~\cite{ranftl2021vision}.
+We report the results on the TAP-Vid-DAVIS~\cite{pont20172017,tap-vid} dataset in Tab.~\ref{table:ablatio_depth}.
+``Ours \textit{w/} ZoeDepth'' achieves the best results, probably due to the fact that ZoeDepth~\cite{ZoeDepth} is a metric depth estimator and exhibits less temporal inconsistency across frames compared to relative depth estimators MiDaS~\cite{birkl2023midas} and DPT~\cite{ranftl2021vision}.
+Furthermore, it is noteworthy that the efficacy of our model has a positive correlation with the advancements in the underlying monocular depth models. 
+Please refer to the supplementary material for additional analysis and ablations.
+% The results are shown in Table~\ref{table:ablatio_depth}.
+
+
+
+% \paragraph{Effectiveness of different components.}
+% To ascertain the significance of the different components of our model, we  conduct comprehensive ablation studies on the DAVIS dataset. 
+% First, we design a baseline model that removes the ARAP term. This baseline is abbreviated as ``Ours w/o ARAP''.
+% Second, to demonstrate the effectiveness of tracking in 3D space, we propose a baseline model that replaces the input of CoTracker with RGBD data, where the monocular depth is consistent with our model. This baseline is abbreviated as ``CoTracker w/ RGBD''.
+
+
+

@@ -1,0 +1,131 @@
+
+\documentclass[11pt]{article}
+\usepackage[final]{rbs}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{graphicx}
+\usepackage{booktabs,multirow,tabularx}
+\usepackage{xspace}
+\usepackage{enumitem}
+
+% Optional math commands from https://github.com/goodfeli/dlbook_notation.
+\input{math_commands.tex}
+
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{wrapfig}
+\usepackage{array}
+\usepackage{hyperref}
+\usepackage{url}
+\hypersetup{colorlinks=true,linkcolor=rbsInk,citecolor=rbsInk,urlcolor=rbsGreen}
+
+% Unified figure/table caption styling
+\captionsetup{
+  font=small,
+  labelfont={bf,sf,color=rbsInk},
+  textfont={color=rbsInk},
+  labelsep=period,
+  justification=justified,
+  singlelinecheck=false,
+  skip=4pt
+}
+\captionsetup*[subfigure]{
+  font=footnotesize,
+  labelfont={bf,sf,color=rbsInk},
+  textfont={color=rbsInk},
+  justification=centering,
+  singlelinecheck=true,
+  skip=3pt
+}
+\captionsetup*[subtable]{
+  font=footnotesize,
+  labelfont={bf,sf,color=rbsInk},
+  textfont={color=rbsInk},
+  justification=centering,
+  singlelinecheck=true,
+  skip=3pt
+}
+\newcommand{\method}{\textsc{WorldFlow}}
+\newcommand{\objectflow}{\textit{object flow}}
+\newcommand{\flow}{f}
+\newcommand{\points}{\mathbf{p}}
+\newcommand{\video}{I}
+\newcommand{\todoresult}{\textcolor{gray}{TBD}}
+
+\newcommand{\figplaceholder}[2]{%
+  \fbox{\begin{minipage}[c][#1][c]{0.98\linewidth}%
+  \centering\textcolor{gray}{\textit{#2}}%
+  \end{minipage}}}
+
+\hyphenpenalty=5000
+\tolerance=1000
+
+
+\title{WorldFlow: Joint Video and 3D Motion Prediction via Large-Scale Pretraining}
+
+\author{%
+\begin{minipage}{\dimexpr\textwidth-3\tabcolsep\relax}
+\centering
+{\bfseries Yuhao Lu\textsuperscript{1,*}, Jiongxu Chen\textsuperscript{1,*}, Hexiang Wei\textsuperscript{1}, Jiajin Wu\textsuperscript{1}, Juelin Li\textsuperscript{1}, Mingjian Liang\textsuperscript{1}} \\[0.3em]
+{\bfseries Fan Yang\textsuperscript{1}, Zhuowei Liang\textsuperscript{1}, Zihao Liu\textsuperscript{1}, Zhennan Wang\textsuperscript{1}, Sheng Wang$^{1,\dagger}$, Lin Shao$^{1,2,\ddagger}$} \\[0.4em]
+{\normalfont\small \textsuperscript{1}RoboScience \quad \textsuperscript{2}National University of Singapore}
+\end{minipage}}
+
+
+\begin{document}
+
+\raggedbottom
+
+\maketitle
+\begingroup
+\makeatletter
+\renewcommand{\@makefntext}[1]{\noindent#1}
+\makeatother
+\renewcommand{\thefootnote}{}
+\renewcommand{\theHfootnote}{rbscredits}
+\begin{NoHyper}
+\footnotetext{\textsuperscript{*} Equal contribution.\quad \textsuperscript{\ensuremath{\dagger}} Project leader.\quad \textsuperscript{\ensuremath{\ddagger}} Corresponding author.}
+\end{NoHyper}
+\endgroup
+
+\input{sec/0_abstract}
+
+\begin{center}
+\vspace{-0.25cm}
+\includegraphics[width=0.98\linewidth]{figures/teaser.pdf}
+\end{center}
+\vspace{-0.15cm}
+\begingroup
+\captionsetup{type=figure,hypcap=false}
+\caption{
+    \textbf{3D Flow Predictions and motion modeling paradigms.}
+    \textbf{Left:} 3D motion flow predicted by WorldFlow across simulated, robotic manipulation, human-object interaction, and in-the-wild environments.
+    \textbf{Right:} (a) Tracking models recover dense scene flow from video.
+    (b) Motion prediction models forecast future 3D flow from an image and text.
+    Existing formulations can be broadly divided into sparse scene flow prediction and query-conditioned flow prediction.
+    (c) \method{} is a world model conditioned on an image, text, and query points that jointly generates future video and query-conditioned 3D flow.
+}
+\label{fig:teaser}
+\endgroup
+
+\input{sec/1_intro}
+\input{sec/2_liter}
+\input{sec/3_meth}
+\input{sec/4_exp}
+\input{sec/5_sum}
+
+
+
+% \subsubsection*{Acknowledgments}
+% Use unnumbered third level headings for the acknowledgments. All
+% acknowledgments, including those to funding agencies, go at the end of the paper.
+
+
+\bibliographystyle{rbs}
+\bibliography{references}
+
+\input{sec/X_suppl}
+
+
+\end{document}

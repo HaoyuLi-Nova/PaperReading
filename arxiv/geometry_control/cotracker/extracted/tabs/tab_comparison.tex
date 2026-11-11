@@ -1,0 +1,36 @@
+\begin{table*}[t]
+\centering
+\footnotesize
+\begin{tabular}{llcccccccccccc}
+\toprule
+\multirow{2}{*}{Method} &\multirow{2}{*}{Train} & \multicolumn{3}{c}{DAVIS First} & \multicolumn{3}{c}{DAVIS Strided} & \multicolumn{3}{c}{RGB-S First}  \\
+% & \multicolumn{3}{c}{RGB-S every 5th}
+\cmidrule(lr){3-5}
+\cmidrule(lr){6-8}
+\cmidrule(lr){9-11}
+ & & AJ \ua & \davgvis\ua & OA \ua & AJ \ua & \davgvis\ua & OA \ua &  AJ \ua & \davgvis\ua & OA\ua \\
+ % &  AJ \ua & \davgvis\ua & OA\ua 
+\midrule
+TAP-Net~\cite{tapvid} & K & 33.0 & 48.6 & 78.8 & 38.4 & 53.1 & 82.3 & --- & --- & --- \\
+OmniMotion~\cite{wang2023tracking} & --- & 52.8 & 66.9 & \underline{87.1} & 51.7 & 67.5 & 85.3 &  \underline{69.5} &  \underline{82.4} &  \textbf{90.3} \\
+PIPs~\cite{pips} &  FT++ & 42.2 & 64.8 & 77.7 & 52.4 & 70.0 & 83.6&  ---  & 59.1 & ---  \\
+MFT~\cite{neoral2023mft} & K++ & 47.3 & 66.8 & 77.8 & 56.1 & 70.8 & 86.9 & --- &  --- &  --- \\
+PIPs++~\cite{zheng2023pointodyssey}  & PO & --- & 69.1 & --- & --- & \underline{73.7} & --- &  ---  & 77.8 & --- & \\
+TAPIR~\cite{doersch2023tapir} & K & \underline{56.2} & \underline{70.0} & 86.5 & \underline{61.3} & 73.6 & \underline{88.8} &  60.3 & 74.1 & 85.5 \\
+\midrule
+CoTracker (Ours) & K & \textbf{62.2 }& \textbf{75.7} & \textbf{89.3} & \textbf{65.9} & \textbf{79.4} & \textbf{89.9} & 
+ \textbf{71.6} & \textbf{83.3}  & \underline{89.6} \\
+ 
+\bottomrule
+\end{tabular}
+\caption{
+\textbf{TAP-Vid benchmarks}
+We compare \method to the best trackers available on TAP-Vid benchmarks utilizing both their ``first'' and ``strided'' evaluation protocols. 
+During evaluation, TAPIR and OmniMotion have access to all video frames at once, while we process videos in an online manner using a causal sliding window. This puts online trackers like ours at a disadvantage on long videos with slow motion, such as in RGB-S. To address this, we decrease the frame rate for RGB-S evaluation by keeping every 5th frame.
+Training data:
+(K) Kubric,
+(K++) Kubric+more,
+(FT) FlyingThings++,
+(PO) Point Odyssey.
+ }\label{tab:tab_comparison}
+\end{table*}

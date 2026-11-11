@@ -1,0 +1,20 @@
+\begin{table}[t!]
+\centering\small
+\setlength{\tabcolsep}{8pt}
+\begin{tabular}{lccc}
+\toprule
+  \textbf{Methods} & \textbf{MTE}$\downarrow$ & $\mathbf{\deltaavg}$ $\uparrow$ & \textbf{Survival}$\uparrow$ \\
+\midrule
+TAP-Net~\cite{tap-vid} & $37.8$ & $29.2$  & $52.8$
+\\ 
+PIPs~\cite{zheng2023pointodyssey} & $41.0$ & $30.4$ & $67.0$ \\
+CoTracker~\cite{cotracker}  & $30.5$  & $56.2$ & $76.1$  \\ 
+Ours \textit{w/} ZoeDepth~\cite{ZoeDepth} & $28.3$ & $58.4$ & $\mathbf{78.6}$ \\
+Ours \textit{w/} GT depth  & $\mathbf{26.6}$ & $\mathbf{64.1}$ & $78.0$\\
+\bottomrule
+\end{tabular}
+\vspace{-5pt}
+\caption{\textbf{2D Tracking Results on the PointOdyssey Dataset~\cite{zheng2023pointodyssey}.} The Median Trajectory Error (MTE), average position accuracy ($\deltaavg$), and survival rate (Survival) are reported.}
+\label{table:PointOdyssey_2d}
+\end{table}
+    

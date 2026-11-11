@@ -1,0 +1,25 @@
+\section{Related Works}
+\label{sec:formatting}
+
+\paragraph{Video Diffusion Models}
+Diffusion models~\cite{ho2020denoising, song2020denoising, song2020score, liu2022flow} have made great progress in image generation~\cite{dhariwal2021diffusion, nichol2021glide, ramesh2021zero, rombach2022high, saharia2022photorealistic, ramesh2022hierarchical, zhang2024creatilayout, zhang2025creatidesign, zhang2023adadiff, zhang2025blockdance, wang2025simplear, zhang2025reasongen}, which has led to the rapid development of video generation~\cite{ho2022video, wu2023tune, khachatryan2023text2video, guo2023animatediff, blattmann2023stable, zheng2024open, hong2022cogvideo, yang2024cogvideox, kong2024hunyuanvideo, xing2024survey, xing2024aid, xing2023vidiff, xie2025human2robot, du2024challenge, tu2024motioneditor, tu2024motionfollower, tu2025stableanimator, tu2025stableanimator++, tian2025unigen}.
+VDM~\cite{ho2022video} is the first to apply diffusion models to video generation. 
+Early works like AnimateDiff~\cite{guo2023animatediff} and SimDA~\cite{xing2024simda} attempt to insert temporal layers into pretrained T2I model for video generation.
+Subsequently, VideoCrafter~\cite{chen2023videocrafter1} and SVD~\cite{blattmann2023stable} use large-scale and high-quality data for training, acheiving better performance.
+However, these methods have trouble on generating long videos with high quality, mainly due to the inherent limitations of the UNet architecture.
+The emergence of Sora~\cite{videoworldsimulators2024} is a significant success, demonstrating the potential of DiT~\cite{Peebles2022DiT} models to generate high-quality videos with tens of seconds.
+Recent video generation methods~\cite{zheng2024open, yang2024cogvideox, kong2024hunyuanvideo} are mainly based on DiT architecture, and have achieved great success in the open-source community.
+However, these methods rely solely on text or image guidance for video generation, lacking precise control over object or camera trajectory, which is crucial for high-quality video generation.
+
+\vspace{-1em}
+\paragraph{Trajectory Controllable Video Generation}
+Trajectory Controllable Video Generation has recently garnered significant attention for its ability to precisely control object and camera trajectories during video synthesis.
+Previous methods~\cite{yin2023dragnuwa, zhang2025tora, shi2024motion, li2025image}
+integrate optical flow maps into video generation through a trajectory encoder.
+% Points Trajectory
+Recent works~\cite{wang2024motionctrl, zhou2025trackgo} suggest using point maps as a form of guidance.
+MotionCtrl~\cite{wang2024motionctrl} processes point maps with a Gaussian filter and employs trainable encoders to encode object trajectories. Trackgo~\cite{zhou2025trackgo} represents objects using a few key points and injects this information via an encoder and a custom-designed adapter structure.
+Other works~\cite{wang2024boximator,qiu2024freetraj, namekata2024sgi2v, jain2023peekaboo} employ bounding box to control object trajectories. Boximator~\cite{wang2024boximator} employs a trainable self-attention layer to fuse box and visual tokens inspired by GLIGEN~\cite{li2023gligen}. Some training-free methods~\cite{qiu2024freetraj, namekata2024sgi2v, jain2023peekaboo} purpose to modify attention layers or initial noised video latents to inject box signals.
+Additionally, certain methods~\cite{wang2025cinemaster, gu2025das, fu20243dtrajmaster,wang2025levitor} explore the potential of 3D trajectories to achieve more sophisticated motion control. LeViTor~\cite{wang2025levitor} employs keypoint trajectory maps enriched with depth information, while others~\cite{wang2025cinemaster, gu2025das, fu20243dtrajmaster} construct custom 3D trajectories to represent object movements.
+However, sparse trajectories lead to imprecise control on objects shape and size, while dense trajectories are difficult for users to provide.
+In contrast, MagicMotion can control both dense and sparse trajectories, providing users with more flexible control over video generation.

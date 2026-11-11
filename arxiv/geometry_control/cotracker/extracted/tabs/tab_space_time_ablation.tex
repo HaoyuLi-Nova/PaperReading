@@ -1,0 +1,35 @@
+% \begin{table}[t]
+% \centering
+\setlength{\tabcolsep}{1pt}
+
+\begin{tabular}{c c c>{\centering}p{1.5cm} ccc }
+% ccc
+\toprule \multicolumn{2}{c}{Support:} &
+\multicolumn{3}{c}{DAVIS First} &
+
+\\
+\cmidrule(lr){3-5}
+% \cmidrule(lr){6-8}
+global    &  local              & AJ \ua & \davg\ua & OA \ua  \\
+    % \davg\ua & \davgvis\ua   & \davgocc\ua  \\
+\midrule
+\xmark & \xmark &    55.6  & 70.1 &     83.0   \\
+\cmark & \xmark                & 56.8                  &  71.2              & 85.8          \\
+
+\xmark  & \cmark              & 60.4 & 75.4 & 87.3 \\
+\cmark  & \cmark & \textbf{62.2}         &  \textbf{75.7}     & \textbf{89.3} \\ 
+
+
+
+\bottomrule
+\end{tabular}
+\caption{\textbf{Support points for TAP-Vid benchmarks}.
+We track single target points from DAVIS using additional support points for context, as described in \cref{sec:point_selection}. Adding points for context always helps, while additional global \textit{and} local context works best.
+}%
+\label{tab:tab_joint_tracking_ablation_global_local}
+%
+% \end{table}
+
+
+
+

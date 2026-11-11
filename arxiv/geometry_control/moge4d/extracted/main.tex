@@ -1,0 +1,160 @@
+
+\documentclass[runningheads]{llncs}
+
+% ---------------------------------------------------------------
+% Include basic ECCV package
+ 
+% TODO REVIEW: Insert your submission number below by replacing '*****'
+% TODO FINAL: Comment out the following line for the camera-ready version
+% \usepackage[review,year=2026,ID=3881]{eccv}
+% TODO FINAL: Un-comment the following line for the camera-ready version
+\usepackage{eccv}
+
+% OPTIONAL: Un-comment the following line for a version which is easier to read
+% on small portrait-orientation screens (e.g., mobile phones, or beside other windows)
+%\usepackage[mobile]{eccv}
+
+
+% ---------------------------------------------------------------
+% Other packages
+
+% Commonly used abbreviations (\eg, \ie, \etc, \cf, \etal, etc.)
+\usepackage{eccvabbrv}
+
+% Include other packages here, before hyperref.
+\usepackage{graphicx}
+\usepackage{booktabs}
+
+% The "axessiblity" package can be found at: https://ctan.org/pkg/axessibility?lang=en
+\usepackage[accsupp]{axessibility}  % Improves PDF readability for those with disabilities.
+
+
+% ---------------------------------------------------------------
+% Hyperref package
+
+% It is strongly recommended to use hyperref, especially for the review version.
+% Please disable hyperref *only* if you encounter grave issues.
+% hyperref with option pagebackref eases the reviewers' job, but should be disabled for the final version.
+%
+% If you comment hyperref and then uncomment it, you should delete
+% main.aux before re-running LaTeX.
+% (Or just hit 'q' on the first LaTeX run, let it finish, and you
+%  should be clear).
+
+% TODO FINAL: Comment out the following line for the camera-ready version
+\usepackage[pagebackref,breaklinks,colorlinks,citecolor=eccvblue]{hyperref}
+% TODO FINAL: Un-comment the following line for the camera-ready version
+% \usepackage{hyperref}
+% \usepackage[
+%     colorlinks=true,
+%     citecolor=blue,
+%     linkcolor=blue,
+%     urlcolor=blue
+% ]{hyperref}
+
+% Support for ORCID icon
+\usepackage{orcidlink}
+
+
+
+\begin{document}
+
+% ---------------------------------------------------------------
+% TODO REVIEW: Replace with your title
+\title{Geometry-Aware Single-Image 4D Synthesis via Dense Trajectory Generation} 
+
+% TODO REVIEW: If the paper title is too long for the running head, you can set
+% an abbreviated paper title here. If not, comment out.
+\titlerunning{MoGe4D}
+
+% TODO FINAL: Replace with your author list. 
+% Include the authors' OCRID for the camera-ready version, if at all possible.
+\author{Yanran Zhang$^{*,1}$
+\orcidlink{0009-0005-7209-9761}
+\and
+Ziyi Wang$^{*,1}$
+\orcidlink{0000-0002-9007-1210}
+\and
+Wenzhao Zheng\textsuperscript{\Letter}$^{,1}$
+\orcidlink{0000-0001-7188-3734}
+\and
+Zheng Zhu$^{2}$
+\orcidlink{0000-0002-4435-1692}
+\and
+Jie Zhou$^{1}$
+\orcidlink{0009-0001-7276-8487}
+\and
+Jiwen Lu$^{1}$
+\orcidlink{0000-0002-6121-5529}}
+
+% TODO FINAL: Replace with an abbreviated list of authors.
+\authorrunning{Zhang et al.}
+% First names are abbreviated in the running head.
+% If there are more than two authors, 'et al.' is used.
+
+% TODO FINAL: Replace with your institution list.
+% \institute{Princeton University, Princeton NJ 08544, USA \and
+% Springer Heidelberg, Tiergartenstr.~17, 69121 Heidelberg, Germany
+% \email{lncs@springer.com}\\
+% \url{http://www.springer.com/gp/computer-science/lncs} \and
+% ABC Institute, Rupert-Karls-University Heidelberg, Heidelberg, Germany\\
+% \email{\{abc,lncs\}@uni-heidelberg.de}}
+\institute{$^1$ Department of Automation, Tsinghua University, China ~~~ 
+$^2$ GigaAI\\
+\url{https://ivg-yanranzhang.github.io/MoGe4D/}\\
+\email{zhangyr21@mails.tsinghua.edu.cn, \ lujiwen@tsinghua.edu.cn}}
+% \institute{}
+\newcommand{\ours}{{MoGe4D}\xspace}
+\maketitle
+
+\begin{figure}[h]
+\vspace{-5mm}
+\centering
+\includegraphics[width=1\linewidth]{./assets/teaser_new.pdf}
+\vspace{-8mm}
+\captionof{figure}{\textbf{\ours for 4D synthesis from a single image.} Most existing paradigms either suffer from geometric inconsistencies (\textit{generate-then-reconstruct}) or are constrained by animating a pre-determined static geometry (vanilla \textit{reconstruct-then-generate}). Our \ours advances by tightly coupling geometric modeling and motion generation, effectively achieving consistent 4D motion and geometry.}
+\vspace{-10mm}
+\label{fig:teaser}
+\end{figure}
+\renewcommand{\thefootnote}{\fnsymbol{footnote}} 
+\footnotetext[1]{Equal contributions. 
+% $^\dagger$Project leader.
+\textsuperscript{\Letter}Corresponding author.} % 使用 [1] 但实际显示为 *
+\renewcommand{\thefootnote}{\arabic{footnote}} 
+
+\input{sec/0_abstract}    
+\input{sec/1_intro}
+\input{sec/2_related_work}
+\input{sec/3_method}
+\input{sec/4_experiments}
+\input{sec/5_conclusion}
+\input{sec/6_acknowledgement}
+{
+\newpage
+    \centering
+    \Large
+    \vspace{0.5em}Supplementary Material \\
+    \vspace{1.0em}
+}
+\input{sec/supp}
+
+% {
+%     \small
+%     \bibliographystyle{ieeenat_fullname}
+%     \bibliography{main}
+% }
+
+% ---- Bibliography ----
+%
+% BibTeX users should specify bibliography style 'splncs04'.
+% References will then be sorted and formatted in the correct style.
+%
+\bibliographystyle{splncs04}
+\bibliography{main}
+
+\clearpage
+
+
+
+
+\end{document}

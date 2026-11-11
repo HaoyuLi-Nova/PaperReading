@@ -1,0 +1,82 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{arxiv}
+\usepackage[utf8]{inputenc} %
+\usepackage[T1]{fontenc}    %
+\usepackage{hyperref}       %
+\usepackage{url}            %
+\usepackage{booktabs}       %
+\usepackage{amsmath}       %
+\usepackage{amsfonts}       %
+\usepackage{nicefrac}       %
+\usepackage{microtype}      %
+\usepackage{cleveref}       %
+\usepackage{natbib}
+\usepackage{doi}
+\usepackage{balance}
+\usepackage{xcolor}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{wrapfig}
+\usepackage{subcaption}
+\usepackage{xspace}
+
+
+
+\usepackage{multicol}
+\usepackage{tabularx}
+\input{header/cmds}
+
+
+
+
+\title{\TitleLong: Trajectory Control for Diffusion-Based Video Generation}
+
+\author{
+    \href{https://www.linkedin.com/in/kurt-ma/}{Wan-Duo Kurt Ma}\\
+    % \href{https://orcid.org/0000-0002-9499-2623}{Wan-Duo Kurt Ma}\\
+    Victoria University of Wellington\\
+    \texttt{mawand@ecs.vuw.ac.nz}\\
+\And
+    % \href{https://orcid.org/0000-0002-6835-7263}{J. P.~Lewis}\\  %
+    \href{http://scribblethink.org/}{J. P.~Lewis}\\  %
+    NVIDIA Research\\
+    \texttt{jpl@nvidia.com}\\
+\And
+    \href{https://people.wgtn.ac.nz/bastiaan.kleijn}{W. Bastiaan Kleijn}\\  %
+    % W. Bastiaan Kleijn\\
+    Victoria University of Wellington\\
+    bastiaan.kleijn@vuw.ac.nz
+}
+
+
+\begin{document}
+\vspace{-0.1in}
+\maketitle
+\vspace{-0.6in}
+
+
+\begin{center}
+    \centering \captionsetup{type=figure}
+    \includegraphics[width=\textwidth]{assets/teaser-3.pdf}
+    \captionof{figure}{\emph{\TitleLong} extends a pre-trained video diffusion model to introduce trajectory control over one or multiple subjects. Its primary contribution lies in the ability to animate the synthesized subject using a bounding box \emph{(bbox),} whether it remains static (Top-left) or dynamic in terms of location and bbox size (Top-right), morphing for subject interpolation (Middle-left), and varied movement speed (Middle-right). The moving subjects fit naturally within an environment specified by the overall prompt (Bottom-right). Additionally, the speed of the subjects can be controlled through keyframing (Bottom-left).}
+    \label{fig:teaser}
+\end{center}
+
+% , the cat sitting in the early half of video in red bbox, and then moving with cyan bbox, achieved through keyframing
+
+\input{source/0_abstract}
+
+\input{source/1_intro}
+\input{source/2_related}
+\input{source/3_method}
+\input{source/4_experiment}
+\input{source/5_cond}
+\input{source/supp_main}
+% \input{source/6_note}
+
+\small
+\bibliographystyle{ieeenat_fullname}
+\bibliography{main}
+\end{document}

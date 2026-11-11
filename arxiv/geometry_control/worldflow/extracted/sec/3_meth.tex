@@ -1,0 +1,245 @@
+\section{WorldFlow}
+\label{sec:method}
+
+\subsection{Problem Formulation}
+\label{sec:problem}
+
+Given a language instruction $c$, an observed RGB frame $I_0$,
+and 3D query points
+$\mathcal{Q}=\{\mathbf{p}_{0,i}\}_{i=1}^{N}$
+with corresponding image coordinates
+$\mathcal{S}_0=\{\mathbf{s}_{0,i}\}_{i=1}^{N}$,
+\method{} jointly predicts future RGB frames $I_{1:T}$
+and 3D flow $f_{1:T}$.
+All 3D positions are expressed in the initial camera
+coordinate system.
+We define flow as the frame-to-frame displacement
+of each query point:
+\begin{equation}
+f_{t,i}
+=
+\mathbf{p}_{t,i}-\mathbf{p}_{t-1,i},
+\qquad t=1,\ldots,T.
+\label{eq:flow-definition}
+\end{equation}
+The corresponding trajectories are recovered by accumulation:
+\begin{equation}
+\mathbf{p}_{t,i}
+=
+\mathbf{p}_{0,i}+\sum_{\tau=1}^{t}f_{\tau,i}.
+\label{eq:trajectory-reconstruction}
+\end{equation}
+Our objective is to model the conditional joint distribution
+\begin{equation}
+p_\theta\left(
+I_{1:T},f_{1:T}
+\mid I_0,\mathcal{Q},\mathcal{S}_0,c
+\right).
+\label{eq:joint-distribution}
+\end{equation}
+
+\subsection{Architecture}
+\label{sec:architecture}
+
+Our central design introduces 3D flow tokens as an additional
+generative modality for joint video-motion prediction.
+Built on the Cosmos-Nano framework~\citep{nvidia2026cosmos3}, \method{} retains
+the pretrained reasoner and extends the generator to
+jointly synthesize future video and 3D flow
+(Figure~\ref{fig:overview}).
+The reasoner processes the language instruction, while
+the video VAE encodes the observed frame into clean latents.
+The flow tokenizer embeds noisy displacements together
+with initial query-point geometry and aligns their
+spatiotemporal positional coordinates with the video
+token grid (Section~\ref{sec:tokenizer}).
+
+Within the Mixture-of-Transformers (MoT) architecture,
+video and flow tokens interact through full attention
+and attend to the reasoner's causal context.
+At inference, future video latents and flow are initialized
+from noise and jointly denoised, conditioned on the clean
+observed-frame latents, language context, and query geometry.
+The VAE decodes the generated video latents into RGB frames,
+while the predicted flow is rescaled and accumulated
+to recover 3D trajectories.
+This joint generation process produces explicit motion
+alongside video without a separate tracking stage.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/architecture.pdf}
+    \caption{
+        Overview of \method{}.
+        Conditioned on text tokens $t_j$ through the pretrained
+        reasoner, clean observed-frame latents $v_0$, and query-point geometry, the generator jointly denoises video and flow from noise $\epsilon_j$ and $\delta_k$ through shared multimodal attention.
+        Generated video latents $v_j$ are decoded by the VAE,
+        while generated 3D flow $f_t$ is rescaled and
+        accumulated from the initial query positions
+        to recover metric trajectories.
+        The 2D flow overlay shows generated 3D trajectories projected onto generated video frames.
+        The 3D flow overlay shows generated 3D trajectories overlaid on a scene point cloud reconstructed from
+        the initial frame's ground-truth depth.
+    }
+    \label{fig:overview}
+\end{figure}
+
+\subsection{3D Flow Tokenization}
+\label{sec:tokenizer}
+
+We represent each query point's displacement at each future
+frame as a continuous-valued token, augmented with initial
+3D geometry and spatiotemporal positional encoding.
+
+\paragraph{Normalization and sequence construction.}
+To balance motion scales across domains, we normalize
+displacements by a domain-specific scalar estimated
+from training data and fixed throughout training:
+\begin{equation}
+\bar{f}_{t,i}=\frac{f_{t,i}}{a_d},
+\qquad a_d>0.
+\label{eq:motion-normalization}
+\end{equation}
+The normalized displacements are arranged in frame-major
+order, yielding $TN$ three-dimensional vectors for
+token construction.
+
+\paragraph{Query point geometry encoder.}
+We encode each query point's absolute initial position
+and its position relative to the query-set centroid
+using two parallel encoders.
+Each applies coordinate normalization, fixed Fourier
+features, and an MLP.
+Their outputs are concatenated and fused:
+\begin{equation}
+\mathbf{e}^{\mathrm{3D}}_i
+=
+\mathrm{MLP}
+\left(
+\left[
+E_{\mathrm{abs}}(\mathbf{p}_{0,i});
+E_{\mathrm{rel}}(\mathbf{p}_{0,i}-\boldsymbol{\mu})
+\right]
+\right),
+\label{eq:point-pe}
+\end{equation}
+where $E_{\mathrm{abs}}$ and $E_{\mathrm{rel}}$ denote
+the two encoders, and $\boldsymbol{\mu}$ is the query-set
+centroid.
+The geometry embedding is shared across all future
+tokens of the same query point.
+
+\paragraph{Flow token construction.}
+A linear projection maps noisy normalized displacements
+into the generator's hidden space, where they are combined
+with geometry and conditioning embeddings:
+\begin{equation}
+\mathbf{h}_{t,i}^{(\sigma)}
+=
+\mathrm{Linear}(\bar{f}_{t,i}^{(\sigma)})
++
+\mathbf{e}^{\mathrm{3D}}_i
++
+\mathbf{e}_{\mathrm{cond}}(\sigma).
+\label{eq:flow-embedding}
+\end{equation}
+Here, $\sigma$ denotes the denoising noise level,
+distinct from the physical frame index $t$.
+The conditioning embedding combines a learned
+flow-modality embedding with the noise-level embedding.
+
+\paragraph{Spatiotemporal alignment.}
+We assign flow tokens rotary positional coordinates
+using the same temporal and spatial conventions as
+video tokens.
+Each flow token is anchored to its future frame
+and the query point's initial image patch:
+\begin{equation}
+\mathbf{r}_{t,i}
+=
+\left(
+\frac{t}{q_t},
+\left\lfloor\frac{v_{0,i}}{q_s p_s}\right\rfloor,
+\left\lfloor\frac{u_{0,i}}{q_s p_s}\right\rfloor
+\right),
+\label{eq:flow-rope-coordinates}
+\end{equation}
+where $(u_{0,i},v_{0,i})=\mathbf{s}_{0,i}$ denotes
+the initial image coordinates, $q_t$ and $q_s$ are
+the temporal and spatial VAE compression factors,
+and $p_s$ is the latent patch size.
+These coordinates determine the rotary transformations
+of attention queries and keys:
+\begin{equation}
+\widetilde{\mathbf{q}}_{t,i}
+=
+R(\mathbf{r}_{t,i})\mathbf{q}_{t,i},
+\qquad
+\widetilde{\mathbf{k}}_{t,i}
+=
+R(\mathbf{r}_{t,i})\mathbf{k}_{t,i}.
+\label{eq:flow-rope}
+\end{equation}
+The shared positional convention encodes relative
+spatiotemporal relationships between flow and video
+tokens within multimodal attention.
+
+\subsection{Training Objectives}
+\label{sec:training}
+
+\subsubsection{Joint flow matching}
+We jointly train video and 3D flow generation using
+a weighted rectified-flow objective:
+\begin{equation}
+\mathcal{L}_{\mathrm{FM}}
+=
+\lambda_{\mathrm{video}}\mathcal{L}_{\mathrm{video}}
++
+\lambda_{\mathrm{flow}}\mathcal{L}_{\mathrm{flow}},
+\label{eq:joint-objective}
+\end{equation}
+where $\mathcal{L}_{\mathrm{video}}$ and
+$\mathcal{L}_{\mathrm{flow}}$ supervise vector-field
+prediction for video latents and normalized 3D flow,
+respectively.
+Both modalities share a per-sample noise level and
+are jointly denoised.
+Losses are computed separately for each modality,
+excluding conditioning positions from supervision.
+
+\subsubsection{Auxiliary motion objectives}
+To complement vector-field supervision with explicit
+constraints on predicted motion, we apply auxiliary
+objectives to clean normalized flow reconstructed
+from the predicted vector field.
+These objectives penalize frame-to-frame displacement
+error, cumulative displacement direction error,
+and relative endpoint error, encouraging both local
+accuracy and trajectory-level consistency.
+
+Direction errors are weighted by ground-truth displacement
+magnitude, while points with small net displacement
+are excluded from endpoint supervision.
+All auxiliary terms operate in normalized coordinates
+and use noise-dependent weighting to emphasize
+lower-noise samples.
+The complete objective is
+\begin{equation}
+\mathcal{L}
+=
+\mathcal{L}_{\mathrm{FM}}
++
+\lambda_{\mathrm{dir}}\mathcal{L}_{\mathrm{dir}}
++
+\lambda_{\mathrm{vmag}}\mathcal{L}_{\mathrm{vmag}}
++
+\lambda_{\mathrm{end}}\mathcal{L}_{\mathrm{end}},
+\label{eq:complete-objective}
+\end{equation}
+where $\mathcal{L}_{\mathrm{dir}}$,
+$\mathcal{L}_{\mathrm{vmag}}$, and
+$\mathcal{L}_{\mathrm{end}}$ denote the direction,
+displacement, and endpoint losses, respectively.
+Detailed formulations and derivations are provided
+in the supplementary material, and their contribution
+is evaluated through ablation experiments.

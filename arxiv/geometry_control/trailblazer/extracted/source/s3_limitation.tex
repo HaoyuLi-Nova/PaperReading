@@ -1,0 +1,20 @@
+
+\section{Limitations}
+\label{ssec:limits}
+% jp previously said assign attribute e.g color, *size*, but size is controlled by the bbox
+%Our method has several limitations at the certain level which inherits all possible shortages from the SD, and the ZeroScope.
+Our method shares and inherits  common failure cases of the underlying diffusion model.
+Notably, at the time of writing, models based on CLIP and Stable Diffusion sometimes generate deformed objects and struggle to generate multiple objects and correctly assign attributes (e.g.~color) to objects. We show some failures in \FigRef{fig:limit}. For instance, we requested a red jeep driving on the road but the synthesis shows it sinking into a mud road. The panda example shows the camera moving instead of the panda itself. The red car has implausible deformation, and Darth Vader's light saber turns into a surf board. The length of the resulting video clips is restricted to that produced by the pre-trained model, for instance, the 24 images in the case of ZeroScope. This is not a crucial limitation, as movies are commonly (with some exceptions!) composed of short ``shots'' of several seconds each.  The bbox guides object placement without precisely constraining it. This is an advantage as well, however, since otherwise the user would have to specify the correct x-y aspect ratio for objects, a complicated task for non-artists.
+
+
+\begin{figure}[tp]
+  \centering
+  % \includegraphics[width=\linewidth]{assets/limitation.jpg }
+  \includegraphics[width=\linewidth]{assets/limitation.pdf}
+  \vspace{-0.5em}
+  \caption{\textbf{Failure cases.} %Several limitations depending on the context.
+  Prompts used in subfigures: ``\textbf{A red jeep} driving on the road'', ``\textbf{A red car} driving on the highway'', ``\textbf{a panda} eating bamboo'', and ``\textbf{Darth Vader} surfing in waves'', where the bold prompt word is the directed subject.}
+  \label{fig:limit}
+\vspace{-1em}
+\end{figure}
+

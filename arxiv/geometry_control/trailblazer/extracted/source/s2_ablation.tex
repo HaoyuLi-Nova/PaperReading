@@ -1,0 +1,53 @@
+
+%     _    _     _       _   _
+%    / \  | |__ | | __ _| |_(_) ___  _ __
+%   / _ \ | '_ \| |/ _` | __| |/ _ \| '_ \
+%  / ___ \| |_) | | (_| | |_| | (_) | | | |
+% /_/   \_\_.__/|_|\__,_|\__|_|\___/|_| |_|
+
+\section{Ablations}
+\label{sec:ablation}
+
+We conduct ablation experiments on the number of trailing attention maps and the number of temporal steps.
+
+%  _____          _ _ _
+% |_   _| __ __ _(_) (_)_ __   __ _
+%   | || '__/ _` | | | | '_ \ / _` |
+%   | || | | (_| | | | | | | | (_| |
+%   |_||_|  \__,_|_|_|_|_| |_|\__, |
+%                             |___/
+
+\textbf{Trailing attention maps.} \FigRef{fig:abl_trailings} shows an ablation varying the number of trailing attention maps used in our spatial cross attention process, where the top row shows our method without trailing attention maps (e.g, $|\TTT|=0$) to the bottom row (e.g., $|\TTT|=30$). The guided bbox is annotated with green bbox moving from left to right. It is observed that the astronaut remains static at the image center without the trailing attention maps. In contrast, the synthesis with a large number of trailing attentions can lead to failed results such as a flag rather than the intended astronaut. A good number of edited trailing attention maps is between $|\TTT|=10$ and $|\TTT|=20$.
+
+
+\begin{figure}[tp]
+  \centering
+  % \includegraphics[width=\linewidth]{assets/ablation_trailings.jpg}
+  \includegraphics[width=\linewidth]{assets/ablation_trailings.pdf}
+  \caption{\textbf{Ablation: Trailing maps.}
+  % Varied trailing maps used in spatial cross attention map editing. save space, is said in the main text
+  The rows from top to bottom show the video synthesis with 0 (no trailing maps), 10, 20, and 30 trailing maps. Prompt: ``The \textbf{astronaut} walking on the moon'', where ``astronaut'' is the directed subject. The number of temporal edit steps is five  in all cases.}
+  \label{fig:abl_trailings}
+  \vspace{-2em}
+\end{figure}
+
+
+
+%  _____
+% |_   _|__ _ __ ___  _ __
+%   | |/ _ \ '_ ` _ \| '_ \
+%   | |  __/ | | | | | |_) |
+%   |_|\___|_| |_| |_| .__/
+%                    |_|
+
+\textbf{Temporal attention editing.} We further show an ablation test in \FigRef{fig:abl_temp} with varied number of temporal attention editing steps. We take the case of the astronaut from \FigRef{fig:abl_trailings} with $|\TTT|=10$, and set $N_M = 0$ (no editing steps), and $N_M = 10$. The result with $N_M = 0$ shows a red blob moving from left to right. The value $N_M = 10$ gives satisfactory result on the astronaut, but the background along the bbox path is missing. From these results we see that a reasonable balance between spatial and the temporal attention editing must be maintained, while extreme values of either produce poor results. An intermediate value such as $N_M=5$ used in most of our experiments produces the desired result of an astronaut moving over a moon background.
+
+\begin{figure}[tp]
+  \centering
+  % \includegraphics[width=\linewidth]{assets/ablation_temp_steps.jpg}
+  \includegraphics[width=\linewidth]{assets/ablation_temporal.pdf}
+  \vspace{-0.3em}
+  \caption{\textbf{Ablation: Temporal edits.} Following up the experiments in \FigRef{fig:abl_trailings}, the ablation test on the temporal attention editing with varied number of steps of the first and last frame of video reconstruction, shown at the left/right of each set of experiments. (Left/Right): No temporal attention editing, and 10 steps editing, respectively. The number of trailing is 10 for the two cases.}
+  \label{fig:abl_temp}
+\end{figure}
+

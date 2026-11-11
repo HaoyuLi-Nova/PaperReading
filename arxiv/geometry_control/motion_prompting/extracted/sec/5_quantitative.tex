@@ -1,0 +1,43 @@
+\section{Quantitative Results}
+\label{sec:quantitative}
+
+In addition to the qualitative examples above, we describe a quantitative benchmark, and evaluate our method against recent baselines. Furthermore, we conduct a human study, and describe ablations in this section.
+
+\subsection{Track-Conditioned Generation Evaluation}
+\label{sec:davis_eval}
+
+To evaluate our track-text-and-first frame conditioned video generation, we use the validation split of the DAVIS video dataset~\cite{pont20172017}. We extract first frames and tracks from the dataset and feed this to the models along with an automatically generated text prompt. For exact implementation details, please see \cref{apdx:implementation}. 
+To evaluate a range of track densities, we vary the number of conditioning tracks from just a single track to 2048 tracks.
+
+We compare our method with two recent works: ImageConductor~\cite{li2024image}, which finetunes AnimateDiff~\cite{guo2023animatediff} for camera and object motion, and DragAnything~\cite{wu2024draganything}, which is designed to move ``entities" along tracks by finetuning Stable Video Diffusion~\cite{blattmann2023stable}.
+To evaluate the appearance of the generated videos we compute \textbf{PSNR}, \textbf{SSIM}~\cite{wang2004image}, \textbf{LPIPS}~\cite{zhang2018perceptual}, and \textbf{FVD}~\cite{unterthiner2019fvd} between the generated videos and ground truth videos. 
+To evaluate how well the generated video matches the motion conditioning, we use end-point error (\textbf{EPE}) which is computed as the L2 distance between the conditioning tracks and tracks estimated from the generated videos.
+
+\input{figtabs/davis_eval_abridged.tex}
+
+As shown in \cref{tbl:davis_eval_abridged}, our model outperforms the baselines in almost all cases.
+On some examples, DragAnything performs better in terms of EPE with fewer tracks.
+This is because DragAnything includes a module that effectively warps latents.
+While this warping effect may result in accurate motion, it also creates visual artifacts as evidenced by the underperforming PSNR, SSIM, LPIPS, and FVD results. \supparxiv{Please refer to the \supp{} to see this effect. }{}We also provide numbers for 4 and 64 tracks in \cref{apdx:quantitative}, which we omit here for brevity.
+
+\input{figtabs/human_study}
+
+\subsection{Human Study}
+
+We run a human study where we manually create a set of 30 inputs consisting of a single trajectory.
+We run a two alternative forced choice test where we ask (1) which video follows the motion conditioning better (2) which video has more realistic motion and (3) which video has higher visual quality. There are 180 questions total, and win rates for our method as well as 95\% confidence intervals are presented in \cref{tbl:human_study}.
+When considering both motion and appearance together, our approach is preferred over baselines in all categories. Implementation details can be found in \cref{apdx:implementation}.
+
+
+\subsection{Ablations}
+
+In \cref{tbl:ablations} we present an ablation where we train our model on only {\it Sparse} point trajectories (1-8 tracks) and {\it Dense + Sparse}, where the number of tracks is sampled logarithmically from $2^0$ to $2^{13}$. 
+We find that dense training is most effective, especially for large number of tracks. Surprisingly, dense training is also better for sparse tracks. We hypothesize that this is because using sparse tracks gives so little training signal that it is more efficient to train on dense tracks, which then generalizes to sparser tracks, though this may be influenced by our usage of ControlNet and zero convolutions. We use a subset of the DAVIS evaluation from \cref{sec:davis_eval}, but we note that the numbers do not match as we use less data and fewer training steps for the ablations.
+
+
+\input{figtabs/ablations}
+
+
+
+
+

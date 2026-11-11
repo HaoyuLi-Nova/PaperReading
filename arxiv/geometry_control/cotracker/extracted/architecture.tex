@@ -1,0 +1,10 @@
+
+\begin{figure*}
+  \centering
+  \includegraphics[width=\textwidth]{figures/sliding_window_inference.pdf}
+  
+  \caption{\textbf{CoTracker architecture.}  Visualization of one sliding window with $M$ updates. During one iteration, we update point tracks $\hat P^{(m)}$ and track features $Q^{(m)}$. $Q^{(0)}$ is initialized with the initially sampled features $Q$ for all sliding windows, $\hat P^{(0)}$ with the starting locations for the first window. For other windows, $\hat P^{(0)}$ starts with predictions for frames processed in the preceding sliding window, and with the last predicted positions for the unseen frames.  
+  We compute visibility $\hat v$ after the last update $M$.
+  }\label{fig:architecture}
+\end{figure*}
+

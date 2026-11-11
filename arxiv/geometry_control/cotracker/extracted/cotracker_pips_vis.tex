@@ -1,0 +1,8 @@
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/cotracker_pips.pdf}
+% \fbox{\rule[-.5cm]{0cm}{4cm} \rule[-.5cm]{4cm}{0cm}}
+\caption{\textbf{Qualitative Results}.
+For PIPs++ (top), many points are incorrectly tracked and end up being `stuck' on the front of the car.  TAPIR (middle) works well for visible points but fails to handle occluded points. As soon as a point becomes occluded, it starts moving chaotically around the image.
+Our \method (bottom) produces cleaner tracks. The tracks are also more `linear' than those of  PIPs++ or TAPIR, which is accurate as the primary motion is a homography (the observer does not translate).}
+\end{figure*}

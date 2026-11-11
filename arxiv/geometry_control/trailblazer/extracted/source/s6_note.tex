@@ -1,0 +1,126 @@
+\newpage
+
+\section{Internal Note}
+\label{sec:note}
+
+@kurt Why edit:
+this issue $>$ these limitations: because the preceding sentence only mentions one limitation not several
+
+\textbf{Kurt todo:}\\
+// teaser figure: change deformation to "morphing"
+
+
+JP todo:
+update cheetah section
+
+//say something about why T2V and PB are the only baselines.\\
+//Boximator\\
+//Direct-a-video Feb\\
+//peekaboo negative attention offset\\
+
+QUESTIONS
+
+We use the pre-trained ZeroScope model [6] (which is a fine-tuned version of [44]) as our underlying model. //is modelscope ref correct
+
+378 However, changing bbox size and the corresponding perspective effects are not shown in Peekaboo’s tiger example
+
+a cheetah running with a fixed camera
+
+230 A larger number of trailing indices set
+
+REDUCE SPACE: 
+//omit 392 artifacts are common in diffusion models
+
+376  for example if the camera is approaching the car from the side, 
+
+comparisons vs peekaboo
+less blurry background.
+their fid/fvd is better, but comes at the expense of not following the bbox, and motion artifacts like tiger fliping direction (as well, their background is often blurred.
+also following a fast bbox can introduce motion blur which may hurt fid measures.
+
+we tried 10 random seeds
+
+what is FID-vid?\\
+limitations "see sup for fourther discussions",\\
+subject morphing in abstract\\
+competing methods feet moving but not walking
+
+Peekaboo paper says it can change bbox size, however their released code does not appear to handle this.
+
+We adjusted our resolutin to theirs (576,320) because their code worked poorly on square images.
+
+
+It has 16 pages while the page limit is 14 pages excluding references. The ECCV24 rule is here (link). I think the task is clear for this submission:
+
+1) Table:
+I realize we have a table already but small. I'll try to add some recent method with public code for comparison, such as Peekapoo, 
+ 
+2) Models: 
+We claim TrailBlazer can work for any video diffusion model that uses temporal attention. However, one CVPR review argued whether this is true or not (i think it is). I'll try to see if there's any public video model so we can compare with.
+
+3) Story refactor:
+The top issue from CVPR review is that they complain we are sort of copying DD paper here, including figures (e.g., pipeline?) and equations. I guess I can try to re-design all figures to look a bit different. But I need your help on the story refactoring if possible, saying the work is built on DD in terms of novelty.
+
+(Do you think the current approach is too naive for the submission? I guess we could probably analyze the spatial/temporal cross-attn directly from the video diffusion model, and edit the current formulation from that aspect)
+
+4) New references:
+There are some papers that were recently released this year (e.g., Direct-a-Video, Boximitor, Motion-Zero, no provided code), or some papers we missed (e.g., Peekapoo). I will try to update the related work on this.
+
+TODO:
+\begin{itemize}
+
+    \item Our method builds on previous work, primarily that of Directed Diffusion [19]. However, our work addresses a different problem, that of controlling position and trajectories in videos, which requires careful control of temporal cross-attention. In addition, our work discards the optimization algorithm used in [19].
+
+
+    \item question about trailing maps when there is more than one bbox
+
+    \item JP near 96-
+
+    \item section 4.1 and fig5: 
+\JP{question: looking at the text2video-zero results, it looks like the subject is moving from right to left. With the normal math convention that +x means going right, this would mean the motion vector should be (-8,0) rather than (8,0)?}
+
+    \item check new description above eq2
+
+    \item in eq2 $w_r$ are hyperparams? need a statement about what their values are. "The weights $w_r$ are set to 0.9 in our experiments..."
+
+    \item abstract: natural motion
+    
+    \item supp (discuss): "The following attention module signature is incorporated into our spatial attention editing list, with varied attention resolutions", not clear what the editing list is
+
+    \item supp I think the single-keyframe (astronaut) motion slide could go \emph{before} the multiple-keys(cat), since it seems like a simpler experiment
+
+    \item supp (check, discuss on call): Fig14, I think the order is "left/right top/bottom" rather than "clockwise"
+
+    \item supp question fig7.4(single keyframe) "undesirable entity generation" -- means multiple legs or multiple astronauts?
+
+    \item supp I noticed two paragraphs that seem similar, such as this on the last page. ARe the two paragraphs before+after chatgpt?
+    
+We demonstrate the irregular trajectory determined by varied keyframe in \FigRef{fig:supp_irr_path}. The four experiments with the trajectory of zigzag (top-left), triangle (top-right), discontinuity (bottom-left), and the down-pointing triangle (bottom-right). All horse result showcases the fast speed running with motion blur. However, the results with turning points has limitation to show the horse turning around and creates the artifacts. E.g., the third frame of down-pointing triangle case, that the horse swaps its head and tail. We think it is somewhat expected because it is naturally that a horse is good at charging forward rather than turning around with high speed like the cat or dog. In summary, the consistency between the prompt, the timing and bboxes in the keyframe must be maintained to increase the result fidelity.
+
+We illustrate the irregular trajectory determined by varied keyframes in \FigRef{fig:supp_irr_path}. The four experiments involve zigzag trajectory (top-left), triangle trajectory (top-right), discontinuous trajectory (bottom-left), and down-pointing triangle trajectory (bottom-right). All horse results showcase fast-speed running with motion blur. However, results with turning points have limitations in depicting the horse turning around and may generate artifacts. For example, in the third frame of the down-pointing triangle case, the horse appears to swap its head and tail. This is somewhat expected, as horses are naturally better at charging forward than executing high-speed turns, unlike cats or dogs. Notably, some results show the perspective (e.g., down-pointing triangle) that the horse charging to the camera and then moving away, similar to the previous experience in \FigRef{fig:supp_dyn_bbox}, and also the car/tiger example \FigRef{fig:main_dyn}. In summary, maintaining consistency between the prompt, timing, and bounding boxes in the keyframes is crucial for increasing result fidelity.
+
+    \item  intro line 31 need a reference for fine-tuning of sd for video. (Dreambooth is for images only I think?)
+
+    \item quantitative section, maybe a statemnt "Following the methodology introduced in [paper], we apply FVD, to [a sequence of still images]..."
+
+    \item L100 "Notably, We extend the exploration from DD that the SD is first position the objects, then refine the results."  // needs to be re-inserted 
+
+    \item question r.e. this:  boxdiff,multidiffusion} have addressed the layout-to-image (L2I) issue using few-shot learning. The limitation is it only allow to generate the subject that are part of the training. // still have a question here, but low priority
+
+    \item L429(quant) "without the supported input prior." // what does it mean
+
+% LOW PRIORITY ------------------
+
+    \item L133 "weight and the specific representation describing the image", explain to me later
+
+\end{itemize}
+
+
+JP a couple small notes on changes:\\
+\begin{itemize}
+[attention] depicted->discussed [in detail in sec 3.2, 3.3].  Depicted is ok but often suggests that the explanation mostly uses a picture to explain. Sec3.2 is mostly text/math
+\item
+all information between these keyframes is linearly interpolate $\rightarrow$ the information in these keyframes is linearly interpolate: original version is understandable, but someone might feel that the "all" might include all information in the image, not just the bounding box
+\end{itemize}
+
+

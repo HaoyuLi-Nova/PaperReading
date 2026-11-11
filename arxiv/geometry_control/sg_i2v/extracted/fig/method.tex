@@ -1,0 +1,13 @@
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\textwidth]{imgs/overview.pdf}
+\caption{\textbf{Overview of the controllable image-to-video generation framework.}
+To control trajectories of scene elements, we optimize the latent $\bm{z}_t$ at specific denoising timesteps $t$ of a pre-trained video diffusion model.
+First, we extract semantically aligned feature maps from the denoising U-Net to estimate the video layout.
+Next, we enforce cross-frame feature similarity along the bounding box trajectory to drive the motion of each region.
+To preserve the visual quality of the generated video, a frequency-based post-processing method is applied to retain high-frequency noise of the original latent $\bm{z}_t$. The updated latent $\tilde{\bm{z}}_t$
+ is input to the next denoising step.
+}
+\label{fig:method}
+\vspace{-2.0mm}
+\end{figure}

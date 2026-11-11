@@ -1,0 +1,38 @@
+\section{Introduction}
+\label{sec:intro}
+
+The generation of 3D human motion and realistic video sequences is essential to understanding human behaviors and coherent visual dynamics, with broad downstream applications including character animation, VR/AR, and gaming. 
+
+Traditional text-driven motion generation models learn to generate 3D human motion given textual descriptions~\cite{tevet2022mdm,zhang2023remodiffuse,chen2023mld,dai2024motionlcm,zhou2024emdm,meng2025mardm,ahn2018text2action,zhang2023t2mgpt,jiang2023motiongpt,guo2024momask,xiao2025motionstreamer,fan2025gotozero}. However, these approaches are often constrained by the bottleneck of high-quality 3D motion data, which leads to limited generalization capabilities and low prompt fidelity of these methods. 
+Recently, advanced approaches~\cite{huang2025animax,pi2024motion2to3,lin2025vimogen} attempt to overcome these limitations by first generates human videos and then applying video-based motion capture algorithms to recover 3D human motion. While video generation models generalize well, they often struggle with highly structured objects such as human bodies, frequently producing implausible motions with inconsistent body structure, which in turn corrupts the recovered 3D motion.
+
+\begin{figure*}[t!]
+    \centering
+    \includegraphics[width=\textwidth]{figure/teaser.png}
+    \vspace{-20pt}
+    \caption{Given an input human image and motion description, \textbf{CoMoVi} generates 3D human motion and realistic video synchronously.}
+    \label{fig:teaser}
+    \vspace{-15pt}
+\end{figure*}
+
+On the other hand, although recent Video Diffusion Models (VDMs)~\cite{hong2022cogvideo,blattmann2023svd,yang2024cogvideox,wan2025wan,agarwal2025cosmos} demonstrate remarkable performance and strong generalization capabilities, the generation of a video about a specific person performing a particular action with high fidelity remains challenging. Previous human-centric video generation works introduce such priors by pre-extracting 2D pose or 3D motion as driving signals to guide the video generation process~\cite{hu2024animate,niu2024mofa,zhang2024mimicmotion,gan2025humandit,taghipour2025latentmove,zhu2024champ,zhou2024realisdance,zhou2025realisdance,he2025posegen}, achieving promising results with high quality. However, these methods all require external videos and motions as reference to provide such a guidance, and it remains unexplored how to generate high-quality video without such external video and motion references.
+
+Through our discussion above, it is revealed that there exists a strong coupling relationship between 3D human motion and video generation. High-quality 3D motion can derive high-fidelity generated videos, and, conversely, the powerful prior of VDMs can enhance the generalization capabilities of 3D motion generation. However, as illustrated in Fig.~\ref{fig:paradigm}, existing works are cascaded, either in a motion-to-video or a video-to-motion framework, which are suboptimal. In this paper, we introduce \textbf{CoMoVi}, a novel framework for the co-generation of 3D human motion and human video synchronously. This co-generative framework allows mutual information exchange between the motion and video generation processes, enabling generalization enhancement for motion generation and structure guidance for video generation.
+
+To achieve this synchronous co-generation, we first need to address the inherent modality gap between 3D human motion and 2D video. A natural approach to bridging this gap is to render 3D human motion into 2D feature maps, which allows for the synchronous generation of both motion and video utilizing VDMs. However, effectively formulating this 2D representation remains a critical challenge. Utilizing normal maps as the representation struggles to disambiguate symmetrical or overlapping body parts (e.g., distinguishing the left hand from the right) and lacks explicit structural semantics. Conversely, semantic maps provide part-level awareness, but inherently discard crucial 3D geometric information. To overcome these limitations, we propose a novel 2D human motion representation that successfully encapsulates both rich semantic distinctions and precise 3D structural geometry into the pixel space. As demonstrated in our experiments, this unified representation is pivotal to effectively aligning the two modalities and serves as the cornerstone of our co-generation framework.
+
+Building upon this representation, we design a unified pipeline that takes an input image and a text description to synchronously generate human motions and the corresponding video sequences within a single diffusion denoising loop. Specifically, we develop a dual-branch VDM extended from Wan2.2-I2V-5B~\cite{wan2025wan}. This architecture tightly couples the denoising processes of 2D motion videos and RGB videos through mutual feature interactions, ensuring that the video generation is explicitly guided by robust human motion priors and that the motion generation shares the generalization ability of video generation. 
+Furthermore, instead of solving for a 3D motion from our generated 2D motion representations with optimization, we design a module to combine the features from both videos and 2D motion maps for direct 3D motion estimation. Thus, CoMoVi can directly output both 3D human motions and 2D human-centric videos.
+
+Finally, effective training and evaluation of our co-generation framework inherently demand a dataset that simultaneously provides comprehensive text descriptions, high-quality video sequences, and precise 3D motion annotations. Existing datasets often fall short of these stringent requirements: while large-scale datasets like Motion-X++~\cite{lin2023motionx} suffer from compromised video quality and low resolution, high-fidelity datasets such as HumanVid~\cite{wang2024humanvid} are limited in scale and rich 3D annotations, with less than 20k real-world videos. To bridge this critical data gap, we contribute the CoMoVi-Dataset. Leveraging a meticulously designed data processing pipeline, we curate a collection of approximately 50K high-resolution, real-world human videos. Our dataset significantly surpasses HumanVid~\cite{wang2024humanvid} in scale while offering vastly superior video quality compared to Motion-X++~\cite{lin2023motionx}. Furnished with reliable text and motion annotations, the CoMoVi-Dataset covers a diverse array of challenging human dynamics, serving as a robust foundation for our model and future research in this domain.
+
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=\linewidth]{figure/paradigm.png}
+    \vspace{-20pt}
+    \caption{Different paradigms of motion video co-generation.}
+    \label{fig:paradigm}
+\vspace{-15pt}
+\end{figure}
+
+To demonstrate the effectiveness of CoMoVi, we conduct comprehensive experiments on the Motion-X++ dataset~\cite{lin2023motionx}, VBench benchmark~\cite{huang2023vbench,huang2024vbench++,zheng2025vbench2}, and our CoMoVi-Dataset for both motion generation and video generation tasks. Qualitative and quantitative results validate that our approach is effective in generalizable 3D human motion generation, outperforming state-of-the-art (SoTA) text-to-motion (T2M). For human-centric video generation, CoMoVi achieves high-quality video generation without relying on external reference videos and pre-extracted motion signals.

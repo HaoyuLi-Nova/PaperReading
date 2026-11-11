@@ -1,0 +1,404 @@
+\begin{thebibliography}{10}\itemsep=-1pt
+
+\bibitem{Bain21}
+Max Bain, Arsha Nagrani, G{\"u}l Varol, and Andrew Zisserman.
+\newblock Frozen in time: A joint video and image encoder for end-to-end retrieval.
+\newblock In {\em IEEE International Conference on Computer Vision}, 2021.
+
+\bibitem{black1993framework}
+Michael~J Black and Padmanabhan Anandan.
+\newblock A framework for the robust estimation of optical flow.
+\newblock In {\em 1993 (4th) International Conference on Computer Vision}, pages 231--236. IEEE, 1993.
+
+\bibitem{Blattmann2021Understanding}
+Andreas Blattmann, Timo Milbich, Michael Dorkenwald, and Björn Ommer.
+\newblock Understanding object dynamics for interactive image-to-video synthesis.
+\newblock In {\em 2021 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)}, pages 5167--5177, 2021.
+
+\bibitem{blattmann2023align}
+Andreas Blattmann, Robin Rombach, Huan Ling, Tim Dockhorn, Seung~Wook Kim, Sanja Fidler, and Karsten Kreis.
+\newblock Align your latents: High-resolution video synthesis with latent diffusion models.
+\newblock In {\em Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, pages 22563--22575, 2023.
+
+\bibitem{bruhn2005lucas}
+Andr{\'e}s Bruhn, Joachim Weickert, and Christoph Schn{\"o}rr.
+\newblock Lucas/kanade meets horn/schunck: Combining local and global optic flow methods.
+\newblock {\em International journal of computer vision}, 61(3):211--231, 2005.
+
+\bibitem{dai2023finegrained}
+Zuozhuo Dai, Zhenghao Zhang, Yao Yao, Bingxue Qiu, Siyu Zhu, Long Qin, and Weizhi Wang.
+\newblock Fine-grained open domain image animation with motion guidance, 2023.
+
+\bibitem{flow_models}
+Laurent Dinh, David Krueger, and Yoshua Bengio.
+\newblock {NICE:} non-linear independent components estimation.
+\newblock In Yoshua Bengio and Yann LeCun, editors, {\em 3rd International Conference on Learning Representations, {ICLR} 2015, San Diego, CA, USA, May 7-9, 2015, Workshop Track Proceedings}, 2015.
+
+\bibitem{doersch2022tap}
+Carl Doersch, Ankush Gupta, Larisa Markeeva, Adri{\`a} Recasens, Lucas Smaira, Yusuf Aytar, Jo{\~a}o Carreira, Andrew Zisserman, and Yi Yang.
+\newblock Tap-vid: A benchmark for tracking any point in a video.
+\newblock {\em arXiv preprint arXiv:2211.03726}, 2022.
+
+\bibitem{dosovitskiy2015flownet}
+Alexey Dosovitskiy, Philipp Fischer, Eddy Ilg, Philip Hausser, Caner Hazirbas, Vladimir Golkov, Patrick Van Der~Smagt, Daniel Cremers, and Thomas Brox.
+\newblock Flownet: Learning optical flow with convolutional networks.
+\newblock In {\em Proceedings of the IEEE international conference on computer vision}, pages 2758--2766, 2015.
+
+\bibitem{fang2023feataug}
+Rongyao Fang, Peng Gao, Aojun Zhou, Yingjie Cai, Si Liu, Jifeng Dai, and Hongsheng Li.
+\newblock Feataug-detr: Enriching one-to-many matching for detrs with feature augmentation.
+\newblock {\em arXiv preprint arXiv:2303.01503}, 2023.
+
+\bibitem{fang2023instructseq}
+Rongyao Fang, Shilin Yan, Zhaoyang Huang, Jingqiu Zhou, Hao Tian, Jifeng Dai, and Hongsheng Li.
+\newblock Instructseq: Unifying vision tasks with instruction-conditioned multi-modal sequence generation.
+\newblock {\em arXiv preprint arXiv:2311.18835}, 2023.
+
+\bibitem{gao2023clip}
+Peng Gao, Shijie Geng, Renrui Zhang, Teli Ma, Rongyao Fang, Yongfeng Zhang, Hongsheng Li, and Yu Qiao.
+\newblock Clip-adapter: Better vision-language models with feature adapters.
+\newblock {\em International Journal of Computer Vision}, pages 1--15, 2023.
+
+\bibitem{10.1145/3272127.3275043}
+Jiahao Geng, Tianjia Shao, Youyi Zheng, Yanlin Weng, and Kun Zhou.
+\newblock Warp-guided gans for single-photo facial animation.
+\newblock {\em ACM Trans. Graph.}, 37(6), dec 2018.
+
+\bibitem{geng_facialanimation}
+Jiahao Geng, Tianjia Shao, Youyi Zheng, Yanlin Weng, and Kun Zhou.
+\newblock Warp-guided gans for single-photo facial animation.
+\newblock {\em ACM Trans. Graph.}, 37(6), dec 2018.
+
+\bibitem{GAN}
+Ian Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farley, Sherjil Ozair, Aaron Courville, and Yoshua Bengio.
+\newblock Generative adversarial nets.
+\newblock In Z. Ghahramani, M. Welling, C. Cortes, N. Lawrence, and K.Q. Weinberger, editors, {\em Advances in Neural Information Processing Systems}, volume~27. Curran Associates, Inc., 2014.
+
+\bibitem{guo2023animatediff}
+Yuwei Guo, Ceyuan Yang, Anyi Rao, Yaohui Wang, Yu Qiao, Dahua Lin, and Bo Dai.
+\newblock Animatediff: Animate your personalized text-to-image diffusion models without specific tuning.
+\newblock {\em arXiv preprint arXiv:2307.04725}, 2023.
+
+\bibitem{harley2022particle}
+Adam~W Harley, Zhaoyuan Fang, and Katerina Fragkiadaki.
+\newblock Particle video revisited: Tracking through occlusions using point trajectories.
+\newblock In {\em Computer Vision--ECCV 2022: 17th European Conference, Tel Aviv, Israel, October 23--27, 2022, Proceedings, Part XXII}, pages 59--75. Springer, 2022.
+
+\bibitem{Ho2022ImagenVH}
+Jonathan Ho, William Chan, Chitwan Saharia, Jay Whang, Ruiqi Gao, Alexey~A. Gritsenko, Diederik~P. Kingma, Ben Poole, Mohammad Norouzi, David~J. Fleet, and Tim Salimans.
+\newblock Imagen video: High definition video generation with diffusion models.
+\newblock {\em ArXiv}, abs/2210.02303, 2022.
+
+\bibitem{ho2020denoising}
+Jonathan Ho, Ajay Jain, and Pieter Abbeel.
+\newblock Denoising diffusion probabilistic models.
+\newblock {\em arXiv preprint arxiv:2006.11239}, 2020.
+
+\bibitem{Holynski_2021_CVPR}
+Aleksander Holynski, Brian~L. Curless, Steven~M. Seitz, and Richard Szeliski.
+\newblock Animating pictures with eulerian motion fields.
+\newblock In {\em Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)}, pages 5810--5819, June 2021.
+
+\bibitem{horn1981determining}
+Berthold~KP Horn and Brian~G Schunck.
+\newblock Determining optical flow.
+\newblock {\em Artificial intelligence}, 17(1-3):185--203, 1981.
+
+\bibitem{huang2023region}
+Nisha Huang, Fan Tang, Weiming Dong, Tong-Yee Lee, and Changsheng Xu.
+\newblock Region-aware diffusion for zero-shot text-driven image editing.
+\newblock {\em arXiv preprint arXiv:2302.11797}, 2023.
+
+\bibitem{huang2022flowformer}
+Zhaoyang Huang, Xiaoyu Shi, Chao Zhang, Qiang Wang, Ka~Chun Cheung, Hongwei Qin, Jifeng Dai, and Hongsheng Li.
+\newblock Flowformer: A transformer architecture for optical flow.
+\newblock {\em arXiv preprint arXiv:2203.16194}, 2022.
+
+\bibitem{hui2018liteflownet}
+Tak-Wai Hui, Xiaoou Tang, and Chen~Change Loy.
+\newblock Liteflownet: A lightweight convolutional neural network for optical flow estimation.
+\newblock In {\em Proceedings of the IEEE conference on computer vision and pattern recognition}, pages 8981--8989, 2018.
+
+\bibitem{hui2020lightweight}
+Tak-Wai Hui, Xiaoou Tang, and Chen~Change Loy.
+\newblock A lightweight optical flow cnn—revisiting data fidelity and regularization.
+\newblock {\em IEEE transactions on pattern analysis and machine intelligence}, 43(8):2555--2569, 2020.
+
+\bibitem{ilg2017flownet}
+Eddy Ilg, Nikolaus Mayer, Tonmoy Saikia, Margret Keuper, Alexey Dosovitskiy, and Thomas Brox.
+\newblock Flownet 2.0: Evolution of optical flow estimation with deep networks.
+\newblock In {\em Proceedings of the IEEE conference on computer vision and pattern recognition}, pages 2462--2470, 2017.
+
+\bibitem{Animating_cloud}
+Wei-Cih Jhou and Wen-Huang Cheng.
+\newblock Animating still landscape photographs through cloud motion creation.
+\newblock {\em IEEE Transactions on Multimedia}, 18(1):4--13, 2016.
+
+\bibitem{karaev2023cotracker}
+Nikita Karaev, Ignacio Rocco, Benjamin Graham, Natalia Neverova, Andrea Vedaldi, and Christian Rupprecht.
+\newblock Cotracker: It is better to track together.
+\newblock {\em arXiv preprint arXiv:2307.07635}, 2023.
+
+\bibitem{karras2023dreampose}
+Johanna Karras, Aleksander Holynski, Ting-Chun Wang, and Ira Kemelmacher-Shlizerman.
+\newblock Dreampose: Fashion image-to-video synthesis via stable diffusion, 2023.
+
+\bibitem{text2video-zero}
+Levon Khachatryan, Andranik Movsisyan, Vahram Tadevosyan, Roberto Henschel, Zhangyang Wang, Shant Navasardyan, and Humphrey Shi.
+\newblock Text2video-zero: Text-to-image diffusion models are zero-shot video generators.
+\newblock {\em arXiv preprint arXiv:2303.13439}, 2023.
+
+\bibitem{VAE}
+Diederik~P. Kingma and Max Welling.
+\newblock Auto-encoding variational bayes.
+\newblock In Yoshua Bengio and Yann LeCun, editors, {\em 2nd International Conference on Learning Representations, {ICLR} 2014, Banff, AB, Canada, April 14-16, 2014, Conference Track Proceedings}, 2014.
+
+\bibitem{li2023_3dcinemagraphy}
+Xingyi Li, Zhiguo Cao, Huiqiang Sun, Jianming Zhang, Ke Xian, and Guosheng Lin.
+\newblock 3d cinemagraphy from a single image.
+\newblock In {\em Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)}, pages 4595--4605, June 2023.
+
+\bibitem{li2023generative}
+Zhengqi Li, Richard Tucker, Noah Snavely, and Aleksander Holynski.
+\newblock Generative image dynamics, 2023.
+
+\bibitem{lin2024common}
+Shanchuan Lin, Bingchen Liu, Jiashi Li, and Xiao Yang.
+\newblock Common diffusion noise schedules and sample steps are flawed.
+\newblock In {\em Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision}, pages 5404--5411, 2024.
+
+\bibitem{liu2023videop2p}
+Shaoteng Liu, Yuechen Zhang, Wenbo Li, Zhe Lin, and Jiaya Jia.
+\newblock Video-p2p: Video editing with cross-attention control, 2023.
+
+\bibitem{loshchilov2017decoupled}
+Ilya Loshchilov and Frank Hutter.
+\newblock Decoupled weight decay regularization.
+\newblock {\em arXiv preprint arXiv:1711.05101}, 2017.
+
+\bibitem{mahapatra2021controllable}
+Aniruddha Mahapatra and Kuldeep Kulkarni.
+\newblock Controllable animation of fluid elements in still images.
+\newblock In {\em Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)}, 2022.
+
+\bibitem{mahapatra2023synthesizing}
+Aniruddha Mahapatra, Aliaksandr Siarohin, Hsin-Ying Lee, Sergey Tulyakov, and Jun-Yan Zhu.
+\newblock Text-guided synthesis of eulerian cinemagraphs.
+\newblock {\em arXiv preprint arXiv:2307.03190}, 2023.
+
+\bibitem{moing2023dense}
+Guillaume~Le Moing, Jean Ponce, and Cordelia Schmid.
+\newblock Dense optical tracking: Connecting the dots.
+\newblock {\em arXiv preprint arXiv:2312.00786}, 2023.
+
+\bibitem{mou2023dragondiffusion}
+Chong Mou, Xintao Wang, Jiechong Song, Ying Shan, and Jian Zhang.
+\newblock Dragondiffusion: Enabling drag-style manipulation on diffusion models.
+\newblock {\em arXiv preprint arXiv:2307.02421}, 2023.
+
+\bibitem{glide}
+Alex Nichol, Prafulla Dhariwal, Aditya Ramesh, Pranav Shyam, Pamela Mishkin, Bob McGrew, Ilya Sutskever, and Mark Chen.
+\newblock {GLIDE:} towards photorealistic image generation and editing with text-guided diffusion models.
+\newblock {\em CoRR}, abs/2112.10741, 2021.
+
+\bibitem{niklaus2020softmax}
+Simon Niklaus and Feng Liu.
+\newblock Softmax splatting for video frame interpolation.
+\newblock In {\em Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, pages 5437--5446, 2020.
+
+\bibitem{Okabe2009AnimatingPO}
+Makoto Okabe, Ken ichi Anjyo, Takeo Igarashi, and Hans-Peter Seidel.
+\newblock Animating pictures of fluid using video examples.
+\newblock {\em Computer Graphics Forum}, 28, 2009.
+
+\bibitem{10.1145/3588432.3591500}
+Xingang Pan, Ayush Tewari, Thomas Leimk\"{u}hler, Lingjie Liu, Abhimitra Meka, and Christian Theobalt.
+\newblock Drag your gan: Interactive point-based manipulation on the generative image manifold.
+\newblock In {\em ACM SIGGRAPH 2023 Conference Proceedings}, SIGGRAPH '23, New York, NY, USA, 2023. Association for Computing Machinery.
+
+\bibitem{Clip}
+Alec Radford, Jong~Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, Gretchen Krueger, and Ilya Sutskever.
+\newblock Learning transferable visual models from natural language supervision.
+\newblock In {\em International Conference on Machine Learning}, 2021.
+
+\bibitem{T5}
+Colin Raffel, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang, Michael Matena, Yanqi Zhou, Wei Li, and Peter~J. Liu.
+\newblock Exploring the limits of transfer learning with a unified text-to-text transformer.
+\newblock {\em J. Mach. Learn. Res.}, 21(1), jan 2020.
+
+\bibitem{DALL-E}
+Aditya Ramesh, Prafulla Dhariwal, Alex Nichol, Casey Chu, and Mark Chen.
+\newblock Hierarchical text-conditional image generation with clip latents.
+\newblock {\em ArXiv}, abs/2204.06125, 2022.
+
+\bibitem{ranjan2017optical}
+Anurag Ranjan and Michael~J Black.
+\newblock Optical flow estimation using a spatial pyramid network.
+\newblock In {\em Proceedings of the IEEE conference on computer vision and pattern recognition}, pages 4161--4170, 2017.
+
+\bibitem{rombach2021highresolution}
+Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer.
+\newblock High-resolution image synthesis with latent diffusion models, 2021.
+
+\bibitem{rottshaham2019singan}
+Tamar Rott~Shaham, Tali Dekel, and Tomer Michaeli.
+\newblock Singan: Learning a generative model from a single natural image.
+\newblock In {\em Computer Vision (ICCV), IEEE International Conference on}, 2019.
+
+\bibitem{Imagen}
+Chitwan Saharia, William Chan, Saurabh Saxena, Lala Li, Jay Whang, Emily Denton, Seyed Kamyar~Seyed Ghasemipour, Raphael Gontijo-Lopes, Burcu~Karagol Ayan, Tim Salimans, Jonathan Ho, David~J. Fleet, and Mohammad Norouzi.
+\newblock Photorealistic text-to-image diffusion models with deep language understanding.
+\newblock In Alice~H. Oh, Alekh Agarwal, Danielle Belgrave, and Kyunghyun Cho, editors, {\em Advances in Neural Information Processing Systems}, 2022.
+
+\bibitem{shi2023videoflow}
+Xiaoyu Shi, Zhaoyang Huang, Weikang Bian, Dasong Li, Manyuan Zhang, Ka~Chun Cheung, Simon See, Hongwei Qin, Jifeng Dai, and Hongsheng Li.
+\newblock Videoflow: Exploiting temporal cues for multi-frame optical flow estimation.
+\newblock {\em arXiv preprint arXiv:2303.08340}, 2023.
+
+\bibitem{shi2023flowformer++}
+Xiaoyu Shi, Zhaoyang Huang, Dasong Li, Manyuan Zhang, Ka~Chun Cheung, Simon See, Hongwei Qin, Jifeng Dai, and Hongsheng Li.
+\newblock Flowformer++: Masked cost volume autoencoding for pretraining optical flow estimation.
+\newblock {\em arXiv preprint arXiv:2303.01237}, 2023.
+
+\bibitem{shi2023dragdiffusion}
+Yujun Shi, Chuhui Xue, Jiachun Pan, Wenqing Zhang, Vincent~YF Tan, and Song Bai.
+\newblock Dragdiffusion: Harnessing diffusion models for interactive point-based image editing.
+\newblock {\em arXiv preprint arXiv:2306.14435}, 2023.
+
+\bibitem{siarohin2021motion}
+Aliaksandr Siarohin, Oliver Woodford, Jian Ren, Menglei Chai, and Sergey Tulyakov.
+\newblock Motion representations for articulated animation.
+\newblock In {\em CVPR}, 2021.
+
+\bibitem{singer2022makeavideo}
+Uriel Singer, Adam Polyak, Thomas Hayes, Xi Yin, Jie An, Songyang Zhang, Qiyuan Hu, Harry Yang, Oron Ashual, Oran Gafni, Devi Parikh, Sonal Gupta, and Yaniv Taigman.
+\newblock Make-a-video: Text-to-video generation without text-video data, 2022.
+
+\bibitem{song2021denoising}
+Jiaming Song, Chenlin Meng, and Stefano Ermon.
+\newblock Denoising diffusion implicit models.
+\newblock In {\em International Conference on Learning Representations}, 2021.
+
+\bibitem{sun2014quantitative}
+Deqing Sun, Stefan Roth, and Michael~J Black.
+\newblock A quantitative analysis of current practices in optical flow estimation and the principles behind them.
+\newblock {\em International Journal of Computer Vision}, 106(2):115--137, 2014.
+
+\bibitem{sun2018pwc}
+Deqing Sun, Xiaodong Yang, Ming-Yu Liu, and Jan Kautz.
+\newblock Pwc-net: Cnns for optical flow using pyramid, warping, and cost volume.
+\newblock In {\em Proceedings of the IEEE conference on computer vision and pattern recognition}, pages 8934--8943, 2018.
+
+\bibitem{sun2021loftr}
+Jiaming Sun, Zehong Shen, Yuang Wang, Hujun Bao, and Xiaowei Zhou.
+\newblock Loftr: Detector-free local feature matching with transformers.
+\newblock In {\em Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, pages 8922--8931, 2021.
+
+\bibitem{teed2020raft}
+Zachary Teed and Jia Deng.
+\newblock Raft: Recurrent all-pairs field transforms for optical flow.
+\newblock In {\em European conference on computer vision}, pages 402--419. Springer, 2020.
+
+\bibitem{wang2023gen}
+Fu-Yun Wang, Wenshuo Chen, Guanglu Song, Han-Jia Ye, Yu Liu, and Hongsheng Li.
+\newblock Gen-l-video: Multi-text to long video generation via temporal co-denoising.
+\newblock {\em arXiv preprint arXiv:2305.18264}, 2023.
+
+\bibitem{vid2vid-zero}
+Wen Wang, kangyang Xie, Zide Liu, Hao Chen, Yue Cao, Xinlong Wang, and Chunhua Shen.
+\newblock Zero-shot video editing using off-the-shelf image diffusion models.
+\newblock {\em arXiv preprint arXiv:2303.17599}, 2023.
+
+\bibitem{2023videocomposer}
+Xiang* Wang, Hangjie* Yuan, Shiwei* Zhang, Dayou* Chen, Jiuniu Wang, Yingya Zhang, Yujun Shen, Deli Zhao, and Jingren Zhou.
+\newblock Videocomposer: Compositional video synthesis with motion controllability.
+\newblock 2023.
+
+\bibitem{WANG_2020_WACV}
+Yaohui WANG, Piotr Bilinski, Francois Bremond, and Antitza Dantcheva.
+\newblock Imaginator: Conditional spatio-temporal gan for video generation.
+\newblock In {\em The IEEE Winter Conference on Applications of Computer Vision (WACV)}, March 2020.
+
+\bibitem{wang2020ImaGINator}
+Yaohui Wang, Piotr Bilinski, Francois Bremond, and Antitza Dantcheva.
+\newblock Imaginator: Conditional spatio-temporal gan for video generation.
+\newblock In {\em 2020 IEEE Winter Conference on Applications of Computer Vision (WACV)}, pages 1149--1158, 2020.
+
+\bibitem{wang2022latent}
+Yaohui Wang, Di Yang, Francois Bremond, and Antitza Dantcheva.
+\newblock Latent image animator: Learning to animate images via latent space navigation.
+\newblock In {\em International Conference on Learning Representations}, 2022.
+
+\bibitem{weikang2023context}
+BIAN Weikang, Zhaoyang Huang, Xiaoyu Shi, Yitong Dong, Yijin Li, and Hongsheng Li.
+\newblock Context-pips: Persistent independent particles demands context features.
+\newblock In {\em Thirty-seventh Conference on Neural Information Processing Systems}, 2023.
+
+\bibitem{Weng2018PhotoW3}
+Chung-Yi Weng, Brian Curless, and Ira Kemelmacher-Shlizerman.
+\newblock Photo wake-up: 3d character animation from a single photo.
+\newblock {\em 2019 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)}, pages 5901--5910, 2018.
+
+\bibitem{where2edit}
+Changming Xiao, Qi Yang, Xiaoqiang Xu, Jianwei Zhang, Feng Zhou, and Changshui Zhang.
+\newblock Where you edit is what you get: Text-guided image editing with region-based attention.
+\newblock {\em Pattern Recognition}, 139:109458, 2023.
+
+\bibitem{xiao2023automatic}
+Wenpeng Xiao, Wentao Liu, Yitong Wang, Bernard Ghanem, and Bing Li.
+\newblock Automatic animation of hair blowing in still portrait photos.
+\newblock In {\em Proceedings of the IEEE/CVF International Conference on Computer Vision}, pages 22963--22975, 2023.
+
+\bibitem{xing2023dynamicrafter}
+Jinbo Xing, Menghan Xia, Yong Zhang, Haoxin Chen, Wangbo Yu, Hanyuan Liu, Xintao Wang, Tien-Tsin Wong, and Ying Shan.
+\newblock Dynamicrafter: Animating open-domain images with video diffusion priors.
+\newblock {\em arXiv preprint arXiv:2310.12190}, 2023.
+
+\bibitem{Xiong_2018_CVPR}
+Wei Xiong, Wenhan Luo, Lin Ma, Wei Liu, and Jiebo Luo.
+\newblock Learning to generate time-lapse videos using multi-stage dynamic generative adversarial networks.
+\newblock In {\em The IEEE Conference on Computer Vision and Pattern Recognition (CVPR)}, June 2018.
+
+\bibitem{yang2019volumetric}
+Gengshan Yang and Deva Ramanan.
+\newblock Volumetric correspondence networks for optical flow.
+\newblock {\em Advances in neural information processing systems}, 32:794--805, 2019.
+
+\bibitem{zhang2023controlnet}
+Lvmin Zhang, Anyi Rao, and Maneesh Agrawala.
+\newblock Adding conditional control to text-to-image diffusion models, 2023.
+
+\bibitem{zhang2021tip}
+Renrui Zhang, Rongyao Fang, Wei Zhang, Peng Gao, Kunchang Li, Jifeng Dai, Yu Qiao, and Hongsheng Li.
+\newblock Tip-adapter: Training-free clip-adapter for better vision-language modeling.
+\newblock {\em arXiv preprint arXiv:2111.03930}, 2021.
+
+\bibitem{2023i2vgenxl}
+Shiwei Zhang, Jiayu Wang, Yingya Zhang, Kang Zhao, Hangjie Yuan, Zhiwu Qing, Xiang Wang, Deli Zhao, and Jingren Zhou.
+\newblock I2vgen-xl: High-quality image-to-video synthesis via cascaded diffusion models.
+\newblock 2023.
+
+\bibitem{zhang2023kbnet}
+Yi Zhang, Dasong Li, Xiaoyu Shi, Dailan He, Kangning Song, Xiaogang Wang, Hongwei Qin, and Hongsheng Li.
+\newblock Kbnet: Kernel basis network for image restoration.
+\newblock {\em arXiv preprint arXiv:2303.02881}, 2023.
+
+\bibitem{zhang2023unified}
+Yi Zhang, Xiaoyu Shi, Dasong Li, Xiaogang Wang, Jian Wang, and Hongsheng Li.
+\newblock A unified conditional framework for diffusion-based image restoration.
+\newblock {\em arXiv preprint arXiv:2305.20049}, 2023.
+
+\bibitem{zhang2023pia}
+Yiming Zhang, Zhening Xing, Yanhong Zeng, Youqing Fang, and Kai Chen.
+\newblock Pia: Your personalized image animator via plug-and-play modules in text-to-image models, 2023.
+
+\bibitem{zheng2023pointodyssey}
+Yang Zheng, Adam~W Harley, Bokui Shen, Gordon Wetzstein, and Leonidas~J Guibas.
+\newblock Pointodyssey: A large-scale synthetic dataset for long-term point tracking.
+\newblock In {\em Proceedings of the IEEE/CVF International Conference on Computer Vision}, pages 19855--19865, 2023.
+
+\bibitem{zhou2023magicvideo}
+Daquan Zhou, Weimin Wang, Hanshu Yan, Weiwei Lv, Yizhe Zhu, and Jiashi Feng.
+\newblock Magicvideo: Efficient video generation with latent diffusion models, 2023.
+
+\end{thebibliography}

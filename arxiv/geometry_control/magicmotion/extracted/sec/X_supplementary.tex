@@ -1,0 +1,237 @@
+\clearpage
+\appendix
+\setcounter{page}{1}
+\maketitle
+
+\section{Ablations on Latent Segment Loss}
+We present qualitative results from the ablation study on Latent Segment Loss. As shown in Fig.~\ref{fig:ablation segment}, removing the Latent Segment Loss significantly reduces the model’s ability to capture object shapes, resulting in less accurate trajectory control. For instance, without this loss, the woman’s arm in the generated video appears incomplete.
+
+\begin{figure*}[ht]
+    \centering
+    \vspace{-0.8em}
+    \includegraphics[width=\linewidth]{Images/Segment_Ablation.pdf}
+    \caption{Ablation Study on latent segment loss. Without it, the generated arms appear partially missing.}
+    \label{fig:ablation segment}
+    \vspace{-1.4em}
+\end{figure*}
+
+\begin{figure*}[ht]
+    \centering
+    \includegraphics[width=\linewidth]{Images/Supplementary/Camera_Motion.pdf}
+    \caption{Camera motion controlled results. By setting specific trajectory conditions, MagicMotion can control camera movements.}
+    \label{fig:supp camera motion}
+\end{figure*}
+\section{Additional Experiments}
+We conducted additional experiments using MagicMotion under various task settings, including camera motion control and video editing. We also generate videos by applying different motion trajectories to a single input image.
+
+\paragraph{Camera Motion Control.}
+As shown in Fig.~\ref{fig:supp camera motion}, MagicMotion enables precise control over camera motion, allowing for operations such as rotation, zoom, and pan.
+In the first row of Fig.~\ref{fig:supp camera motion}, we enclose oranges within bounding boxes and apply rotation to the boxes. This results in a video with a simulated camera rotation effect.
+In the second and third rows, we adjust the size of the foreground object’s bounding box to control its perceived distance from the camera, effectively achieving zoom-in and zoom-out effects.
+In the last two rows, we shift the bounding box to the left and downward, creating the effect of the camera moving in the opposite direction.
+
+
+
+\paragraph{Video Editing.}
+As shown in Fig.~\ref{fig:supp editing}, MagicMotion can be applied to video editing to generate high-quality videos. Specifically, we first use FLUX~\cite{flux2024} to edit the first frame of the original video, which serves as the input for MagicMotion. Then, we extract the segment mask of the original video and use it as trajectory guidance for the MagicMotion Stage1. 
+Using this approach, we transform a black swan into a diamond swan, make the camel walk in a majestic palace, and turn a hiking backpacker into an astronaut.
+
+\begin{figure*}[h]
+    \centering
+    \includegraphics[width=\linewidth]{Images/Supplementary/Editing.pdf}
+    \caption{Video Editing Results. We use FLUX~\cite{flux2024} to edit the first-frame image and MagicMotion Stage1 to move the foreground objects following the trajectory of the origin video.}
+    \label{fig:supp editing}
+\end{figure*}
+
+\paragraph{Same input image with different trajectories}
+Extensive experiments have demonstrated that MagicMotion enables objects to move along specified trajectories, generating high-quality videos. To further showcase the capabilities of MagicMotion, we use stage2 of MagicMotion to animate objects from the same input image along different motion trajectories.
+As shown in Fig.~\ref{fig:supp same image different traj}, MagicMotion successfully animates two bears, two fish, and the moon, each following their designated paths.
+
+\begin{figure*}[h]
+    \centering
+    \includegraphics[width=\linewidth]{Images/Supplementary/Same_image_different_traj.pdf}
+    \caption{MagicMotion can generate videos using the same input image and different trajectories (marked by red arrows).}
+    \label{fig:supp same image different traj}
+\end{figure*}
+
+\section{Latent Segment Masks}
+In this section, we provide a more detailed demonstration of Latent Segmentation Masks. Specifically, we use MagicMotion Stage 3 to predict the latent segmentation masks for each frame based on sparse bounding box conditions.
+As shown in Fig.~\ref{fig:supp latent segment}, MagicMotion accurately predicts the Latent Segmentation Masks throughout dynamic scenes, such as a man gradually standing up to face a robot and a boy’s head slowly sinking into the water. This holds true for frames where only the bounding box trajectory is available and even for frames where no trajectory information is provided at all.
+
+\begin{figure*}[h]
+    \centering
+    \includegraphics[width=\linewidth]{Images/Supplementary/Latent_Segment_Masks.pdf}
+    \caption{Latent Segment Masks visualization. MagicMotion can predict out latent segment masks of each frame even when only provided with sparse bounding boxes guidance.}
+    \label{fig:supp latent segment}
+\end{figure*}
+
+\section{Additional Comparison results}
+\paragraph{Baseline Comparisons.}
+As shown in Table~\ref{tab: supp baseline comparison}, we provide a comparison of the backbones used by each method, along with the supported video generation length and resolution. 
+
+\begin{table}[h]
+\centering
+\resizebox{\linewidth}{!}{
+\begin{tabular}{l|ccc}
+\hline
+                                                                                      & Resolution & Length & Base Model                                                  \\ \hline
+Motion-I2V~\cite{shi2024motion}                                 & 320*512    & 16     & AnimateDiff~\cite{guo2023animatediff} \\
+ImageConductor~\cite{li2025image}      & 256*384    & 16     & AnimateDiff~\cite{guo2023animatediff} \\ \hline
+DragAnything~\cite{wu2024draganything}                          & 320*576    & 25     & SVD~\cite{blattmann2023stable}        \\
+LeViTor~\cite{wang2025levitor}                                  & 288*512    & 16     & SVD~\cite{blattmann2023stable}        \\
+DragNUWA~\cite{yin2023dragnuwa}                                 & 320*576    & 14     & SVD~\cite{blattmann2023stable}        \\
+SG-I2V~\cite{namekata2024sgi2v}                                 & 576*1024   & 14     & SVD~\cite{blattmann2023stable}        \\ \hline
+Tora~\cite{zhang2025tora} & 480*720    & 49     & CogVideoX~\cite{yang2024cogvideox}    \\
+\textbf{MagicMotion-CogVideoX}                                                                  & 480*720    & 49     & CogVideoX~\cite{yang2024cogvideox}    \\ \hline
+\textbf{MagicMotion-Wan1.3B}                                                          & 480*832    & 81     & Wan~\cite{wan2025}                 \\ \hline
+\end{tabular}
+}
+\caption{Comparisons on each method's backbone.}
+\label{tab: supp baseline comparison}
+\end{table}
+
+\paragraph{Quantitative Comparisons on different object number}
+Due to space constraints, we only included radar charts in the main text to compare the performance of different methods in controlling varying numbers of objects on MagicBench. Here, we provide the specific quantitative results. As shown in Table~\ref{tab:magicbench objnum1&2}, Table~\ref{tab:magicbench objnum3&4}, and Table~\ref{tab:magicbench objnum5&6}, MagicMotion consistently outperforms other methods across all metrics by a significant margin, especially when the number of moving objects is large. This demonstrates that other methods exhibit poorer performance when controlling a larger number of objects.
+
+\begin{table*}[h]
+\centering
+\resizebox{\linewidth}{!}{
+\begin{tabular}{c|cccc|cccc}
+\hline
+\multirow{2}{*}{\textbf{Method}}                                                                       & \multicolumn{4}{c|}{\textbf{MagicBench (Object Number = 1)}}                                                                                                          & \multicolumn{4}{c}{\textbf{MagicBench (Object Number = 2)}}                                                                                                                   \\ \cline{2-9} 
+                                                                                                       & \multicolumn{1}{c}{FID($\downarrow$)} & \multicolumn{1}{c}{FVD($\downarrow$)} & \multicolumn{1}{c}{Mask\_IoU($\uparrow$)} & \multicolumn{1}{c|}{Box\_IoU($\uparrow$)} & \multicolumn{1}{c}{FID($\downarrow$)} & \multicolumn{1}{c}{FVD($\downarrow$)} & \multicolumn{1}{c}{Mask\_IoU($\uparrow$)} & \multicolumn{1}{c}{Box\_IoU($\uparrow$)} \\ \hline
+Motion-I2V~\cite{shi2024motion}                                 & 78.3245                             & 660.8655                              & 0.6057                                    & 0.7142                                    & 90.4269                              & 867.6057                              & 0.5078                                    & 0.5938                                   \\
+ImageConductor~\cite{li2025image}      & 106.1569                              & 674.4987                              & 0.5706                                    & 0.6974                                    & 109.2959                            & 879.8890                              & 0.4786                                    & 0.5579                                   \\
+DragAnything~\cite{wu2024draganything}                          & 72.2494                              & 884.6453                              & 0.6706                                    & 0.8088                                    & 85.6511                              & 940.4941                              & 0.6148                                    & 0.7232                                   \\
+LeViTor~\cite{wang2025levitor}                                  & 80.9714                              & 492.4725                              & 0.5536                                    & 0.7057                                    & 94.0106                              & 542.8533                              & 0.4352                                    & 0.5364                                   \\
+DragNUWA~\cite{yin2023dragnuwa}                                 & 76.3963                              & 610.0368                              & 0.6699                                    & 0.7769                                    & 81.2921                              & 624.3985                              & 0.6033                                    & 0.6809                                   \\
+SG-I2V~\cite{namekata2024sgi2v}                                 & 60.8617                              & 547.8107                              & 0.7144                                    & 0.8668                                    & 71.8699                              & 619.2791                              & 0.6315                                    & 0.7378                                   \\
+Tora~\cite{zhang2025tora} & 60.2737                              & 805.0145                              & 0.6468                                    & 0.7776                                    & 73.6499                              & 795.8535                              & 0.5509                                    & 0.6584                                   \\ \hline
+\textbf{Ours (Stage1-Wan1.3B)}                                                                 & 48.4211                          & \underline{461.1011}                          & \underline{0.8518}                          & \underline{0.9186}                          & \underline{49.3071}                          & \underline{438.2138}                          & \underline{0.8143}                          & 0.8161                          \\
+\textbf{Ours (Stage2-Wan1.3B)}                                                                 & 51.2964                          & 555.1390                          & 0.6693                          & 0.8163                          & 55.5581                          & 569.0549                          & 0.6318                          & 0.7454                          \\ \hline
+\textbf{Ours (Stage1-CogVideoX)}                                                                                  & \textbf{42.3523}                               & \textbf{473.2179}                              & \textbf{0.9359}                                    & \textbf{0.9607}                                    & \textbf{48.6525}                              & \textbf{428.3430}                              & \textbf{0.9080}                                    & \textbf{0.9097}                                   \\
+\textbf{Ours (Stage2-CogVideoX)}                                                                                  & \underline{46.1080}                              & 564.1036                              & 0.7363                                    & 0.9017                                    & 52.7296                              & 550.5857                              & 0.6931                                   & \underline{0.8256}                                   \\ \hline
+\end{tabular}
+}
+\caption{Quantitative Comparison results on MagicBench with moving objects number equals to 1 / 2.}
+\label{tab:magicbench objnum1&2}
+\end{table*}
+
+\begin{table*}[h]
+\centering
+\resizebox{\linewidth}{!}{
+\begin{tabular}{c|cccc|cccc}
+\hline
+\multirow{2}{*}{\textbf{Method}}                                                                       & \multicolumn{4}{c|}{\textbf{MagicBench (Object Number = 3)}}                                                                                                          & \multicolumn{4}{c}{\textbf{MagicBench (Object Number = 4)}}                                                                                                                   \\ \cline{2-9} 
+                                                                                                       & \multicolumn{1}{c}{FID($\downarrow$)} & \multicolumn{1}{c}{FVD($\downarrow$)} & \multicolumn{1}{c}{Mask\_IoU($\uparrow$)} & \multicolumn{1}{c|}{Box\_IoU($\uparrow$)} & \multicolumn{1}{c}{FID($\downarrow$)} & \multicolumn{1}{c}{FVD($\downarrow$)} & \multicolumn{1}{c}{Mask\_IoU($\uparrow$)} & \multicolumn{1}{c}{Box\_IoU($\uparrow$)} \\ \hline
+Motion-I2V~\cite{shi2024motion}                                 & 89.3195                              & 842.6530                              & 0.5366                                    & 0.6076                                    & 83.2024                              & 744.5470                              & 0.6018                                    & 0.6484                                   \\
+ImageConductor~\cite{li2025image}      & 114.7662                              & 927.3884                              & 0.5169                                    & 0.5578                                    & 110.8037                              & 832.4498                              & 0.5679                                    & 0.5417                                   \\
+DragAnything~\cite{wu2024draganything}                          & 85.1437                              & 925.2795                              & 0.6332                                    & 0.6625                                    & 71.8865                              & 901.7427                              & 0.6946                                    & 0.7148                                   \\
+LeViTor~\cite{wang2025levitor}                                  & 93.3111                              & 607.7522                              & 0.3809                                    & 0.4671                                    & 90.4561                              & 688.8164                              & 0.3555                                    & 0.4044                                   \\
+DragNUWA~\cite{yin2023dragnuwa}                                 & 79.3941                              & 642.4184                              & 0.6420                                    & 0.7012                                    & 71.0587                              & 512.5130                              & 0.7085                                    & 0.7250                                   \\
+SG-I2V~\cite{namekata2024sgi2v}                                 & 70.0600                              & 520.2733                              & 0.6531                                    & 0.7068                                    & 56.9318                               & 460.1303                              & 0.7145                                    & 0.7423                                   \\
+Tora~\cite{zhang2025tora} & 66.6571                              & 742.4080                              & 0.5926                                    & 0.6356                                    & 64.0669                              & 779.0798                              & 0.6226                                    & 0.6312                                   \\ \hline
+\textbf{Ours (Stage1-Wan1.3B)}                                                        & 51.7821                          & 458.4122                          & \underline{0.8236}                          & \underline{0.8122}                          & 47.8972                          & 463.4390                          & \underline{0.8598}                          & \underline{0.8288}                          \\
+\textbf{Ours (Stage2-Wan1.3B)}                                                        & 56.9454                          & 568.4777                          & 0.6632                          & 0.7089                          & 50.0364                          & 548.9445                          & 0.7112                          & 0.7252                          \\ \hline
+\textbf{Ours (Stage1)}                                                                                                   & \textbf{42.9636}                               & \textbf{421.0036}                              & \textbf{0.9107}                                    & \textbf{0.8797}                                    & \textbf{37.6524}                               & \textbf{396.4754}                              & \textbf{0.9231}                                    & \textbf{0.8896}                                   \\
+\textbf{Ours (Stage2)}                                                                                                   & \underline{45.4721}                               & \underline{440.2373}                              & 0.7562                                    & 0.8097                                    & \underline{37.4172}                               & \underline{442.0640}                              & 0.7998                                    & 0.8253                                   \\ \hline
+\end{tabular}
+}
+\caption{Quantitative Comparison results on MagicBench with moving objects number equals to 3 / 4.}
+\label{tab:magicbench objnum3&4}
+\end{table*}
+
+\begin{table*}[h]
+\centering
+\resizebox{\linewidth}{!}{
+\begin{tabular}{c|cccc|cccc}
+\hline
+\multirow{2}{*}{\textbf{Method}}                                                                       & \multicolumn{4}{c|}{\textbf{MagicBench (Object Number = 5)}}                                                                                                          & \multicolumn{4}{c}{\textbf{MagicBench (Object Number \textgreater 5)}}                                                                                                                   \\ \cline{2-9} 
+                                                                                                       & \multicolumn{1}{c}{FID($\downarrow$)} & \multicolumn{1}{c}{FVD($\downarrow$)} & \multicolumn{1}{c}{Mask\_IoU($\uparrow$)} & \multicolumn{1}{c|}{Box\_IoU($\uparrow$)} & \multicolumn{1}{c}{FID($\downarrow$)} & \multicolumn{1}{c}{FVD($\downarrow$)} & \multicolumn{1}{c}{Mask\_IoU($\uparrow$)} & \multicolumn{1}{c}{Box\_IoU($\uparrow$)} \\ \hline
+Motion-I2V~\cite{shi2024motion}                                 & 84.2231                              & 582.0029                              & 0.6295                                    & 0.6267                                    & 79.9077                              & 923.2557                              & 0.4899                                    & 0.4511                                   \\
+ImageConductor~\cite{li2025image}      & 117.8054                              & 857.3489                              & 0.5180                                    & 0.4737                                    & 106.3168                              & 963.6862                              & 0.4536                                    & 0.3442                                   \\
+DragAnything~\cite{wu2024draganything}                          & 79.7015                              & 710.5812                              & 0.7050                                    & 0.7011                                    & 87.1509                              & 719.2442                              & 0.6534                                    & 0.6045                                   \\
+LeViTor~\cite{wang2025levitor}                                  & 90.8332                              & 578.5567                              & 0.3913                                    & 0.4281                                    & 92.5265                              & 763.3157                              & 0.2812                                    & 0.2768                                   \\
+DragNUWA~\cite{yin2023dragnuwa}                                 & 77.2094                              & 435.9205                              & 0.7253                                    & 0.6988                                    & 78.5956                              & 549.7680                              & 0.6638                                    & 0.5709                                   \\
+SG-I2V~\cite{namekata2024sgi2v}                                 & 65.2560                               & 453.1147                              & 0.7431                                    & 0.7367                                    & 95.7569                              & 596.4075                              & 0.6616                                    & 0.6211                                   \\
+Tora~\cite{zhang2025tora} & 67.3827                              & 709.1618                              & 0.6228                                    & 0.6111                                    & 77.2571                              & 907.9254                              & 0.4976                                    & 0.4866                                   \\ \hline
+\textbf{Ours (Stage1-Wan1.3B)}                                                        & 40.8559                          & 384.3586                          & \underline{0.8645}                          & 0.8112                          & 39.6606                          & \textbf{395.2139}                          & \underline{0.8136}                          & 0.6726                          \\
+\textbf{Ours (Stage2-Wan1.3B)}                                                        & 46.7040                          & 491.7079                          & 0.7461                          & 0.7210                          & 42.0005                          & 454.2931                          & 0.6941                          & 0.5861                          \\ \hline
+\textbf{Ours (Stage1)}                                                                                                                    & \textbf{39.4636}                               & \underline{374.6467}                              & \textbf{0.9155}                                    & \textbf{0.8600}                                    & \underline{39.2044}                               & 449.3122                              & \textbf{0.9012}                                    & \textbf{0.7653}                                   \\
+\textbf{Ours (Stage2)}                                                                                                                    & \underline{40.0656}                               & \textbf{350.5010}                              & 0.8106                                    & \underline{0.8123}                                    & \textbf{37.1917}                               & \underline{396.0661}                              & 0.8004                                    & \underline{0.7124}                                   \\ \hline
+\end{tabular}
+}
+\caption{Quantitative Comparison results on MagicBench with moving objects number equals to 5 / above 5.}
+\label{tab:magicbench objnum5&6}
+\end{table*}
+
+\paragraph{More qualitative comparison results.}
+In this section, we provide additional qualitative comparison results with previous works.
+As shown in Fig.\ref{fig:supp comparisons1}, Fig.\ref{fig:supp comparisons2}, Fig.\ref{fig:supp comparisons3}, Fig.\ref{fig:supp comparisons4}, and Fig.~\ref{fig:supp comparisons5}, MagicMotion accurately controls object trajectories and generates high-quality videos, while other methods exhibit significant defects. For fully rendered videos, we refer the reader to “$\texttt{Supplementary video.mp4}$” in supplementary material.
+
+\begin{figure*}[h]
+    \centering
+    \includegraphics[width=\linewidth]{Images/Supplementary/Comparison_cat.pdf}
+    \caption{Qualitative Comparisons Results. MagicMotion successfully control the cat jumping over the bowl, while all other methods exhibit significant defects.}
+    \label{fig:supp comparisons1}
+\end{figure*}
+
+\begin{figure*}[h]
+    \centering
+    \includegraphics[width=\linewidth]{Images/Supplementary/Comparison_witch.pdf}
+    \caption{Qualitative Comparisons Results. MagicMotion successfully control the witch flying over the input trajectory, while all other methods exhibit significant defects.}
+    \label{fig:supp comparisons2}
+\end{figure*}
+
+\begin{figure*}[h]
+    \centering
+    \includegraphics[width=\linewidth]{Images/Supplementary/Comparison_elephant.pdf}
+    \caption{Qualitative Comparisons Results. MagicMotion successfully control the elephant walking along the input trajectory, while all other methods exhibit significant defects.}
+    \label{fig:supp comparisons3}
+\end{figure*}
+
+\begin{figure*}[h]
+    \centering
+    \includegraphics[width=\linewidth]{Images/Supplementary/Comparison_robot.pdf}
+    \caption{Qualitative Comparisons Results. MagicMotion successfully control the robot moving along the input trajectory, while all other methods exhibit significant defects.}
+    \label{fig:supp comparisons4}
+\end{figure*}
+
+\begin{figure*}[h]
+    \centering
+    \includegraphics[width=\linewidth]{Images/Supplementary/Comparison_tiger.pdf}
+    \caption{Qualitative Comparisons Results. MagicMotion successfully control the tiger's head moving along the input trajectory, while all other methods exhibit significant defects.}
+    \label{fig:supp comparisons5}
+\end{figure*}
+
+\section{Additional Ablation Results.}
+Here, we provide additional qualitative comparison results from the ablation study.
+As shown in Fig.~\ref{fig:additional ablation}, not using MagicData for training results in the generation of a woman with an extra hand. Not using the Progressive Training Procedure results in significant defects, such as a dancing woman showing severe issues when turning, with a second face appearing where her hair should be. Additionally, without the Latent Segment Loss, the woman’s lipstick is distorted into a rectangular shape.
+
+\begin{figure*}[h]
+    \centering
+    \includegraphics[width=\linewidth]{Images/Supplementary/Additional_Ablation.pdf}
+    \caption{Additional Ablation results.}
+    \label{fig:additional ablation}
+\end{figure*}
+
+\section{More Details on MagicData}
+Here, we provide some detailed statistical information about MagicData. On average, each video in MagicData contains 346 frames, with a typical height of 999 pixels and a width of 1503 pixels.
+For a more comprehensive understanding of the distribution and variability across the dataset, please refer to Fig.~\ref{fig:magicdata details}, which visualizes the detailed distribution of video frame counts, heights, and widths. During training, these videos are resized to 48 frames and converted to a 720p resolution.
+
+\begin{figure*}[h]
+    \centering
+    \includegraphics[width=\linewidth]{Images/Supplementary/MagicData_Details.pdf}
+    \caption{Detail information on MagicData.}
+    \label{fig:magicdata details}
+\end{figure*}
+
+\section{More Details on MagicBench}
+For evaluation purposes, all videos in MagicBench are sampled to 49 frames and resized to a resolution of 720p. MagicBench is categorized into 6 classes based on the number of annotated foreground objects. Below, we provide one video example for each category, offering a more intuitive understanding of MagicBench.
+
+\begin{figure*}[h]
+    \centering
+    \includegraphics[width=\linewidth]{Images/Supplementary/MagicBench_Visualization.pdf}
+    \caption{MagicBench visualization. We provide one video as a visual example for each object number category..}
+    \label{fig:magicbench visualization}
+\end{figure*}

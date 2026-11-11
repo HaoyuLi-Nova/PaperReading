@@ -1,0 +1,79 @@
+\documentclass[10pt,twocolumn,letterpaper]{article}
+\usepackage{amsmath}
+\usepackage[accsupp]{axessibility}
+\pdfobjcompresslevel=0
+\pdfminorversion=4
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage{cvpr}
+\input{preamble}
+\definecolor{cvprblue}{rgb}{0.21,0.49,0.74}
+\usepackage[pagebackref,breaklinks,colorlinks,allcolors=cvprblue]{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{siunitx}
+\usepackage[table]{xcolor}
+\definecolor{myorange}{RGB}{255,100,3}
+\definecolor{mygray}{gray}{.85}
+\definecolor{mygray1}{gray}{.7}
+\definecolor{mygray2}{gray}{.93}
+\definecolor{mygray3}{gray}{.90}
+\usepackage{array}
+\newcommand{\methodname}{\textit{SymphoMotion}\xspace}
+\newcommand\li[1]{\textcolor{purple}{[\textbf{li}: #1]}}
+\newcommand\liz[1]{\textcolor{purple}{#1}}
+\def\paperID{}
+\def\confName{CVPR}
+\def\confYear{2026}
+\title{SymphoMotion: Joint Control of Camera Motion and Object Dynamics for Coherent Video Generation}
+
+\author{
+Guiyu Zhang\textsuperscript{1},  
+Yabo Chen\textsuperscript{2},  
+Xunzhi Xiang\textsuperscript{3}, \\
+Junchao Huang\textsuperscript{1},  
+Zhongyu Wang\textsuperscript{4},
+Li Jiang\textsuperscript{\textdagger 1}\\
+\textsuperscript{1}The Chinese University of Hong Kong, Shenzhen
+\textsuperscript{2}Shanghai Jiaotong University \\
+\textsuperscript{3}Nanjing University
+\textsuperscript{4}Beihang University \\
+{\tt\small guiyuzhang@link.cuhk.edu.cn, chenyabo@sjtu.edu.cn, xbxsxp@gmail.com,}\\
+{\tt\small junchaohuang@link.cuhk.edu.cn, wangzhongyu@buaa.edu.cn, jiangli@cuhk.edu.cn.} \\
+\url{https://grenoble-zhang.github.io/SymphoMotion/}
+}
+
+\begin{document}
+\vspace{-10mm}
+\twocolumn[{
+\renewcommand\twocolumn[1][]{#1}
+\maketitle
+\footnotetext{\textsuperscript{*}Equal Contribution. \textsuperscript{\textdagger}Corresponding Author.}
+
+
+\begin{center}
+    \captionsetup{type=figure}
+    \includegraphics[width=1\textwidth]{images/fig1-teaser.pdf}
+    \vspace{-3mm}
+    \caption{\textbf{Joint Control of Camera and Object Motion.} Given a reference image, a set of 3D object trajectories, and a camera trajectory, SymphoMotion generates videos that are spatially consistent and faithfully reflect both object and camera motion.}
+    \label{fig:Teaser}
+\end{center}
+}]
+
+\input{sec/0_abstract}    
+\input{sec/1_intro}
+\input{sec/2_relatedwork_method}
+\input{sec/3_experiment}
+\input{sec/X_suppl}
+
+\clearpage
+{
+    \small
+    \bibliographystyle{ieeenat_fullname}
+    \bibliography{main}
+}
+
+
+\end{document}

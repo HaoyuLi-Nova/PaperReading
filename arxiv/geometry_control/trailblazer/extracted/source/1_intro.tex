@@ -1,0 +1,29 @@
+\section{Introduction}
+\label{sec:intro}
+
+Advancements in generative models for text-to-image (T2I) have been dramatic \cite{DALLE2,IMAGEN,RombachStablediffusion21,ediffI}. Recently, text-to-video (T2V) systems have made significant strides, enabling the automatic generation of videos based on textual prompt descriptions \cite{Ho2022ImagenVH, ho2022video, wu2023tune, Esser2023StructureAC}. One primary challenge in video synthesis lies in the extensive memory and required training data. Methods based on the pre-trained Stable Diffusion (SD) model have been proposed to address the efficiency issues in T2V synthesis. These approaches address the problem from several perspectives including finetuning  and zero-shot learning \cite{text2video-zero, qi2023fatezero}.
+
+However, text prompts do not provide good control over the spatial layout and trajectories of objects in the generated video. This control is known to be required for understandable narration of a story \cite{FilmGrammar}. Existing work such as \cite{hu2023videocontrolnet} has approached this problem by providing low-level control signals, e.g.,~using Canny edge maps or tracked skeletons to guide the objects in the video using ControlNet \cite{controlnet}. These methods achieve good controllability, but they can require considerable effort to produce the control signal. For example, capturing the desired motion of an animal (e.g.,~a tiger) or an expensive object (e.g.,~a jet plane) would be quite difficult, while sketching the desired movement on a frame-by-frame basis would be tedious.
+
+
+To address the needs of casual users, we introduce a high-level interface for the control of object trajectories in synthesized videos summarized in \FigRef{fig:teaser}. Users simply provide bounding boxes (bboxes) specifying the desired position of an object at several times (keyframes) in the video, together with the text prompt(s) describing the object at the corresponding times. The provided bboxes are interpolated between the keyframes, resulting in smooth motion and size changes of the object. For instance, the cat sitting in the early half of the video in the red bbox, and then moving with the cyan bbox achieved through keyframing in the middle right of \FigRef{fig:teaser}.
+
+If more than one different text prompt is provided, these prompts are also interpolated, resulting in a ``morphing'' effect such as the cat that transforms into a dog in \FigRef{fig:teaser}. To achieve this guidance we take inspiration from the observation \cite{Magicmix} that object position is established early in the denoising diffusion process, and we leverage the clear spatial interpretation of spatial and temporal attention maps as illustrated in \FigRef{fig:mot}.
+Our resulting strategy involves editing \emph{both spatial and temporal attention maps} for a specific object during the initial denoising diffusion steps to concentrate activation at the desired object location. Our inference-time editing approach achieves this without disrupting the learned text-image association in the pre-trained model, and requires minimal code modifications. 
+
+Our method, \textit{TrailBlazer}, builds on previous works. We use the pre-trained ZeroScope model \cite{zeroscope}, which is a fine-tuned version of \cite{modelscope}, as our underlying model. A body of previous and concurrent works have addressed guiding object position in image generation models, including \cite{layout2im,L2Igan,L2Ixformer,ediffI,ma2023directed,boxdiff,GLIGEN,multidiffusion}.
+%The bounding box guidance paradigm has been previously used in guided image editing \cite{ma2023directed}, \cite{boxdiff}, \cite{GLIGEN}. 
+TrailBlazer most closely resembles the cross-attention injection used in \cite{ma2023directed}, and we adopt some notation from that paper. However, our work addresses a different problem, that of controlling position and trajectories in \emph{videos}, which requires a different approach to control temporal cross-frame attention. Our work also does not require the inference-time optimization algorithm used in \cite{ma2023directed}.
+
+Our contributions are three-fold:
+
+\begin{itemize}
+    \item \textbf{Novelty.} We introduce a novel approach employing high-level bounding boxes to guide the subject in diffusion-based video synthesis. This approach is suitable for casual users, as it avoids the need to record or draw a frame-by-frame positioning control signal. In contrast, the low-level guidance signals such as detailed masks, edge maps, used by some other approaches have two disadvantages: it is difficult for non-artists to draw these shapes, and processing existing videos to obtain these signals limits the available motion to copies of existing sources.
+
+    \item \textbf{Position, size, and prompt trajectory control.} Our approach enables users to position the subject by keyframing its bounding box. The size of the bbox can be similarly controlled, thereby producing perspective effects (Figs.~\ref{fig:teaser},\ref{fig:main_dyn}).
+    Finally, users can also keyframe the text prompt to
+    influence the behavior and identity of the subject in the synthesized video (Figs.~\ref{fig:teaser}).
+
+    \item \textbf{Simplicity.} Our method operates by directly editing the spatial and temporal attention in the pre-trained denoising UNet. It requires no training or optimization, and the core algorithm can be implemented in less than 200 lines of code.
+
+\end{itemize}

@@ -1,0 +1,16 @@
+% arXiv build of the ICLR 2027 submission.  <-- set this as the Overleaf
+%                                               "Main document" to compile it.
+%
+% There is no content here on purpose. This file flips a flag and pulls in
+% the submission source verbatim, so the two versions cannot drift apart:
+% the paper exists exactly once, in iclr2027_conference.tex.
+%
+% \arxivbuild changes three things in that file and nothing else:
+%   - \iclrfinalcopy : shows the author list, removes the line-number ruler
+%   - \lhead{}       : blanks the running header
+%   - the abstract's last sentence points at the project page instead of
+%     the supplementary zip (that URL would de-anonymise the submission)
+
+\documentclass{article}
+\def\arxivbuild{}
+\input{iclr2027_conference}

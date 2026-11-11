@@ -1,0 +1,46 @@
+\section{Introduction}
+\label{sec:intro}
+
+Recent advances in video diffusion models demonstrate significant improvements in visual and motion quality ~\citep{VideoDiffusionModels,blattmann2023stable,AlignYourLatents,LVDM}. 
+These models typically take a text prompt~\citep{VideoDiffusionModels,blattmann2023stable,ImagenVideo} or image~\citep{VideoCrafter1,VideoCrafter2,AnimateDiff,DynamiCrafter} as input and generate video frames of a photorealistic, animated scene.
+Current methods can generate videos that are largely consistent with an input text description or image; however, fine-grained adjustment of specific video elements (e.g., object motion or camera movement) is conventionally a tedious process that requires re-running the model with different text prompts or random seeds~\citep{wu2023freeinit,qiu2024freetraj}.
+
+Approaches for controllable video generation aim to eliminate this process of trial-and-error through direct manipulation of generated video elements, such as object motion~\citep{wu2024draganything,yin2023dragnuwa,wang2024boximator}, pose~\citep{AnimateAnyone,MagicAnimate}, and camera movement~\citep{MotionCtrl,li2024image,CameraCtrl,MotionMaster}.
+One line of work fine-tunes pre-trained video generators to incorporate control signals such as bounding boxes or point trajectories~\citep{wu2024draganything,MotionCtrl}. 
+One of the primary challenges with these supervised methods is the expensive training cost, and thus, previous methods usually incorporate trajectory control by fine-tuning at a lower resolution than the original model~\cite{wu2024draganything, yin2023dragnuwa}.
+More recently, several methods for zero-shot, controllable text-to-video generation have been developed~\citep{ma2023trailblazer,qiu2024freetraj,jain2024peekaboo}.
+They control object trajectories by modulating the cross-attention maps between features within a bounding box and an object-related text token.
+Still, it is not always possible to associate a desired edit with the input text prompt (consider, e.g., motion of object parts). 
+Moreover, these methods cannot be directly applied to animate existing images, as they are only conditioned on text.
+
+In this work, we propose SG-I2V, a new method for controllable image-to-video generation.
+Our approach is \textit{self-guided}, in that it offers zero-shot control by relying solely on knowledge present in a pre-trained video diffusion model. 
+Concretely, given an input image, a user specifies a set of bounding boxes and associated trajectories.
+Then, our framework alters the generation process to control the motion of target scene elements.
+It is essential to manipulate the structure of the
+generated video to achieve precise control over element positions, which is mainly decided by early denoising steps~\citep{balaji2022ediff,DMProcessAnalyze}.
+In image diffusion models, it is known that feature maps extracted from the output of upsampling blocks are \textit{semantically aligned}, i.e., pixels belonging to the same object share similar feature vectors on the feature map and thus can be used to control the spatial layout of generated images~\citep{tang2023emergent, shi2024dragdiffusion, namekata2024emerdiff, tumanyan2023plug}.
+However, our analysis reveals that feature maps extracted from the upsampling blocks of video diffusion models are only weakly aligned across frames (see~\cref{fig:correspondence}).
+This misalignment poses challenges, as directly manipulating these feature maps fails to give useful guidance signals for layout control. %
+Instead, we find that feature maps extracted from the self-attention layers can be semantically aligned by replacing the key and value tokens for each frame with those of the first frame (see bottom row of \cref{fig:correspondence}).
+After that, we can control the motion of generated videos by optimizing the latent (the input to the denoising network) with a loss that encourages similarity between the aligned features within each bounding box along the input trajectory. 
+Finally, we apply a post-processing step to enhance output quality by ensuring that our optimization does not disrupt the distribution of high-frequency noise expected by the diffusion model.
+
+
+
+
+In summary, our work makes the following contributions:
+\begin{itemize}
+    \item We conduct a first-of-its-kind analysis of semantic feature alignment in a pre-trained image-to-video diffusion model and identify important differences from image diffusion models.
+    \item Building on this analysis, we propose SG-I2V, a zero-shot, self-guided approach for controllable image-to-video generation.
+    Our method can control object motion and camera dynamics for arbitrary input images and any number of objects or regions of a scene.
+    \item We conduct extensive experiments to show superior performance over zero-shot baselines while significantly narrowing down the performance gap with supervised baselines in visual and motion quality.
+\end{itemize}
+
+
+
+
+
+\input{fig/correspondence}
+
+

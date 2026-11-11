@@ -1,0 +1,92 @@
+\input{fig/method}
+
+\section{Method}
+\label{sec:method}
+
+In this section, we describe our method for the trajectory control task in image-to-video generation (\cref{sec:3_task}).
+Our framework, SG-I2V, builds on the publicly available image-to-video diffusion model Stable Video Diffusion~(SVD)~\citep{blattmann2023stable},
+and consists of two main steps. 
+First, we extract and semantically align the feature maps from a specific layer of SVD during the early steps of the diffusion process (\cref{sec:motion_estimation}); we show that such feature maps are especially effective at influencing motion in the output video.
+Second, we optimize the noisy latent (i.e., the input to the denoising network) to enforce similarity between features within the bounding box trajectories (\cref{sec:motion_optimization}).
+However, we find that naive optimization of latent is prone to overfitting and often results in low-quality generation.
+Thus, we employ frequency-based post-processing to retain an in-distribution noisy latent (\cref{sec:fft}).
+Our entire pipeline is summarized in \cref{fig:method}.
+
+\input{sec/3_task}
+
+\subsection{Extracting Semantic Video Layout}
+\label{sec:motion_estimation}
+\paragraph{Preliminaries: Stable Video Diffusion.}
+Video diffusion models~\citep{VideoDiffusionModels} learn a data distribution $\bm{x}_0 \sim p_\theta(\bm{x}_0)$ by gradually denoising a video corrupted by Gaussian noise. 
+The output denoised video is thus drawn from the distribution $p_\theta(\bm{x}_0) = \int p_\theta(\bm{x}_{0:T}) \ d\bm{x}_{1:T}$, where $\bm{x}_0 \in \mathbb{R}^{N \times H \times W}$ is a clean video, and $\bm{x}_{1:T}$ are intermediate noisy samples.
+For simplicity, we omit the channel dimension throughout the paper.
+To reduce computation, Stable Video Diffusion (SVD)~\citep{blattmann2023stable} performs the diffusion process in a latent space, where a variational autoencoder~\citep{VAE} maps a raw video $\bm{x}_0$ to a latent $\bm{z}_0 \in \mathbb{R}^{N \times h \times w}$. \\
+Since this work aims to animate an existing image, we utilize the image-to-video variant of SVD, which concatenates a conditioning frame with noisy latent ($\bm{z}_t$) and runs a 3D U-Net~\citep{U-net} to predict the noise.
+The 3D U-Net contains a downsampling and an upsampling path.
+Specifically, the upsampling path consists of three stages operating at different resolutions, where each stage contains three blocks with interleaved residual blocks~\citep{ResNet}, spatial, and temporal attention layers~\citep{Transformer}.
+We will call these three stages bottom, middle, and top from lower to higher resolution.
+For more details, we refer readers to the original paper of SVD~\citep{blattmann2023stable}.
+
+
+\vspace{-2.0mm}
+\paragraph{SVD feature map analysis.} 
+In image diffusion models, prior work has shown that output feature maps of upsampling blocks in the middle stage of the denoising U-Net are \textit{semantically aligned}~\citep{tang2023emergent, namekata2024emerdiff, hedlin2024unsupervised, zhang2023tale, luo2023dhf}, i.e., regions belonging to the same object tend to have similar feature vectors. %
+Such semantically aligned feature maps are useful in estimating the layout of generated images, enabling spatial control of objects~\citep{shi2024dragdiffusion, mou2023dragondiffusion}.
+Therefore, we first examine whether SVD feature maps are also semantically correlated across \textit{both spatial and temporal dimension}. %
+\cref{fig:correspondence} visualizes the principal components of feature maps extracted from the upsampling block and spatial attention layers.
+We observe that SVD feature maps exhibit weak semantic correspondence across frames at early denoising steps, leading to inaccurate object trajectory estimation.
+Yet, we want to operate at early steps as they decide the structure of generated videos~\citep{materzynska2023customizing}.
+This dilemma prompts us to align these features before applying optimization.
+
+\textbf{Feature alignment with modified self-attention.} 
+SVD leverages separate spatial and temporal self-attention to model the entire video.
+Since spatial self-attention is only applied per frame, it does not produce cross-frame aligned features.
+While temporal attention communicates across frames, it only attends to the same pixel position on the feature map, which may be inadequate for capturing semantic information spatially. %
+To address this issue, inspired by \citep{Tune-a-video}, we modify the spatial self-attention on each frame to directly attend to the first frame.
+Concretely, for the $n$-th frame, the original spatial self-attention works as $\bm{F}_n = 
+\mathrm{Softmax}(\frac{\bm{Q}_{n} \cdot \bm{K}_{n}^T}{\sqrt{D}})\cdot \bm{V}_{n}$, where $\bm{F}_n$ %
+is the %
+outputs of self-attention, $\bm{Q}, \bm{K}, \bm{V}$ are the query, key, and value tokens, respectively, and $D$ is the dimensionality of the key and query tokens~\cite{Transformer}.
+Instead, we replace the key $\bm{K}_{n}$ and value $\bm{V}_{n}$ of each frame with $\bm{K}_{1}$ and $\bm{V}_{1}$ from the first frame, leading to a new operation $\tilde{\bm{F}}_n = 
+\mathrm{SoftMax}(\frac{\bm{Q}_{n} \cdot \mathrm{SG}(\bm{K}_{1})^T}{\sqrt{D}}) \cdot \mathrm{SG}(\bm{V}_{1})$.
+We apply a stop gradient $\mathrm{SG}(\cdot)$ on $\bm{K}_{1}$ and $\bm{V}_{1}$ to stabilize the subsequent optimization process.
+Now, all the modified %
+feature maps $\tilde{\bm{F}}_n$ are weighted combinations of $\bm{V}_1$, exhibiting a stronger cross-frame correspondence while still maintaining the object layout of each frame, as shown in the bottom row of \cref{fig:correspondence}. Notably, this modification occurs during the loss computation only and does not affect the denoising steps.
+
+
+\subsection{Trajectory Control with Latent Optimization}
+\label{sec:motion_optimization}
+
+
+So far, we have obtained spatio-temporally aligned feature maps $\tilde{\bm{F}}_n(z_t) \in \mathbb{R}^{h \times w \times d}$ at each frame given the noisy latent $\bm{z}_t$ as input (for simplicity, we resize $\tilde{\bm{F}}_n$ to the same resolution as the noisy latent).
+Recall that our goal is to control the output video frames so that the bounding boxes $\mathcal{B}_b$ identified in the first frame move along the associated trajectories.  
+Inspired by prior drag-based control methods~\citep{shi2024dragdiffusion,pan2023drag}, we optimize the noisy latent $\bm{z}_t$ to enforce cross-frame similarity between features within bounding boxes. 
+The optimization objective is as follows:
+\begin{equation}\label{eq:feature-optimization}
+    \bm{z}_t^* = \argmin_{\bm{z}_t} \sum_{b\in[1, B], n\in[2, N]}\lVert \bm{G}_{b} \odot \left(\tilde{\bm{F}}_n(\bm{z}_t)[\mathcal{B}_{b, n}] - \mathrm{SG}(\tilde{\bm{F}}_1(\bm{z}_t)[\mathcal{B}_{b, 1}])\right) \rVert_2,
+\end{equation}
+where $\odot$ is Hadamard product, and $\tilde{\bm{F}}_n(\bm{z}_t)[\mathcal{B}_{b, n}] \in \mathbb{R}^{h_b \times w_b \times d}$ is feature maps cropped by the bounding box $\mathcal{B}_{b, n}$. 
+Following DragAnything~\citep{wu2024draganything}, we weight the feature difference using a Gaussian heatmap $\bm{G}_{b} \in \mathbb{R}^{h \times w}$. This focuses on optimizing pixels closer to the bounding box center, as pixels near the edge may be background pixels that we do not want to move. 
+\vspace{-2.5mm}
+\paragraph{Selective latent optimization.}
+We optimize \cref{eq:feature-optimization} on a subset of denoising timesteps and self-attention layers.
+Concretely, we only select early denoising timesteps as the coarse structure of output frames is determined at these timesteps~\citep{DMProcessAnalyze,materzynska2023customizing}.
+In addition, consistent with previous works in image diffusion models~\citep{shi2024dragdiffusion,mou2023dragondiffusion}, we observe that feature maps extracted from the middle stage of the denoising U-Net are more semantically correlated, and thus we use them for optimization.
+
+\vspace{-2.0mm}
+\subsection{High-Frequency Preserved Post-Processing}
+\label{sec:fft}
+
+Although the presented pipeline already enables trajectory control in video generation, we notice a quality degradation in generated videos.
+We attribute this degradation to the deviation of $\bm{z}_t^{*}$ from the sampling distribution of the diffusion process after optimization. 
+A recent work FreeInit~\citep{wu2023freeinit} observed that motions of generated videos are mostly encoded in the low-frequency component of noisy latent.
+Inspired by this, we propose to discard the high-frequency component of the optimized latent $\bm{z}_t^*$ and replace it with the high-frequency component of the original latent $\bm{z}_t$. 
+Formally, we obtain the new latent $\tilde{\bm{z}}_t$ as follows:
+\begin{equation}
+\begin{aligned}
+    \tilde{\bm{z}}_t = \textsc{IFFT}_{\mathrm{2D}}\left(\textsc{FFT}_{\mathrm{2D}}(\bm{z}_t^*) \odot \mathbf{H}_\gamma + \textsc{FFT}_{\mathrm{2D}}(\bm{z}_t) \odot (1 - \mathbf{H}_\gamma)\right),
+\end{aligned}
+\end{equation}
+where $\textsc{FFT}_{\mathrm{2D}}$ is the Fast Fourier transformation applied to each frame, and $\textsc{IFFT}_{\mathrm{2D}}$ is the corresponding inverse operation.
+We set $\mathbf{H}_\gamma$ as the frequency response of a 2D low-pass filter (we follow FreeTraj and use a Butterworth filter) with cut-off frequency $\gamma$.
+This post-processing step retains the target motion signals encoded in the low-frequency component of $\bm{z}^*_t$ while eliminating undesirable high-frequency disruptions. %

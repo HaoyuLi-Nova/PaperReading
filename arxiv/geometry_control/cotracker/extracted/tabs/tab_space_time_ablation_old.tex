@@ -1,0 +1,36 @@
+\setlength\tabcolsep{.5em}
+\begin{table}[t]
+\centering
+
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{c cc c>{\centering}p{1.5cm} ccc}
+\toprule
+&\multicolumn{2}{c}{Attention} & \multicolumn{2}{c}{Points} & \multicolumn{3}{c}{DAVIS First} \\
+\cmidrule(lr){2-3}
+\cmidrule(lr){4-5}
+\cmidrule(lr){6-8}
+   &time   & joint  & target & support                             & AJ \ua                 &  \davg\ua & OA \ua         \\
+\midrule
+(a)&\cmark & \xmark & single & ---    &           58.3                      &        71.5   &  86.4               \\
+
+(b)&\cmark & \cmark & single & ---                       &        41.1   &    62.9     & 75.1              \\
+
+(c)&\cmark & \cmark & single & glob. $9\ctimes9$                   & 56.8                  &  71.2              & 85.8          \\
+(d)&\cmark & \cmark & single & SIFT $8\ctimes8$                    & 57.4                  &  72.1              & 85.8          \\
+(e)&\cmark & \cmark & single & loc.~$10\ctimes10$                  & 60.4                  &  75.2              & 87.5          \\
+(f)&\cmark & \cmark & single & glob. $5\ctimes5$ +loc. $8\ctimes8$ & \textbf{62.2}         &  \textbf{75.7}     & \textbf{89.3} \\ 
+
+\midrule
+(g)&\cmark & \cmark & all    & ---                                 & 57.6                  &  73.2              & 86.1          \\
+(h)&\cmark & \cmark & all    & glob. $5\ctimes5$                   & 60.5                  &  \textbf{75.8}     & 87.6          \\
+(i)&\cmark & \cmark & all    & SIFT $8\ctimes8$                    & \textbf{60.7}         &  75.7              & \textbf{88.1} \\
+\bottomrule
+\end{tabular}
+\caption{\nk{We need to simplify this table. SEE THE NEW TABLE BELOW. } \textbf{Importance of joint tracking}.
+We compare models pre-trained with time and cross-track attention, while tracking single or multiple target points, and using additional support points.
+}%
+\label{tab:tab_joint_tracking_ablation}
+%
+\end{table}
+
+

@@ -1,0 +1,27 @@
+%\setlength\tabcolsep{.4em}
+% \begin{table}[t]
+% \centering
+\begin{tabular}{cccccc}
+\toprule
+\multirow{2}{1cm}{\centering {\scriptsize\begin{tabular}[c]{@{}c@{}}Num.\\ proxy\\ tokens\end{tabular}}} &
+\multicolumn{3}{c}{DAVIS First} &
+\multirow{2}{1cm}{\centering {\scriptsize\begin{tabular}[c]{@{}c@{}}Max.\\ num.\\ tracks\end{tabular}}} &
+\multirow{2}{*}{Time [s]}\\
+\cmidrule(lr){2-4}
+& AJ \ua& \davg\ua & OA\ua \\ 
+\midrule
+% \midrule
+0  & 61.6 & 75.6 & 88.3 & $9.4$k &  207.3 \\
+32 & 60.2 &  74.4 &  88.5 & $69.2$k & 26.8 \\
+64 &  \textbf{62.2} & \textbf{75.7} & \textbf{89.3} & $69.2$k  & 27.9 \\
+128 & 60.9 &  74.8 & 88.4 & $69.2$k & 30.1 \\
+\bottomrule
+\end{tabular}
+\caption{The \textbf{proxy tokens} allow \method to scale. We train models with different numbers of proxy tokens and show that they help to decrease both memory complexity and inference time. 
+We report the maximum number of tracks that can fit on a 80 GB GPU.}%
+\label{tab:tab_ablate_clusters}
+% \end{table}
+
+
+
+

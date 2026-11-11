@@ -1,0 +1,19 @@
+\section{Related Work}
+\label{sec:formatting}
+
+
+
+\textbf{World Foundation Models}.
+As a significant advancement of spatial intelligence, world foundation models (WFMs)~\cite{brooks2024video,deepmind_genie3_2024,ali2025world,meng2024towards,kang2024far} involve the perception, simulation, and interaction within dynamic scenes. Given these properties, 3D geometric perception (covering depth estimation~\cite{piccinelli2024unidepth,yang2024depth,wang2025moge}, scene reconstruction~\cite{wang2025vggt,zhang2024monst3r, wang2025continuous, zhang2025flare,li2025megasam}, and dynamic point tracking~\cite{karaev2025cotracker3,xiao2024spatialtracker,xiao2025spatialtrackerv2}) and video generation (covering text-to-video~\cite{kong2024hunyuanvideo,wang2024scene,hong2022cogvideo,wan2025}, image-to-video~\cite{blattmann2023stable,xing2024dynamicrafter,xu2024easyanimate}, and pose-to-video~\cite{bahmani2025ac3d,he2024cameractrl,bai2025recammaster,bai2024syncammaster}) have emerged as fundamental technologies of WFMs.
+This paper presents a unified resource that integrates spatio-temporal semantic and geometric information, advancing WFMs from separate video generation or 3D perception to interactive simulations within virtual environments.
+
+
+
+\noindent\textbf{Video Data with Geometric/Semantic Annotations}.
+Existing datasets~\cite{yao2020blendedmvs,cabon2020virtual,zhou2018stereo,bai2024syncammaster, zhao2024genxd, rockwell2025dynamic} for 3D perception primarily provide annotations such as depth maps, camera poses, and dynamic tracks, facilitating spatial tasks like depth estimation, scene reconstruction, and dynamic point tracking.
+Meanwhile, text-to-video datasets typically consist of video collections with various scales, accompanied by either brief~\cite{soomro2012ucf101,xu_2016_CVPR,zhu2022celebv,yuan2024chronomagic} or detailed~\cite{xue2022advancing,chen2024panda,wang2025koala,nan2024openvid} descriptions.
+Despite the availability of these datasets, they frequently lack a comprehensive resource capable of supporting large-scale advancements in both 3D understanding and video generation.
+Notably, concurrent studies demonstrate an increasing trend toward integrating spatial geometry and semantic information. However, these works remain constrained either by the data scale (600+ hours of Sekai~\cite{li2025sekai} compared to our 4,000+ hours) or the comprehensive geometric annotations (the lack of consistent 3D point tracks in SpatialVID~\cite{wang2025spatialvid}). As summarized in Table~\ref{tab:source_video}, SceneScribe-1M features comprehensive geometric and semantic annotations for dynamic scenes, demonstrating superior scale and applicability compared to existing datasets.
+
+
+

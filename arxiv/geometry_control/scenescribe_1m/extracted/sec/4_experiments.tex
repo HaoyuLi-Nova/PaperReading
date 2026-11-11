@@ -1,0 +1,237 @@
+\section{Experiments}
+
+
+\begin{figure*}
+  \centering
+    \includegraphics[width=\linewidth]{figures/all_vis6.pdf}
+  \vspace{-0.6cm}
+  \caption{\textbf{Visualization Results of Downstream Tasks.} We conduct various downstream task on SceneScribe-1M, \textit{i.e.}, MoGe~\cite{wang2025moge} (monocular depth estimation), VGGT~\cite{wang2025vggt} (3D reconstruction), MonST3R~\cite{zhang2024monst3r} (4D reconstruction), CoTracker3~\cite{karaev2025cotracker3} (2D Point Tracking), SpatialTrackerV2~\cite{xiao2025spatialtrackerv2} (3D Point Tracking) and A3CD~\cite{bahmani2025ac3d}. These results highlight the robust applicability of SceneScribe-1M in 3D perception and video generation, offering a unified resource that effectively supports both domains at scale.}
+  \vspace{-0.5cm}
+  \label{fig:vis}
+\end{figure*}
+
+
+\begin{table*}[htbp]
+  \centering
+  \caption{\textbf{Evaluation of Monocular Depth Estimation on Representative Benchmarks}.}
+    \vspace{-0.25cm}
+  \resizebox{\linewidth}{!}{
+    \begin{tabular}{lcccccccccccccccccc}
+    \toprule
+    \multicolumn{1}{c}{\multirow{2}[4]{*}{\textbf{Method}}} & \multicolumn{2}{c}{\textbf{NYUv2}~\cite{silberman2012indoor}} & \multicolumn{2}{c}{\textbf{KITTI}~\cite{uhrig2017sparsity}} & \multicolumn{2}{c}{\textbf{ETH3D}~\cite{schops2019bad}} & \multicolumn{2}{c}{\textbf{iBims-1}~\cite{koch2020comparison}} & \multicolumn{2}{c}{\textbf{GSO}~\cite{downs2022google}} & \multicolumn{2}{c}{\textbf{Sintel}~\cite{butler2012naturalistic}} & \multicolumn{2}{c}{\textbf{DDAD}~\cite{guizilini20203d}} & \multicolumn{2}{c}{\textbf{DIODE}~\cite{vasiljevic2019diode}} & \multicolumn{2}{c}{\textbf{Average}} \\
+\cmidrule{2-19}          & Rel $\downarrow$     & $\delta_1 \uparrow$     & Rel $\downarrow$     & $\delta_1 \uparrow$     & Rel $\downarrow$     & $\delta_1 \uparrow$     & Rel $\downarrow$     & $\delta_1 \uparrow$     & Rel $\downarrow$     & $\delta_1 \uparrow$    & Rel $\downarrow$    & $\delta_1 \uparrow$    & Rel $\downarrow$    & $\delta_1 \uparrow$    & Rel $\downarrow$    & $\delta_1 \uparrow$    & Rel $\downarrow$    & $\delta_1 \uparrow$ \\
+    \midrule
+    \multicolumn{19}{c}{{Scale-invariant depth map}} \\
+    \midrule
+    Moge (w/o SceneScribe) & 3.44  & \textbf{98.4}  & 4.25  & 97.8  & \textbf{3.36}  & \textbf{98.9}  & 3.46  & 97.0    & \textbf{1.47}  & \textbf{100}   & \textbf{19.3}  & \textbf{73.4}  & 9.17  & 90.5  & 4.89  & 94.7  & 6.17 & 93.8 \\
+    Moge (w SceneScribe-1M) & \textbf{3.42}  & 98.3  & \textbf{4.13}  & \textbf{97.9}  & 3.45  & 98.7  & \textbf{3.26}  & \textbf{98.0}    & \textbf{1.47}  & \textbf{100}   & 19.6  & 72.0    & \textbf{8.95}  & \textbf{91.5}  & \textbf{4.82}  & \textbf{95.3}  & \textbf{6.14} & \textbf{94.0} \\
+    \midrule
+    \multicolumn{19}{c}{{Affine-invariant depth map}} \\
+    \midrule
+    Moge (w/o SceneScribe) & 2.92  & \textbf{98.6}  & 3.94  & 98.0    & \textbf{2.69}  & \textbf{99.2}  & 2.74  & 97.9  & \textbf{0.94}  & \textbf{100}   & \textbf{13.0}    & \textbf{83.2}  & 8.40   & 92.1  & 3.16  & \textbf{97.5} & 4.72 & 95.8 \\
+    Moge (w SceneScribe) & \textbf{2.83}  & \textbf{98.6}  & \textbf{3.80}   & \textbf{98.1}  & 2.78  & \textbf{99.2}  & \textbf{2.46}  & \textbf{98.5}  & 0.95  & \textbf{100}   & 13.2  & 82.7  & \textbf{8.31}  & \textbf{92.4}  & \textbf{3.14}  & \textbf{97.5}  & \textbf{4.68} & \textbf{95.9} \\
+    \midrule
+    \multicolumn{19}{c}{{Affine-invariant disparity map}} \\
+    \midrule
+    Moge (w/o SceneScribe) & 3.38  & 98.6  & 4.05  & \textbf{98.1}  & \textbf{3.11}  & \textbf{98.9}  & 3.23  & 98.0    & \textbf{0.96}  & \textbf{100}   & 18.4  & 79.5  & 8.99  & 91.5  & \textbf{3.98}  & \textbf{97.2}  & 5.76 & 95.2 \\
+    Moge (w SceneScribe) & \textbf{3.35}  & \textbf{98.7}  & \textbf{3.99}  & \textbf{98.1}  & 3.19  & \textbf{98.9}  & \textbf{2.97}  & \textbf{98.4}  & \textbf{0.96}  & \textbf{100}   & \textbf{18.2}  & 79.4  & \textbf{8.74}  & \textbf{91.9}  & 4.01  & \textbf{97.2}  & \textbf{5.68} & \textbf{95.3} \\
+    \bottomrule
+    \end{tabular}}%
+  \label{tab:moge}%
+     \vspace{-0.25cm}
+\end{table*}%
+
+
+
+\begin{table*}[!t]
+    \centering
+    \caption{\textbf{Evaluation of Scene Reconstruction on Representative Benchmarks}.}
+       \vspace{-0.25cm}
+    \begin{minipage}[t]{.49\textwidth}
+        \centering
+        \centerline{(a) 3D Reconstruction  on CO3Dv2~\cite{reizenstein2021common} and ETH3D~\cite{butler2012naturalistic}.}
+        \resizebox{\textwidth}{!}{
+            \setlength{\tabcolsep}{1.2mm}{
+    \begin{tabular}{lccccc}
+    \toprule
+          & \multicolumn{2}{c}{\textbf{Pose Estimation}} & \multicolumn{3}{c}{\textbf{Point Map Estimation}} \\
+    \midrule
+    \textbf{Method} & {AUC$_{30}$} $\uparrow$ & {AUC$_{15}$} $\uparrow$ & \multicolumn{1}{c}{ACC.} $\downarrow$ & Comp. $\downarrow$ & Overall $\downarrow$ \\
+    \midrule
+    VGGT (w/o SceneScribe-1M) & 89.5  & 83.4   & \textbf{{0.873}} & \textbf{0.482} & \textbf{0.677} \\
+    VGGT (w SceneScribe-1M) &  \textbf{89.9}   &  \textbf{83.8}   &   0.890 &0.504&	0.697\\
+    \bottomrule
+    \end{tabular}%
+            }
+        }
+        \end{minipage}
+        \hfill
+        \begin{minipage}[t]{.49\textwidth}
+        \centering
+        \centerline{(b) 4D Reconstruction  on Sintel~\cite{butler2012naturalistic} Dataset.}
+        \resizebox{\textwidth}{!}{
+            \setlength{\tabcolsep}{1.0mm}{
+                \begin{tabular}{lccccc}
+                \toprule
+                \multicolumn{1}{c}{\multirow{2}[4]{*}{\textbf{Method}}} & \multicolumn{3}{c}{\textbf{Pose Estimation}} & \multicolumn{2}{c}{\textbf{Depth Estimation}} \\
+            \cmidrule{2-6}          & \multicolumn{1}{c}{ATE $\downarrow$} & \multicolumn{1}{c}{RPE trans $\downarrow$} & \multicolumn{1}{c}{RPE rot $\downarrow$} & {Rel $\downarrow$} & {$\delta_1 \uparrow$} \\
+                \midrule
+                MonST3R (w/o SceneScribe) & 0.108 & 0.042 & 0.732 & 0.335 & \textbf{58.5} \\
+                MonST3R  (w SceneScribe) & \textbf{0.099} & \textbf{0.038} & \textbf{0.685} &  \textbf{0.320} & 58.1 \\
+                \bottomrule
+                \end{tabular}
+            }
+        }
+    \end{minipage}
+     \vspace{-0.25cm}
+    \label{tab::recs}
+\end{table*}
+
+
+\begin{table*}[!t]
+    \centering
+    \caption{\textbf{Evaluation of Dynamic Point Tracking on Representative Benchmarks.}}
+       \vspace{-0.25cm}
+    \begin{minipage}[t]{.49\textwidth}
+        \centering
+        \centerline{(a) 2D Point Tracking on TAP-Vid~\cite{doersch2022tap} benchmarks.}
+        \resizebox{\textwidth}{!}{
+            \setlength{\tabcolsep}{1.0mm}{
+                \begin{tabular}{lcccccccccc}
+                \toprule
+                      & \multicolumn{3}{c}{\textbf{Kinetics}} & \multicolumn{3}{c}{\textbf{RGB-S}} & \multicolumn{3}{c}{\textbf{DAVIS}} & \multicolumn{1}{l}{\textbf{Mean}} \\
+                \midrule
+                \textbf{Method} & AJ $\uparrow$    & $\delta_{avg}^{vis}$ $\uparrow$     & OA $\uparrow$    & AJ $\uparrow$     & $\delta_{avg}^{vis}$ $\uparrow$    & OA  $\uparrow$   & AJ $\uparrow$    & $\delta_{avg}^{vis}$  $\uparrow$   & OA $\uparrow$    & $\delta_{avg}^{vis}$ $\uparrow$ \\
+                \midrule
+                CoTracker3 (w/o SceneScribe) & 54.7  & 67.8  & 87.4  & 74.3  & 85.2  & 92.4  & 64.4  & 76.9  & 91.2  & 76.6 \\
+                CoTracker3 (w SceneScribe) & \textbf{55.5} & \textbf{68.4} & \textbf{88.2} & \textbf{74.9} & \textbf{86.3} & \textbf{92.8} & \textbf{64.5} & \textbf{77.6} & \textbf{92.0} & \textbf{77.4} \\
+                \bottomrule
+                \end{tabular}
+            }
+        }
+        \end{minipage}
+        \hfill
+        \begin{minipage}[t]{.49\textwidth}
+        \centering
+        \centerline{(b) 3D Point Tracking on TAPVid-3D~\cite{koppula2024tapvid} benchmarks}
+        \resizebox{\textwidth}{!}{
+            \setlength{\tabcolsep}{1.0mm}{
+                \begin{tabular}{lccccccccc}
+                \toprule
+                      & \multicolumn{3}{c}{\textbf{Aria}} & \multicolumn{3}{c}{\textbf{Pstudio}} & \multicolumn{3}{c}{\textbf{Average}} \\
+                \midrule
+                \textbf{Method} & AJ $\uparrow$    & APD $\uparrow$  & OA    & AJ $\uparrow$    & APD $\uparrow$   & OA $\uparrow$   & AJ $\uparrow$    & APD $\uparrow$   & OA $\uparrow$ \\
+                \midrule
+                SpatialTrackerV2(w/o SceneScribe) & 24.6  & 34.7  & 93.6  & 21.9  & 32.1  & 87.4  & 23.25 & 33.4  & 60.3 \\
+                SpatialTrackerV2 (w SceneScribe-1M) & \textbf{24.7} & \textbf{34.7} & \textbf{93.8} & \textbf{22.3} & \textbf{32.5} & \textbf{87.9} & \textbf{23.5} & \textbf{33.6} & \textbf{60.6} \\
+                \bottomrule
+                \end{tabular}
+            }
+        }
+    \end{minipage}
+       \vspace{-0.3cm}
+    \label{tab::track}
+\end{table*}
+
+
+% Table generated by Excel2LaTeX from sheet 'Sheet1'
+\begin{table}[!t]
+  \centering
+  \caption{\textbf{Text/Pose-to-Video Evaluation on RealEstate10K~\cite{zhou2018stereo}}.}
+     \vspace{-0.2cm}
+  \resizebox{\linewidth}{!}{
+    \begin{tabular}{lccccc}
+    \toprule
+    \textbf{Method} & \multicolumn{1}{c}{TransErr $\downarrow$} & \multicolumn{1}{c}{RotErr $\downarrow$} & \multicolumn{1}{c}{FID $\downarrow$} & \multicolumn{1}{c}{FVD $\downarrow$} & \multicolumn{1}{c}{CLIP $\uparrow$} \\
+    \midrule
+    AC3D (w/o SceneScribe-1M) & 0.374 & 0.039 & 1.27  & 38.20  & 28.62 \\
+    AC3D (w SceneScribe-1M) & \textbf{0.318} & \textbf{0.026} & \textbf{1.19}  & \textbf{35.15} & \textbf{29.98} \\
+    \bottomrule
+    \end{tabular}}
+  \label{tab:ac3d}%
+   \vspace{-0.6cm}
+\end{table}%
+
+
+\subsection{Implementation Details}
+ For the curation pipeline, 
+ we parallelized the inference of MegaSaM and TAPIP3D using batch processing and multithreading.
+ We utilize more than $1,000$ NVIDIA H20 GPUs across multiple machines. The overall annotation process consumed about $150k$ GPU hours.
+Unless otherwise specified, all downstream models follow the original training configurations, including hyperparameters and the number of GPUs. To ensure a fair comparison, all baselines are evaluated under their officially specified configurations.
+
+
+
+
+
+
+
+
+% % Table generated by Excel2LaTeX from sheet 'Sheet1'
+% \begin{table}[ht]
+%   \centering
+%   \caption{\textbf{Evaluation of 3D Point Tracking on TAPVid-3D~\cite{koppula2024tapvid} benchmarks}.}
+%   \resizebox{\linewidth}{!}{
+%     \begin{tabular}{lccccccccc}
+%     \toprule
+%           & \multicolumn{3}{c}{\textbf{Aria}} & \multicolumn{3}{c}{\textbf{Pstudio}} & \multicolumn{3}{c}{\textbf{Average}} \\
+%     \midrule
+%     \textbf{Method} & AJ $\uparrow$    & APD$_{3D}$ $\uparrow$  & OA    & AJ $\uparrow$    & APD$_{3D}$ $\uparrow$   & OA $\uparrow$   & AJ $\uparrow$    & APD$_{3D}$ $\uparrow$   & OA $\uparrow$ \\
+%     \midrule
+%     SpatialTrackerV2(w/o SceneScribe) & 24.6  & 34.7  & 93.6  & 21.9  & 32.1  & 87.4  & 23.25 & 33.4  & 60.3 \\
+%     SpatialTrackerV2 (w SceneScribe) & \textbf{24.7} & \textbf{34.7} & \textbf{93.8} & \textbf{22.3} & \textbf{32.5} & \textbf{87.9} & \textbf{23.5} & \textbf{33.6} & \textbf{60.6} \\
+%     \bottomrule
+%     \end{tabular}
+%     }%
+%   \label{tab:st2}%
+% \end{table}%
+
+
+
+\subsection{Downstream Tasks}
+To comprehensively evaluate the reliability and applicability of the annotation pipeline, we conduct multiple downstream tasks on the SceneScribe-1M, including monocular depth estimation~\cite{wang2025moge}, Scene reconstruction~\cite{wang2025vggt,zhang2024monst3r}, dynamic point tracking~\cite{karaev2025cotracker3,xiao2025spatialtrackerv2}, and generative tasks~\cite{bahmani2025ac3d}. The qualitative results are illustrated in Figure~\ref{fig:vis}. 
+
+
+\noindent\textbf{Monocular Depth Estimation}. MagaSaM optimizes continuous video depth by leveraging temporal information, making the per-frame depth maps suitable for monocular depth estimation tasks. 
+Accordingly, we retrain MoGe~\cite{wang2025moge} by integrating the SceneScribe with the original TartanAir~\cite{wang2020tartanair} datasets.
+Notably, as the TartanAir dataset is synthetic, it inherently provides high-quality annotations. Thus, the improvements achieved by integrating SceneScribe-1M (as shown in Figure~\ref{fig:vis} (a) and Table~\ref{tab:moge}) demonstrate the effectiveness of our annotation pipeline.
+
+
+
+
+
+
+\noindent\textbf{Scene Reconstruction}.
+Since SceneScribe-1M provides annotations for continuous video depth and camera pose, it can be directly applied to the 3D reconstruction of VGGT~\cite{wang2025vggt} and 4D reconstruction of MonST3R~\cite{zhang2024monst3r}.
+As shown in Table~\ref{tab::recs} (a), we begin by assessing the impact of SceneScribe-1M on the 3D reconstruction performance of VGGT. The quantitative results indicate that SceneScribe-1M facilitates camera pose estimation, while slightly compromising the performance of point map estimation, consistent with the qualitative results in Figure~\ref{fig:vis} (b).
+In Table~\ref{tab::recs} (b), we evaluate 4D reconstruction capabilities on the Sintel dataset to assess model performance under diverse dynamic scene conditions. SceneScribe further improves the camera pose estimation capability of MonST3R, while preserving its strength in depth estimation. In addition,  we provide a visualization of the 4D reconstruction in Figure~\ref{fig:vis} (c).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\noindent\textbf{Dynamic Point Tracking}.
+SceneScribe-1M contains point tracks annotated by TAPIP3D~\cite{zhang2025tapip3d} based on the geometric format of MegaSAM~\cite{li2025megasam}, which makes it suitable for CoTracker3~\cite{karaev2025cotracker3} (2D Point Tracking) and SpatialTrackerV2~\cite{xiao2025spatialtrackerv2} (3D Point Tracking).
+As shown in Tables~\ref{tab::track}, the results on TAP-Vid and TAPVid-3D benchmarks demonstrate that SceneScribe-1M achieves annotation accuracy comparable to that of standard datasets such as Kubric~\cite{greff2022kubric}, PointOdyssey~\cite{zheng2023pointodyssey}, and Dynamic Replica~\cite{karaev2023dynamicstereo}.
+Meanwhile, the large-scale annotation further guarantees the generalizability of dynamic point tracking, as demonstrated by the visualizations in Figures~\ref{fig:vis} (d) and~\ref{fig:vis} (e).
+
+
+% \textbf{Dynamic Novel View Synthesis}
+% To demonstrate the data diversity and camera pose accuracy of the SceneScribe-1M dataset, we employ the 4DGaussians~\cite{wu20244d} model to perform dynamic novel view synthesis.
+
+\noindent\textbf{Text/Pose-to-Video Generation}.
+Given the textual descriptions and camera pose annotations provided in SceneScribe-1M, we utilize the AC3D~\cite{bahmani2025ac3d} model to demonstrate the feasibility of the text/pose-to-video task. Compared to RealEstate10K~\cite{zhou2018stereo}, the larger SceneScribe-1M provides superior diversity in video content and increased precision in camera pose annotations. These advantages lead to improved generation quality and camera controllability, as shown in the qualitative results in Figure~\ref{fig:vis} (f) and the quantitative results in Table~\ref{tab:ac3d}, respectively.
+
+
+
+
+
+

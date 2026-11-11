@@ -1,0 +1,562 @@
+
+% ===============================================================
+% Supplementary Content (starts at Section 6 automatically)
+% ===============================================================
+
+\section{User Interface}
+\label{sec:UI}
+To support unified control of both object and camera motion at inference time, we implement an interactive graphical user interface (GUI) that enables users to define 3D object trajectories and 3D camera trajectories through an intuitive two-phase workflow. Fig.~\ref{fig:ui_demo} shows a visualization of our GUI and results.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\linewidth]{figures/UI_demo.png}
+    \caption{Visualization of our interactive GUI for unified camera and object motion control. Users select objects via polygon masks on the 2D image and edit 3D object trajectories and camera paths using interactive gizmos in the 3D view. Notice how 3D point-tracks allow us to define the exact 3D trajectory of the woman in yellow dress (go behind the man).}
+    \label{fig:ui_demo}
+\end{figure}
+
+
+\paragraph{Data Processing.}
+Given a single input image, we first run ViPE~\citep{huang2025vipe} to estimate monocular depth and camera intrinsics. Using the estimated depth map and camera parameters, we reconstruct a dense 3D point cloud of the scene. This point cloud serves as the spatial context for all subsequent editing operations.
+
+\paragraph{2D Object Selection.}
+In the first phase, the GUI displays the input image as a 2D canvas. The user selects the object(s) of interest by drawing polygon masks directly on the image. Multiple objects can be selected as separate groups, each receiving its own mask. From each object mask, we proportionally sample 3D point tracks: for an object whose mask covers $n$ pixels out of the total $H \times W$ image, we allocate $\max(1, \lfloor n / (H \times W) \times N \rfloor)$ of the $N = 1024$ total point tracks. The remaining tracks are sampled uniformly from regions outside all masks to represent background motion. Each sampled pixel is mapped to its corresponding 3D world-space coordinate via the reconstructed point cloud.
+
+\paragraph{3D Object Motion Editing.}
+In the second phase, the GUI transitions to a 3D view showing the reconstructed point cloud alongside the sampled point tracks. The user defines target object trajectories by placing keyframes along a desired 3D path using interactive translation and rotation gizmos (6-DoF transform controls). Intermediate frames are obtained via linear interpolation between keyframes, producing continuous target motion trajectories for all points within each object group.
+
+\paragraph{Camera Trajectory Editing.}
+Camera motion is edited through a separate set of 6-DoF gizmos that control the virtual camera's position and orientation at user-specified keyframes. The camera trajectory is visualized as a sequence of frustums connected by a spline curve, allowing the user to intuitively design complex camera paths including panning, tilting, dollying, and orbiting. As with object motion, intermediate camera poses are linearly interpolated between keyframes.
+
+\paragraph{Export and Video Generation.}
+Once the user finalizes both object and camera trajectories, the GUI exports a single \texttt{.npz} file containing: (i) 3D point track coordinates of shape $(T, N, 3)$, (ii) per-frame visibility flags of shape $(T, N)$, (iii) camera intrinsics of shape $(T, 3, 3)$, and (iv) camera extrinsics (world-to-camera) of shape $(T, 4, 4)$. These exported signals are directly fed into our Guidance-based Noise Warping module (\Cref{sec:noise_construction}) to construct the 3D-grounded motion-consistent noise, which then initializes the video diffusion model for generation.
+
+\section{Implementation Details}
+\label{sec:supp_impl}
+
+% --- excluded: Inference Pipeline (A.1) ---
+% \subsection{Inference Pipeline}
+% \label{sec:infer_scheme}
+
+% Fig.~\ref{fig:inference_scheme} illustrates our inference pipeline.
+% Given a single input image, we first reconstruct the scene using ViPE~\citep{huang2025vipe} to obtain a 3D point cloud, depth map, and camera intrinsics. The user then specifies desired object and camera motions through our interactive GUI (Sec.~\ref{sec:UI}), which exports guidance signals in the form of 3D point tracks and camera poses. These signals are fed into our Guidance-based Noise Warping module, consisting of Track-the-Noise (Sec.~\ref{sec:tracknoise}) for encoding object motion and Move-the-World (Sec.~\ref{sec:sphere}) for encoding camera motion, to construct 3D-grounded motion noise. The constructed noise is then concatenated with the encoded image latent and passed to a LoRA-adapted video diffusion model. Finally, the output latent is decoded via a VAE decoder to produce the generated video with faithful object and camera motion control.
+
+% \begin{figure}[!ht]
+%     \centering
+%     \includegraphics[width=0.9\textwidth]{figures/fig6.pdf}
+%     \caption{Overview of our inference pipeline.}
+%     \label{fig:inference_scheme}
+% \end{figure}
+
+\subsection{Training and inference details}
+\label{sec:details}
+Given a ground-truth training video, we first preprocess it using off-the-shelf models to obtain the signals needed for motion-consistent noise construction. Specifically, we estimate camera intrinsics, extrinsics, and depth using ViPE~\citep{huang2025vipe}, foreground masks using SAM3~\citep{carion2025sam3segmentconcepts}, and sparse 3D point tracks using TAPIP3D~\citep{tapip3d}. These quantities capture the object and camera motions of the target video and allow us to apply the procedure in Sec.~\ref{sec:noise_construction} to construct a sequence of 2D Gaussian noise maps whose cross-frame correspondences are consistent with those motions. This naturally defines a supervised training pair: the motion-consistent noise sequence serves as the input initialization to the video diffusion model, while the original video serves as the target output. Importantly, the extracted geometric and motion signals are used only to construct the noise initializer and are not provided to the model as additional conditioning inputs.
+
+We curate 400K training clips from DynPose100K++, WSDG-1M, and 4DNeX~\citep{huang2025vipe,chen20254dnex}, and precompute and cache all signals required for noise construction. To standardize captions across data sources, we re-caption all clips using Qwen2.5-VL~\citep{bai2025qwen3}, following the Wan-Move prompt-extension protocol~\citep{chu2025wan}. We fine-tune a pretrained Wan2.1-I2V-14B model~\citep{wanvideo} using flow matching, with the motion-consistent noise sequence as initialization and the reference frame and text prompt as conditioning. We apply LoRA only to the DiT denoiser, while freezing the VAE and all encoders. We use a LoRA rank of 64 with $\alpha{=}1$ and train for 10K steps in bfloat16 with gradient checkpointing on 32 NVIDIA H100 GPUs, using a batch size of 1 per GPU, for approximately three days. To improve robustness to different guidance densities, we randomly sample 512–1024 points from the extracted 3D tracks during training. At inference time, we use classifier-free guidance with $\gamma{=}5.0$. UniCaMo introduces no additional model parameters at inference time and incurs only approximately 0.2,s of noise-construction overhead per sample, preserving the runtime efficiency of the base model.
+
+
+\subsection{Implementation Details of Foreground Noise Propagation}
+\label{sec:track_the_noise_imple}
+\paragraph{Patch copy--paste along trajectories.}
+We initialize the first-frame latent noise as i.i.d. Gaussian,
+\begin{align}
+\mathbf{Z}_T^{1} \sim \mathcal{N}(\mathbf{0}, \mathbf{I}).
+\end{align}
+For each tracked point $i$ and frame $t$, let $(u_i^t, v_i^t)$ be its (integer) latent coordinates.
+To propagate an identifiable noise footprint along the trajectory, we copy a small square patch around the track location in frame $1$ to the corresponding location in frame $t$.
+Using a patch radius $r$, we define a patch of  $(2r{-}1)\times(2r{-}1)$ pixels where the copy follows:
+\begin{align}
+\mathbf{Z}_T^{t}\!\left[u_i^t+\Delta u,\; v_i^t+\Delta v\right]
+:=
+\mathbf{Z}_T^{1}\!\left[u_i^1+\Delta u,\; v_i^1+\Delta v\right].
+\end{align}
+where $\Delta u$ and $\Delta v$ are the pixel offsets. 
+For $r=2$, the patch size is $3\times 3$, and the offset is
+in $\{-1,0,1\}$. 
+By transporting the same local noise pattern across time, motion becomes \emph{visible} to the latents so that visual features in the diffusion process are encouraged to follow the specified trajectory.
+When multiple trajectories project to the same latent location at time $t$, naive composition yields ambiguous assignments and can introduce inconsistent motion cues. We then apply the Depth-aware Noise Composition rule described in \Cref{sec:noise_construction} to resolve the overlap.
+
+
+\subsection{Implementation Details of Spherical Noise Sampling}
+\label{sec:move_the_world_imple}
+\paragraph{Ray construction (pixel $\rightarrow$ world ray).}
+For each pixel $(p_x,p_y)$ (we use pixel centers), we form a unit ray direction in camera coordinates using intrinsics $(f_x,f_y,c_x,c_y)$:
+\begin{align}
+\mathbf{d}_{c}(p_x,p_y) 
+&= 
+\frac{1}{\left\| \left(\frac{p_x-c_x}{f_x},\,\frac{p_y-c_y}{f_y},\,1\right) \right\|_2}
+\begin{bmatrix}
+\frac{p_x-c_x}{f_x}\\[2pt]
+\frac{p_y-c_y}{f_y}\\[2pt]
+1
+\end{bmatrix},
+\end{align}
+and then apply a camera-to-world transformation to determine the ray direction in the world space:
+\begin{align}
+\mathbf{d}_{w}(p_x,p_y) 
+&= \mathbf{R}^t \, \mathbf{d}_{c}(p_x,p_y),
+\end{align}
+where $\mathbf{R}^t$ is the rotation from $\mathbf{T}_{c\rightarrow w}^t$.
+The origin of the ray is at the camera location. 
+
+\paragraph{Ray-sphere intersection and spherical UV.}
+Let $\mathbf{S}$ be the sphere center with radius $r$. 
+Let $\mathbf{o}^t$ be the ray origin and $\mathbf{d}_w$ be the ray direction in the world space. We define the direction from the sphere center $\mathbf{S}$ to the ray origin as $\mathbf{O}^t=\mathbf{o}^t-\mathbf{S}$.
+%\son{I suppose S is the sphere center.}
+We perform ray-sphere intersection by solving a quadratic equation.
+With $b=\langle \mathbf{d}_w,\mathbf{O}^t\rangle$ and $c=\|\mathbf{O}^t\|_2^2-r^2$, the (non-negative) discriminant is
+\begin{equation}
+\Delta = b^2 - c,
+\end{equation}
+and we take the exiting intersection (consistent with the camera being inside or near the sphere):
+\begin{equation}
+\tau = -b + \sqrt{\Delta} .
+\end{equation}
+The hit point and outward normal are
+\begin{equation}
+\mathbf{P} = \mathbf{o}^t + \tau \mathbf{d}_w,
+\qquad \mathrm{and} \qquad
+\mathbf{n} = \frac{\mathbf{P}-\mathbf{S}}{r}.
+\end{equation}
+We convert the normal to spherical coordinates using longitude--latitude mapping:
+\begin{align}
+u &= \mathrm{fract}\!\left(\frac{\mathrm{atan2}(\mathbf{n}_x, \mathbf{n}_z)}{2\pi} + \frac{1}{2}\right),
+\\
+v &= \frac{\arccos(\mathrm{clip}(\mathbf{n}_y,-1,1))}{\pi},
+\end{align}
+where $\mathrm{fract}(\cdot)$ wraps $u$ into $[0,1)$.
+
+\paragraph{Sampling sphere noise and downsampling to latent.}
+We sample the Gaussian noise map at the computed spherical coordinates using nearest-neighbor lookup,
+yielding a per-frame noise image.
+This yields a 3D-consistent noise field while preserving the spatial Gaussianity per frame.
+
+
+% ---------------------------------------------------------------
+
+% \section{Additional Experiments}
+% \label{sec:supp_extra}
+
+
+\begin{comment}
+% Son: hide as already included in the main paper
+
+\subsection{Effects of using Sphere Noise Sampling}
+\label{sec:supp_sphere}
+
+As discussed in the Spherical Noise Sampling section of the main paper, we construct sphere‑projected noise to fill the gaps in the partial motion-visible noise generated during the Foreground Noise Propagation step. A natural question arises: what happens if we omit the sphere-projected noise and instead fill these gaps in each frame using randomly sampled Gaussian noise?
+To investigate this, we compare the performance of our UniCaMo model with and without sphere‑projected noise on the MoveBench~\citep{chu2025wan} evaluation set. As shown in Table~\ref{tab:movebench_sphere} and Fig.~\ref{fig:sphere} of the main paper, the sphere-projected noise proves to be a crucial component. It ensures temporal consistency in the background content of the scene and prevents unnecessary hallucinations that would otherwise arise from the randomness introduced by Gaussian noise in background regions.
+
+
+\begin{table}[t]
+\centering
+\caption{Ablation study on our proposed UniCaMo with and without using the sphere-projected noise of Move-The-World on the  MoveBench~\citep{chu2025wan} single object-motion evaluation set. We report VBench-I2V scores and other metrics such as PSNR, SSIM and End Point Error (EPE).}
+\label{tab:movebench_sphere}
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{4pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l|ccc|ccccccc}
+\hline
+\textbf{Method}
+& \shortstack{PSNR$\uparrow$}
+& \shortstack{SSIM$\uparrow$}
+& \shortstack{EPE$\downarrow$}
+& \shortstack{Subject\\Consistency$\uparrow$}
+& \shortstack{Background\\Consistency$\uparrow$}
+& \shortstack{Aesthetic\\Quality$\uparrow$}
+& \shortstack{Imaging\\Quality$\uparrow$}
+& \shortstack{Overall\\Consistency$\uparrow$}
+& \shortstack{Temporal\\Flickering$\uparrow$}
+& \shortstack{Motion\\Smoothness$\uparrow$} \\
+\hline
+Ours-w/ sphere
+& \textbf{19.28}
+& \textbf{0.78}
+& \textbf{2.26}
+& \textbf{95.12}
+& \textbf{96.33}
+& \textbf{53.42}
+& 69.88
+& 21.68
+& \textbf{98.26}
+& \textbf{99.07} \\
+Ours-w/o sphere
+& 19.10
+& \textbf{0.78}
+& 2.42
+& 94.79
+& 96.11
+& 52.94
+& \textbf{70.05}
+& \textbf{21.72}
+& 98.11
+& 98.92 \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+
+\subsection{Effect of Degradation Rate}
+\label{sec:supp_deg}
+
+We observed that our 3D-grounded motion noise preserves spatial Gaussian characteristics but lacks temporal Gaussianity. This discrepancy introduces a distribution mismatch between the constructed 3D-grounded motion noise and the pure Gaussian noise on which the backbone model was originally trained. To mitigate such distribution shift, we blend the constructed motion-noise with pure Gaussian noise through alpha blending, using a randomly sampled degradation rate $\theta \in [0, 0.5]$.
+As shown in Table~\ref{tab:movebench_theta} and Fig.~\ref{fig:degra_qual} in the main paper, a degradation rate of $\theta = 0.2$ provides the best balance between visual quality and end‑point error metrics. Using purely constructed motion-noise ($\theta = 0.0$) yields lower end‑point errors, but at the cost of degraded visual quality, as reflected by the VBench‑I2V scores. On the other hand, blending too much Gaussian noise into the constructed motion-noise (e.g., $\theta = 0.5$) results in a substantial drop in performance across all metrics.
+Consequently, we adopt $\theta = 0.2$ as the default setting in our experiments, as it achieves the most favorable trade-off between motion accuracy and visual fidelity.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/degra_qual.png}
+    \caption{Effect of degradation rate on generated samples. A lower degradation rate ($\theta = 0.0$) offers more precise trajectory control but introduces visible artifacts. Conversely, a higher degradation rate ($\theta = 0.5$) yields visually plausible videos but reduces 3D trajectory accuracy. We adopt $\theta = 0.2$ as the default, which achieves the best trade-off between motion fidelity and visual quality.}
+    \label{fig:degra_qual}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\caption{Ablation study on our proposed UniCaMo using different degradation rate $\theta$ on the  MoveBench~\citep{chu2025wan} single object-motion evaluation set. We report VBench-I2V scores and other metrics such as PSNR, SSIM and End Point Error (EPE).}
+\label{tab:movebench_theta}
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{4pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{c|ccc|ccccccc}
+\hline
+\textbf{Degradation Rate}
+& \shortstack{PSNR$\uparrow$}
+& \shortstack{SSIM$\uparrow$}
+& \shortstack{EPE$\downarrow$}
+& \shortstack{Subject\\Consistency$\uparrow$}
+& \shortstack{Background\\Consistency$\uparrow$}
+& \shortstack{Aesthetic\\Quality$\uparrow$}
+& \shortstack{Imaging\\Quality$\uparrow$}
+& \shortstack{Overall\\Consistency$\uparrow$}
+& \shortstack{Temporal\\Flickering$\uparrow$}
+& \shortstack{Motion\\Smoothness$\uparrow$} \\
+\hline
+$\theta = 0.0$
+& \textbf{19.46}
+& \textbf{0.79}
+& \textbf{2.19}
+& \textbf{95.40}
+& 96.35
+& 53.39
+& 69.51
+& \textbf{21.75}
+& \textbf{98.33}
+& \textbf{99.13} \\
+$\theta = 0.2$
+& 19.41
+& \textbf{0.79}
+& 2.21
+& 95.29
+& \textbf{96.38}
+& 53.41
+& 69.58
+& 21.65
+& 98.31
+& 99.12 \\
+$\theta = 0.5$
+& 19.02
+& 0.78
+& 2.49
+& 95.08
+& 96.24
+& \textbf{53.52}
+& \textbf{69.59}
+& 21.67
+& 98.12
+& 98.92 \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+\end{comment}
+
+% \subsection{Additional MoveBench Single and Multi-Object Evaluation}
+% \label{sec:supp_movebench_multi}
+
+% In this section, we present additional experimental results on the MoveBench Single‑ and Multi‑Object evaluation settings. We report VBench‑I2V~\cite{huang2023vbench} scores alongside other quantitative metrics, including PSNR, SSIM, and EPE (End‑Point Error).
+% To ensure a fair comparison with the baseline Wan‑move~\cite{chu2025wan}, which is fully fine‑tuned from the Wan 2.1 14B checkpoint, we additionally train a UniCaMo variant on the Wan 2.1 14B backbone using the same training data as our Wan 2.2 14B model. As shown in Table~\ref{tab:movebench_methods}, across both single‑object and multi‑object motion‑editing settings, UniCaMo—regardless of whether it is built on Wan 2.1 14B or Wan 2.2 14B—consistently and significantly outperforms Wan‑move across most metrics.
+% These results further highlight the effectiveness and generality of our proposed 3D‑grounded motion‑noise formulation. In particular, they demonstrate that UniCaMo can be efficiently adapted to different video‑generation backbones using lightweight LoRA fine‑tuning, avoiding the need for costly full‑model fine‑tuning.
+
+
+% \begin{table}[t]
+% \centering
+% \caption{Comparison of different methods on MoveBench on both single and multi-object editing. Methods with asterisk(*) show quantitative number on multi-object editing. We report VBench-I2V scores and other metrics such as PSNR, SSIM and End Point Error (EPE). \son{Do we still need this table and Wan 2.2?}}
+% \label{tab:movebench_methods}
+
+% \renewcommand{\arraystretch}{1.15}
+% \setlength{\tabcolsep}{4pt}
+% \resizebox{\textwidth}{!}{%
+% \begin{tabular}{l|ccccccc|ccc}
+% \hline
+% \textbf{Method}
+% & \shortstack{Subject\\Consistency$\uparrow$}
+% & \shortstack{Background\\Consistency$\uparrow$}
+% & \shortstack{Aesthetic\\Quality$\uparrow$}
+% & \shortstack{Imaging\\Quality$\uparrow$}
+% & \shortstack{Overall\\Consistency$\uparrow$}
+% & \shortstack{Temporal\\Flickering$\uparrow$}
+% & \shortstack{Motion\\Smoothness$\uparrow$}
+% & \shortstack{PSNR$\uparrow$}
+% & \shortstack{SSIM$\uparrow$}
+% & \shortstack{EPE$\downarrow$} \\
+% \hline
+% Wan-move~\cite{chu2025wan}
+% & \textbf{94.53}
+% & 94.95
+% & 56.60
+% & \textbf{70.28}
+% & 22.35
+% & \textbf{97.86}
+% & \textbf{98.79}
+% & 17.8
+% & 0.64
+% & 2.6 \\
+% \textbf{Ours (Wan 2.1)}
+% & 93.78
+% & \textbf{95.86}
+% & \textbf{56.67}
+% & 69.98
+% & \textbf{22.35}
+% & 97.55
+% & 98.72
+% & \textbf{18.33}
+% & \textbf{0.73}
+% & \textbf{2.3} \\
+% \hline
+% Wan-move~\cite{chu2025wan} *
+% & 94.55
+% & 94.77
+% & 57.86
+% & \textbf{71.80}
+% & 21.74
+% & 97.70
+% & 98.75
+% & 16.7
+% & 0.62
+% & 2.2 \\
+% \textbf{Ours (Wan 2.1)} *
+% & 94.14
+% & 95.91
+% & \textbf{58.46}
+% & 71.59
+% & 21.66
+% & 97.59
+% & 98.78
+% & 18.21
+% & 0.72
+% & 1.86 \\
+% \textbf{Ours (Wan 2.2)} *
+% & \textbf{94.69}
+% & \textbf{96.13}
+% & 58.17
+% & 71.45
+% & \textbf{21.74}
+% & \textbf{97.72}
+% & \textbf{98.83}
+% & \textbf{19.27}
+% & \textbf{0.75}
+% & \textbf{1.67} \\
+% \hline
+% \end{tabular}%
+% }
+% \end{table}
+
+% ---------------------------------------------------------------
+
+
+% ---------------------------------------------------------------
+\section{Additional Ablation Studies}
+\label{sec:additional_ablations}
+
+\begin{table}[t]
+\centering
+\vspace{-0.2cm}
+\caption{Analysis of \textit{(a)} the degradation rate $\theta$ for blending the constructed motion-consistent noise with Gaussian noise, \textit{(b)} the number of 3D point tracks, and \textit{(c)} the foreground noise patch dimension, evaluated on MoveBench evaluation data with multi-object motions.}
+\label{tab:analysis_points_patch}
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{6pt}
+\scalebox{0.7915}{%
+\begin{tabular}{l|ccccc}
+\toprule
+\textbf{Setting}
+& FID $\downarrow$ & FVD $\downarrow$ & PSNR $\uparrow$ & SSIM $\uparrow$ & EPE $\downarrow$ \\
+\midrule
+\multicolumn{6}{c}{\textit{(a) Degradation rate $\theta$}} \\
+\midrule
+$\theta = 0.0$ & 26.93 & 235.3 & \textbf{18.35} & \textbf{0.72} & \textbf{1.88} \\
+$\theta = 0.2$ & 26.1 & 215.2 & 18.15 & \textbf{0.72} & 1.92 \\
+$\theta = 0.5$ & \textbf{26.03} & \textbf{212.78} & 17.35 & 0.67 & 2.12 \\
+\midrule
+\multicolumn{6}{c}{\textit{(b) Number of 3D point tracks}} \\
+\midrule
+$N = 1024$ & \textbf{26.1} & \textbf{215.2} & \textbf{18.15} & \textbf{0.72} & \textbf{1.92} \\
+$N = 512$  & 26.5 & 223.3 & 16.44 & 0.65 & 2.18 \\
+$N = 256$  & 26.3 & 224.6 & 16.12 & 0.62 & 2.38 \\
+\midrule
+\multicolumn{6}{c}{\textit{(c) Patch dimension in Foreground Noise Propagation}} \\
+\midrule
+$R = 1.0$ & 27.6 & 254.6 & 15.32 & 0.54 & 3.34 \\
+$R = 2.0$ & \textbf{26.1} & \textbf{215.2} & \textbf{18.15} & \textbf{0.72} & \textbf{1.92} \\
+$R = 3.0$ & 26.8 & 221.19 & 16.70 & 0.64 & 2.28 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\subsection{Effect of various hyperparameters.}
+\label{sec:robust_3d}
+\noindent\textbf{Degradation rate.}
+Our motion-consistent noise is spatially Gaussian but introduces cross-frame correlations that differ from the independent Gaussian prior used to train the backbone. We therefore blend it with independent Gaussian noise using a randomly sampled degradation rate $\theta \in [0,0.5]$. At $\theta=0$, the initialization preserves the motion signal most strongly, yielding the best control fidelity (EPE $1.88$, PSNR $18.35$), but also deviates most from the original noise prior, resulting in lower video quality (FID $26.93$, FVD $235.3$). Increasing $\theta$ reduces this mismatch and monotonically improves FID and FVD, at the cost of motion-control fidelity. We adopt $\theta=0.2$ as a good trade-off between video quality and control fidelity (\Cref{tab:analysis_points_patch}~(a) and \Fref{fig:degra_qual}).
+
+\noindent\textbf{Point tracks.}
+We extract $1024$ tracks per video using TAPIP3D~\citep{tapip3d} and vary the number used during training to assess robustness to the track budget (\Cref{tab:analysis_points_patch}(b) and Fig.~\ref{fig:supp_numtrack_qual}). Visual quality is relatively insensitive to this choice, with FID and FVD varying by at most $0.4$ and $9.4$, respectively. Control fidelity is more sensitive: PSNR decreases from $18.15$ with $1024$ tracks to $16.44$ with $512$ and $16.12$ with $256$, while EPE increases from $1.92$ to $2.38$. We therefore use $1024$ tracks by default, although performance degrades gracefully as the number of tracks decreases.
+
+\noindent\textbf{Patch size.}
+We vary the patch dimension $(2R-1)$ used to propagate noise along the 3D point tracks; results are reported in \Cref{tab:analysis_points_patch}(c) and Fig.~\ref{fig:supp_radius_qual}. $R=2$ performs best across all five metrics. Both a smaller patch ($R=1$) and a larger one ($R=3$) degrade performance, suggesting that the patch should be large enough to provide a sufficiently strong motion signal while remaining sufficiently localized to avoid interference between neighboring trajectories. We therefore use $R=2$ by default.
+
+
+\subsection{Robustness to Errors in 3D Estimation}
+\label{sec:robust_3d}
+
+UniCaMo depends on off-the-shelf modules for depth, camera pose and 3D point tracking, both when constructing training data and when preparing inference guidance, and errors in those estimates propagate into the constructed noise. To make the model tolerant of them, we add a small perturbation to the clean motion-visible noise during both training and inference. We assess that tolerance in two ways on the multi-object split of MoveBench (\Cref{tab:robust_3d}).
+
+\begin{table}[t]
+\centering
+\caption{Robustness of UniCaMo to errors in the estimated 3D signals, evaluated on the multi-object split of MoveBench. \textit{(a)} perturbs the per-pixel depth by a controlled percentage; \textit{(b)} substitutes the camera poses and depth of different 3D foundation models. Best result in each block in \textbf{bold}.}
+\label{tab:robust_3d}
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{6pt}
+\scalebox{0.7915}{%
+\begin{tabular}{l|ccccc}
+\toprule
+\textbf{Setting}
+& FID $\downarrow$ & FVD $\downarrow$ & PSNR $\uparrow$ & SSIM $\uparrow$ & EPE $\downarrow$ \\
+\midrule
+\multicolumn{6}{c}{\textit{(a) Perturbation of the estimated depth}} \\
+\midrule
+Depth perturbation $= 0\%$ (default) & \textbf{26.08} & \textbf{215.20} & \textbf{18.15} & \textbf{0.72} & \textbf{1.92} \\
+Depth perturbation $= 5\%$           & 26.12 & 215.21 & 18.11 & 0.71 & 1.94 \\
+Depth perturbation $= 10\%$          & 27.14 & 223.56 & 17.35 & 0.68 & 2.10 \\
+Depth perturbation $= 30\%$          & 31.20 & 283.32 & 16.22 & 0.60 & 2.57 \\
+\midrule
+\multicolumn{6}{c}{\textit{(b) Source of the estimated camera poses and depth}} \\
+\midrule
+MegaSaM~\citep{li2025megasam}           & 26.23 & 216.40 & 18.30 & 0.69 & 2.23 \\
+ViPE~\citep{huang2025vipe} (default)    & 26.08 & \textbf{215.20} & 18.15 & \textbf{0.72} & 1.92 \\
+VGGT-$\Omega$~\citep{wang2026vggtomega} & \textbf{25.93} & 215.87 & \textbf{18.37} & \textbf{0.72} & \textbf{1.88} \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\noindent\textbf{Perturbed depth.}
+We perturb the per-pixel depth estimated by ViPE~\citep{huang2025vipe} by a controlled percentage. At $5\%$ and $10\%$ the effect is small --- $0.04$ FID and $0.02$ EPE, and $1.06$ FID and $0.18$ EPE respectively --- which spans the error regime of modern depth estimators. Only at $30\%$ does quality degrade appreciably ($5.12$ FID, $0.65$ EPE). This is expected: a perturbation of that magnitude changes the depth ordering of the scene, and therefore which surfaces occlude which, so generation is guided by a geometrically different scene.
+
+\noindent\textbf{Alternative 3D foundation models.}
+We also replace the estimated camera poses and depth with those of other state-of-the-art 3D foundation models. UniCaMo works with every estimator tested, and its accuracy tracks that of the estimator: FID and EPE both improve monotonically from MegaSaM~\citep{li2025megasam} through ViPE~\citep{huang2025vipe} to VGGT-$\Omega$~\citep{wang2026vggtomega}, which gives our best overall result ($25.93$ FID, $1.88$ EPE). UniCaMo can therefore inherit future advances in 3D estimation without retraining.
+
+\section{Additional Qualitative Visualizations}
+\label{sec:supp_qual}
+
+% \subsection{Additional Qualitative Comparisons on MoveBench Dataset}
+% \label{sec:supp_morequal}
+
+% We provide additional qualitative comparisons between UniCaMo and Wan-Move~\citep{chu2025wan} on challenging samples from MoveBench in Fig.~\ref{fig:supp_qual1}, Fig.~\ref{fig:supp_qual2}, and Fig.~\ref{fig:supp_qual3}. These examples feature complex scenes with multiple interacting objects. Under such challenging conditions, Wan-Move often results in incorrect motion directions, implausible object deformations, or failure to follow the text prompt faithfully. In contrast, UniCaMo consistently generates videos with more physically plausible motion dynamics and better prompt adherence, demonstrating the effectiveness of our 3D-grounded motion-consistent noise in encoding both object and camera motion cues. 
+% % We encourage readers to view the accompanying video results in the supplementary webpage for more detailed comparisons.
+% % --- excluded: old teaser figure ---
+% % \begin{figure}[!htbp]
+% %     \centering
+% %     \includegraphics[width=\linewidth]{figures/teaser.pdf}
+% %     \caption{We demonstrate control of the camera motion, single-object movement, multiple-object movement, and unified control of camera and object motion in diverse scenes.}
+% %     \label{fig:old_teaser}
+% % \end{figure}
+
+
+% \begin{figure}[!ht]
+%     \centering
+%     \includegraphics[width=\linewidth]{figures/movebench_qual1.png}
+%     \caption{Additional qualitative comparison on MoveBench (1/3). Our method produces more physically plausible motion and better preserves scene structure compared to Wan-Move~\citep{chu2025wan}.}
+%     \label{fig:supp_qual1}
+% \end{figure}
+
+% \begin{figure}[!ht]
+%     \centering
+%     \includegraphics[width=\linewidth]{figures/movebench_qual2.png}
+%     \caption{Additional qualitative comparison on MoveBench (2/3). Under complex object interactions, UniCaMo better follows the target trajectories and demonstrates stronger prompt adherence while maintaining visual quality.}
+%     \label{fig:supp_qual2}
+% \end{figure}
+
+% \begin{figure}[!ht]
+%     \centering
+%     \includegraphics[width=\linewidth]{figures/movebench_qual3.png}
+%     \caption{Additional qualitative comparison on MoveBench (3/3).}
+%     \label{fig:supp_qual3}
+% \end{figure}
+\newlength{\suppfigwidth}
+\setlength{\suppfigwidth}{0.898\linewidth}
+
+
+In this section, we provide more qualitative results for camera control (see Fig.~\ref{fig:supp_camera_control}), motion control (see Fig.~\ref{fig:supp_motion_control}), joint camera and motion control (see Fig.~\ref{fig:supp_join_control}). Finally, we show our superior results compared with other baseline on some complex trajectory samples in the Fig.~\ref{fig:supp_in_the_wild_control}. Overall, UniCaMo display precise controllable video generation capabilities even in extreme out-of-domain cases.
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=\suppfigwidth]{figures/supp_camera_control.pdf}
+  \caption{Additional qualitative results for \textbf{camera control} on the
+  RealEstate10K dataset.}
+  \label{fig:supp_camera_control}
+\end{figure}
+
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.95\suppfigwidth]{figures/supp_motion_control.pdf}
+  \caption{Additional qualitative results for \textbf{motion control} on the
+  MoveBench dataset. }
+  \label{fig:supp_motion_control}
+\end{figure}
+
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.95\suppfigwidth]{figures/supp_join_control.pdf}
+  \caption{Additional qualitative results for \textbf{joint camera and motion
+  control}.}
+  \label{fig:supp_join_control}
+\end{figure}
+
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=\suppfigwidth]{figures/supp_in_the_wild_control.pdf}
+  \caption{Qualitative results for joint control on \textbf{copmlex trajectory} cases}
+  \label{fig:supp_in_the_wild_control}
+\end{figure}
+
+
+
+\begin{figure}[!tbp]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/degra_qual.png}
+    \caption{Effect of degradation rate on generated samples. A lower degradation rate ($\theta = 0.0$) offers more precise trajectory control but introduces visible artifacts. Conversely, a higher degradation rate ($\theta = 0.5$) yields visually plausible videos but reduces 3D trajectory accuracy. We adopt $\theta = 0.2$ as the default, which achieves the best trade-off between motion fidelity and visual quality.}
+    \label{fig:degra_qual}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/numtrack_qual.png}
+    \caption{Qualitative results of our proposed UniCaMo method using different number of 3D point tracks.}
+    \label{fig:supp_numtrack_qual}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/radius_qual.png}
+    \caption{Qualitative results of our proposed UniCaMo method using different configuration of patch size $R$.}
+    \label{fig:supp_radius_qual}
+\end{figure}
+
+\clearpage
+
+
+\section{Discussion, Limitations, and Future Work}
+While our 3D-grounded, motion-consistent noise enables flexible control of object and camera motion, the method has limitations. First, the Foreground Noise Propagation stage depends heavily on accurate 3D point tracks and camera poses, so tracking or calibration errors can degrade controllability. Second, the Spherical Noise Sampling stage uses a coarse 3D sphere proxy, which may fail to capture dynamic background geometry. Future improvements in 3D tracking, depth estimation, and noise representations would further enhance our approach.

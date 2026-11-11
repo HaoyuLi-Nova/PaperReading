@@ -1,0 +1,20 @@
+\begin{table}[t!]
+\centering\small
+\setlength{\tabcolsep}{9pt}
+\begin{tabular}{lccc}
+\toprule
+ \textbf{Methods} & $\mathbf{\rm ATE}_{3D}\downarrow$ & $\mathbf{\delta_{0.1}}\uparrow$ & $\mathbf{\delta_{0.2}}\uparrow$ \\
+\midrule
+Chained RAFT3D~\cite{raft3D}  &  0.70 & 0.12  & 0.25 \\
+Lifted CoTracker~\cite{cotracker}  & 0.77  & 0.51 & 0.64  \\
+Ours  & \textbf{0.22} & \textbf{0.59}  & \textbf{0.76 } \\
+
+\bottomrule
+\end{tabular}
+\vspace{-5pt}
+\caption{\textbf{3D Tracking Results on the PointOdyssey Dataset.} ${\rm ATE}_{3D}$ is the average trajectory error in 3D space and
+$\delta_{t}$ measures the percentage of points whose distances are within $t$ (in meter) from the ground truth.}
+\label{table:PointOdyssey}
+\end{table}
+    
+    

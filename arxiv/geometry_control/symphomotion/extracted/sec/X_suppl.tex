@@ -1,0 +1,104 @@
+\clearpage
+\setcounter{page}{1}
+\twocolumn[{
+\renewcommand\twocolumn[1][]{#1}
+\maketitlesupplementary
+\begin{center}
+    \captionsetup{type=figure}
+    \includegraphics[width=1\textwidth]{images/fig8-ui.pdf}
+    \vspace{-8mm}
+    \caption{
+    \textbf{Interactive Panel Interface.} The panel offers a unified interface for specifying motion inputs to SymphoMotion.
+(a) An input image is uploaded, and SAM2 extracts the mask of the target object for subsequent control.
+(b) The Camera Control Panel allows users to configure camera movement through rotational and translational adjustments for viewpoint specification.
+(c) The Object Control Panel provides interactive editing of 3D object trajectories using the automatically fitted bounding box.
+    }
+    \label{fig:ui}
+\end{center}
+}]
+\noindent This supplementary material provides inference details and visualization analyses for SymphoMotion, complementing the discussions in the main paper. Specifically, it includes:
+\vspace{1mm}
+\begin{itemize}
+\item Section~\ref{sec:panel}: An overview of the interactive panel used to specify camera and object control signals, along with examples illustrating its use for motion design.
+\item Sections~\ref{sec:supplementary-camera}–\ref{sec:supplementary-object}: Additional qualitative comparisons on independent control of camera and object motions.
+\item Section~\ref{sec:supplementary-camera-object}: Additional qualitative results on jointly controlling camera motion and object dynamics, showing that SymphoMotion preserves high visual fidelity, accurate camera movement, and reliable object manipulation, whereas prior methods struggle to maintain these properties even under independent camera or object control.
+\end{itemize}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{images/fig9-camera-scene.pdf}
+    \vspace{-2mm}
+    \caption{\textbf{Independent camera control for static scene.}}
+    \label{fig:material-camera1}
+    \vspace{-1mm}
+\end{figure}
+
+\section{Interactive Panel}
+\label{sec:panel}
+The interactive panel provides an intuitive interface for specifying camera movement and object motion before generating videos with SymphoMotion. As shown in Fig.~\ref{fig:ui}, users begin by uploading an input image, from which SAM2 extracts the mask of the object of interest (Fig.~\ref{fig:ui} (a)). The masked region identifies the target object for subsequent control.
+After mask selection, users can define motion through two interfaces: the Camera Control Panel (Fig.~\ref{fig:ui} (b)) and the Object Control Panel (Fig.~\ref{fig:ui} (c)). Together, these interfaces offer a simple and flexible way to configure both camera movement and object motion.
+\subsection{Camera Control}
+\label{sec:panel-camera}
+The camera control interface allows users to define the camera movement. As shown in Fig.~\ref{fig:ui} (b), it supports rotational and translational adjustments, including modifications to distance, elevation, azimuth, and spatial offsets. Collectively, these controls specify a camera trajectory that is provided to SymphoMotion as an explicit input for control.
+
+\subsection{Object Control}
+\label{sec:panel-object}
+To specify object dynamics, the panel incorporates a 3D tracking interface built upon Depth-Pro. After reconstructing a dense point cloud from the first frame, the system automatically fits a 3D bounding box around the selected object. Users can then interactively drag or reposition this bounding box to define the object’s motion trajectory in 3D space. As illustrated in Fig.~\ref{fig:ui}  (c), the blue dashed box denotes the object's initial position, the arrow indicates the user-defined direction of movement, and the red box represents the final position after manipulation.
+
+The resulting trajectory provides a complete 3D motion specification that serves as the object-side control input to SymphoMotion. Combined with the camera trajectory defined in Section~\ref{sec:panel-camera}, this interface enables unified and precise motion inputs for SymphoMotion.
+
+
+
+\section{Additional Qualitative Comparisons}
+\label{sec:supplementary-comparison}
+To further examine motion controllability, we present additional qualitative evaluations across three complementary settings.
+Section~\ref{sec:supplementary-camera} investigates independent camera control, assessing how each method follows specified trajectories while maintaining scene stability.
+Section~\ref{sec:supplementary-object} analyzes independent object control, focusing on the coherence and consistency of object motion in static environments.
+Section~\ref{sec:supplementary-camera-object} evaluates simultaneous control of camera and object motions, examining the capability of each method to coordinate both motion sources within a unified generative framework.
+Collectively, these comparisons offer a comprehensive assessment of SymphoMotion's motion controllability across diverse configurations.
+
+\subsection{Independent Control of Camera Motion.}
+\label{sec:supplementary-camera}
+
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{images/fig10-camera-object.pdf}
+    \vspace{-2mm}
+    \caption{\textbf{Independent camera control for static object.}}
+    \label{fig:material-camera2}
+    \vspace{-1mm}
+\end{figure}
+
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=1\textwidth]{images/fig11-object.pdf}
+\caption{
+\textbf{More Qualitative Results on Independent Object Motion Control.}
+}
+\label{fig:material-object}
+\end{figure*}
+Fig.~\ref{fig:material-camera1} and Fig.~\ref{fig:material-camera2} present additional qualitative comparisons for independent camera control at the scene and object levels, respectively. CameraCtrl consistently shows noticeable drift and reduced video fidelity in both settings, suggesting limited adherence to the intended trajectories and weaker geometric stability under viewpoint changes. ViewCrafter performs reasonably well at the scene level, where camera motion is relatively coarse and global, but deteriorates substantially under object-level cues requiring more precise local control. For instance, in Fig.~\ref{fig:material-camera2}, second row, the target trajectory specifies a zoom-in motion, but ViewCrafter introduces noticeable distortions during camera movement, indicating limited precision in fine-grained camera adjustment and poor consistency under object-centric viewpoint control. In contrast, both Uni3C and SymphoMotion follow the prescribed trajectories more faithfully and preserve scene stability across both settings. Their videos exhibit more accurate viewpoint transitions, stronger structural consistency, and fewer distortions during camera movement, demonstrating more reliable camera control, especially under object-level conditions.
+
+\subsection{Independent Control of Object Motion.}
+\label{sec:supplementary-object}
+
+Additional examples in Fig.~\ref{fig:material-object} assess object-level control in static scenes. MotionCtrl exhibits inaccurate and unstable object behavior, failing to maintain coherent motion or consistent trajectories over time, even in the absence of camera movement. SymphoMotion, in contrast, adheres to the specified object-motion cues and generates smooth, consistent dynamics with noticeably improved temporal stability. These observations highlight the effectiveness of incorporating 3D trajectory conditioning, which enables more stable and reliable object-motion control.
+
+\subsection{Simultaneous Control of Camera and Object Motions.}
+\label{sec:supplementary-camera-object}
+
+
+
+Fig.~\ref{fig:material-camera-object} examines the simultaneous control of camera and object motions. MotionCtrl exhibits pronounced limitations in this configuration, with both camera trajectories and object dynamics deviating from the intended motion cues. The method struggles to handle the interaction between the two motion sources, resulting in coupled and unstable behaviors. SymphoMotion, in contrast, coordinates both motions effectively, maintaining accurate camera movement while producing coherent object dynamics. These qualitative results highlight the robustness of our unified framework in handling coupled motion conditions.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=1\textwidth]{images/fig12-camera-object.pdf}
+\caption{
+\textbf{More Qualitative Results on Simultaneous Camera and Object Motion Control.}
+}
+\label{fig:material-camera-object}
+\end{figure*}

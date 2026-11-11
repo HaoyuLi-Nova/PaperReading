@@ -1,0 +1,93 @@
+\section{Motion Prompts}
+\label{sec:motionprompting}
+
+In this section, we discuss different types of effects achievable through motion prompts and prompt expansion. In particular, we identify and demonstrate several different types of expansion, as shown in \cref{fig:teaser}. Text prompts and other parameters for each video may be found in \cref{tbl:figure_details}. \textbf{We strongly encourage readers to view generated videos \supparxiv{in the \supp{}}{on our \href{https://motion-prompting.github.io/}{webpage}.}}
+
+\subsection{``Interacting'' with an Image} 
+\label{sec:interacting}
+
+\input{figtabs/sparse}
+\input{figtabs/drag_editing}
+
+Our model enables the ability to ``interact" with images. To do this, we build a GUI that displays a still image and records mouse drags from a user.
+This recording is then converted to tracks, as described below, and is fed to the model along with the initial frame and text.
+More information about the GUI can be found in \cref{apdx:implementation}.
+For simple mouse motions, where the mouse is constantly dragged, this approach is similar to prior work on sparse trajectory conditioned video generation~\cite{wang2024motionctrl,yin2023dragnuwa,li2024image,wu2024draganything,niu2024mofa,2023videocomposer,shi2024motion,zhang2024tora,zhou2024trackgo,namekata2024sg}.
+However, because our model generalizes to partial tracks, we can also handle multiple mouse drags in different locations at different times, resulting in natural user control as in \cref{fig:sparse}b and \cref{fig:sparse}d.
+Please note that while we record mouse inputs in real-time, our method requires sampling from the video diffusion model, which is not real-time -- it takes about 12 minutes to generate an output video. 
+
+To create the motion prompts, we translate mouse drags into a grid of point tracks as shown in \cref{fig:sparse}. 
+The density and size of this grid can be chosen by the user, similar to the Gaussian blurring of tracks in~\cite{yin2023dragnuwa,wang2024motionctrl,wu2024draganything,li2024image} to specify the spatial extent of the motion.
+However, note that in our approach this step is done only at inference time, and not at train time.
+Additionally, a user may choose to place a grid of static tracks down to keep the background still, as in \cref{fig:sparse}b and \cref{fig:sparse}d, or have tracks persist after a mouse drag as in \cref{fig:sparse}d.
+
+
+
+
+
+
+\mypar{Emergent Phenomena.} We find that these ``interaction" motion prompts can result in straightforward motions, such as turning the head of a parrot in \cref{fig:sparse}a. But interestingly, we also observe more complex dynamics: \eg, in \cref{fig:sparse}b, where the tracks toss the hair of the subject, or in \cref{fig:sparse}d where the sand is swept around. In these examples, we are essentially probing the video prior learned by the model, and by doing so are able to visualize the physics and general world understanding that the model has learned. Furthermore, because our model supports temporally sparse track conditioning, we can effectively do prediction. That is, we can query our model with a motion for a short duration, and then let the model predict the future, allowing us to answer questions such as {\it "how will the hair behave if I pull on it this way or that?"} as in \cref{fig:sparse}b.
+
+
+\input{figtabs/depth}
+\input{figtabs/primitives}
+
+\mypar{Drag-Based Image Editing.} A natural application of this ``interaction" ability is drag-based image editing~\cite{pan2023drag,shi2023dragdiffusion,mou2023dragondiffusion,geng2024motion,alzayer2024magic,rotstein2024pathways}. This task involves taking user supplied ``drags" and editing an image such that objects follow these drags.
+We shows qualitative results in \cref{fig:drag_editing}.
+
+
+\subsection{Object Control with Primitives}
+\label{sec:primitives}
+
+We can also reinterpret mouse motions as manipulating a proxy geometric primitive, such as a sphere. By placing these tracks over an object that can be roughly approximated by the primitive, we can effect more fine-grained control over the object than with sparse mouse tracks alone. For example, in \cref{fig:primitives}, we place a sphere over the head of a cat and the eye of a frog to precisely rotate these objects to different positions, and in \cref{fig:teaser} we animate a bear. In this setting, the user must supply both the mouse motion, and also the location and radius of the sphere to use.
+This allows for the user to specify more complex motions than translations, which would be hard to express with a single mouse-drag created trajectory. 
+For implementation details, please see \cref{apdx:implementation}. %
+
+\subsection{Camera Control with Depth}
+\label{sec:depth}
+
+We can also design motion prompts to achieve camera control with our model. We do this by first running an off-the-shelf monocular depth estimator~\cite{piccinelli2024unidepth} on the input frame to obtain a point cloud of the scene. Then, given a trajectory of camera poses we can re-project the point cloud onto each camera, resulting in 2D tracks for input.
+We can further improve quality by running z-buffering to get occlusion flags.
+
+Prompting our model with these motion prompts results in camera control, as shown in \cref{fig:depth}. We can orbit a camera in circles as in \cref{fig:depth}a or have it arc upwards as in \cref{fig:depth}b. In addition, we can combine this camera control with mouse recordings for even greater ease of use. To do so, we record mouse inputs as is done in \cref{sec:interacting}. We then construct a camera trajectory such that a single point in the point cloud follows the mouse trajectory, and that the camera is constrained to a vertical plane, which we show in \cref{fig:depth}c.
+For implementation details, please see \cref{apdx:implementation}.
+
+Note that our model is neither trained on nor conditioned on camera poses, as with prior work~\cite{wang2024motionctrl,li2024image,watson2024controlling}. Furthermore, none of our training data includes pose annotations. 
+Despite this, we find that our model can achieve compelling camera control. 
+This shows that instead of training a video model on specific types of motion, we can train a model on general motions and tease out specific capabilities by using motion prompts.
+
+\subsection{Composing Motions}
+\label{sec:composition}
+
+\input{figtabs/compositions}
+
+By composing motion prompts together we can combine capabilities. For example, in \cref{fig:compositions}, we add together tracks for object control and camera control, resulting in simultaneous control of both. This is done by converting the object tracks to displacements, and adding these deltas to the camera control tracks. In two dimensions, this composition is an approximation and will fail for extreme camera motion, but we find it works well for small to moderate camera motion. 
+Again note, that we do not specifically train for this capability in contrast to prior work~\cite{wang2024motionctrl,li2024image,watson2024controlling}.
+
+
+\subsection{Motion Transfer}
+\label{sec:transfer}
+
+Many types of motions may be hard to design a motion prompt for. Given a video with a desired motion, we can perform motion transfer~\cite{2023videocomposer,geng2024motion}, where we extract motion tracks from a source video and apply it to an image. For example, we can extract the motion of a person turning their head and use it to puppeteer a macaque, as in \cref{fig:motion_transfer}. Moreover, we find that our model is surprisingly robust, in that we can apply motions to fairly out-of-domain images. For example, in \cref{fig:motion_transfer} we apply the motion of {\it a monkey chewing} to a bird's eye view image of trees. 
+The resulting videos exhibit an interesting effect in which pausing the video on any frame removes the percept of the source video~\cite{reddit2024rickroll}. 
+The {\it monkey} can only be perceived when the video is playing, where a Gestalt common-fate effect occurs~\cite{johansson1973visual}.
+
+
+\input{figtabs/motion_transfer}
+\input{figtabs/failures.tex}
+
+
+\subsection{Failures, Limitations, and Probing Models}
+\label{sec:failures}
+We differentiate failures into two broad categories. The first are failures of our motion conditioning or our motion prompting. For example, in \cref{fig:failures}a we show an example in which the cow's head is unnaturally stretched due to the horns being mistakingly ``locked" to the background. 
+The second category are failures due to the underlying video model. 
+For example, in \cref{fig:failures}b, we drag the chess piece but a new one spontaneously forms, which is a less plausible video given the constraint. 
+These types of failures suggest that we might be able to use motion prompts as a way to {\it probe} video models and discover limitations in their learned representations. 
+
+
+
+
+
+
+
+

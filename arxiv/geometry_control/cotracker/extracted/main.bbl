@@ -1,0 +1,330 @@
+\begin{thebibliography}{10}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\providecommand{\doi}[1]{https://doi.org/#1}
+
+\bibitem{agarwal2011building}
+Agarwal, S., Furukawa, Y., Snavely, N., Simon, I., Curless, B., Seitz, S.M.,
+  Szeliski, R.: Building rome in a day. Communications of the ACM
+  \textbf{54}(10),  105--112 (2011)
+
+\bibitem{gberta_2021_ICML}
+Bertasius, G., Wang, H., Torresani, L.: Is space-time attention all you need
+  for video understanding? In: Proc. {ICML} (July 2021)
+
+\bibitem{bertinetto2016fully}
+Bertinetto, L., Valmadre, J., Henriques, J.F., Vedaldi, A., Torr, P.H.:
+  Fully-convolutional siamese networks for object tracking. In: Computer
+  Vision--ECCV 2016 Workshops: Amsterdam, The Netherlands, October 8-10 and
+  15-16, 2016, Proceedings, Part II 14. pp. 850--865. Springer (2016)
+
+\bibitem{Bhat_2019_ICCV}
+Bhat, G., Danelljan, M., Gool, L.V., Timofte, R.: Learning discriminative model
+  prediction for tracking. In: Proceedings of the IEEE/CVF International
+  Conference on Computer Vision (ICCV) (October 2019)
+
+\bibitem{birchfield08joint}
+Birchfield, S.T., Pundlik, S.J.: Joint tracking of features and edges. In:
+  Proc. {CVPR} (2008)
+
+\bibitem{Black:ICCV:1993}
+Black, M.J., Anandan, P.: A framework for the robust estimation of optical
+  flow. In: Proc. {ICCV} (1993)
+
+\bibitem{bruhn2005lucas}
+Bruhn, A., Weickert, J., Schn{\"o}rr, C.: Lucas/kanade meets horn/schunck:
+  Combining local and global optic flow methods. {IJCV}  \textbf{61} (2005)
+
+\bibitem{butler2012naturalistic}
+Butler, D.J., Wulff, J., Stanley, G.B., Black, M.J.: A naturalistic open source
+  movie for optical flow evaluation. In: Proc. {ECCV} (2012)
+
+\bibitem{carion20end-to-end}
+Carion, N., Massa, F., Synnaeve, G., Usunier, N., Kirillov, A., Zagoruyko, S.:
+  End-to-end object detection with transformers. In: Proc. {ECCV} (2020)
+
+\bibitem{carreira2017quo}
+Carreira, J., Zisserman, A.: Quo vadis, action recognition? a new model and the
+  kinetics dataset. In: Proc. {CVPR} (2017)
+
+\bibitem{chen22visual}
+Chen, F., Wang, X., Zhao, Y., Lv, S., Niu, X.: Visual object tracking: {A}
+  survey. CVIU  \textbf{222} (2022)
+
+\bibitem{Chen_2021_CVPR}
+Chen, X., Yan, B., Zhu, J., Wang, D., Yang, X., Lu, H.: Transformer tracking.
+  In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern
+  Recognition (CVPR). pp. 8126--8135 (June 2021)
+
+\bibitem{chin1994probabilistic}
+Chin, T.M., Karl, W.C., Willsky, A.S.: Probabilistic and sequential computation
+  of optical flow using temporal coherence. IEEE Trans. on Image Processing
+  \textbf{3}(6) (1994)
+
+\bibitem{cui2022mixformer}
+Cui, Y., Jiang, C., Wang, L., Wu, G.: Mixformer: End-to-end tracking with
+  iterative mixed attention. In: Proceedings of the IEEE/CVF Conference on
+  Computer Vision and Pattern Recognition. pp. 13608--13618 (2022)
+
+\bibitem{danelljan2019atom}
+Danelljan, M., Bhat, G., Khan, F.S., Felsberg, M.: Atom: Accurate tracking by
+  overlap maximization. In: Proceedings of the IEEE/CVF conference on computer
+  vision and pattern recognition. pp. 4660--4669 (2019)
+
+\bibitem{danelljan2017eco}
+Danelljan, M., Bhat, G., Shahbaz~Khan, F., Felsberg, M.: Eco: Efficient
+  convolution operators for tracking. In: Proceedings of the IEEE conference on
+  computer vision and pattern recognition. pp. 6638--6646 (2017)
+
+\bibitem{darcet2023vision}
+Darcet, T., Oquab, M., Mairal, J., Bojanowski, P.: Vision transformers need
+  registers. arXiv preprint arXiv:2309.16588  (2023)
+
+\bibitem{tapvid}
+Doersch, C., Gupta, A., Markeeva, L., Recasens, A., Smaira, L., Aytar, Y.,
+  Carreira, J., Zisserman, A., Yang, Y.: Tap-vid: A benchmark for tracking any
+  point in a video. arXiv  (2022)
+
+\bibitem{doersch2023tapir}
+Doersch, C., Yang, Y., Vecerik, M., Gokay, D., Gupta, A., Aytar, Y., Carreira,
+  J., Zisserman, A.: Tapir: Tracking any point with per-frame initialization
+  and temporal refinement (2023)
+
+\bibitem{dosovitskiy2015flownet}
+Dosovitskiy, A., Fischer, P., Ilg, E., Hausser, P., Hazirbas, C., Golkov, V.,
+  Van Der~Smagt, P., Cremers, D., Brox, T.: Flownet: Learning optical flow with
+  convolutional networks. In: Proc. {ICCV} (2015)
+
+\bibitem{elad1998recursive}
+Elad, M., Feuer, A.: Recursive optical flow estimation—adaptive filtering
+  approach. J. of Visual Communication and Image Representation  \textbf{9}(2)
+  (1998)
+
+\bibitem{girshick2015deformable}
+Girshick, R., Iandola, F., Darrell, T., Malik, J.: Deformable part models are
+  convolutional neural networks. In: Proceedings of the IEEE conference on
+  Computer Vision and Pattern Recognition. pp. 437--446 (2015)
+
+\bibitem{greff2022kubric}
+Greff, K., Belletti, F., Beyer, L., Doersch, C., Du, Y., Duckworth, D., Fleet,
+  D.J., Gnanapragasam, D., Golemo, F., Herrmann, C., et~al.: Kubric: A scalable
+  dataset generator. In: Proceedings of the IEEE/CVF Conference on Computer
+  Vision and Pattern Recognition. pp. 3749--3761 (2022)
+
+\bibitem{pips}
+Harley, A.W., Fang, Z., Fragkiadaki, K.: Particle video revisited: Tracking
+  through occlusions using point trajectories. In: Proc. {ECCV} (2022)
+
+\bibitem{harley22particle}
+Harley, A.W., Fang, Z., Fragkiadaki, K.: Particle videos revisited: Tracking
+  through occlusions using point trajectories. In: Proc. {ECCV} (2022)
+
+\bibitem{held2016learning}
+Held, D., Thrun, S., Savarese, S.: Learning to track at 100 fps with deep
+  regression networks. In: Computer Vision--ECCV 2016: 14th European
+  Conference, Amsterdam, The Netherlands, October 11--14, 2016, Proceedings,
+  Part I 14. pp. 749--765. Springer (2016)
+
+\bibitem{horn1981determining}
+Horn, B.K., Schunck, B.G.: Determining optical flow. Artificial intelligence
+  \textbf{17}(1-3) (1981)
+
+\bibitem{huang2022flowformer}
+Huang, Z., Shi, X., Zhang, C., Wang, Q., Cheung, K.C., Qin, H., Dai, J., Li,
+  H.: Flowformer: A transformer architecture for optical flow. In: Proc. {ECCV}
+  (2022)
+
+\bibitem{ilg2017flownet}
+Ilg, E., Mayer, N., Saikia, T., Keuper, M., Dosovitskiy, A., Brox, T.:
+  {FlowNet} 2.0: Evolution of optical flow estimation with deep networks. In:
+  Proc. {CVPR} (2017)
+
+\bibitem{jaegle22perceiver}
+Jaegle, A., Borgeaud, S., Alayrac, J., Doersch, C., Ionescu, C., Ding, D.,
+  Koppula, S., Zoran, D., Brock, A., Shelhamer, E., H{\'{e}}naff, O.J.,
+  Botvinick, M.M., Zisserman, A., Vinyals, O., Carreira, J.: Perceiver {IO:}
+  {A} general architecture for structured inputs {\&} outputs. In: Proc. {ICLR}
+  (2022)
+
+\bibitem{janai2018unsupervised}
+Janai, J., Guney, F., Ranjan, A., Black, M., Geiger, A.: Unsupervised learning
+  of multi-frame optical flow with occlusions. In: Proc. {ECCV} (2018)
+
+\bibitem{jia2012visual}
+Jia, X., Lu, H., Yang, M.H.: Visual tracking via adaptive structural local
+  sparse appearance model. In: 2012 IEEE Conference on computer vision and
+  pattern recognition. pp. 1822--1829. IEEE (2012)
+
+\bibitem{jiang2018super}
+Jiang, H., Sun, D., Jampani, V., Yang, M.H., Learned-Miller, E., Kautz, J.:
+  Super slomo: High quality estimation of multiple intermediate frames for
+  video interpolation. In: Proceedings of the IEEE conference on computer
+  vision and pattern recognition. pp. 9000--9008 (2018)
+
+\bibitem{jiang2021learning}
+Jiang, S., Lu, Y., Li, H., Hartley, R.: Learning optical flow from a few
+  matches. In: Proc. {CVPR} (2021)
+
+\bibitem{karaev2023dynamicstereo}
+Karaev, N., Rocco, I., Graham, B., Neverova, N., Vedaldi, A., Rupprecht, C.:
+  Dynamicstereo: Consistent dynamic depth from stereo videos. In: Proc. {CVPR}
+  (2023)
+
+\bibitem{li2018learning}
+Li, F., Tian, C., Zuo, W., Zhang, L., Yang, M.H.: Learning spatial-temporal
+  regularized correlation filters for visual tracking. In: Proceedings of the
+  IEEE conference on computer vision and pattern recognition. pp. 4904--4913
+  (2018)
+
+\bibitem{li2015reliable}
+Li, Y., Zhu, J., Hoi, S.C.: Reliable patch trackers: Robust visual tracking by
+  exploiting reliable patches. In: Proceedings of the IEEE Conference on
+  Computer Vision and Pattern Recognition. pp. 353--361 (2015)
+
+\bibitem{loshchilov2017decoupled}
+Loshchilov, I., Hutter, F.: Decoupled weight decay regularization. arXiv
+  preprint arXiv:1711.05101  (2017)
+
+\bibitem{lowe04distinctive}
+Lowe, D.G.: Distinctive image features from scale-invariant keypoints. {IJCV}
+  \textbf{60}(2) (2004)
+
+\bibitem{lucas1981iterative}
+Lucas, B.D., Kanade, T.: An iterative image registration technique with an
+  application to stereo vision. In: Proc. {IJCAI}. vol.~2 (1981)
+
+\bibitem{luo2023continuous}
+Luo, J., Wan, Z., Li, B., Dai, Y., et~al.: Continuous parametric optical flow.
+  In: Thirty-seventh Conference on Neural Information Processing Systems (2023)
+
+\bibitem{matthews2004template}
+Matthews, L., Ishikawa, T., Baker, S.: The template update problem. {PAMI}
+  \textbf{26}(6) (2004)
+
+\bibitem{mayer2016large}
+Mayer, N., Ilg, E., Hausser, P., Fischer, P., Cremers, D., Dosovitskiy, A.,
+  Brox, T.: A large dataset to train convolutional networks for disparity,
+  optical flow, and scene flow estimation. In: Proc. {CVPR} (2016)
+
+\bibitem{nagrani2021attention}
+Nagrani, A., Yang, S., Arnab, A., Jansen, A., Schmid, C., Sun, C.: Attention
+  bottlenecks for multimodal fusion. Advances in Neural Information Processing
+  Systems  \textbf{34},  14200--14213 (2021)
+
+\bibitem{neoral2023mft}
+Neoral, M., Šerých, J., Matas, J.: Mft: Long-term tracking of every pixel
+  (2023)
+
+\bibitem{pont20172017}
+Pont-Tuset, J., Perazzi, F., Caelles, S., Arbel{\'a}ez, P., Sorkine-Hornung,
+  A., Van~Gool, L.: The 2017 davis challenge on video object segmentation.
+  arXiv  (2017)
+
+\bibitem{ren2019fusion}
+Ren, Z., Gallo, O., Sun, D., Yang, M.H., Sudderth, E.B., Kautz, J.: A fusion
+  approach for multi-frame optical flow estimation. In: Proc. {WACV} (2019)
+
+\bibitem{sand2008particle}
+Sand, P., Teller, S.: Particle video: Long-range motion estimation using point
+  trajectories. {IJCV}  \textbf{80} (2008)
+
+\bibitem{shi2023videoflow}
+Shi, X., Huang, Z., Bian, W., Li, D., Zhang, M., Cheung, K.C., See, S., Qin,
+  H., Dai, J., Li, H.: Videoflow: Exploiting temporal cues for multi-frame
+  optical flow estimation. arXiv  (2023)
+
+\bibitem{shi2023flowformer++}
+Shi, X., Huang, Z., Li, D., Zhang, M., Cheung, K.C., See, S., Qin, H., Dai, J.,
+  Li, H.: Flowformer++: Masked cost volume autoencoding for pretraining optical
+  flow estimation. arXiv  (2023)
+
+\bibitem{sidenbladh2000stochastic}
+Sidenbladh, H., Black, M.J., Fleet, D.J.: Stochastic tracking of 3d human
+  figures using 2d image motion. In: Proc. {ECCV} (2000)
+
+\bibitem{smith2019super}
+Smith, L.N., Topin, N.: Super-convergence: Very fast training of neural
+  networks using large learning rates. In: Artificial intelligence and machine
+  learning for multi-domain operations applications. vol. 11006, pp. 369--386.
+  SPIE (2019)
+
+\bibitem{song2017crest}
+Song, Y., Ma, C., Gong, L., Zhang, J., Lau, R.W., Yang, M.H.: Crest:
+  Convolutional residual learning for visual tracking. In: Proceedings of the
+  IEEE international conference on computer vision. pp. 2555--2564 (2017)
+
+\bibitem{sui2022craft}
+Sui, X., Li, S., Geng, X., Wu, Y., Xu, X., Liu, Y., Goh, R., Zhu, H.: Craft:
+  Cross-attentional flow transformer for robust optical flow. In: Proc. {CVPR}
+  (2022)
+
+\bibitem{sun2021autoflow}
+Sun, D., Vlasic, D., Herrmann, C., Jampani, V., Krainin, M., Chang, H., Zabih,
+  R., Freeman, W.T., Liu, C.: Autoflow: Learning a better training set for
+  optical flow. In: Proc. {CVPR} (2021)
+
+\bibitem{sun2018pwc}
+Sun, D., Yang, X., Liu, M.Y., Kautz, J.: Pwc-net: Cnns for optical flow using
+  pyramid, warping, and cost volume. In: Proc. {CVPR} (2018)
+
+\bibitem{sun2022skflow}
+Sun, S., Chen, Y., Zhu, Y., Guo, G., Li, G.: Skflow: Learning optical flow with
+  super kernels. arXiv  (2022)
+
+\bibitem{raft}
+Teed, Z., Deng, J.: Raft: Recurrent all-pairs field transforms for optical
+  flow. In: Proc. {ECCV} (2020)
+
+\bibitem{teed2021droid}
+Teed, Z., Deng, J.: Droid-slam: Deep visual slam for monocular, stereo, and
+  rgb-d cameras. Advances in neural information processing systems
+  \textbf{34},  16558--16569 (2021)
+
+\bibitem{vaswani2017attention}
+Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A.N.,
+  Kaiser, {\L}., Polosukhin, I.: Attention is all you need. In: Proc. {NeurIPS}
+  (2017)
+
+\bibitem{wang2020displacement}
+Wang, J., Zhong, Y., Dai, Y., Zhang, K., Ji, P., Li, H.: Displacement-invariant
+  matching cost learning for accurate optical flow estimation. Proc. {NeurIPS}
+  \textbf{33} (2020)
+
+\bibitem{wang2023tracking}
+Wang, Q., Chang, Y.Y., Cai, R., Li, Z., Hariharan, B., Holynski, A., Snavely,
+  N.: Tracking everything everywhere all at once (2023)
+
+\bibitem{xu2021high}
+Xu, H., Yang, J., Cai, J., Zhang, J., Tong, X.: High-resolution optical flow
+  from 1d attention and correlation. In: Proc. {CVPR} (2021)
+
+\bibitem{Xu_2017_CVPR}
+Xu, J., Ranftl, R., Koltun, V.: Accurate optical flow via direct cost volume
+  processing. In: Proc. {CVPR} (July 2017)
+
+\bibitem{yang2022banmo}
+Yang, G., Vo, M., Neverova, N., Ramanan, D., Vedaldi, A., Joo, H.: Banmo:
+  Building animatable 3d neural models from many casual videos. In: Proceedings
+  of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp.
+  2863--2873 (2022)
+
+\bibitem{zhang2021separable}
+Zhang, F., Woodford, O.J., Prisacariu, V.A., Torr, P.H.: Separable flow:
+  Learning motion cost volumes for optical flow estimation. In: Proc. {CVPR}
+  (2021)
+
+\bibitem{zhao2022global}
+Zhao, S., Zhao, L., Zhang, Z., Zhou, E., Metaxas, D.: Global matching with
+  overlapping attention for optical flow estimation. In: Proc. {CVPR} (2022)
+
+\bibitem{zhao2004tracking}
+Zhao, T., Nevatia, R.: Tracking multiple humans in crowded environment. In:
+  Proc. {CVPR}. vol.~2 (2004)
+
+\bibitem{zheng2023pointodyssey}
+Zheng, Y., Harley, A.W., Shen, B., Wetzstein, G., Guibas, L.J.: Pointodyssey: A
+  large-scale synthetic dataset for long-term point tracking. In: Proceedings
+  of the IEEE/CVF International Conference on Computer Vision. pp. 19855--19865
+  (2023)
+
+\end{thebibliography}

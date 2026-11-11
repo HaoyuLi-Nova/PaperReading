@@ -1,0 +1,20 @@
+%\setlength\tabcolsep{.4em}
+% \begin{table}[t]
+% \centering
+% \footnotesize
+
+\begin{tabular}{ ccccc }
+\toprule
+ \multirow{2}{*}{Window size}  & \multicolumn{3}{c}{DAVIS First} \\
+\cmidrule(lr){2-4}
+% \cmidrule(lr){5-6}
+            & AJ            & \! \! \! $< \delta^x_{avg}$\! & OA    \\
+\midrule
+
+4         &  56.7  & 73.1 &  86.5  \\
+\textbf{8}         &  \textbf{62.2}          & \textbf{75.7}  & \textbf{89.3} \\
+16 &  61.1 & 75.5 & 88.4 \\
+\bottomrule
+\end{tabular}
+\caption{  \textbf{Training sliding window size}. We train and evaluate \method with varying window lengths. As the training data only contains sequences of length 24, the model does not benefit from training with a bigger sliding window.}\label{tab:tab_train_sliding_window_len_ablation}
+% \end{table}

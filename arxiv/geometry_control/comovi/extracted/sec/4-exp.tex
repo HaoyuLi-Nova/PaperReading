@@ -1,0 +1,182 @@
+\section{Experiments}
+\label{sec:experiments}
+
+In this section, we first introduce our implementation and evaluation details. Then, we compare our approach with SoTA T2M and I2V models for motion generation and video generation tasks, respectively. Finally, we conduct ablation studies to validate the effectiveness of our proposed motion representation and model architecture designs.
+
+\subsection{Implementation Details}
+\label{sec:imp_details}
+
+We train our model on the training set of our proposed dataset using 24 A100-SXM4-40G GPUs with per GPU batch size 1 and gradient accumulation steps 4 for 6,000 optimization steps. We use the ZeRO-3~\cite{rajbhandari2020zero} strategy and AdamW optimizer with learning rate 2e-5. Our training data are unified to resolution $H\times W=704\times1280$, $F=81$ frames in 16 fps. More implementation details can be found in the supplementary material.
+
+\subsection{Evaluation Datasets and Metrics}
+\label{sec:eval_metrics}
+For comprehensive evaluations on both motion generation and video generation tasks, we take the widely-used Motion-X++ dataset~\cite{lin2023motionx}, VBench benchmark~\cite{huang2023vbench,huang2024vbench++,zheng2025vbench2}, and also our testing set to assess performance of all compared models. For the motion generation task, we adhere to the evaluation protocol defined by MoMask~\cite{guo2024momask} and use Frechet Inception Distance (FID), R-Precision (@1 and @3), and MultiModal Distance (MMDist) metrics. Since our method generates motions and videos from an input image and a text prompt, we adopt the Motion-X++ benchmark~\cite{lin2023motionx} containing texts, images, and 3D human motions. Though HumanML3D~\cite{guo2022ml3d} is widely used in motion generation evaluation, it lacks images, so not a good fit with our method. For the video generation task, we calculate ``Subject Consistency (SC)'', ``Background Consistency (BC)'', ``Motion Smoothness (MS)'', ``Aesthetic Quality (AQ)'', and ``Imaging Quality (IQ)'' metrics provided by VBench~\cite{huang2023vbench,huang2024vbench++,zheng2025vbench2}. The ``Dynamic Degree (DD)'' is excluded since it is aimed at measuring scene-level dynamics, on our testing set. For the following tables, the numbers marked in \textbf{bold} and \underline{underlined} represent the first and the second best, respectively.
+
+\subsection{Comparisons on Motion Generation Task}
+\label{sec:comp_mogen}
+
+\paragraph{\bf Baselines.}
+We compare with SoTA T2M methods, including diffusion-based MDM~\cite{tevet2022mdm} and autoregressive MotionGPT~\cite{jiang2023motiongpt}, Momask~\cite{guo2024momask}, and Go-to-Zero~\cite{fan2025gotozero}. Additionally, since we explore a new task of co-generating 3D human motions and videos from text prompts together with an input image, there does not exist a T2M baseline that perfectly matches our setting currently. Therefore, we build and compare with a simple yet meaningful baseline Wan2.2-I2V-5B+CameraHMR~\cite{wan2025wan,patel2025camerahmr} that first generates human video from a starting image and a text prompt, and then captures the 3D motion of the person in that generated video. It is noteworthy that we sample test sequences from Motion-X++~\cite{lin2023motionx} on our own since no official train/test split is provided, which might be included in the training set of Go-to-Zero~\cite{fan2025gotozero}.
+
+\begin{figure*}[t!]
+    \centering
+    \includegraphics[width=\linewidth]{figure/mogen_comp.png}
+    \vspace{-20pt}
+    \caption{Qualitataive comparison of 3D human motion generation with SoTA T2M models~\cite{tevet2022mdm,jiang2023motiongpt,guo2024momask,fan2025gotozero}. Wan2.2-I2V-5B+CameraHMR~\cite{wan2025wan,patel2025camerahmr} is a simple yet meaningful baseline composed a video generation model followed by a video motion capture model. We present motion keywords in text prompts for simplicity.}
+    \label{fig:mogen_comp}
+\vspace{-5pt}
+\end{figure*}
+
+\vspace{-2mm}
+\paragraph{\bf Results.}
+As presented in Fig.~\ref{fig:mogen_comp}, CoMoVi generates 3D human motions with high prompt fidelity and dynamic smoothness, while baselines often produce jittery motions, unrelated contents, and implausible body movements. Quantitative evaluations in Tab.~\ref{tab:mogen} also validate that our co-generative framework outperforms SoTA T2M models on the testing set of CoMoVi-Dataset, and also generalizes well, achieving comparable performance on the unseen MotionX++ dataset~\cite{lin2023motionx} to Go-to-Zero~\cite{fan2025gotozero}. According to the results of Wan+CameraHMR~\cite{wan2025wan,patel2025camerahmr}, incorporating additional reference images helps achieve promising performance by providing structural cues. Advancing more, our co-generative framework effectively couples motion and video modalities, enabling them to mutually guide one another during the denoising process, leading to further improvements in both generated motion and video.
+
+\begin{table*}[t!]
+    \centering
+    \scriptsize
+    \setlength{\tabcolsep}{2.4pt}
+    \begin{tabular}{lcccccccc}
+        \toprule
+        & \multicolumn{4}{c}{CoMoVi-Dataset} & \multicolumn{4}{c}{Motion-X++~\cite{lin2023motionx}}\\
+        \cmidrule(lr){2-5} \cmidrule(lr){6-9}
+        Method & FID $\downarrow$ & R@1 $\uparrow$ & R@3 $\uparrow$ & MMDist $\downarrow$ & FID $\downarrow$ & R@1 $\uparrow$ & R@3 $\uparrow$ & MMDist $\downarrow$ \\
+        \midrule
+        MDM~\cite{tevet2022mdm}                                 & 27.740 & 0.287 & 0.540 & 4.848 & 20.871 & 0.332 & 0.406 & 4.803 \\
+        MotionGPT~\cite{jiang2023motiongpt}                     & 26.079 & 0.316 & 0.569 & 4.486 & 27.084 & 0.305 & 0.529 & 5.276 \\
+        MoMask~\cite{guo2024momask}                             & 24.521 & 0.385 & 0.606 & 4.943 & 19.365 & 0.316 & 0.569 & 4.915 \\
+        Go-to-Zero-3B*~\cite{fan2025gotozero}                   & 3.175  & 0.440 & 0.605 & 3.585 & \underline{15.474} & 0.311 & \underline{0.692} & 3.751 \\
+        Go-to-Zero-7B*~\cite{fan2025gotozero}                   & 1.641  & 0.459 & \underline{0.608} & 3.429 & \textbf{14.470} & \textbf{0.384} & \textbf{0.699} & \underline{3.578} \\
+        Wan+CameraHMR~\cite{wan2025wan,patel2025camerahmr}      & \underline{0.815} & \underline{0.539} & 0.591 & \underline{3.056} & 21.538 & 0.302 & 0.464 & 3.735 \\
+        \cellcolor{lightgray!30}Ours                                                    & \cellcolor{lightgray!30}\textbf{0.349} & \cellcolor{lightgray!30}\textbf{0.565} & \cellcolor{lightgray!30}\textbf{0.640} & \cellcolor{lightgray!30}\textbf{3.035} & \cellcolor{lightgray!30}16.728 & \cellcolor{lightgray!30}\underline{0.377} & \cellcolor{lightgray!30}0.571 & \cellcolor{lightgray!30}\textbf{3.507} \\
+        \bottomrule
+    \end{tabular}
+    \vspace{2pt}
+    \caption{Quantitative evaluation of 3D human motion generation. ``*'': Motion-X++~\cite{lin2023motionx} is in the training set of Go-to-Zero~\cite{fan2025gotozero}.}
+    \label{tab:mogen}
+\vspace{-25pt}
+\end{table*}
+
+\begin{wrapfigure}{r}{0.42\textwidth}
+    \centering
+    \vspace{-50pt}
+    \includegraphics[width=0.35\textwidth]{figure/world_space.png}
+    \vspace{-10pt}
+    \caption{Extending CoMoVi results to world space via kinematic processing.}
+    \label{fig:worldspace}
+    \vspace{-30pt}
+\end{wrapfigure}
+
+
+\begin{figure*}[t!]
+    \centering
+    \includegraphics[width=\linewidth]{figure/vigen_comp.png}
+    \vspace{-20pt}
+    \caption{Qualitataive comparison of human video generation with SoTA open-souce I2V models~\cite{yang2024cogvideox,wan2025wan}, and a baseline composed of SoTA T2M~\cite{fan2025gotozero} and motion-driven video generation model~\cite{zhu2024champ}.}
+    \label{fig:vigen_comp}
+\vspace{-5pt}
+\end{figure*}
+
+\vspace{-2mm}
+\paragraph{\bf Extending to World-Centric Motion Generation.}
+As shown in Fig.~\ref{fig:worldspace}, despite that CoMoVi generates in-place motion, it can be easily extended to world space via a kinematic post-processing. Details are provided in the supplementary materials.
+
+\begin{table*}[t!]
+    \centering
+    \scriptsize
+    \setlength{\tabcolsep}{11.2pt}
+    \begin{tabular}{lccccc}
+        \toprule
+        Method & SC $\uparrow$ & BC $\uparrow$ & MS $\uparrow$ & AQ $\uparrow$ & IQ $\uparrow$\\
+        \midrule
+        CogVideoX1.5-I2V-5B~\cite{yang2024cogvideox} & 0.933 & 0.947 & 0.991 & 0.512 & \underline{0.716}\\
+        Wan2.2-I2V-5B~\cite{wan2025wan} & \underline{0.948} & \underline{0.960} & \underline{0.993} & \underline{0.529} & 0.713\\
+        Go-to-Zero-7B+Champ~\cite{fan2025gotozero,zhu2024champ} & 0.931 & 0.934 & 0.980 & 0.479 & 0.663\\
+        \cellcolor{lightgray!30}Ours & \cellcolor{lightgray!30}\textbf{0.955} & \cellcolor{lightgray!30}\textbf{0.963} & \cellcolor{lightgray!30}\textbf{0.993} & \cellcolor{lightgray!30}\textbf{0.533}& \cellcolor{lightgray!30}\textbf{0.718}\\
+        \bottomrule
+  \end{tabular}
+  \vspace{2pt}
+  \caption{Quantitative evaluation of human video generation using VBench metrics.}
+  \label{tab:vigen}
+\vspace{-25pt}
+\end{table*}
+
+\subsection{Comparisons on Video Generation Task}
+\label{sec:comp_vigen}
+
+\paragraph{\bf Baselines.}
+We choose to compare with two leading open-source I2V models, CogVideoX1.5-I2V-5B~\cite{yang2024cogvideox} and Wan2.2-I2V-5B~\cite{wan2025wan}, to which the model size of CoMoVi is comparable. Additionally, we construct a cascaded baseline composed of SoTA text-driven motion synthesis~\cite{fan2025gotozero} and motion-driven video generation~\cite{zhu2024champ} to ensure a fair and meaningful comparison between different models and paradigms in similar scale and capability.
+
+\vspace{-2mm}
+\paragraph{\bf Results.} As depicted in Fig.~\ref{fig:vigen_comp}, CoMoVi gets benefits from our 2D motion representation, which encapsulates rich 3D motion information, generating realistic human videos with more consistent body structure, higher prompt fidelity, and anatomically plausible motions. While CogVideoX1.5~\cite{yang2024cogvideox} and Wan2.2-I2V-5B~\cite{wan2025wan} struggle with motion-prompt misalignment, distorted body shapes, and background maintenance. 
+Though the motion-driven video generation methods achieve promising performances as shown in previous works~\cite{hu2024animate,zhu2024champ,wang2024humanvid}, cascading a SoTA T2M model Go-to-Zero~\cite{fan2025gotozero} and a SoTA motion-controllable video generation model Champ~\cite{zhu2024champ} leads to inferior results due to the limited generalization capability, low prompt fidelity, and misalignment with the video frames to guide video generation. Details are provided in the supplementary material. In contrast, CoMoVi achieves high-quality video generation by the co-generation of aligned motion and videos, avoiding reliance on external video and motion reference. 
+
+The quantitative results detailed in Tab.~\ref{tab:vigen} demonstrate the advantage of our co-generative framework in all evaluation dimensions defined by VBench~\cite{huang2023vbench,huang2024vbench++,zheng2025vbench2}. 
+It is noteworthy that VBench metrics~\cite{huang2023vbench,zheng2025vbench2,huang2024vbench++} prioritize consistency of subject identity and background, smoothness of pixel flow, and imagery clarity, but do not fully show the human motion quality and plausibility. As evidenced by Fig.~\ref{fig:vigen_comp} and Tab.~\ref{tab:vigen}, our method significantly outperforms baselines in body structure consistency and prompt fidelity, but the metric differences are within $\pm 0.05$ due to no significant variation or mutation exhibited in baseline results.
+% In comparison with text-to-motion,
+
+\subsection{Ablation Study}
+\label{sec:ablation_study}
+
+We further conduct extensive ablation studies to validate the significance of our 2D motion representation and the effectiveness of our model architecture design.
+
+\vspace{-2mm}
+\paragraph{\bf Ablation of 2D Motion Representations.} As introduced in Sec.~\ref{sec:morep}, our 2D human motion representation integrates surface normals with body part semantics. Therefore, we experiment with ``normal only'' and ``body semantic only'' settings, and also a commonly used 2D pose representation ``DWPose''~\cite{yang2023dwpose}. Tab.~\ref{tab:ablation} shows that directly fine-tuning Wan2.2-I2V-5B~\cite{wan2025wan} on RGB videos only without our co-generative framework (``w/o motion'') leads to significant performance degradation. While the absence of any factor among normals, body semantics, and surface rendering results in suboptimal performance in both generation tasks.
+
+\begin{figure*}[t!]
+    \centering
+    \includegraphics[width=\linewidth]{figure/ablation.png}
+    \vspace{-20pt}
+    \caption{Qualitative results of different motion representations and model architectures. The input motion keyword is: \textit{``transition from seated state to get up and stretch body"}.}
+    \label{fig:ablation}
+\vspace{-5pt}
+\end{figure*}
+
+\vspace{-2mm}
+\paragraph{\bf Ablation of Model Architecture Designs.} In designing our model architecture, we explore several approaches inspired by VideoJAM~\cite{chefer2025videojam} and VACE~\cite{jiang2025vace}, ultimately adopting a dual-branch diffusion model with the full copy strategy.
+
+\vspace{-2mm}
+\paragraph{Dual-Branch Architecture.} Specifically, we first refer to VideoJAM~\cite{chefer2025videojam} to concatenate RGB videos and our 2D motion representations along the latent channel dimension, and double the dimension of the patch embedding layer and the output head layer of Wan2.2-I2V-5B~\cite{wan2025wan}. However, we observe that this severely disrupts the pre-trained VDM's latent space during the initial training phase, requiring a computationally expensive reconstruction process. Consequently, this method fails to outperform baseline models with a limited training budget.
+
+\begin{table*}[t!]
+    \centering
+    \scriptsize
+    \setlength{\tabcolsep}{2pt}
+    \begin{tabular}{lccccccccc}
+        \toprule
+        & \multicolumn{4}{c}{Motion Generation} & \multicolumn{5}{c}{Video Generation}\\
+        \cmidrule(lr){2-5}\cmidrule(lr){6-10}
+        Ablation Configs & FID $\downarrow$ & R@1 $\uparrow$ & R@3 $\uparrow$ & MMDist $\downarrow$ & SC $\uparrow$ & BC $\uparrow$ & MS $\uparrow$ & AQ $\uparrow$ & IQ $\uparrow$ \\
+        \midrule
+        \cellcolor{lightgray!30}Motion Representation & \cellcolor{lightgray!30} & \cellcolor{lightgray!30} & \cellcolor{lightgray!30} & \cellcolor{lightgray!30} & \cellcolor{lightgray!30} & \cellcolor{lightgray!30} & \cellcolor{lightgray!30} & \cellcolor{lightgray!30} & \cellcolor{lightgray!30} \\
+        w/o motion & 0.758 & 0.458 & 0.556 & 4.079 & 0.937 & 0.944 & 0.980 & 0.520 & 0.709\\
+        Normal only & \underline{0.415} & \underline{0.538} & 0.556 & \textbf{3.003} & 0.918 & 0.946 & 0.988 & 0.521 & 0.710\\
+        Body semantic only & 0.553 & 0.499 & \underline{0.589} & 3.536 & 0.940 & 0.944 & \textbf{0.994} & 0.528 & 0.708\\
+        DWPose & 0.503 & 0.464 & 0.551 & 3.396 & 0.929 & 0.951 & 0.981 & 0.522 & 0.701\\
+        \midrule
+        \cellcolor{lightgray!30}Architecture & \cellcolor{lightgray!30} & \cellcolor{lightgray!30} & \cellcolor{lightgray!30} & \cellcolor{lightgray!30} & \cellcolor{lightgray!30} & \cellcolor{lightgray!30} & \cellcolor{lightgray!30} & \cellcolor{lightgray!30} & \cellcolor{lightgray!30} \\
+        VideoJAM joint latent space & 0.755 & 0.459 & 0.559 & 3.534 & 0.868 & 0.942 & 0.987 & 0.529 & 0.705\\
+        VACE distributed copy & 0.625 & 0.500 & 0.572 & 3.148 & 0.927 & 0.949 & 0.994 & 0.522 & 0.715\\
+        Pass $\bm{x}_t^{\text{fused}}$ to $\mathcal{D}^{\text{motion}}$ & 0.718 & 0.466 & 0.552 & 4.157 & 0.911 & 0.955 & 0.985 & 0.530 & \underline{0.718}\\
+        Ours w/o $\mathcal{L}^{\text{smpl}}$ & - & - & - & - & \underline{0.951} & \underline{0.961} & 0.993 & \underline{0.532} & 0.714\\
+        Ours w/o $\mathcal{D}^{\text{motion}}$ & - & - & - & - & 0.949 & 0.940 & 0.988 & 0.517 & 0.709\\
+        \midrule
+        \cellcolor{lightgray!30}Ours & \cellcolor{lightgray!30}\textbf{0.349} & \cellcolor{lightgray!30}\textbf{0.565} & \cellcolor{lightgray!30}\textbf{0.640} & \cellcolor{lightgray!30}\underline{3.035} & \cellcolor{lightgray!30}\textbf{0.955} & \cellcolor{lightgray!30}\textbf{0.963} & \cellcolor{lightgray!30}\underline{0.993} & \cellcolor{lightgray!30}\textbf{0.533} & \cellcolor{lightgray!30}\textbf{0.718}\\
+        \bottomrule
+    \end{tabular}
+    \vspace{2pt}
+    \caption{Quantitative ablation of representations and architectures.}
+    \label{tab:ablation}
+\vspace{-25pt}
+\end{table*}
+
+\vspace{-2mm}
+\paragraph{Full Copy of DiT Blocks.} Therefore, we adopt dual-branch diffusion architecture following VACE~\cite{jiang2025vace}, which effectively preserves the integrity of the latent space of pre-trained VDM. Nevertheless, we identify that the distributed copy strategy proposed by VACE~\cite{jiang2025vace} causes the copied branch to completely lose the prior knowledge of pre-trained VDM. At the first training step, the output of the copied branch is totally noised, indicating that it essentially discards priors and requires to be trained from scratch. The quantitative performance shown in Tab.~\ref{tab:ablation} demonstrates that our dual-branch diffusion architecture with the full copy strategy achieves better performance in both generation tasks.
+
+\vspace{-2mm}
+\paragraph{Inject Information from $\mathcal{D}^{\text{rgb}}$ to $\mathcal{D}^{\text{motion}}$.} Furthermore, we experiment with passing the fused latent feature $\bm{x}_t^{\text{fused}}$ defined in Eq.~\ref{eq:fuse} rather than $\bm{x}_t^{\text{motion}}$ to the 2D motion diffusion branch $\mathcal{D}^{\text{motion}}$. Intriguingly, it is found that the direct feature injection from RGB to 2D motion latents significantly disturbs the denoising process of $\mathcal{D}^{\text{motion}}$. We analyze that 2D motion representation is far more sparse than RGB videos containing rich appearances and background details, which results in chaotic and fluctuating artifacts in 2D motion generation, degrading the preservation of essential 3D information. And eventually, the effectiveness of motion guidance is weakened, leading to the suboptimal performance (see Fig.~\ref{fig:ablation}).
+
+\vspace{-2mm}
+\paragraph{3D Regularization $\mathcal{L}^{\text{smpl}}$.} As stated in Sec.~\ref{sec:comovi}, the additional 3D regularization term $\mathcal{L}^{\text{smpl}}$ is introduced to reinforce the alignment between 2D latents and 3D representation, ensuring structure consistency and visual plausibility of generated human videos. Without $\mathcal{L}^{\text{smpl}}$, as we quantitatively evaluate in Tab.~\ref{tab:ablation}, the quality of video generation results degrade especially in ``Subject Consistency'' dimension.
+
+\vspace{-2mm}
+\paragraph{Directly Use 3D Motion without $\mathcal{D}^{\text{motion}}$.} Finally, we validate the importance of our 2D motion branch $\mathcal{D}^{\text{motion}}$. Tab.~\ref{tab:ablation} demonstrates that discarding our 2D motion representation and $\mathcal{D}^{\text{motion}}$ causes performance degradation in all five evaluation dimensions on video generation task. We analyze that, different from motion-driven video generation methods like Animate Anyone~\cite{hu2024animate} and Champ~\cite{zhu2024champ} which require a reference video and pre-extracted 2D pose or 3D motion sequence from it, co-generation of human motion and video necessiates a tight coupling the generation process of the two modalities to ensure the alignment of gerated 3D motions and 2D videos. Consequently, our 2D motion representation is not only pixel-aligned with RGB video, but also encodes rich 3D structure and semantic information, which is incorporated in a shared denoising process with VDM via $\mathcal{D}^{\text{motion}}$. This design thus achieves superior performance to directly using 3D motion conditioning without $\mathcal{D}^{\text{motion}}$.

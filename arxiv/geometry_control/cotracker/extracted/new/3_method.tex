@@ -1,0 +1,246 @@
+\section{\method}%
+\label{sec:method}
+
+Our goal is to track 2D points throughout the duration of a video $V = (I_t)_{t=1}^T$, which is a sequence of $T$ RGB frames $I_t \in \mathbb{R}^{3 \times H \times W}$.
+The goal of the \emph{tracker} is to predict $N$ point tracks
+$
+P^i_t = (x^i_t, y^i_t) \in \mathbb{R}^{2}
+$,
+$
+t =t^i,\dots,T
+$,
+$
+i=1,\dots,N
+$,
+where
+$
+t^i \in \{1, \dots, T\}
+$
+is the time when the track starts.
+The tracker also predicts the \emph{visibility flag} $v^i_t \in \{0,1\}$, which tells if a point is visible or occluded in a given frame.
+To make the task definition unambiguous~\cite{tapvid}, we assume that each point is visible at the start of the track (\ie, $v^i_{t_i} = 1$).
+The tracker is thus given as input the video $V$ and the starting locations and times $(P^i_{t^i}, t^i)_{i=1}^N$ of $N$ tracks, and outputs an estimate
+$
+(\hat P^i_t = (\hat x^i_t, \hat y^i_t), \hat v^i_t)
+$
+of the track locations and visibility for all valid times, \ie, $t \ge t^i$.
+
+\input{sliding_window_inference_vis}
+\subsection{Transformer formulation}
+
+We implement the tracker as a transformer neural network (\cref{fig:window_architecture,fig:architecture})
+$
+\Psi : G \to O
+$.
+The goal of this transformer is to improve an initial estimate of the tracks.
+Tracks are encoded as a grid $G$ of input tokens $G^i_t$, one for each track $i=1,\dots,N$, and time $t=1,\dots, T$.
+The updated tracks are expressed by a corresponding grid $O$ of output tokens $O^i_t$.
+
+\paragraph{Image features.}
+
+We extract dense $d$-dimensional appearance features
+$
+\phi(I_t) \in \mathbb{R}^{d\times \frac{H}{k} \times \frac{W}{k}}
+$
+from each video frame $I_t$ using a convolutional neural network (trained end-to-end).
+We reduce the resolution by $k=4$ for efficiency.
+We also consider several scaled versions
+$
+\phi_s(I_t)\in \mathbb{R}^{d\times \frac{H}{k2^{s-1}} \times \frac{W}{k2^{s-1}}}
+$,
+of the features with strides $s=1,\dots,S$ and use $S=4$ scales.
+These downscaled features are obtained by applying average pooling to the base features.
+
+\paragraph{Track features.}
+
+The appearance of the tracks is captured by feature vectors $Q_t^i \in \mathbb{R}^{d}$ (these are time-dependent to accommodate changes in the track appearance).
+They are initialized by broadcasting image features sampled at the starting locations and are updated by the neural network, as explained below.
+
+\paragraph{Spatial correlation features.}
+
+In order to facilitate matching tracks to images, we adopt correlation features $C^i_t \in \mathbb{R}^S$ similar to RAFT~\cite{raft}.
+Each $C^i_t$ is obtained by comparing the track features $Q_t^i$ to the image features $\phi_s(I_t)$ around the current estimate $\hat P_t^i$ of the track's location.
+Specifically, the vector $C_{t}^i$ is obtained by stacking the inner products
+$
+[C_t^i]_{s\delta}
+=
+\langle
+Q^i_t,~
+\phi_s(I_t)[
+  \hat P_t^i / ks + \delta
+]
+\rangle,
+$
+where
+$
+s = 1,\dots, S
+$
+are the feature scales
+and
+$
+\delta \in \mathbb{Z}^2
+$,
+$
+\| \delta \|_\infty \leq \Delta
+$
+are offsets.
+The image features $\phi_s(I_t)$ are sampled at non-integer locations by using bilinear interpolation and border padding.
+The dimension of $C^{i}_t$ is $\big (2\Delta+1)^2 S=196$ for our choice $S = 4; \Delta = 3$.
+
+\paragraph{Tokens.}
+
+The input tokens $G(\hat P, \hat v, Q)$ code for position, visibility, appearance, and correlation of the tracks.
+They are given by the following concatenation of features with added positional encodings:
+\begin{equation}
+   G^i_t = (
+   \hat P^i_t - \hat P^i_1,~
+   \hat v^i_t,~
+   Q^i_t,~
+   C^i_t,~
+   \eta (\hat P^i_t - \hat P^i_1)
+   )
+   + \eta'(\hat P^i_1) + \eta'(t).
+\end{equation}
+All the components except the last one have been introduced above.
+The last component is derived from the estimated position: it is the sinusoidal positional encoding $\eta$ of the track location with respect to the initial location at time $t=1$.
+We also add encodings $\eta'$ of the start location $P^i_1$ and for the time $t$, with appropriate dimensions.
+In fact, we found it beneficial to separately encode the position of points at the first frame and their relative displacement to this frame.
+
+The output tokens $O(\Delta \hat P, \Delta Q)$ contain updates for location and appearance, \ie
+$
+O^i_t =
+(
+    \Delta \hat P^{i}_t,
+    \Delta Q^{i}_t
+).
+$
+
+\paragraph{Iterated transformer application.}%
+\label{sec:updates}
+
+We apply the transformer $M$ times in order to progressively improve the track estimates.
+Let $m=0,1,\dots,M$ index the estimate, with $m=0$ denoting initialization.
+Each update computes
+$$
+  O(\Delta \hat P, \Delta Q)
+  = \Psi(G(
+    \hat P^{(m)}, \hat v^{(0)}, Q^{(m)}
+  ))
+$$
+and sets
+$
+\hat P^{(m+1)} = \hat P^{(m)} + \Delta \hat P
+$
+and
+$
+Q^{(m+1)} = Q^{(m)} + \Delta Q.
+$
+The visibility mask $\hat v$ is not updated iteratively, but only once after the last transformer application as
+$
+ \hat v^{(M)} = \sigma(W Q^{(M)})
+$,
+where $\sigma$ is the sigmoid activation function and $W$ is a learned matrix of weights.
+We found that updating the visibility flag iteratively did not improve performance, likely due to the fact that predicting visibility requires predicting an accurate location first.
+
+For $m=0$, the position, visibility and appearance estimates $\hat P^{(0)}$, $v^{(0)}$ and $Q^{(0)}$ are initialized by broadcasting their query point's initial location $P^i_{t^i}$, visibility $v^i_{t^i}=1$ (meaning visible) and appearance $\phi(I_{t^i})[P^i_{t^i}/k]$ to all times $t=1,\dots,T$.
+
+\input{architecture}
+
+\subsection{Transformer architecture and proxy tokens}%
+\label{s:virtual_tracks}
+The transformer $\Psi$ interleaves attention layers operating across the \emph{time} and \emph{track dimensions}, respectively.
+Factorising the attention~\cite{gberta_2021_ICML} across time and tracks makes the model computationally tractable:
+the complexity is reduced from $O(N^2T^2)$ to $O(N^2+T^2)$.
+However, for very large values of $N$, this cost is still prohibitive.
+We thus propose a new design, in which we introduce $K$ \emph{proxy tracks}, where $K \ll N$ is a hyper-parameter.
+% Proxy tracks are formed by concatenating rows of fixed learnable tokens to the list of actual tracks at the input to the transformer.
+Proxy tracks are learned fixed tokens that we concatenate to the list of `regular' tracks at the input to the transformer and discard at the output.
+% , and removing them at the output.
+
+% We concatenate the learned proxy tokens to the list of actual tracks at the input to the transformer.
+
+
+For time attention, `regular' and proxy tracks are processed identically.
+For track attention, however, regular tracks cross-attend the proxies, but not each other, reducing the cost to $O(NK + K^2 + T^2)$.
+ We discard the proxy tracks at the output of the transformer. 
+
+Proxies are often used to accelerate, \eg, large graph neural networks; here, proxies are learnable query tokens.
+In computer vision, DETR~\cite{carion20end-to-end} makes use of learnable queries in a transformer and methods like {}\cite{jaegle22perceiver} use them to decode dense outputs.
+Our proxy tokens are different: They mirror and shadow the computation of the regular tracks, similarly to registers~\cite{darcet2023vision}.
+
+\subsection{Windowed inference and unrolled training}%
+\label{sec:unrolled_training}
+
+An advantage of formulating tracking as the progressive refinement of a window of tracks is the ability to process arbitrarily long videos:
+It suffices to initialize the next window using partially overlapping tracks from the previous one.
+
+%  of an initial track estimate is  updates allows to process arbitrarily long videos sliding window application to process ,
+% by initializing the iterative transformer updates with the outputs of the previous time window.
+
+Consider, in particular, a video $V$ of length $T' > T$ longer than the maximum window length $T$ supported by the architecture.
+To track points throughout the entire video $V$, we split the video in
+$J = \left\lceil 2T'/T - 1 \right\rceil$ windows of length $T$, with an overlap of $T/2$ frames.\footnote{We assume that $T$ is even. The last window is shorter if $T/2$ does not divide $T'$.}
+
+Let the superscript $(m,j)$ denote the $m$-th application of the transformer to the $j$-th window.
+We thus have a $M \times J$ grid of quantities
+$
+(
+  \hat P^{(m,j)},~
+  \hat v^{(m,j)},~
+  Q^{(m,j)}
+)
+$,
+spanning transformer iterations and windows.
+For $m=0$ and $j=1$, these are initialized as for the single window case.
+Then, the transformer is applied $M$ times to obtain the estimate $(M,1)$.
+The latter is used to initialize estimate $(0,2)$ via broadcasting.
+Specifically, the first $T/2$ components of $\hat P^{(0,2)}$ are copies of the last $T/2$ components of $\hat P^{(M,1)}$; the last $T/2$ components of $\hat P^{(0,2)}$ are instead copies of the last time $t=T/2-1$ from $\hat P^{(M,1)}$.
+The same update rule is used for
+$
+\hat v^{(0,2)}
+$,
+while
+$
+Q^{(0,j)}
+$
+is always initialized with the features $Q$ of the track's staring location.
+This process is repeated until estimate $(M,J)$ is obtained.
+
+The windowed transformer essentially operates as a recurrent network, so we train it in an unrolled fashion.
+Specifically, we optimize the track prediction error summed over iterated transformer applications and windows
+\begin{equation}\label{e:loss1}
+\mathcal{L}_1(\hat{P}, P)
+=
+\sum_{j=1}^{J}
+\sum_{m=1}^{M}
+\gamma^{M-m}
+\|
+\hat P^{(m,j)} - P^{(j)}
+\|,
+\end{equation}
+where $\gamma=0.8$ discounts early transformer updates.
+Here, $P^{(j)}$ contains the ground-truth trajectories restricted to window $j$ (trajectories which start in the middle of the window are padded backwards).
+The second loss is the cross entropy of the visibility flags
+$
+\mathcal{L}_2(\hat{v}, v)
+=
+\sum_{j=1}^{J}
+\operatorname{CE}(
+  \hat v^{(M,j)},
+  v^{(j)}
+)
+$.
+While only a moderate number of windows are used in the loss during training due to the computational cost, at test time, we can unroll the windowed transformer applications arbitrarily, thus, in principle, handling any video length. In combination with joint tracking, unrolling allows the model to track points through occlusions of duration longer than one sliding window and to track points even outside of the camera view.
+
+\subsection{Support points}%
+\label{sec:point_selection}
+
+\method can take advantage of tracking several points jointly.
+It is typical for applications to have several points to track, but in some cases, one might be interested in tracking a few or even a single point at inference time.
+
+In these cases, we found it beneficial to track additional \textit{support points} which are not explicitly requested by the user.
+Moreover, we have found that different configurations of such support points can lead to small differences in performance.
+We experiment with various configuration types, visualized in \cref{fig:evaluation_sampling_fig}.
+With the ``global'' strategy, the support points form a regular grid across the whole image.
+With the ``local'' strategy, the grid of points is centred around the point we wish to track, thus allowing the model to focus on a neighbourhood of it.
+Note that these patterns are only considered at inference time and are used to improve the tracker's accuracy for the target points by incorporating context.

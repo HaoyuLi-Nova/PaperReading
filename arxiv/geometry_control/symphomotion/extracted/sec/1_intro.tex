@@ -1,0 +1,33 @@
+\section{Introduction}
+\label{sec:intro}
+
+{\noindent\itshape
+“A symphony is like the world, it must contain everything.”%
+\vspace{-0.5em}
+\begin{flushright}
+\normalfont--- Gustav Mahler
+\end{flushright}
+}
+\vspace{-0.5em}
+
+\noindent Precise control of motion dynamics in video generation has gained increasing attention~\cite{zhang2025proteus, hu2024motionmaster, chu2025wan, ling2024motionclone, huang2026live}, as it enables customized synthesis and richer visual expression. In filmmaking, directors coordinate camera movement and actor trajectories to shape narrative intent; analogously, controllable video generation requires jointly steering both camera motion and object dynamics to produce coherent and meaningful scenes. However, achieving such unified control remains challenging: camera trajectories induce global parallax and viewpoint changes, while objects follow independent, often complex 3D paths. Existing methods typically handle only one motion type, resulting in unsynchronized behaviors and reduced realism in naturally dynamic scenes.
+
+
+Camera-control methods~\cite{he2024cameractrl,feng2024i2vcontrol,xu2024camco,hou2024training,bahmani2025ac3d,bahmani2024vd3d} generally inject camera parameters or view-related cues to regulate viewpoint transitions. While effective in static or near-static settings, these approaches model camera motion in isolation and are unable to capture how camera trajectories interact with moving objects, often degrading when significant foreground dynamics are present. Conversely, object-control methods~\cite{shi2024motion,yin2023dragnuwa,zhang2025tora,zhou2025trackgo,jain2024peekaboo,li2025magicmotion,fu20243dtrajmaster} rely primarily on 2D motion cues such as bounding boxes, trajectories, or optical flow. Such image-plane representations are inherently viewpoint-dependent and fail to disentangle true object motion from camera-induced parallax, making them unreliable under camera movement or large viewpoint changes.
+
+
+Recent attempts toward joint control encode both camera and object motion within shared 2D motion fields or dense correspondences, such as the optical flow or point-trajectory representations employed by MotionPrompting~\cite{geng2025motion} and ATI~\cite{wang2025ati}. However, mixing camera-induced parallax and true object dynamics in the same 2D space leads to ambiguous supervision, as distinct 3D motions can project similarly onto the image plane, especially in scenes with substantial depth variation. Methods such as MotionCtrl~\cite{wang2024motionctrl} and Perception-as-Control~\cite{chen2025perception} move toward disentanglement by introducing separate processing branches for camera and object motion, yet they still define object trajectories purely in 2D image space, limiting their ability to model depth-aware motion or maintain consistency under strong camera movement. To address the inherent limitations of image-plane trajectory modeling, FMC~\cite{shuai2025free} uses explicit 6-DoF pose trajectories to represent motion in true 3D space; however, its reliance on synthetic data and the requirement for fully specified 6-DoF inputs hinder its practicality in real-world scenarios, where such detailed annotations are rarely available. These limitations underscore the need for a unified, 3D-aware, and intuitive representation capable of reliably guiding both camera and object motion.
+
+To address these limitations, we propose SymphoMotion, a unified motion-control framework that jointly handles camera trajectories and dynamic object manipulation. SymphoMotion comprises two complementary mechanisms. The Camera Trajectory Control (CTC) enhances viewpoint control by combining explicit camera trajectories with geometry-aware cues that help preserve scene structure and maintain consistency throughout the generated sequence. The Object Dynamics Control (ODC) governs object dynamics by integrating 2D visual guidance with 3D trajectory embeddings, enabling objects to move along user-specified paths in full 3D space while remaining spatially coherent with the evolving viewpoint. In addition, SymphoMotion provides flexible interfaces for specifying motion: users may directly manipulate object paths in 3D through intuitive interactive editing, or simply supply a desired camera trajectory to guide viewpoint changes. Together, these components enable SymphoMotion to generate videos that faithfully follow user-defined camera motion and object dynamics within a unified, coherent framework.
+
+A further challenge lies in the lack of real-world datasets that jointly annotate camera and object motion. Existing datasets usually cover only one modality: camera-centric datasets such as RealEstate10K~\cite{zhou2018stereo} and ACID~\cite{xiao2021development} provide diverse camera trajectories but mostly depict static scenes, while object-centric datasets such as MagicData~\cite{li2025magicmotion} and 360°-Motion~\cite{fu20243dtrajmaster} capture rich object motion but assume a fixed or nearly fixed camera. Although synthetic datasets like SynFMC~\cite{shuai2025free} and OmniWorld-Game~\cite{zhou2025omniworld} include both types of motion, the domain gap limits their applicability to real-world video generation.
+To fill this gap, we introduce RealCOD-25K, a large-scale real-world dataset with paired annotations of camera poses and object-level 3D trajectories. RealCOD-25K contains more than 25K video clips spanning diverse indoor and outdoor environments, each sequence providing synchronized camera motion and 3D object trajectories. This comprehensive dataset offers the necessary supervision for learning unified camera–object motion and serves as a robust benchmark for evaluating systems such as SymphoMotion.
+
+In summary, our main contributions are threefold:
+\begin{itemize}
+  \item 
+  We propose SymphoMotion, a unified framework that jointly controls camera motion and object dynamics within a single model, enabling coherent, flexible, and depth-aware motion specification that remains consistent across diverse viewpoints and scene configurations.
+  \item We introduce RealCOD-25K, 
+  a comprehensive real-world dataset providing paired annotations of camera poses and object-level 3D trajectories across diverse scenes, addressing a critical data gap for training and evaluating unified motion-control models.
+  \item Extensive experiments and user studies show that SymphoMotion outperforms state-of-the-art methods in both visual fidelity and motion controllability.
+\end{itemize}

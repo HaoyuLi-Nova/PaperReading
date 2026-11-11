@@ -1,0 +1,324 @@
+%                              _        _   _             
+%      /\   annotation        | |      | | (_)            
+%     /  \   _ __  _ __   ___ | |_ __ _| |_ _  ___  _ __  
+%    / /\ \ | '_ \| '_ \ / _ \| __/ _` | __| |/ _ \| '_ \ 
+%   / ____ \| | | | | | | (_) | || (_| | |_| | (_) | | | |
+%  /_/    \_\_| |_|_| |_|\___/ \__\__,_|\__|_|\___/|_| |_| 
+
+% % % % paper-specific definitions
+% \def\AAAISUBMISSIONONLY{}   % include the reproducability checklist, only for aaai submission
+%\newcommand{\SD}{SD\xspace}  % later switch to LDM, use "SD" only for huggingface 
+%\newcommand{\SDtext}{stable diffusion\xspace}
+%\newcommand{\SDText}{Stable diffusion\xspace}
+\newcommand{\SD}{SD\xspace}  % later switch to LDM, use "SD" only for huggingface 
+% SD is use in the video, so use it in the paper 
+\newcommand{\SDtext}{stable diffusion\xspace}
+\newcommand{\SDText}{Stable diffusion\xspace}
+\newcommand{\directed}{directed\xspace}  % or position-controlled
+% replaceds the CP@k$
+\newcommand{\SSatK}{SS@k\xspace}
+\newcommand{\SSat}{SS@\xspace}
+\newcommand{\OneObject}{One Object\xspace}
+\newcommand{\TwoObjects}{Two Objects\xspace}
+%\newcommand{\OneObject}{One-masking\xspace}
+%\newcommand{\TwoObjects}{Two-masking\xspace}
+\newcommand{\SAttn}{SA-Cross\xspace}
+\newcommand{\TAttnSelf}{TA-Self\xspace}
+\newcommand{\TAttnCross}{TA-Cross\xspace}
+
+% paper constant, or parameter
+\newcommand{\NP}{N_P\xspace} % number of 
+\newcommand{\NS}{N_S\xspace} % number of spatial attn editing steps
+\newcommand{\NM}{N_M\xspace} % number of temporal attn editing steps
+\newcommand{\NF}{N_F\xspace} % number of frames in video sequence
+
+
+
+
+\definecolor{purple}{rgb}{0.3, 0, 1.0}
+\definecolor{darkred}{rgb}{0.6, 0.1, 0.1}
+
+% % % status if needed
+\newcommand{\statusfb}{\textcolor{blue}{(Status:Feedback) }}
+\newcommand{\statusready}{\textcolor{darkgray}{(Status:Proofread) }}
+\newcommand{\statustodo}{\textcolor{brown}{(Status:TODO) }}
+\newcommand{\statuswarn}{\textcolor{red}{(Status:Warning) }}
+\newcommand{\statusdone}{\textcolor{black}{(Status:Done) }}
+\newcommand{\statusprogress}{\textcolor{purple}{(Status:InProgress) }}
+
+% % % % % Working command by authors
+% \newcommand\KM[1]{\textcolor{blue}{(KM: #1)}}
+% \newcommand\KMedit[2]{\textcolor{blue}{#1\xspace}}{}  
+% \newcommand\KMtext[1]{\textcolor{blue}{#1}}
+% \newcommand\KMone[1]{\textcolor{blue}{#1}} % one-argument version, 
+\newcommand\JP[1]{\textcolor{red}{(JP: #1)}}
+\newcommand\JPedit[2]{\textcolor{red}{#1\xspace}}{}  
+\newcommand\JPtext[1]{\textcolor{red}{#1\xspace}}
+\newcommand\JPcheck[1]{\textcolor{red}{#1}}
+\newcommand\JPquestion[1]{\textcolor{orange}{#1}}
+%\newcommand\JPnew[1]{#1}
+% \newcommand\JPone[1]{\textcolor{violet}{#1}} % one-argument version, 
+
+\newcommand\WBEdit[1]{\textcolor{purple}{(BKEdit: #1)}}
+\newcommand\WBSuggest[1]{\textcolor{purple}{(BKSuggest: #1)}}
+\newcommand\WB[1]{\textcolor{purple}{(BK: #1)}}
+\newcommand\WBedit[2]{\textcolor{purple}{#1\xspace}}{}  
+\newcommand\WBtext[1]{\textcolor{purple}{#1}}
+\newcommand\WBone[1]{\textcolor{purple}{#1}} % one-argument version, 
+\newcommand\WBK[1]{\textcolor{purple}{#1}}
+
+\newcommand\AAAIedit[2]{{#1\xspace}}{}  
+
+
+\newcommand{\TitleLong}{TrailBlazer\xspace}  % later switch to LDM, use "SD" only for huggingface 
+\newcommand{\TitleShort}{TB\xspace}  % later switch to LDM, use "SD" only for huggingface 
+\newcommand{\thetitle}{\TitleLong: Trajectory Control for Diffusion-Based Video Generation} % is used in supp
+
+
+% % % % clean color for submission
+\newcommand\KM[1]{{(KM: #1)}}
+\newcommand\KMedit[2]{{#1\xspace}}{}  
+\newcommand\KMtext[1]{{#1}}
+\newcommand\KMone[1]{{#1}} % one-argument version, 
+%\newcommand\JP[1]{{(JP: #1)}}
+%\newcommand\JPedit[2]{{#1\xspace}}{}  
+%\newcommand\JPtext[1]{{#1\xspace}}
+\newcommand\JPnew[1]{{#1}}
+%\newcommand\JPone[1]{{#1}} % one-argument version, 
+
+
+%\newcommand\JPone[1]{\textcolor{purple}{#1}} % one-argument version, omit "JP"
+%\newcommand\JPsmall[2]{#1}{}   %\JPsmall{newversion}{oldversion}
+%\newcommand\JPedit[2]{\textcolor{black}{#1\xspace}}{}  
+%\JPedit{newversion}{oldversion}   please check this edit
+%\newcommand\JPone[1]{\textcolor{black}{#1}} % one-argument version, omit "JP"
+
+
+
+% % % This is temporary solution to turn off the comments
+% \newcommand\KM[1]{}
+% \newcommand\GF[1]{}
+% \newcommand\JPedit[2]{}{}  
+% \newcommand\JPone[1]{} %
+% \newcommand\JPsmall[2]{}{}  
+
+
+
+
+% % % shared
+
+%\newcommand{\note}[1]{\marginnote{\fontsize{8}{8}\selectfont \textcolor{red}{\text{#1}}}[3cm]}
+\newcommand{\znote}[1]{\marginnote{\tiny{#1}}}
+\newcommand{\zcut}[1]{\textcolor{red}{\sout{#1}}}
+\newcommand{\WIP}{\textcolor{red}{\text{WIP}}}
+% \newcommand{\TODO}[1]{\textcolor{red}{\text{TODO}:{#1}}}
+\newcommand{\checkthis}[1]{\textcolor{red}{#1}}
+%\newcommand{\checkthis}[1]{#1}
+\newcommand{\findbetterword}[1]{\textcolor{darkred}{#1}}  % maybe find better word or phrase
+\newcommand{\notunderstand}[1]{\textcolor{red}{??#1??}}
+\newcommand{\FIXLATER}[1]{}  % fix this after submitting thesis
+\newcommand{\CHECKLATER}[1]{#1}  % after submitting, change to color and check this
+\newcommand{\SHORTER}[1]{#1}   % consider removing this
+\newcommand{\LONGVERSION}[1]{}  % for longer version, e.g. thesis or journal
+
+% % % make life easier, 
+% % % also allows quickly changing Fig. <-> Figure according to style guides
+\newcommand{\SecRef}[1]{{Sec.~\ref{#1}}}   % spelling of "section" reference (short)
+\newcommand{\SecRefLong}[1]{Section~\ref{#1}}   % spelling of "section" reference (long)
+\newcommand{\FigRef}[1]{{Fig.~\ref{#1}}}   % spelling of figure reference (short)
+\newcommand{\FigsRef}[1]{{Figs.~\ref{#1}}} % for 2 figures, then add \ref{} of the second
+\newcommand{\AlgoRef}[1]{{Algo.~\ref{#1}}}   % spelling of algorithm reference (short)
+\newcommand{\EqRef}[1]{{Eq.~\ref{#1}}}
+\newcommand{\link}[1]{\href{#1}{[link]}}
+% aliasing for those hardcoding items. So we can change quickly
+\newcommand{\Fig}{Fig.\ }
+\newcommand{\Algo}{Algo.\ }
+\newcommand{\Eq}{Eq.\ }
+\newcommand{\Sec}{Sec.\ }
+
+
+
+
+%   __  __       _   _                           _           _ 
+%  |  \/  |     | | | |   math symbols          | |         | |
+%  | \  / | __ _| |_| |__    ___ _   _ _ __ ___ | |__   ___ | |
+%  | |\/| |/ _` | __| '_ \  / __| | | | '_ ` _ \| '_ \ / _ \| |
+%  | |  | | (_| | |_| | | | \__ \ |_| | | | | | | |_) | (_) | |
+%  |_|  |_|\__,_|\__|_| |_| |___/\__, |_| |_| |_|_.__/ \___/|_|
+%                                 __/ |                        
+%                               |___/                         
+
+% shorthand macros for bold-face letters for linear algebra, e.g.
+%            \MM \xx = \bb
+% Most are just a double letter (\bb,\cc,\dd, etc) however there are a couple
+% \bAA, \bSS due to conflicts with predefined latex symbols
+%
+% this file needs the mathbbol package, and bm package depending on \LLambda
+% also include zillacmds
+
+
+\newcommand{\thth}{\bm{\theta}}
+%\renewcommand{\aa}{\mathbf{a}}			% removed oct11. put in particular files not global
+\renewcommand{\aa}{\mathbf{a}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\cc}{\mathbf{c}}
+\newcommand{\dd}{\mathbf{d}}
+\newcommand{\ee}{\mathbf{e}}
+\newcommand{\ff}{\mathbf{f}}
+% \newcommand{\gg}{\mathbf{g}} already defined, means >> ie much greater
+\renewcommand{\gg}{\mathbf{g}}
+\newcommand{\hh}{\mathbf{h}}
+\newcommand{\kk}{\mathbf{k}}
+\newcommand{\bll}{\mathbf{l}}
+\newcommand{\mm}{\mathbf{m}}
+\newcommand{\nn}{\mathbf{n}}
+\newcommand{\pp}{\mathbf{p}}
+\newcommand{\qq}{\mathbf{q}}
+\newcommand{\rr}{\mathbf{r}}
+\newcommand{\bss}{\mathbf{s}}		% ss appears to be GauB style ss
+\renewcommand{\tt}{\mathbf{t}}		% also some problem
+\newcommand{\uu}{\mathbf{u}}
+% \renewcommand{\vv}{\mathbf{v}}
+\newcommand{\bvv}{\mathbf{v}}   % vv already deined
+\newcommand{\ww}{\mathbf{w}}
+\newcommand{\xx}{\mathbf{x}}
+\newcommand{\yy}{\mathbf{y}}
+\newcommand{\zz}{\mathbf{z}}
+
+% other letters are already overloaded so use bx instead
+\newcommand{\ba}{\mathbf{a}}
+\newcommand{\br}{\mathbf{r}}
+\newcommand{\bu}{\mathbf{u}}
+\newcommand{\bw}{\mathbf{w}}
+\newcommand{\bx}{\mathbf{x}}
+
+\newcommand{\bAA}{\mathbf{A}}
+\newcommand{\BB}{\mathbf{B}}
+\newcommand{\CC}{\mathbf{C}}
+\newcommand{\DD}{\mathbf{D}}
+\newcommand{\EE}{\mathbf{E}}
+\newcommand{\FF}{\mathbf{F}}
+\newcommand{\GG}{\mathbf{G}}
+\newcommand{\HH}{\mathbf{H}}
+\newcommand{\II}{\mathbf{I}}
+\newcommand{\JJ}{\mathbf{J}}
+\newcommand{\KK}{\mathbf{K}}
+\newcommand{\LL}{\mathbf{L}}
+\newcommand{\MM}{\mathbf{M}}
+\newcommand{\NN}{\mathbf{N}}
+\newcommand{\OO}{\mathbf{O}}
+\newcommand{\PP}{\mathbf{P}}
+\newcommand{\QQ}{\mathbf{Q}}
+\newcommand{\RR}{\mathbf{R}}
+\newcommand{\fSS}{\mathbf{S}}
+\newcommand{\TT}{\mathbf{T}}
+\newcommand{\UU}{\mathbf{U}}
+\newcommand{\VV}{\mathbf{V}}
+\newcommand{\WW}{\mathbf{W}}
+\newcommand{\XX}{\mathbf{X}}
+\newcommand{\YY}{\mathbf{Y}}
+\newcommand{\ZZ}{\mathbf{Z}}
+
+\newcommand{\AAA}{\mathcal{A}}
+\newcommand{\BBB}{\mathcal{B}}
+\newcommand{\CCC}{\mathcal{C}}
+\newcommand{\DDD}{\mathcal{D}}
+\newcommand{\EEE}{\mathcal{E}}
+\newcommand{\FFF}{\mathcal{F}}
+\newcommand{\GGG}{\mathcal{G}}
+\newcommand{\HHH}{\mathcal{H}}
+\newcommand{\III}{\mathcal{I}}
+\newcommand{\JJJ}{\mathcal{J}}
+\newcommand{\KKK}{\mathcal{K}}
+\newcommand{\LLL}{\mathcal{L}}
+\newcommand{\MMM}{\mathcal{M}}
+\newcommand{\NNN}{\mathcal{N}}
+\newcommand{\OOO}{\mathcal{O}}
+\newcommand{\PPP}{\mathcal{P}}
+\newcommand{\QQQ}{\mathcal{Q}}
+\newcommand{\RRR}{\mathcal{R}}
+\newcommand{\SSS}{\mathcal{S}}
+\newcommand{\TTT}{\mathcal{T}}
+\newcommand{\UUU}{\mathcal{U}}
+\newcommand{\VVV}{\mathcal{V}}
+\newcommand{\WWW}{\mathcal{W}}
+\newcommand{\XXX}{\mathcal{X}}
+\newcommand{\YYY}{\mathcal{Y}}
+\newcommand{\ZZZ}{\mathcal{Z}}
+
+\newcommand{\bOne}{\mathbf{1}}
+\newcommand{\bZero}{\mathbf{0}}
+
+\newcommand{\aalpha}{\boldsymbol{\alpha}}
+\newcommand{\ddelta}{\boldsymbol{\delta}}
+\newcommand{\ggamma}{\boldsymbol{\gamma}}
+\newcommand{\oomega}{\boldsymbol{\omega}}
+\newcommand{\llambda}{\boldsymbol{\lambda}}
+\newcommand{\mmu}{\boldsymbol{\mu}}
+\newcommand{\pphi}{\boldsymbol{\phi}}
+\newcommand{\ttheta}{\boldsymbol{\theta}}
+
+\newcommand{\DDelta}{\bm{\Delta}}
+\newcommand{\PHI}{\bm{\Phi}}		
+\newcommand{\PPHI}{\bm{\Phi}}		% formerly PHI
+\newcommand{\SSigma}{\bm{\Sigma}}
+\newcommand{\LLambda}{\bm{\Lambda}}
+
+% had a case where using this macro did not work, but expanding \mathbb{R} did work
+\newcommand{\Reals}{\mathbb{R}}	% use amssymb.  Ken says
+\newcommand{\Complex}{\mathbb{C}}	% use amssymb.  Ken saysmathbf is better, mathbb is for sets or something
+% \newcommand{\Expect}{\mathbb{E}}
+\newcommand{\Zi}{\mathbb{Z}}
+\newcommand{\Eop}{\mathbb{E}}
+\newcommand{\tk}{\bar{k}}
+\newcommand{\tl}{\bar{l}}
+
+% % % new command for math
+\newcommand{\dett}[1]{\text{det} \bigg[ #1 \bigg]}
+\newcommand{\abs}[1]{\left | #1 \right |}
+\newcommand{\card}[1]{\left | #1 \right |}
+% \newcommand{\norm}[1]{\left \| #1  \right \|}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}  % better looking norm, I think it scales vertically if the thing inside is tall
+\newcommand{\set}[1]{\left \{ #1  \right \}}
+\newcommand{\tuple}[1]{\left ( #1 \right )}
+\newcommand{\closeinterval}[1]{\text{\left \[} #1  \text{\right \]}}
+\newcommand{\inner}[1]{\left \langle #1 \right \rangle}
+\newcommand{\expectation}[2]{\mathbb{E}_{#1}\left [ #2 \right ]}
+\newcommand{\Expect}[2]{\mathbb{E}_{#1}\left [ #2 \right ]}
+\newcommand{\E}[1]{\mathbb{E}\left [ #1 \right ]}
+\newcommand{\drv}[2]{\frac{\delta #1}{\delta #2}}
+\newcommand{\drvf}[2]{\delta #1/\delta #2}
+\newcommand{\kl}[2]{\text{D}_{\text{KL}}(#1||#2)}
+% \newcommand{\percent}{\%}
+% % % texts
+\newcommand{\MI}{\text{I}}
+\newcommand{\trace}[1]{\text{trace}(#1)}
+\newcommand{\eqcmt}[1]{\quad \text{#1}}
+
+%\DeclareMathOperator{\MI}{MI}
+% \DeclareMathOperator{\tr}{tr}
+%\newcommand{\MI}{\text{MI}}
+%\newcommand{\tr}{\text{trace}}
+% switch between "Figure", "Fig."
+
+\newcommand{\fancynote}[1]{\marginnote{\fontsize{8}{8}\selectfont\textcolor{red}{\text{#1}}}[1cm]}
+
+\iffalse
+% undefined command ??
+\ulposdef{\ulnumaux}{%
+   $\underset{\saveulnum}{\rule[-.7ex]{\ulwidth}{.4pt}}$}
+\newcommand{\ulnum}[2]{%
+  \def\saveulnum{#1}%
+  \ulnumaux{#2}}
+\fi
+
+\graphicspath{{assets/}}     % organize your images and other figures under media/ folder
+
+\def\lc{\left\lfloor}   
+\def\rc{\right\rfloor}
+
+% \usepackage{amsmath}
+% \DeclareMathOperator*{\argmax}{arg\,max}
+% \DeclareMathOperator*{\argmin}{arg\,min}
+
+% \setlength{\belowcaptionskip}{-10pt}

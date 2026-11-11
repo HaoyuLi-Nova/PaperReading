@@ -1,0 +1,12 @@
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\textwidth]{imgs/semantic_correspondence_labeled.jpg}
+\caption{\textbf{Semantic correspondences in video diffusion models.}
+We analyze feature maps in the image-to-video diffusion model SVD~\citep{blattmann2023stable} for three generated video sequences (row 1). 
+We use PCA to visualize the features at diffusion timestep 30 (out of 50) at the output of an upsampling block (row 2), a self-attention layer (row 3), and the same self-attention layer after our alignment procedure (row 4). %
+Although output feature maps of upsampling blocks in image diffusion models are known to encode semantic information ~\citep{tang2023emergent}, we only observe weak semantic correspondences across frames in SVD. 
+Thus, we focus on the self-attention layer and modify it to produce feature maps that are semantically aligned across frames.
+}
+\label{fig:correspondence}
+\vspace{-2.0mm}
+\end{figure}

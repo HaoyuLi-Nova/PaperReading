@@ -1,0 +1,56 @@
+\section{Related work}%
+\label{sec:related}
+
+\paragraph{Optical flow.}
+
+Optical flow approximates dense instantaneous motion.
+Originally approached by studying the brightness constancy equation~\cite{horn1981determining, lucas1981iterative, Black:ICCV:1993, bruhn2005lucas}, starting with
+FlowNet~\cite{dosovitskiy2015flownet,ilg2017flownet} optical flow has been tackled using deep learning.
+More recently, DCFlow~\cite{Xu_2017_CVPR} has introduced the computation of a 4D cost volume, used in most follow-up works~\cite{sun2018pwc, wang2020displacement, raft}.
+Notable is RAFT~\cite{raft}, which introduced incremental flow updates and inspired several follow-up works~\cite{jiang2021learning, xu2021high, jiang2021learning, zhang2021separable}.
+\method also uses 4D cost volumes and iterated updates but is applied to tracking.
+
+Transformers~\cite{vaswani2017attention} have also been applied to the optical flow problem~\cite{huang2022flowformer, shi2023flowformer++, zhao2022global}.
+Flowformer~\cite{huang2022flowformer} drew inspiration from RAFT and proposed a transformer-based approach that tokenizes the 4D cost volume.
+GMFlow~\cite{zhao2022global} replaced the update network with a softmax with self-attention for refinement.
+Perceiver IO~\cite{jaegle22perceiver} proposed a unified transformer for several tasks, including optical flow.
+
+Optical flow can be applied to tracking by integrating predictions over time, but this approach accumulates errors in the form of drift~\cite{pips}, which motivates developing architectures like \method that track points over longer horizons.
+
+\paragraph{Multi-frame optical flow.}
+
+Several authors~\cite{ren2019fusion, shi2023videoflow, janai2018unsupervised, luo2023continuous} have extended optical flow to multiple frames.
+Early methods used Kalman filtering~\cite{chin1994probabilistic, elad1998recursive} to encourage temporal consistency.
+Modern multi-frame methods produce dense flow.
+RAFT~\cite{raft} can be applied in a warm-start manner~\cite{sui2022craft, sun2022skflow} for multi-frame optical flow estimation.
+However, these methods are not designed for long-term tracking and do not consider points occluded for a long time.
+VideoFlow~\cite{shi2023videoflow} extends optical flow to three and five consecutive frames by integrating forward and backward motion features during flow refinement.
+MFT~\cite{neoral2023mft} conducts optical flow estimation between distant frames and chooses the most reliable chain of optical flows.
+Our tracker scales to produce semi-dense tracks.
+
+\paragraph{Visual object tracking.}
+
+Before the emergence of deep learning, some authors proposed handcrafted joint trackers~\cite{birchfield08joint,sand2008particle}, but few have considered doing so using deep networks like \method.
+Our work is weakly related to \emph{multiple object tracking}~\cite{chen22visual} where tracking through occlusions~\cite{zhao2004tracking}, with changes in appearance~\cite{matthews2004template}, and with temporal priors~\cite{sidenbladh2000stochastic} have been extensively studied.
+
+Some recent point trackers have been inspired by visual object tracking that predict the target states by extracting and combining features extracted from source and target image regions~\cite{bertinetto2016fully, danelljan2017eco, li2018learning, Bhat_2019_ICCV, danelljan2019atom}.
+Transformers have also been applied in visual object tracking~\cite{Chen_2021_CVPR, cui2022mixformer}.
+However, our focus is the tracking of points, including background points, not objects.
+
+\paragraph{Tracking any point.}
+
+Particle Video~\cite{sand2008particle} introduced the problem of Tracking Any Point in a video (TAP), and PIPs~\cite{pips} proposed a better model which can track through occlusions more reliably by predicting tracks in a sliding window and restarting them from the last frame where the point was visible.
+However, PIP cannot track a point beyond the duration of a window.
+TAP-Vid~\cite{tapvid} introduced a new benchmark and a simple baseline for TAP\@.
+While the original Particle Video does track points jointly, PIPs and TAP-Vid track points independently (in parallel).
+Inspired by TAP-Vid~\cite{tapvid} and PIPs~\cite{pips}, TAPIR~\cite{doersch2023tapir} further improved tracking with a two-stage, feed-forward point tracker that uses TAP-Vid-like matching and PIPs-like refinement.
+
+PointOdyssey~\cite{zheng2023pointodyssey} addressed long-term tracking with PIPs++, a simplified version of PIPs, and introduced another benchmark for long-term tracking.
+However, PIPs++ still tracks points independently.
+OmniMotion~\cite{wang2023tracking} optimizes a volumetric representation for each video, refining correspondences in a canonical space.
+However, this approach requires test-time optimization, which, due to its cost, is not suitable for many practical applications, especially online ones.
+
+Trackers and optical flow models are often trained using synthetic datasets~\cite{karaev2023dynamicstereo, mayer2016large, dosovitskiy2015flownet, sun2021autoflow, butler2012naturalistic, zheng2023pointodyssey}, as annotating real data can be challenging.
+Synthetic datasets provide accurate annotations, and training on them has demonstrated the ability to generalize to real-world data~\cite{mayer2016large, sun2021autoflow}.
+
+

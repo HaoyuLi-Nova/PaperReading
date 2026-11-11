@@ -1,0 +1,46 @@
+\section{Method}
+
+Our video generation method takes as input a single frame, a text prompt, and a motion prompt in the form of point tracks---which we explain how to create in Sec.~\ref{sec:motionprompting}. Full implementation details can be found in \cref{apdx:implementation}. %
+
+\subsection{Motion Prompts}
+
+
+To fully harness the expressiveness of motion, we need to be able to represent any type of motion. 
+To this end, we use point trajectories for our motion prompts, which can encode both spatially (and temporally) sparse and dense motions, motion on a single object or of an entire scene, and even occlusions via a visibility flag.
+Using this representation enables a broad range of capabilities such as object control (\cref{sec:interacting}), camera control (\cref{sec:depth}), both simultaneously (\cref{sec:composition}), motion transfer (\cref{sec:transfer}), and drag-based image editing (\cref{sec:interacting}) under a unified model.
+
+Formally, we denote a set of $N$ point trajectories of length $T$ by $\mathbf{p} \in \mathbb{R}^{N \times T \times 2}$, where the 2D coordinate of the $n^{th}$ track at the $t^{th}$ timestep is $\mathbf{p}[n, t] = (x_t^n, y_t^n)$.  In addition, we denote the visibility of the tracks as $\mathbf{v} \in \mathbb{R}^{N \times T}$, an array of 1's and 0's where $0$ indicates an off-screen or occluded track, and $1$ indicates a visible track.
+
+
+\subsection{Architecture}
+
+We build our model on top of Lumiere, a pre-trained video diffusion model~\cite{bar2024lumiere} which has been trained to generate 5 seconds of video at 16 fps given text and first frame conditioning.
+In order to train in track conditioning, we use a ControlNet~\cite{zhang2023adding} which requires encoding tracks in a spatial-temporal volume, $\mathbf{c} \in \mathbb{R}^{T \times H \times W \times C}$, where $T$ is the number of frames, $H$ and $W$ are the height and width of the generated video, and $C$ is the channel dimension. To do this, we associate with each track, $\mathbf{p}[n, :]$, a unique and random embedding vector $\phi^n \in \mathbb{R}^C$. Then, for each space-time location a track visits, and is visible at, we simply place the embedding $\phi^n \in \mathbb{R}^C$ in that location. All other values in the conditioning signal are set to 0.
+\cref{fig:conditioning} illustrates this process. In other words, we zero-initialize $\mathbf{c}$ and set
+\begin{equation}
+    \mathbf{c}[t, x_t^n, y_t^n] = \mathbf{v}[n,t] \phi_n
+\end{equation} 
+for all tracks at each timestep $t$, where multiplying by the visibility $\mathbf{v}[n, t]$ zeros out the embedding if the track is not visible at that location and time. We quantize $x_t^n$ and $y_t^n$ to the nearest integer for simplicity. When multiple tracks pass through the same space-time location, we add the embeddings together. 
+The track embeddings $\phi^n$ are {\it randomly} drawn from a fixed pool, and act simply as a unique identifier for each track. %
+For completely dense tracks, this representation is equivalent to starting with a dense grid of embeddings and forward warping, similar to~\cite{seo2024genwarp}. 
+
+
+
+\input{figtabs/conditioning.tex}
+
+\subsection{Data}
+
+To train our model, we prepare a video dataset paired with tracks. We run BootsTAP~\cite{doersch2024bootstap}, an off-the-shelf point tracking method, on an internal dataset consisting of 2.2M videos resized to $128 \times 128$, the output size of our base model. 
+We extract tracks densely, resulting in 16,384 tracks per video as well as predicted occlusions, which we can sample from during training. We do not filter the videos in any way, with the hypothesis being that training on diverse motions will result in a more powerful and flexible model. 
+
+
+\subsection{Training}
+\label{sec:training}
+
+Training follows ControlNet~\cite{zhang2023adding}, where the conditioning signal is given to a trainable copy of the base model's encoder and the standard diffusion loss is optimized. For every video, we sample a random number of tracks from a uniform distribution and construct the conditioning signal as explained above. More details can be found in \cref{apdx:implementation}.
+
+
+We observe various phenomena during training. For one, we find that the loss is not correlated with the performance of the model at following tracks. Also, similar to~\cite{zhang2023adding}, we observe a ``sudden convergence phenomena" in which the model goes from completely ignoring the conditioning signal to fully trained in a short number of training steps. More details can be found in \cref{apdx:training}.
+
+Finally, we observe that our model exhibits fairly strong generalization in multiple directions. For example, while our model is trained on randomly sampled tracks, resulting in spatially uniformly distributed tracks during training, the model can generalize to spatially localized track conditioning (\cref{fig:sparse,fig:primitives}). In addition, while our model is trained for specific numbers of tracks, it generalizes surprisingly well to more (\cref{fig:depth}) or fewer number of tracks (\cref{fig:sparse,fig:primitives,fig:drag_editing}). Finally, we find that our model generalizes to tracks that don't necessarily start from the first frame, despite only being trained on these tracks (\cref{fig:sparse}b). We hypothesize this generalization is due to a combination of inductive biases from the convolutions in the network and the fact that we train the model on a large variety of trajectories.
+

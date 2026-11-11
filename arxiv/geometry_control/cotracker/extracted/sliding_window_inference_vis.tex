@@ -1,0 +1,7 @@
+
+\begin{figure*}[tb]
+  \centering
+  \includegraphics[width=\textwidth]{figures/architecture.pdf}
+  % \fbox{\rule[-.5cm]{0cm}{4cm} \rule[-.5cm]{4cm}{0cm}}
+  \caption{\textbf{CoTracker architecture.} We compute convolutional features $\phi(I_t)$ for every frame and process them with sliding windows. To initialize track features $Q$, we bilinearly sample from $\phi(I_t)$ with starting point locations $P$. Locations $P$ also serve to initialize estimated tracks $\hat P$. See \cref{fig:architecture} for a visualization of one sliding window.}\label{fig:window_architecture}
+\end{figure*}

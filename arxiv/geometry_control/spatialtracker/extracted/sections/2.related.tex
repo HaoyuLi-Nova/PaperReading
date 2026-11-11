@@ -1,0 +1,53 @@
+\input{figures/pipeline}
+
+
+\section{Related Work}\label{sec:related}
+
+
+\paragraph{Optical flow.}
+Optical flow is the task of estimating dense 2D pixel-level motion between a pair of frames. While traditional methods~\cite{black1993framework,beauchemin1995computation,horn1981determining,brox2009large,weinzaepfel2013deepflow,zach2007duality} formulate it as an energy minimization problem, recent approaches~\cite{fischer2015flownet,ilg2017flownet,sun2018pwc,hui2018liteflownet,xu2017accurate} have demonstrated the ability to predict optical flow directly using deep neural networks. Notably, RAFT~\cite{teed2020raft} employs a 4D correlation volume and estimates optical flow through iteratively updates with a recurrent operator. More recently, transformer-based flow estimators~\cite{huang2022flowformer,shi2023flowformer++,zhao2022global,jaegle2021perceiver} achieved superior performance, showing the strong capacity of the transformer architecture. However, pairwise optical flow methods are not suitable for long-term tracking, as they are not designed to handle long temporal contexts~\cite{brox2009large,weinzaepfel2013deepflow}. Multi-frame optical flow methods~\cite{ren2019fusion,janai2018unsupervised,irani1999multi,volz2011modeling,kennedy2015optical} extend pairwise flow by incorporating multi-frame contexts~(typically 3-5 frames), but this remains insufficient for tracking through long occlusions in videos spanning tens or hundreds of frames.
+
+\vspace{-0.5em}
+\paragraph{Tracking any point.} Recognizing the limitations of optical flow, seminal work Particle Video~\cite{PartVid} proposes to represent video motion as a set of long-range particles that move through time, which are optimized by enforcing long-range appearance consistency and motion coherence with variational techniques. However, Particle Video only generates semi-dense tracks and cannot recover from occlusion events~\cite{rubinstein2012towards}. Recently, PIPs~\cite{pips} revisited this idea by introducing a feedforward network that takes RGB frames of a fixed temporal window~(8 frames) as input and predicts the motion for any given query point through iterative updates. However, PIPs tracks points independently, neglecting spatial context information, and will lose the target if they stay occluded beyond the temporal window.
+Several recent advancements~\cite{neoral2023mft,tap-vid,Tapir,wang2023tracking,bian2023context,zheng2023pointodyssey} in point tracking have surfaced, addressing some of PIPs' limitations.
+TAPIR~\cite{Tapir} relaxes the fixed-length window constraint by using a temporal depthwise convolutional network capable of accommodating variable lengths. CoTracker~\cite{cotracker} proposed to jointly track multiple points and leverage spatial correlation between them, leading to state-of-the-art performance.
+
+Though significant progress has been made, these works all compute feature correlation in the 2D image space, losing important information about the 3D scene where the motion actually takes place. In contrast, we lift 2D points into 3D and perform tracking in the 3D space. The more meaningful 3D contexts (as opposed to 2D), along with an as-rigid-as-possible regularization, facilitate improved handling of occlusions and enhance tracking accuracy. Previous studies have also explored computing 2D motion with a touch of 3D, e.g., through depth-separated layers~\cite{kasten2021layered,ye2022deformable,sun2010layered,sevilla2016optical} or quasi-3D space~\cite{wang2023tracking}. However, distinct from their optimization-based pipelines, we perform long-range 3D tracking in a more efficient, feedforward manner. 
+
+\vspace{-0.5em}
+\paragraph{Scene flow.}
+Scene flow defines a dense 3D motion field of points in a scene. Early work estimates scene flow in multi-view stereo settings~\cite{vedula1999three,pons2007multi,zhang20013d} through variational optimization~\cite{huguet2007variational}. The introduction of depth sensors enabled more effective scene flow estimation from pairs or sequences of RGB-D frames~\cite{hadfield2011kinecting,raft3D,jaimez2015primal,wang2020flownet3d++,hornacek2014sphereflow,herbst2013rgb,quiroga2014dense}.  A considerable number of recent scene flow methods rely on stereo inputs~\cite{ma2019deep,menze2015object}, but many of them are tailored specifically for self-driving scenes, lacking generalizability to diverse non-automotive contexts. Another line of research~\cite{liu2019flownet3d,wu2020pointpwc,gu2019hplflownet,niemeyer2019occupancy,lei2022cadex,bozic2021neuraldeformationgraphs} estimates 3D motion from a pair or a sequence of point clouds. 
+An important prior that is often used for scene flow estimation is local rigidity~\cite{vogel20113d,vogel2013piecewise}, where pixels are grouped into rigidly moving clusters~(object or part-level), in either a soft or hard manner. For example, RAFT-3D~\cite{raft3D} learns rigid-motion embeddings to softly group pixels into rigid objects. Scene flow estimation is also often solved as a sub-task in non-rigid reconstruction pipelines~\cite{keller2013real,lin2022occlusionfusion,newcombe2011kinectfusion}. For example, DynamicFusion~\cite{dynamicfusion} takes depth maps as input and computes dense volumetric warp functions by interpolating a sparse set of transformations as bases. In contrast to prior works, we learn to predict long-range 3D trajectories through supervised learning, providing generalization capabilities for handling complex real-world motion.
+
+
+% Another line of work are non-rigid reconstruction methods like DynamicFusion, which solve 3D tracking as a sub-task using a sparse set of transformations as bases and defining the dense volumetric warp function through interpolation.
+
+
+% \noindent\textbf{Implicit Neural Representations.}
+% %
+
+% \sd{We need to cite convolutional occupancy network, ALTO: Alternating Latent Topologies for Implicit 3D Reconstruction}{}
+
+% \sd{We need to cite occupancy flow, neural deformation graph}{}
+
+% \noindent\textbf{Consistent Video Editing.}
+% %
+
+
+
+% \noindent\textbf{Video Processing via Generative Models.}
+% %
+
+
+
+
+
+
+
+
+
+
+
+
+
+

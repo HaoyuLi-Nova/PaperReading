@@ -1,0 +1,77 @@
+
+\documentclass[10pt,twocolumn,letterpaper]{article}
+
+\usepackage{cvpr}              %
+
+\input{preamble}
+
+\definecolor{cvprblue}{rgb}{0.21,0.49,0.74}
+\usepackage[pagebackref,breaklinks,colorlinks,citecolor=cvprblue]{hyperref}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{makecell}
+
+\usepackage[symbol]{footmisc}
+
+
+
+
+\newcommand{\mypar}[1]{\vspace{2mm}\noindent\textbf{#1}}
+\newcommand{\ourmethod}{MotionPrompt}
+
+\newcommand{\supp}{\emph{sup.~mat.}}
+
+\def\paperID{483} %
+\def\confName{CVPR}
+\def\confYear{2025}
+
+\title{Motion Prompting: Controlling Video Generation with Motion Trajectories}
+
+\author{
+Daniel Geng$^{1,2,*}$ \hspace{0.2cm}
+Charles Herrmann$^{1,\dagger}$ \hspace{0.2cm}
+Junhwa Hur$^{1}$ \hspace{0.2cm}
+Forrester Cole$^{1}$ \hspace{0.2cm}
+Serena Zhang$^{1}$ \\
+Tobias Pfaff$^{1}$ \hspace{0.2cm} 
+Tatiana Lopez-Guevara$^{1}$ \hspace{0.2cm}
+Carl Doersch$^{1}$ \hspace{0.2cm}  %
+Yusuf Aytar$^{1}$ \hspace{0.2cm}
+Michael Rubinstein$^{1}$ \\
+Chen Sun$^{1,3}$ \hspace{0.2cm}
+Oliver Wang$^{1}$ \hspace{0.2cm}
+Andrew Owens$^{2}$ \hspace{0.2cm}
+Deqing Sun$^{1}$
+\vspace{0.2cm} \\
+$^1$Google DeepMind \hspace{0.8cm}
+$^2$University of Michigan \hspace{0.8cm}
+$^3$Brown University
+\vspace{0.2cm} \\
+\url{https://motion-prompting.github.io/}
+}
+
+
+\begin{document}
+\maketitle
+\input{sec/0_abstract}    
+\input{sec/1_intro}
+\input{sec/2_related_work}
+\input{sec/3_method}
+\input{sec/4_applications}
+\input{sec/5_quantitative}
+\input{sec/6_conclusion}
+
+
+ 
+
+{
+    \small
+    \bibliographystyle{ieeenat_fullname}
+    \bibliography{main}
+}
+
+\newpage
+
+\input{sec/X_suppl}
+
+\end{document}

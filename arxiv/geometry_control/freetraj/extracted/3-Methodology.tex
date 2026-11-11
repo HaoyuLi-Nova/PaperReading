@@ -1,0 +1,201 @@
+\section{Methodology}
+\label{methodology}
+% \vspace{-0.5em}
+
+\subsection{Preliminaries: Video Diffusion Models}
+
+Video Diffusion Models (VDM)~\citep{ho2022imagen} denotes diffusion models used for video generation, which formulates a fixed forward diffusion process to gradually add noise to the 4D video data $\bx_0 \sim p(\bx_0)$ and learn a denoising model to reverse this process. 
+The forward process contains $T$ timesteps, which gradually add noise to the data sample $\bx_0$ to yield $\bx_t$ through a parameterization trick:
+%
+\begin{equation}
+q(\bx_t|\bx_{t-1}) = \mathcal{N}(\bx_t;\sqrt{1-\beta_t}\bx_{t-1},\beta_t \bI), \qquad q(\bx_t|\bx_0) = \mathcal{N}(\bx_t; \sqrt{\bar\alpha_t}\bx_0, (1-\bar\alpha_t)\bI),
+\end{equation}
+%
+where $\beta_t$ is a predefined variance schedule, $t$ is the timestep, $\bar\alpha_t = \prod_{i=1}^t \alpha_i$, and $\alpha_t = 1-\beta_t$.
+The reverse denoising process obtains less noisy data $\boldsymbol{x}_{t-1}$ from the noisy input $\boldsymbol{x}_t$ at each timestep:
+%
+\begin{equation}
+p_\theta\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)=\mathcal{N}\left(\boldsymbol{x}_{t-1} ; \boldsymbol{\mu}_\theta\left(\boldsymbol{x}_t, t\right), \boldsymbol{\Sigma}_\theta\left(\boldsymbol{x}_t, t\right)\right).
+\end{equation}
+
+Here $\boldsymbol{\mu}_\theta$ and $\boldsymbol{\Sigma}_\theta$ are determined through a noise prediction network $\boldsymbol{\epsilon}_{\theta}\left(\boldsymbol{x}_t, t\right)$, which is supervised by the following objective function, where $\boldsymbol{\epsilon}$ is sampled ground truth noise and $\theta$ is the learnable network parameters.
+\begin{equation}
+\min _{\theta} \mathbb{E}_{t, \boldsymbol{x}_0, \boldsymbol{\epsilon}}\left\|\boldsymbol{\epsilon}-\boldsymbol{\epsilon}_{\theta}\left(\boldsymbol{x}_t, t\right)\right\|_2^2,
+\end{equation}
+
+Once the model is trained, we can synthesize a data point $\bx_0$ from random noise $\bx_T$ by sampling $\bx_t$ iteratively. Considering the high complexity and inter-frame redundancy of videos, Latent Diffusion Model (LDM)~\citep{ldm} is widely adopted to formulate the diffusion and denoising process in a more compact latent space. Latent Video Diffusion Models (LVDM) is realized through perceptual compression with a Variational Auto-Encoder (VAE)~\cite{kingma2014autoencoding}, where an encoder $\mathcal{E}$ maps $\bx_0 \in \mathbb{R}^{3 \times F \times H \times W}$ to its latent code $\boldsymbol{z}_0 \in \mathbb{R}^{4 \times F \times H' \times W'}$ and a decoder $\mathcal{D}$ reconstructs the image $\boldsymbol{x}_{0}$ from the $\boldsymbol{z}_0$. Then, the diffusion model $\theta$ operates on the video latent variables to predict the noise $\hat{\bepsilon}$.
+%
+\begin{equation}
+\boldsymbol{z}_0=\mathcal{E}\left(\boldsymbol{x}_0\right), \quad \hat{\bx_0} = \mathcal{D}\left(\boldsymbol{z}_0\right) \approx \bx_0, 
+\quad \hat{\bepsilon} = \bepsilon_\theta(\bz_t, \by, t),
+\end{equation}
+where $\by$ denotes conditions like text prompts. Most mainstream LVDMs~\citep{blattmann2023align,wang2023modelscope,chen2023videocrafter1} are implemented by a UNet equipped with convolutional modules, spatial attentions, and temporal attentions. The basic computation block (whose feature input and output are $\mathbf{h}$ and $\mathbf{h}'$ respectively) could be denoted as:
+\begin{gather}
+\bh' = \mathrm{TT}(\mathrm{ST}(\mathrm{Tconv}(\mathrm{Conv}(\bh, t)), \by)),
+\quad \mathrm{TT} = \mathrm{Proj}_{\mathrm{in}} \circ (\mathrm{Attn}_{\text{temp}} \circ \mathrm{Attn}_{\text{temp}} \circ \mathrm{MLP}) \circ \mathrm{Proj}_{\text{out}}.
+\end{gather}
+Here Conv and ST are residual convolutional block and spatial transformer, while Tconv denotes temporal convolutional block and TT denotes temporal transformers, serving as cross-frame operation modules.
+
+
+\begin{figure*} %[t]
+% \vspace{-0.1in}
+\centering
+\includegraphics[width=0.95\linewidth]{Figures/fig_moveanalysis.pdf}
+\vspace{-1.0em}
+\caption{\textbf{Noise resampling of initial high-frequency components.} Gradually increasing the proportion of resampled high-frequency information in the frame-wise shared noises can significantly reduce the artifact in the generated video. However, this also leads to a gradual loss in trajectory control ability. A resampling percentage of 75\% strikes a better balance between maintaining control and improving the quality of the generated video.}
+\vspace{-1.0em}
+\label{fig:moveanalysis}
+\end{figure*}
+
+
+
+\subsection{Noise Influence on Trajectory Control} 
+\label{subsec:noise_analysis}
+
+During the training process of the video diffusion model, it cannot fully corrupt the semantics, leaving substantial spatio-temporal correlations in the low-frequency components~\citep{wu2023freeinit}. Those low-frequency correlations may still contain the information of trajectory. Therefore, if we simulate the noises of the training process and manually add some spatio-temporal correlations in the low-frequency components, we have a chance to control the motion of the generated video.
+
+\noindent\textbf{Noise Flow.} Our first attempt is to make the noise flow among frames. Instead of randomly sampling initial noises for all frames, we only sample the noise for the first frame. Then we move the noise from the top-left to the bottom-right with stride $2$ and repeat this operation until we get initial noises $z_{T}^{flow}$ for all frames. Specially, initial noise $\epsilon$ for each frame $f$ in position $[i, j]$ is:
+%
+\begin{equation}
+\epsilon[i, j]^{f} = \epsilon[(i-2) \ (\mathrm{mod} \ H), (j-2) \ (\mathrm{mod} \ W)]^{f-1}.
+\end{equation}
+%
+After denoising $z_{T}^{flow}$, although we will get a video with strong artifacts (Figure~\ref{fig:moveanalysis}), we can still find a valuable phenomenon: objects and textures in the video also flow in the same direction (top-left to bottom-right). This phenomenon verifies that the trajectory of the initial noises can guide the motion trajectory of generated results.
+
+\noindent\textbf{High-Frequency Noise Resampling.} Artifacts in Noise Flow are mainly caused by deviation from the independent random distribution of the initial noises. 
+%
+Therefore, if we resample some new random independent noises to replace some dependent noises in $z_{T}^{flow}$, more realistic results are expected to be generated. 
+%
+According to the analysis of FreeInit~\citep{wu2023freeinit}, the trajectory information is mainly obtained in the low-frequency noise. Therefore, we use Fourier Transformation to resample high-frequency noise and get new latent $\tilde{z_T}$ to perform further denoising.
+%
+\begin{equation}
+\begin{aligned}
+\mathcal{F}_{z_T}^{low} & =\mathcal{F F T}_{3 D}\left(z_T\right) \odot \mathcal{H}, \\
+\mathcal{F}_\eta^{high} & =\mathcal{F F T}_{3 D}(\eta) \odot(1-\mathcal{H}), \\
+\tilde{z_T} & =\mathcal{I F F T}_{3 D}\left(\mathcal{F}_{z_T}^L+\mathcal{F}_\eta^{high}\right),
+\end{aligned}
+\label{eq:resample}
+\end{equation}
+%
+where $\mathcal{F F T}_{3 D}$ is the Fast Fourier Transformation operated on both spatial and temporal dimensions, and $\mathcal{I} \mathcal{F} \mathcal{F T}_{3 D}$ is the Inverse Fast Fourier Transformation that maps noise back from the blended frequency domain. $\mathcal{H}$ is the spatial-temporal Low Pass Filter (LPF), which is a tensor of the same shape as the latent. $\eta$ is a newly sampled random noise to replace the high-frequency of the original noise. In this case, $z_{T} = z_{T}^{flow}$.
+
+Figure~\ref{fig:moveanalysis} shows that the visual quality is significantly improved as the proportion of high-frequency noise resampled increases. Correspondingly, the flow phenomenon is weakened. When $90\%$ high-frequency noise is resampled, the flow is almost stopped with only some similar textures remaining (\textit{e.g.,} branches from top-left to bottom right). Overall, $75\%$ resampling strikes a good balance between sportiness and image quality.
+
+\begin{figure*} %[t]
+% \vspace{-1.0em}
+\centering
+\includegraphics[width=0.95\linewidth]{Figures/fig_localnoise.pdf}
+\vspace{-1.0em}
+\caption{\textbf{Trajectory control via frame-wise shared low-frequency noise.} The success cases on the left demonstrate that the moving objects in the generated videos can be roughly controlled by sharing low-frequent noise across the bounding boxes of the given trajectory. However, the precision of control and the success rate remain somewhat constrained, as evidenced by the failure instances on the right.}
+\vspace{-1.0em}
+\label{fig:localnoise}
+\end{figure*}
+
+\noindent\textbf{Trajectory Injection.} In noise flow, all objects in the foreground and background tend to move toward the direction of flow. If we only control the flow happening in the local area with some trajectories, can we guide the only main object to move following the corresponding trajectories? To answer it, we design some trajectories from simple to complex and make the flow area occupy a quarter of the area, as shown in the first row of Figure~\ref{fig:localnoise}.
+
+Instead of directly denoising random noises, we inject trajectory into the initial noises. We first initialize a random local noise $\epsilon_{local}$ according to the area of the input mask and $F$ frames of random noises $[\epsilon_1, \epsilon_2, ..., \epsilon_{F}]$ independently. Then for each frame $f$, the initial noise $\epsilon_{f}$ will be replaced by the $\epsilon_{local}$ if in the area of the input mask:
+%
+\begin{equation}
+\begin{aligned}
+& \tilde{\epsilon_{f}}[i, j] = \begin{cases} \epsilon_{f}[i, j] & \text { if } M_f[i, j]=0 \\
+\epsilon_{local}[i^*, j^*] & \text { if } M_f[i, j]=1\end{cases},
+\end{aligned}
+\label{eq:noisetraj}
+\end{equation}
+%
+where $\epsilon_{f}, \epsilon_{local} \sim \mathcal{N}\left(\mathbf{0}, \mathbf{I}\right)$, $M_f$ is the input mask of frame $f$, and $M_f[i, j]=1$ if the position $(i,j)$ is inside the bounding box of trajectory. $M_f[i, j]=0$ otherwise. $(i^*, j^*)$ is the corresponding local position in the box.
+
+
+
+As shown in the left of Figure~\ref{fig:localnoise}, some objects are well generated and follow the trajectory injected in initial noises although they may not be fully aligned with the given bounding boxes. While these objects move along the trajectory, they will also try to follow the prior knowledge of the physical world contained in the model (\textit{e.g.} dolphins cannot go too far from the sea after jumping). And the right of Figure~\ref{fig:localnoise} shows some failure cases. They are either poor in visual quality or in trajectory alignment.
+
+Based on those observations, although we can utilize initial noises to guide the trajectory, we still need to involve additional control mechanisms to achieve accurate trajectory control, especially when the target trajectory deviates from a prior knowledge of the physical world contained in the model.
+
+
+
+\begin{figure}
+\centering
+\includegraphics[width=0.95\linewidth]{Figures/fig_framework.pdf}
+\vspace{-1.0em}
+\caption{\textbf{An overview of FreeTraj.} Our framework mainly contains two parts: guidance in noise and guidance in attention. For noise, we inject the target trajectory into the low-frequency part. For attention, we design different reweighing strategies according to the supposed behaviors in different attention layers. Here $\mathcal{S}$, $M_{C A}$, $M_{S A}$, and $M_{T A}$ are different attention masks.}
+\vspace{-1.0em}
+\label{fig:framework}
+\end{figure}
+
+\subsection{The Framework of FreeTraj}
+
+Given a target bounding box for a foreground object in the video, we suppose the pre-trained video model to generate results whose trajectory is aligned with the given box. To achieve that, we propose \textbf{FreeTraj}, which designs guidance in both noise and attention as shown in Figure~\ref{fig:framework}.
+
+\subsubsection{Guidance in Noise}
+As analyzed in Section~\ref{subsec:noise_analysis}, frame-wise shared low-frequency noise can guide the trajectory of generated objects. Therefore, we inject trajectory in the initial noises through Equation~\ref{eq:noisetraj}. To reduce the phenomena of attention isolation, we still need to remove some of the injected noises through High-Frequency Noise Resampling (Equation~\ref{eq:resample}).
+
+\subsubsection{Guidance in Attention}
+Object trajectories in generated videos with only noise guidance still tend to follow the prior information of the video model.
+%
+To make the control more accurate precisely, we also add trajectory guidance in attention.
+%
+There are three kinds of attention layers in the UNet of VideoCrafter~\citep{chen2024videocrafter2}: spatial cross-attention, spatial self-attention, and temporal self-attention. Unlike previous work Peekaboo~\citep{jain2023peekaboo} directly masks the foreground and background respectively for all attention layers, we design different strategies according to the supposed behaviors in different attention layers. All attention editing is performed in the early steps $t \in\left\{T, \ldots, T-N\right\}$ of the denoising process, where $T$ is the total number of denoising timesteps, and $N$ is the number of timesteps for attention editing.
+
+\noindent\textbf{Attention Isolation.} We find the previous designs in attention may cause attention isolation. It is a phenomenon that some regions become isolated either spatially or temporally and rarely pay attention to information outside their own region. This is often caused by the values in this area deviating too much from the training distribution. Unlucky, it is difficult for this region to restore itself to normal levels through valuable information from the other regions due to the isolation. Therefore, it is necessary to avoid attention isolation when we modify the attention mechanism without re-training.
+%
+We will discuss more in the ablation study and appendix.
+
+\noindent\textbf{Cross Attention Guidance.} Spatial cross-attention is the only place for prompts to inject the information from text embedding. Originally, the model would assign the object according to the prompts and initial noises. It is a random and unpredictable behavior. To force the model to only generate the target object in the given bounding box, we first add guidance to the cross-attention. Given query $Q$, key $K$, value $V$ of cross-attention, and the re-scaled binary 2D attention masks $M_a$ and $M_a^{\prime}$, which indicate the foreground and background areas of the generated video respectively. Our guided cross-attention is:
+%
+\begin{equation}
+\begin{aligned}
+& \text {GuidedCrossAttention}(Q, K, V, M_a, M_a^{\prime})=(\operatorname{softmax}\left(\frac{Q {K}^T}{\sqrt{d}} + \mathcal{M}\right) + \mathcal{S}) V, \\
+& \text { where } \mathcal{S}[i, j]= \begin{cases}0 & \text { if } M_a[i, j]=0 \\
+\alpha \, g(i, j) & \text { if } M_a[i, j]=1\end{cases}, 
+\text{and } \mathcal{M}[i, j]= \begin{cases}-\infty & \text { if } {M_a^{\prime}}[i, j]=0 \\
+0 & \text { if } {M_a^{\prime}}[i, j]=1\end{cases}.
+\end{aligned}
+\label{eq:ca}
+\end{equation}
+%
+Here $\alpha$ is a coefficient to enhance the influence of target prompts in the foreground and $g(\cdot, \cdot)$ is a Gaussian weight~\citep{ma2023trailblazer}.
+%
+Note that the attention masks $M_a, M_a^{\prime} \in\{0,1\}^{d_q \times d_k}$, where $d_q$ and $d_k$ are the lengths of queries and keys, respectively. They are attained with a given prompt $P$ and the target mask $M_{\text {target }}^f[i]$ of frame $f$ ($M_{\text {target }}^f[i]$ is a 1-D flatten form of $M_f$ in Eq.~\ref{eq:noisetraj}). In the cross-attention layer, $M_a$ and $M_a^{\prime}$ are respectively denoted as $M_{CA}$ and $M^{\prime}_{CA}$, where 
+%
+\begin{equation}
+\begin{aligned}
+& M_{C A}^f[i, j] =\operatorname{fg}\left(M_{\text {target }}^f[i]\right) * \operatorname{fg}(P[j]), \\
+& {M^{\prime}}_{C A}^f[i, j] =\left(1-\operatorname{fg}\left(M_{\text {target }}^f[i]\right)\right) * (1-\operatorname{fg}(P[j])),
+\end{aligned}
+\end{equation}
+%
+where $\operatorname{fg}$ is a function that takes a pixel or a text token as input, returning $1$ if it corresponds to the foreground of the video, and $0$ otherwise.
+
+\noindent\textbf{Self Attention Guidance.} Self-attention consists of the spatial part and temporal part. Without mandatory constraints, the information in the foreground and background will interact. In this case, the video model may still generate target objects at unexpected locations. Therefore, we design guided self-attention:
+%
+\begin{equation}
+\begin{aligned}
+& \text {GuidedSelfAttention}(Q, K, V, M_a)=\operatorname{softmax}\left(\frac{Q K^T}{\sqrt{d}}\times \mathcal{W}\right) V, \\
+& \text { where } \mathcal{W}[i, j]= \begin{cases}\beta & \text { if } M_a[i, j]=0 \\
+1 & \text { if } M_a[i, j]=1\end{cases}.
+\end{aligned}
+\label{eq:sata}
+\end{equation}
+Here $\beta$ is a coefficient to weaken the influence of the interaction of foreground and background. Compared to the hard mask using $-\infty$ to forbid the interaction of foreground and background, this soft mask design can avoid some artifacts caused by attention isolation. 
+
+The attention mask $M_a$ designed in self-attention follows the Peekaboo~\citep{jain2023peekaboo}. Specifically, in the spatial self-attention layer, $M_a$ is denoted as $M_{SA}$, where
+%
+\begin{equation}
+\begin{aligned}
+M_{S A}^f[i, j] & =\operatorname{fg}\left(M_{\text {target }}^f[i]\right) * \operatorname{fg}\left(M_{\text {target }}^f[j]\right) \\
+& +\left(1-\operatorname{fg}\left(M_{\text {target }}^f[i]\right)\right) *\left(1-\operatorname{fg}\left(M_{\text {target }}^f[j]\right)\right),
+\end{aligned}
+\end{equation}
+%
+and in the temporal self-attention layer, $M_a$ is denoted as $M_{TA}$, where
+\begin{equation}
+\begin{aligned}
+M_{T A}^i[f, k] & =\operatorname{fg}\left(M_{\text {target }}^f[i]\right) * \operatorname{fg}\left(M_{\text {target }}^k[i]\right) \\
+& +\left(1-\operatorname{fg}\left(M_{\text {target }}^f[i]\right)\right) *\left(1-\operatorname{fg}\left(M_{\text {target }}^k[i]\right)\right).
+\end{aligned}
+\end{equation}
+
+\subsection{Longer Video Generation}
+FreeTraj can also be integrated into the longer video generation framework FreeNoise~\citep{freenoise} to generate rich motion trajectories in long videos. FreeNoise mainly applies Local Window Fusion to the temporal attention to guarantee visual quality and utilize Noise Rescheduling in the noise initialization to reserve video consistency. 
+
+Local Window Fusion divides the temporal attention into several overlapped local windows along the temporal dimension and then fuses them together. In order to cooperate with Local Window Fusion, our guidance in temporal attention is only applied within each Local Window Fusion. Noise Rescheduling reuses and shuffles the sub-fragment of initial noises. To avoid our guidance in noise being destroyed, Equation~\ref{eq:noisetraj} and Equation~\ref{eq:resample} are applied after Noise Rescheduling. As shown in Figure~\ref{fig:long}, our method achieves trajectory controls over a long video sequence without any finetuning.

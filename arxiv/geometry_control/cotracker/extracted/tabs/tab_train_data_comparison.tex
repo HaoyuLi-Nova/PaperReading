@@ -1,0 +1,23 @@
+%\setlength\tabcolsep{.4em}
+\begin{table}[t]
+\centering
+\footnotesize
+\caption{  \textbf{Training data}. For a fair comparison, we train PIPs on Kubric which improves performance.  }\label{tab:tab_train_data_comparison}
+\begin{tabular}{ llcccccc }
+\toprule
+\multirow{2}{*}{Method} & \multirow{2}{*}{Training data}  & \multicolumn{3}{c}{DAVIS First}  \\
+\cmidrule(lr){3-5}
+\cmidrule(lr){6-7}
+& &  AJ & \!\!\!$\davg$\! & OA \\
+\midrule
+% \midrule
+PIPs~\cite{pips} & Flying things++ & 42.2 & 64.8 & 77.7 \\
+ 
+PIPs~\cite{pips} & TAP-Vid-Kubric  & 43.8 & 66.5 & 77.4 \\
+
+\method (Ours)\!\!\! & TAP-Vid-Kubric    & \textbf{60.6} & \textbf{75.4} & \textbf{89.3 } \\
+
+\bottomrule
+\end{tabular}
+
+\end{table}

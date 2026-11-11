@@ -1,0 +1,101 @@
+\section{Introduction}
+\label{sec:introduction}
+
+The philosophy of Heraclitus is often distilled into the
+aphorism \textit{panta rhei}---everything flows.
+In the physical world, appearances and spatial configurations
+continually change, while objects maintain continuity over time.
+An embodied world model should capture both aspects.
+Recent generative video models~\citep{wan2025wan,seedance2026seedance2}
+predict increasingly coherent visual futures, but express
+these predictions in pixels, leaving the underlying 3D
+dynamics implicit.
+World action models~\citep{zhou2026zerowam,yuan2026fastwam,nvidia2026cosmos3,ye2026dreamzero}
+connect future prediction to robotic behavior by incorporating
+actions into world modeling.
+However, action supervision is costly to collect at scale,
+and action representations are often tied to particular
+robot embodiments, complicating cross-platform transfer.
+These limitations motivate extending world modeling into
+the space of explicit 3D motion flow: a geometric representation
+of physical change that can connect visual prediction to
+planning and control across embodiments.
+
+A complementary line of research approaches this space
+through motion modeling, progressing from tracking motion
+in observed videos~\citep{lu2026track4world,luo20264rc} to predicting future trajectories
+from current observations~\citep{zhang2026molmomotion,lee2026mu_0}.
+For generative motion prediction, producing dense 3D
+scene flow is computationally expensive.
+Existing scene-level methods instead predict motion
+on coarse spatial grids~\citep{lee2026tracegen,li2026egowam}.
+However, sparse scene flow still allocates motion tokens
+to task-irrelevant regions, while its reduced spatial
+resolution limits the fidelity of fine motion boundaries.
+Query-conditioned prediction offers a more targeted
+alternative, allocating motion tokens to specified 3D
+locations in task-critical regions while retaining global
+scene context as conditioning information.
+Yet learning generalizable dynamics at scale faces two
+challenges: high-quality 3D trajectory annotations are costly
+to acquire, while flow-only supervision provides a limited
+learning signal for physical dynamics, potentially limiting
+generalization across scenes and interactions.
+Jointly modeling visual evolution and explicit motion
+offers a natural way to enrich this supervision,
+bringing motion prediction into a generative world model.
+
+To this end, we introduce \method{}, a generative world model
+that jointly predicts future video and query-conditioned
+3D object trajectories through a unified
+Mixture-of-Transformers (MoT) backbone.
+Given an observed image, a language instruction, and sparse
+3D query points, \method{} forecasts motion at the queried
+locations while using the full scene as visual context.
+We represent trajectories as continuous tokens encoding
+normalized frame-to-frame 3D displacements, enriched with
+initial point geometry and spatiotemporally aligned with
+video tokens.
+A unified rectified-flow objective jointly denoises both
+modalities, coupling trajectory learning with dense visual
+supervision of the same future.
+
+To support training at scale, we assemble a heterogeneous
+corpus spanning simulated and real-world domains, comprising
+approximately 1.44 million object-level samples---equivalent
+to 1,224 hours of standardized 49-frame sequences at 16 FPS.
+We combine existing motion annotations with automated
+trajectory extraction, unify their representations, and
+apply source-specific quality control and fixed domain-level
+normalization for mixed-data training.
+We further introduce WorldFlowBench, comprising three
+evaluation sets, including SpatialCog for spatial reasoning
+in future motion prediction.
+On WorldFlowBench, \method{} achieves the lowest ADE and FDE
+across all three evaluation sets among non-static methods.
+Compared with its flow-only variant, joint video-flow
+generation reduces ADE by 48.5\% on Sim7 and 55.9\% on
+SpatialCog, with a 68.5\% reduction in FDE on SpatialCog.
+These results support the value of complementary visual
+supervision for accurate 3D motion forecasting.
+
+Our contributions are:
+\begin{itemize}
+    \item We introduce \method{}, a generative world model
+    that jointly predicts video and query-conditioned 3D
+    object motion through a unified MoT backbone, combining
+    explicit trajectory supervision with dense visual
+    supervision.
+
+    \item We construct a heterogeneous corpus of approximately
+    1.44 million object-level samples from simulated and
+    real-world data, using unified motion representations
+    and source-specific quality control to support
+    large-scale training.
+
+    \item We introduce WorldFlowBench, comprising three
+    evaluation sets including SpatialCog for spatial
+    reasoning, and demonstrate improvements over existing
+    motion prediction methods and
+    video-generation-then-tracking pipelines.
+\end{itemize}

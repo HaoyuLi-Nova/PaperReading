@@ -46,6 +46,19 @@ rm -rf code/<track>/<slug>/.git
 | 论文 | 路径 | 来源 |
 |------|------|------|
 | Wan-Move | [`geometry_control/wan_move/`](geometry_control/wan_move/) | [ali-vilab/Wan-Move](https://github.com/ali-vilab/Wan-Move) |
+| LeviTor | [`geometry_control/levitor/`](geometry_control/levitor/) | [ant-research/LeviTor](https://github.com/ant-research/LeviTor) |
+| MotionCanvas | [`geometry_control/motioncanvas/`](geometry_control/motioncanvas/) | [Doubiiu/MotionCanvas](https://github.com/Doubiiu/MotionCanvas) |
+| MotionCtrl | [`geometry_control/motionctrl/`](geometry_control/motionctrl/) | [TencentARC/MotionCtrl](https://github.com/TencentARC/MotionCtrl) |
+| CameraCtrl | [`geometry_control/cameractrl/`](geometry_control/cameractrl/) | [hehao13/CameraCtrl](https://github.com/hehao13/CameraCtrl) |
+| DragAnything | [`geometry_control/draganything/`](geometry_control/draganything/) | [showlab/DragAnything](https://github.com/showlab/DragAnything) |
+| 3DTrajMaster | [`geometry_control/3dtrajmaster/`](geometry_control/3dtrajmaster/) | [KlingAIResearch/3DTrajMaster](https://github.com/KlingAIResearch/3DTrajMaster) |
+| UCPE | [`geometry_control/ucpe/`](geometry_control/ucpe/) | [chengzhag/UCPE](https://github.com/chengzhag/UCPE) |
+| EchoMotion | [`geometry_control/echomotion/`](geometry_control/echomotion/) | [D2I-ai/EchoMotion](https://github.com/D2I-ai/EchoMotion) |
+| MotionCrafter | [`geometry_control/motioncrafter/`](geometry_control/motioncrafter/) | [TencentARC/MotionCrafter](https://github.com/TencentARC/MotionCrafter) |
+| Free-Form Motion Control | [`geometry_control/free_form_motion_control/`](geometry_control/free_form_motion_control/) | [FudanCVL/SynFMC](https://github.com/FudanCVL/SynFMC) |
+| SymphoMotion | [`geometry_control/symphomotion/`](geometry_control/symphomotion/) | [grenoble-zhang/SymphoMotion](https://github.com/grenoble-zhang/SymphoMotion) |
+| CoMoVi | [`geometry_control/comovi/`](geometry_control/comovi/) | [IGL-HKUST/CoMoVi](https://github.com/IGL-HKUST/CoMoVi) |
+| MoGe4D | [`geometry_control/moge4d/`](geometry_control/moge4d/) | [Zhangyr2022/MoGe4D](https://github.com/Zhangyr2022/MoGe4D) |
 
 ## Multi view
 

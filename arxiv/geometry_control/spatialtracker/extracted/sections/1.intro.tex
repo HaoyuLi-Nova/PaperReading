@@ -1,0 +1,123 @@
+\section{Introduction}\label{sec:intro}
+
+
+Motion estimation has historically been approached through two main paradigms: feature tracking~\cite{lucas1981iterative,shi1994good,tomasi1991detection,lowe2004distinctive} and optical flow~\cite{horn1981determining,teed2020raft,beauchemin1995computation}. While each type of method enables numerous applications, neither of them fully captures the motion in a video: optical flow only produces motion for adjacent frames, whereas feature tracking only tracks sparse pixels.
+
+An ideal solution would involve the ability to estimate both \emph{dense} and \emph{long-range} pixel trajectories in a video sequence~\cite{PartVid,rubinstein2012towards}. Seminal work like Particle Video~\cite{PartVid} has bridged the gap by representing video motion using a set of semi-dense and long-range particles. More recently, several efforts~\cite{pips,tap-vid,Tapir,cotracker} have revisited this problem, formulating it as \emph{tracking any point} and addressing it through supervised learning frameworks. While trained solely on synthetic datasets~\cite{kubric,zheng2023pointodyssey}, these methods consistently demonstrate strong generalization abilities to real-world videos, pushing the boundaries of long-range pixel tracking through occlusions.
+
+While great progress has been achieved, current solutions still struggle in challenging scenarios, particularly in cases of complex deformation accompanied by frequent self-occlusions. We argue that one potential cause for this difficulty stems from tracking only in the 2D image space, thereby disregarding the inherent 3D nature of motion. As motion takes place in 3D space, certain properties can only be adequately expressed through 3D representations. For example, rotation can be succinctly explained by three parameters in 3D, and occlusion can be simply expressed with z-buffering, but they are much more complicated to express within a 2D representation. In addition, the key component of these methods --- using \emph{2D} feature correlation to predict motion updates --- can be insufficient. Image projection
+can bring spatially distant regions into proximity within the 2D space, which can cause the local 2D neighborhood for correlation to potentially contain irrelevant context~(especially near occlusion boundaries), thereby leading to difficulties in reasoning.
+
+To tackle these challenges, we propose to leverage geometric priors from state-of-the-art monocular depth estimators~\cite{ZoeDepth} to lift 2D pixels into 3D, and perform tracking in the 3D space. This involves conducting feature correlation in 3D, which provides more meaningful 3D context for tracking especially in cases of complex motion.
+Tracking in 3D also allows for enforcing 3D motion priors~\cite{raft3D,quiroga2014dense} such as ARAP constraint.
+Encouraging the model to learn which points move rigidly together can help track ambiguous or occluded pixels, as their motion can then be inferred using neighboring unambiguous and visible regions within the same rigid group.
+
+Specifically, we propose to represent the 3D scene of each frame with triplane feature maps~\cite{chan2022efficient}, which are obtained by first lifting image features to 3D featured point clouds and then splatting them onto three orthogonal planes.
+The triplane representation is compact and regular, suitable for our learning framework.
+Moreover, it covers the 3D space densely, enabling us to extract the feature vectors of any 3D point for tracking. We then compute 3D trajectories for query pixels through iterative updates predicted by a transformer using features from our triplane representation.
+% To train our model, we utilize ground-truth 3D trajectory annotations from the Kubric dataset~\cite{kubric}. 
+To regularize the estimated 3D trajectories with 3D motion prior, our model additionally predicts a rigidity embedding for each trajectory, which allows us to softly group pixels exhibiting the same rigid body motion and enforce an ARAP regularization for each rigid cluster.
+We demonstrate that the rigidity embedding can be learned self-supervisedly and produce reasonable segmentation of different rigid parts.
+
+Our model achieves state-of-the-art performance on various public tracking benchmarks including TAP-Vid~\cite{tap-vid}, BADJA~\cite{BADJA} and 
+PointOdyssey~\cite{zheng2023pointodyssey}. Qualitative results on challenging Internet videos also demonstrate the superior capability of our model to handle fast complex motion and extended occlusion. 
+
+
+\iffalse
+In conclusion, our paper has the following contributions:
+\begin{itemize}
+    \item A novel framework that tracks dense and long-range 2D motion by lifting pixels to 3D space.
+    \item A triplane encoding of video that facilitates efficient 3D feature learning and tracking.
+    \item A learnable ARAP constraint that can unsupervisedly identify rigid parts in a scene. 
+    \item State-of-the-art results in terms of both 2D and 3D tracking on public benchmarks.
+\end{itemize}
+\fi
+
+\iffalse
+\yj{Occlusion is caused by projection (maybe mention view dependency). There is no concept of occlusion in 3D space (particles are mutually exclusive in 3D space).}
+
+% 介绍论文的任务
+% 1. Motion estimation是什么：Motion estimation aims to track 2D points in a video, which is a cornerstone of many computer vision tasks, such as video coding, video editing, and non-rigid structure from motion.
+% 2. 我们具体的setting: 给定一些2D points，想找到其他视频帧的corresponding points.
+Motion estimation aims to establish long range and dense pixel correspondences across the video, which is a cornerstone of many computer vision tasks, such as video coding, video editing, and non-rigid structure from motion.
+In this paper, we focus on the setting of tracking trajectories within a video for any pixel in any video frame.
+% Prior work: 
+% traditional: particle video (semi dense)
+\sd{Not sure if this is correct}{Traditional motion estimation methods \tocite{} generally represent pixel correspondences as a set of linked particles, which are optimized based on an energy functional defined with low-level features, such as optical flow or image gradient.}
+Although these methods can achieve reasonable results, they are prone to local optima due to the handcrafted objective functions.
+
+% Modern 2D tracking methods: pips, cotracker, tapir, …
+Recently, learning-based trackers~\cite{pips, zheng2023pointodyssey, Tapir, cotracker} exploit deep neural networks to extract informative image features and perform the feature correlation among 2D pixels to obtain reliable correspondences.
+They exhibit impressive tracking performance on complex dynamic scenes and produce long range trajectories.
+However, these methods still struggle to handle challenging cases such as occlusions and viewpoint changes, as shown in Fig.~\tocite{}.
+% How other people do 2d tracking: essentially 2d correlation, but the 2d local neighborhood is not necessarily relevant. Because different surfaces can be projected to neighboring locations in the 2d space, losing 3D information, which can cause failures in challenging cases as seen in Fig 1.
+A plausible reason is that different 3D surfaces can be projected to neighboring locations in 2D image space, resulting in significant interference for the \sd{I found that we still do feature correlation on 2D feature planes.}{2D feature correlation}.
+\sd{I found that 2d local neighborhood is still difficult to understand without context. So I remove it.}{essentially 2d correlation, but the 2d local neighborhood is not necessarily relevant.}
+
+% We propose to overcome this problem by tracking in 3d, which has two advantages: 1) neighborhood in 3d is more meaningful 2) allows for constraints like ARAP (helps occlusion and ambiguous regions).
+In this paper, we propose to overcome this problem by tracking points in 3D space, which naturally has two advantages in contrast to 2D tracking algorithms.
+First, scene structures in 3D space are \sd{a better word is needed}{correctly} arranged, thus decreasing abrupt obstructions in neighboring regions.
+Second, it is easy to apply spatial constraints like ARAP in 3D space, which can regularize the tracking in occlusion and ambiguous regions.
+% Method overview, part 1: 3D tracking (triplane: dense and efficient) Part 2: as rigid as possible, details about affinity map
+To this end, we develop a novel 3D tracker that iteratively predicts 3D trajectories based on the input RGB video.
+Specifically, using the monocular depth estimator and 2D CNN network, the video is first encoded into triplane representations~\tocite{}, allowing us to efficiently establish temporal correspondences for any 3D point.
+Then, we lift query pixels to 3D space and initialize 3D trajectories, where each point is equipped with a token constructed based on triplane features.
+A transformer is designed to iteratively update the 3D trajectories.
+
+% 1. Motivation: Rigid regularization
+% 2. 做法
+% 3. contribution 2的技术优势：This model can produce rigid part segmentation，带来了potential downstream tasks
+\sd{Part 2: ARAP. Motivation -> Concrete method -> benefit (rigid part segmentation.)}{}
+% Besides, the second challenge is that 3d trajectories will increase the freedom of the estimation, which will increase some ambiguity without any constrains. In the particle video's formulation, there exists the "link" topological constraint between among queried pixels. Inspired by this, we propose a neural ARAP (as rigid as possible) module to predict the rigidity relations between any pixel pairs. Specifically, we interact the queried trajectory features with a low rank latent codebook by cross attention~\cite{percevier} for compression. And we leverage the compressed features to calculate the affinity matrix among all the queried points. At the same time, we use the predicted affinity matrix to regularize the 3D trajectories. By the proposed neural arap, we can discover the potential rigid parts during the complex dynamic scenes. And the occluded 3d trajectories could be guided by its rigid neighbours to maintain the topology. 
+
+% 通过讨论之前的方法引出我们解决了的technical challenge
+% 1. Recently, learning-based methods …
+% 2. Co-tracker怎么做的
+% 3. Co-tracker没法处理occlusion、viewpoint changes的问题, as shown in Figure X
+% \yx{
+% The motion estimation had been studied as the optical flow or feature tracking problems~\tocite{} for a long time.
+% However, neither optical flow or feature tracking can perfectly satisfy the requirements of "dense" and "long range" \sd{The occlusion is caused by ``2D feature tracking'' but not ``feature tracking''}{due to the inevitable occlusions}.
+% \sd{A bit wordy here. It is better to introduce a category of methods in one sentence.}{
+% Particle video~\cite{PartVid} first proposes to represent the video as a set of linked particles, which leverages the linking constrains between the particles to mitigate the occlusion influence for attaining the long range trajectories. 
+% Pips\cite{pips} revisits the particle video and renew it with the modern neural networks, which trains a temporal-aware model to track through occlusions via the temporal priors. 
+% And its followers~\cite{pips2, Tapir, cotracker} continue to promote the advancement by introducing joint tracking with spatial and temporal information, coarse to fine refinement or new training datasets.
+% }
+% However, as seen in Fig.~\tocite{}, these methods still get failed in some tricky occluded video.
+% In this paper, we argue that the occlusions are non trivial problem in the 2d space due to the inherent projection model for image.
+% However, there is a very straightforward intuition:
+% \begin{quote}
+% \sd{This statement is easy to be criticized. I lean to implicitly refer the plausible reason for our better performance as 3D, but would not like to make strong statement.}{"As to occlusions, the 3D space has less ambiguity compared to its 2D projection."}
+% \end{quote} 
+
+% Following this intuition, we regard this problem from a different perspective, \ie "track the point within a 3D space instead of in the their projection coordinates."
+% \sd{Starting from a naive baseline decreases the novelty of our approach. Seems that we just make some improvement to video with depth maps.}{
+% Benefiting from the well studied monocular depth estimation~\tocite{}, lifting videos into 3D space is easy to access with just a pretrained model. However, this fancy intuition still introduces extra challenges compared to prior methods. 
+% }
+
+% \sd{Too many technical details in the Introduction section, which probably makes reader difficult to find our core contributions.}{
+% The first challenge is how to efficiently encode the 3D space and calculate the 3D correspondence without unbearable computational cost.  Inspired by convolutional occupancy networks~\cite{ConvOccNetwork}, we propose a novel splatting based triplane encoding module for video. Specifically, given an RGB video, we first utilize a monocular depth estimator for lifting the video to a sequence of featurized point clouds. Then, we splat these point clouds onto triplanes\cite{chan2022efficient} and devise several convolutional layers to enhance the features. And thank to the tri-plane representation, for any queried points, we can construct the 3d correspondence via correlating the its features in the three 2d planes repsectively. 
+% }
+
+% \sd{Too many technical details in the Introduction section, which probably makes reader difficult to find our core contributions.}{
+% Besides, the second challenge is that 3d trajectories will increase the freedom of the estimation, which will increase some ambiguity without any constrains. In the particle video's formulation, there exists the "link" topological constraint between among queried pixels. Inspired by this, we propose a neural ARAP (as rigid as possible) module to predict the rigidity relations between any pixel pairs. Specifically, we interact the queried trajectory features with a low rank latent codebook by cross attention~\cite{percevier} for compression. And we leverage the compressed features to calculate the affinity matrix among all the queried points. At the same time, we use the predicted affinity matrix to regularize the 3D trajectories. By the proposed neural arap, we can discover the potential rigid parts during the complex dynamic scenes. And the occluded 3d trajectories could be guided by its rigid neighbours to maintain the topology. 
+% }
+
+% In order to justify the meaningful functions of tracking points in 3d, we conducted a series of evaluations in both 2D and 3D tracking. Our method outperform the sota tracking algorithms by a clear margin. Meanwhile, given the RGBD video as input, our methods achieve the impressive progress in recovering the long range 3D trajectories of queried points. 
+
+
+
+% % And in 3D space, the topological relations are better to define, which can be formulated as an usual used regularizers, ARAP (as rigid as possible)~\cite{dynamicfusion}. 
+
+% % that monocular videos are just a partial observations, so complete and accurate 3D is inaccessible here. Meanwhile, joint learning a monocular depth model will degrade the generalizability of the model due to the huge domain gap between the tracking training data~\cite{tap-vid, zheng2023pointodyssey} and real data. Therefore, we fix a easily accessed pretrained models to estimate the video depths, while keeping other modules focusing on tracking. Besides, it is very computational costing to calculate the 3D correspondence following the point cloud matching methods~\cite{raft3D}. Inspired by convolutional occupancy networks~\cite{ConvOccNetwork}, we propose a novel splatting based triplane encoding module for video. Specifically, given an RGB video, we first utilize a monocular depth estimator for lifting the video to a sequence of featurized point clouds. Then, we splat these point clouds onto triplanes\cite{chan2022efficient} and devise several convolutional layers to enhance the features. 
+
+% % where it is extremely hard to generate a 3D volume or other dense and continuous representations to encode the points, and it is also computational costing to calculate the 3D correspondence in the whole 3D space.
+
+% % And then we follow the architecture introduced by Cotracker~\cite{cotracker}, and leverage a series of temporal and spatial aware transformers to aggregate the information of the queried pixels. After constructing the featured triplane, the queried pixels are first lift into 3d space via the orthographic projection, and its features are extracted by projecting its positional into the triplanes. Then we just copy their positions as the initialization of the trajectories for subsequent iterative updating. Besides the 3d encoding, there is another tricky challenges that 3d trajectories own more freedom
+
+% }{}
+
+% 2D tracking会因为occlusion的问题在image space导致被occluded objects干扰。而在3D上天生没有这个问题。2D neighborhood经常有干扰，而3D neighborhood一般不会有问题。
+
+% Experiments
+\sd{Experiments, including 2D tracking, 3D tracking, rigid part prediction, and challenging cases}{...}
+\fi

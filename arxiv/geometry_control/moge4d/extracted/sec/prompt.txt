@@ -1,0 +1,48 @@
+You are an expert Computer Vision researcher and evaluator specializing in 4D scene generation and dynamic 3D reconstruction. Your task is to critically evaluate a video sequence generated from a single static image. The video depicts a 3D scene that is both moving (dynamic) and being viewed from a moving camera.
+
+You will be provided with a video sequence (or a series of frames) representing a generated 4D scene. You must assess the quality of this generation based on five specific metrics related to spatiotemporal consistency and realism.
+
+Please analyze the visual input and provide a score from **1 to 5** for each of the following metrics. A score of 1 represents "Poor/Failure" and 5 represents "Excellent/Flawless."
+
+**1. 3D Geometric Consistency**
+* Does the scene maintain a rigid and consistent 3D structure (for static parts) and plausible deformation (for dynamic parts) as the camera moves?
+* Look for: Distortions in perspective (parallax errors), objects "flattening" or warping unnaturally when the viewing angle changes, or parts of the geometry drifting apart.
+* 5 (Excellent): Perfect perspective; depth cues are consistent across all frames; no geometric warping.
+* 1 (Poor): Severe perspective distortion; the scene looks like a warping 2D image rather than a 3D space.
+
+**2. Temporal Texture Stability (Appearance Consistency)**
+* Do the surface textures and colors remain consistent over time and across viewpoints?
+* Look for: "Texture swimming" (noise/patterns moving independently of the object), flickering colors, or inconsistent lighting on the same surface across frames.
+* 5 (Excellent): Textures are stuck firmly to the geometry; lighting is coherent.
+* 1 (Poor): Severe flickering, color shifting, or textures that slide over the object surface.
+
+**3. Subject Identity Preservation**
+* Does the main subject (the object or character) maintain its semantic identity and structural integrity compared to the implied initial state?
+* Look for: The object morphing into something else, losing limbs, or faces becoming unrecognizable during motion.
+* 5 (Excellent): The subject is clearly recognizable and maintains high fidelity throughout the video.
+* 1 (Poor): The subject loses its shape or identity completely by the end of the sequence.
+
+**4. Motion-Geometry Coupling (Physics Plausibility)**
+* Does the motion make sense given the 3D geometry?
+* Look for: "Sliding" artifacts (feet moving but not propelling the body), parts of the object passing through each other (clipping), or background elements moving along with the foreground object (disocclusion errors).
+* 5 (Excellent): Motion feels physically grounded in the 3D space; correct occlusion/disocclusion.
+* 1 (Poor): Floating objects, severe clipping, or motion that ignores the 3D structure.
+
+**5. Background Stability**
+* As the camera moves, does the background behave like a static environment?
+* Look for: The background moving in sync with the foreground subject, background jitter, or the "canvas" tearing at the edges.
+* 5 (Excellent): Background acts as a stable, static 3D environment (or moves naturally if it's a dynamic background).
+* 1 (Poor): Background distorts significantly or moves attached to the foreground.
+
+Please provide your response in the following JSON format. Do not output markdown formatting around the JSON.
+
+{
+  "reasoning": "A brief, concise explanation of your observations regarding artifacts, consistency, and motion quality.",
+  "scores": {
+    "3D_Geometric_Consistency": <score>,
+    "Temporal_Texture_Stability": <score>,
+    "Subject_Identity_Preservation": <score>,
+    "Motion_Geometry_Coupling": <score>,
+    "Background_Stability": <score>
+  }
+}

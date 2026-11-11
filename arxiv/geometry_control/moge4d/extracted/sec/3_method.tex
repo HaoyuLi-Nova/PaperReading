@@ -1,0 +1,108 @@
+\section{Dataset Curation -- TrajScene-60K}
+\label{sec:data}
+Developing a robust 4D generative framework necessitates a multi-faceted dataset comprising three essential modalities: dense 4D point trajectories, viewpoint-specific visual observations, and high-level semantic descriptions of 4D environments. To address the acute shortage of high-quality, large-scale annotated data---especially for complex scene-level videos featuring intricate motion and non-rigid dynamics---we present \textbf{TrajScene-60K}. This meticulously curated dataset provides the foundational supervision required for learning consistent 4D scene representations and trajectories.
+
+As shown in Figure~\ref{fig:data}, we construct our dataset from the high-quality WebVid-10M corpus~\cite{webvid}, extracting about 200,000 candidates via a two-stage automated filtering pipeline. 
+CogVLM2~\cite{cogvlm2} generates a detailed caption $\mathcal{C}$ for each video that captures both its visual content and the temporal characteristics of its motion.
+And DeepSeek-V3~\cite{deepseekv3} evaluates these captions against two criteria: (1) the presence of one or more clearly countable entities, and (2) the exhibition of self-initiated, non-rigid, or articulated motion. 
+Videos dominated by unstructured dynamics (e.g., crowd behaviors, wind-driven oscillations, or background jitter) or by camera motion are discarded. This is particularly important for 4D learning, since egomotion would otherwise be conflated with genuine object dynamics and introduce spurious global drift into the pseudo-GT trajectories. Retaining only clips whose motion originates from the scene itself thus yields well-structured, quantifiable motion targets that enable learning of clear and interpretable dynamic representations.
+
+
+To extract 4D dense point track data from videos, we employ the DELTA~\cite{delta} model. The model takes RGB video sequences $\mathcal{V} \in \mathbb{R}^{T \times H \times W \times 3}$ as input and utilizes monocular depth estimation methods to obtain depth maps $\mathcal{D} \in \mathbb{R}^{T \times H \times W}$, subsequently estimating occlusion-aware 4D trajectories $\mathcal{P} \in \mathbb{R}^{T \times H \times W \times 4}$. Each 4D vector $\mathbf{p}_{t,u,v} = (u_t, v_t, d_t, o_t)$ represents the 3D position and occlusion status in frame $t$ corresponding to the pixel located at $(u, v)$ in the first frame. After obtaining 4D point cloud scene data, we apply a strict three-criterion quality filtering process: (1) samples containing trajectories with invalid or anomalous depth values (e.g., near-infinite or zero) are removed; (2) samples exhibiting excessively large standard deviation in scene depth, indicative of global depth estimation errors, are discarded; (3)
+a scale consistency check removes geometrically inconsistent samples by verifying that uniformly scaled point clouds yield identical renderings from the original camera perspective.
+This pipeline yields 60,000 high-quality samples at $596\times336$ resolution.
+
+We then render these 4D scenes into videos from the original camera viewpoint using Gaussian Splatting~\cite{3dgs}, with inpainting masks generated for void regions. Compared to existing benchmarks, TrajScene-60K provides over \textbf{3 million frames} and approximately \textbf{12 billion 3D point annotations} with dense occlusion-aware tracking, per-frame depth, and language descriptions across diverse real-world indoor and outdoor environments---a combination of scale, realism, and multi-modal annotation unmatched by prior datasets. A detailed comparison with existing datasets is provided in the supplementary material.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{./assets/data.pdf}
+\vspace{-6mm}
+\caption{\textbf{TrajScene-60K curation pipeline.} We curate videos from WebVid-10M, filtered via VLMs for structured motion and countable entities. Dense 4D point tracks are extracted and refined via depth filtering and Gaussian Splatting, producing 60K high-quality 4D scenes.
+}
+\vspace{-8mm}
+\label{fig:data}
+\end{figure*}
+
+
+\section{Proposed Approach}
+
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{./assets/pipeline.pdf}
+\vspace{-6mm}
+
+\caption{{\textbf{Pipeline of \ours.}} Top: The 4D Scene Trajectory Generator (Sec.~\ref{sec:4D-STraG}), a Diffusion Transformer, jointly generates future geometry and motion. Bottom-Left: The Motion Perception Module (MPM) identifies potential motion regions and semantic structure from the input image. Bottom-Right: The 4D View Synthesis Module (Sec.~\ref{sec:4D-ViSM}) renders the output into novel-view videos.}
+\vspace{-2mm}
+\label{fig:pipeline}
+\end{figure*}
+
+\subsection{Problem Definition}
+
+Given a single input image $\mathcal{I} \in \mathbb{R}^{H \times W \times 3}$ and its description $\mathcal{C}$, our goal is to generate a physically plausible and temporally consistent 4D scene. We represent the scene as a point cloud sequence $\mathcal{P} \in \mathbb{R}^{T \times N \times 3}$, capturing the 3D geometry and motion trajectories of $N=H\times W$ points over $T$ frames. From this representation, we render dynamic scene videos $\mathcal{V} \in \mathbb{R}^{T \times H' \times W' \times 3}$ from arbitrary novel viewpoints or along arbitrary camera paths to the gap between a static image and full multi-view 4D dynamic generation.
+
+Unlike canonical-mesh or template-based 4D representations, dense point trajectories are class-agnostic and require no predefined structure, decoupling geometry from appearance to flexibly accommodate diverse topologies and large deformations. This factorization provides a stable spatial reference and avoids the brittleness of loosely cascaded pipelines, while still allowing the model to synthesize rich scene dynamics in a unified trajectory space.
+To systematically achieve these objectives, we first design \textbf{4D} \textbf{S}cene \textbf{Tra}jectory \textbf{G}enerator (\textbf{4D-STraG}), a diffusion model that predicts future 4D trajectory fields conditioned on the initial geometry from the initial image. Then we present in detail the \textbf{4D} \textbf{Vi}ew \textbf{S}ynthesis \textbf{M}odule (\textbf{4D-ViSM}), which leverages the reconstructed 4D representation to enable high-quality video generation under arbitrary camera motion. The overview illustration is shown in Figure~\ref{fig:pipeline}.
+
+\subsection{ \textbf{4D} \textbf{S}cene \textbf{Tra}jectory \textbf{G}enerator (4D-STraG)}
+\label{sec:4D-STraG}
+ 
+To leverage the rich motion priors and structural understanding capabilities, we build upon Wan2.1~\cite{wan2025wan} and finetune its VAE and DiT modules separately.
+
+
+\vspace{3pt}
+\noindent\textbf{Point Trajectory Initialization and Normalization.}
+To enhance training stability and ensure compatibility with generative model scales, we only use the 4D-STraG to predict relative motion $\mathbf{\Delta P}_t = \mathbf{P}_t - \mathbf{P}_0=\{[\Delta{x}_t,\Delta{y}_t,\Delta{z}_t]\}$, where $t \in [0, T]$ and $\mathbf{P}_0$ denotes coordinates in the first frame. We further normalize $\mathbf{\Delta P}_t$ to avoid an unlimited data value range. Based on the observation that a small 3D movement in a nearby object causes a large displacement on the 2D image plane, whereas the same movement in a distant object appears minuscule, we propose a \textit{Depth-Guided Motion Normalization Strategy}. It normalizes the absolute motion of each point relative to its viewing frustum at the initial depth. By doing so, we transform raw motion into a scale-invariant representation, ensuring perceptual consistency across different distances and producing a more uniform data distribution to learn from.
+
+Specifically, given focal lengths $f_x, f_y$ and image size $W \times H$, we define the scaling factors $\alpha_x =  f_x / W $ and $\alpha_y =  f_y / H  $. Geometrically, $z / \alpha_x $ and $  z/\alpha_y$ correspond to the width and height of the viewing frustum at depth $z$, respectively. We normalize motion quantities by the viewing frustum size at depth $z = \mathbf{P}^{(z)}_{0}$:
+\begin{equation}
+\small
+\Delta \tilde{x}_t = \frac{\alpha_x\cdot \Delta x_t }{z }, \quad \Delta \tilde{y}_t = \frac{\alpha_y\cdot \Delta y_t }{z}, \quad \Delta \tilde{z}_t = \frac{\Delta z_t}{z}.
+\label{eq:norm}
+\end{equation}
+This depth-dependent normalization achieves scale invariance across different depth ranges, enabling our diffusion model to effectively learn motion patterns without being biased by the absolute spatial position of points. During inference, we use UniDepthv2~\cite{unidepthv2} to estimate depth, ensuring consistency with the DELTA tracking model setup. The relative motion maps are de-normalized and fused with the initial point cloud to form a 4D scene representation.
+
+\vspace{3pt}
+\noindent\textbf{Model Pipeline.}
+During training, our model takes an image–caption pair as input and learns a diffusion model to predict pixel-level point trajectories across frames. To adapt the generative backbone, we first finetune a motion-sensitive VAE capable of handling trajectory signals. Specifically, the relative point displacement $\mathbf{\Delta P_t}$ is transformed into an RGB motion map by a lightweight Trajectory Encoder, where spatial movements are represented as color variations while the shape and appearance remain static as the first frame. Correspondingly, a Trajectory Decoder is appended after the VAE decoder, ensuring accurate recovery of point trajectories from the RGB motion map.
+
+After finetuning the VAE, we adapt the Diffusion Transformer (DiT) to handle latents encoded from the RGB motion map. We explicitly inject strong geometric priors into the model, thereby enhancing its generative capability. Specifically, the depth information from the initial frame is encoded into a latent representation using the VAE encoder. This provides the model with robust structural priors and geometric cues, significantly improving its ability to reason about scene layout and object relationships. The image, noise, and depth latents are concatenated along the feature dimension to form the final input for the DiT: 
+\begin{equation}
+z_{\text{combined}} = \text{Concat}(z_{\text{image}}, z_{\text{noise}}, z_{\text{depth}}).
+\label{eq:latent_concat}
+\end{equation}
+
+The DiT model is trained using flow matching~\cite{flow_matching}, which learns deterministic flows from noise to data distributions by minimizing the error between predicted and true flow fields, enabling accurate modeling of pixel-level motion. The objective function is defined as:
+\begin{equation}
+\mathcal{L}_{\mathrm{fm}} = \mathbb{E}_{t, x_0, x_1} \left[ | v_\theta(t, x_t) - (x_1 - x_0) |^2 \right],
+\end{equation}
+where $x_0$ and $x_1$ represent the initial and target states, respectively, $x_t$ denotes the interpolated state at time $t$, and $v_\theta$ is the flow vector predicted by the model.
+
+\vspace{3pt}
+\noindent\textbf{Motion Perception Module (MPM).} 
+Adapting powerful motion priors from image-to-video diffusion models poses a key challenge. These models excel at generating dynamic, moving scenes from a static image. Our objective, however, is to leverage this pretrained temporal knowledge for a distinct task: generating structurally static videos that exhibit dynamic color variations. Here, the ‘dynamic color’ sequence is an intermediate RGB motion-map representation that encodes per-pixel 3D displacements. This creates a core conflict, as the model must learn to translate its ingrained understanding of physical displacement into a new domain of temporal color evolution.
+
+To resolve this conflict and effectively guide the model's adaptation, we introduce the Motion Perception Module (MPM). The MPM is designed to identify semantic regions within the static scene that are plausible candidates for these color dynamics. We first employ a pretrained motion feature extractor, OmniMAE~\cite{omnimae}, to derive motion-aware patch-level features $\mathbf{S}$ from the input static image. To embed motion information into the diffusion process, we introduce \textit{Motion-aware Adaptive Normalization} (MAdaNorm). While inspired by conditional injection mechanisms like AdaLN~\cite{dit}, our proposed module is specifically designed for 4D motion generation. Unlike global conditioning approaches, MAdaNorm performs token-wise modulation driven by motion-aware features, enabling fine-grained control over temporal coherence in a geometrically consistent manner. Specifically, after spatial alignment of motion features $\mathbf{S}$ by resizing them to match the DiT token sequence length, token-wise adaptive parameters are generated through linear layers. For intermediate features $\mathbf{F}^i_t \in \mathbb{R}^{N \times d}$ in the $i$-th DiT block, the process is as follows:
+\begin{gather}
+\boldsymbol{\alpha}_1, \boldsymbol{\alpha}_2, \boldsymbol{\beta}_1, \boldsymbol{\beta}_2 = \text{Linear}(\mathbf{S}),\\
+\mathbf{F}' = \text{Attn}\left( \boldsymbol{\gamma_1}\boldsymbol{\alpha}_1 \odot \text{LN}(\mathbf{F}^i_t) + \boldsymbol{\gamma_1}\boldsymbol{\beta}_1 \right), \\
+\mathbf{F}'' = \text{MLP}\left( \boldsymbol{\gamma_2}\boldsymbol{\alpha}_2 \odot \text{LN}(\mathbf{F}') + \boldsymbol{\gamma_2} \boldsymbol{\beta}_2 \right),
+\end{gather}
+where $\boldsymbol{\alpha}_1, \boldsymbol{\alpha}_2, \boldsymbol{\beta}_1, \boldsymbol{\beta}_2 \in \mathbb{R}^{N \times d}$ are token-wise scaling and bias parameters, $\boldsymbol{\gamma_1},\boldsymbol{\gamma_2} \in \mathbb{R}^{d}$ are learnable global gating coefficient, and $\odot$ denotes token-wise multiplication. Experiments show that MPM improves the fidelity of motion trajectory modeling and enhances spatio-temporal consistency of generated 4D content.
+
+
+
+
+\subsection{\textbf{4D} \textbf{Vi}ew \textbf{S}ynthesis \textbf{M}odule (\textbf{4D-ViSM})}
+\label{sec:4D-ViSM}
+
+After obtaining a dense 4D point cloud representation, we propose the 4D-ViSM to achieve novel view video synthesis along arbitrary camera trajectories. The original point cloud may not fully cover image regions in novel views, which results in holes in the rendered output.
+Concretely, we rasterize each frame of the time-varying point cloud as a per-frame set of 3D Gaussians; temporally linking these per-frame Gaussians yields a lightweight dynamic renderer that avoids optimizing a full dynamic-4DGS field while substantially reducing projection-induced holes.
+We thereby leverage generative models to complete these missing regions, ensuring visual coherence and plausibility.
+
+Considering the excellent performance of Wan2.1~\cite{wan2025wan} in video generation tasks, we also choose to finetune this model to build our 4D-ViSM. The training data also come from our  TrajScene-60K dataset, including rendered videos, corresponding occlusion masks, ground truth videos, and captions. During training, we follow the Wan2.1 mask processing strategy, setting the mask value to 0.5 for regions without projected points in each frame. Through finetuning, our model achieves high-quality and visually consistent novel view video synthesis. 
+
+\subsection{Inference}
+\label{sec:inference}
+Given a single image and a text prompt, we first estimate the initial depth with UniDepthv2~\cite{unidepthv2}, matching the estimator used by the DELTA tracker during training. The VAE then encodes the image and depth into latents while MPM extracts motion features, after which the DiT generates and decodes relative motion latents. These are de-normalized by reversing our depth-guided motion normalization and fused with the initial point cloud to construct the 4D scene, which 4D-ViSM finally renders from arbitrary camera poses into a spatio-temporally consistent novel-view video.

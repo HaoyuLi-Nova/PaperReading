@@ -6,7 +6,7 @@
 # priority: P0 (must) | P1 (important) | P2 (context)
 
 version: 1
-updated: 2026-10-10
+updated: 2026-11-11
 
 tracks:
   foundations:
@@ -427,7 +427,10 @@ papers:
     venue: SIGGRAPH
     year: 2024
     arxiv: "2312.03641"
-    status: pending
+    github: https://github.com/TencentARC/MotionCtrl
+    code: code/geometry_control/motionctrl/
+    status: notes_done
+    notes: notes/geometry_control/motionctrl/critique.md
     priority: P0
     deps: [wan]
     tags: [camera, object_motion, video_control]
@@ -441,6 +444,8 @@ papers:
     venue: ICLR
     year: 2025
     arxiv: "2404.02101"
+    github: https://github.com/hehao13/CameraCtrl
+    code: code/geometry_control/cameractrl/
     status: pending
     priority: P0
     deps: [motionctrl]
@@ -455,6 +460,8 @@ papers:
     venue: ICCV
     year: 2025
     arxiv: "2501.01425"
+    github: https://github.com/FudanCVL/SynFMC
+    code: code/geometry_control/free_form_motion_control/
     status: pending
     priority: P0
     deps: [motionctrl, cameractrl]
@@ -482,6 +489,8 @@ papers:
     venue: ECCV
     year: 2024
     arxiv: "2403.07420"
+    github: https://github.com/showlab/DragAnything
+    code: code/geometry_control/draganything/
     status: pending
     priority: P1
     deps: [motionctrl]
@@ -509,7 +518,10 @@ papers:
     venue: CVPR
     year: 2025
     arxiv: "2412.15214"
-    status: pending
+    github: https://github.com/ant-research/LeviTor
+    code: code/geometry_control/levitor/
+    status: notes_done
+    notes: notes/geometry_control/levitor/critique.md
     priority: P1
     deps: [draganything]
     tags: [trajectory, depth, i2v, drag]
@@ -523,6 +535,8 @@ papers:
     venue: SIGGRAPH
     year: 2025
     arxiv: "2502.04299"
+    github: https://github.com/Doubiiu/MotionCanvas
+    code: code/geometry_control/motioncanvas/
     status: pending
     priority: P1
     deps: [motionctrl, cameractrl]
@@ -537,6 +551,8 @@ papers:
     venue: ICLR
     year: 2025
     arxiv: "2412.07759"
+    github: https://github.com/KlingAIResearch/3DTrajMaster
+    code: code/geometry_control/3dtrajmaster/
     status: pending
     priority: P1
     deps: [motionctrl, free_form_motion]
@@ -551,6 +567,8 @@ papers:
     venue: CVPR
     year: 2026
     arxiv: "2512.07237"
+    github: https://github.com/chengzhag/UCPE
+    code: code/geometry_control/ucpe/
     status: pending
     priority: P1
     deps: [cameractrl]
@@ -565,6 +583,8 @@ papers:
     venue: ICLR
     year: 2026
     arxiv: "2512.18814"
+    github: https://github.com/D2I-ai/EchoMotion
+    code: code/geometry_control/echomotion/
     status: pending
     priority: P1
     deps: [wan]
@@ -579,6 +599,8 @@ papers:
     venue: CVPR
     year: 2026
     arxiv: "2602.08961"
+    github: https://github.com/TencentARC/MotionCrafter
+    code: code/geometry_control/motioncrafter/
     status: pending
     priority: P1
     deps: [wan]
@@ -601,6 +623,161 @@ papers:
     code: code/geometry_control/wan_move/
     one_liner: 沿点轨迹搬运首帧潜特征，不改 Wan-I2V 结构做细粒度运动控制
 
+  # ---------- Wan-Move 的点轨迹与 I2V 运动控制前驱 ----------
+  - id: motion_prompting
+    track: geometry_control
+    slug: motion_prompting
+    title: "Motion Prompting: Controlling Video Generation with Motion Trajectories"
+    venue: CVPR
+    year: 2025
+    arxiv: "2412.02700"
+    status: notes_done
+    notes: notes/geometry_control/motion_prompting/critique.md
+    priority: P0
+    deps: [wan]
+    tags: [point_trajectory, video_control, controlnet]
+    one_liner: 用稀疏或稠密点轨迹作为视频生成的 motion prompt
+
+  - id: drag_nuwa
+    track: geometry_control
+    slug: drag_nuwa
+    title: "DragNUWA: Fine-grained Control in Video Generation by Integrating Text, Image, and Trajectory"
+    venue: arXiv
+    year: 2023
+    arxiv: "2308.08089"
+    status: notes_done
+    notes: notes/geometry_control/drag_nuwa/critique.md
+    priority: P1
+    deps: [wan]
+    tags: [trajectory, optical_flow, video_control]
+    one_liner: 联合文字、图像与轨迹条件，并探索稀疏到稠密轨迹控制
+
+  - id: tora
+    track: geometry_control
+    slug: tora
+    title: "Tora: Trajectory-oriented Diffusion Transformer for Video Generation"
+    venue: arXiv
+    year: 2024
+    arxiv: "2407.21705"
+    status: notes_done
+    notes: notes/geometry_control/tora/critique.md
+    priority: P1
+    deps: [wan]
+    tags: [point_trajectory, dit, motion_encoder]
+    one_liner: 轨迹提取器加 motion-guidance fuser，把轨迹作为时空 patch 注入 DiT
+
+  - id: cotracker
+    track: geometry_control
+    slug: cotracker
+    title: "CoTracker: It is Better to Track Together"
+    venue: ECCV
+    year: 2024
+    arxiv: "2307.07635"
+    status: notes_done
+    notes: notes/geometry_control/cotracker/critique.md
+    priority: P0
+    deps: []
+    tags: [point_tracking, correspondence, tracking]
+    one_liner: 联合追踪大量点，利用点间相关性改善遮挡下轨迹质量
+
+  - id: spatialtracker
+    track: geometry_control
+    slug: spatialtracker
+    title: "SpatialTracker: Tracking Any 2D Pixels in 3D Space"
+    venue: CVPR
+    year: 2024
+    arxiv: "2404.04319"
+    status: notes_done
+    notes: notes/geometry_control/spatialtracker/critique.md
+    priority: P2
+    deps: [cotracker]
+    tags: [point_tracking, 3d_tracking, depth]
+    one_liner: 将像素提升到三维空间追踪，缓解遮挡与出平面运动歧义
+
+  - id: sg_i2v
+    track: geometry_control
+    slug: sg_i2v
+    title: "SG-I2V: Self-Guided Trajectory Control in Image-to-Video Generation"
+    venue: arXiv
+    year: 2024
+    arxiv: "2411.04989"
+    status: notes_done
+    notes: notes/geometry_control/sg_i2v/critique.md
+    priority: P1
+    deps: [wan]
+    tags: [trajectory, zero_shot, i2v]
+    one_liner: 不微调模型，利用预训练 I2V 内部特征实现轨迹引导
+
+  - id: freetraj
+    track: geometry_control
+    slug: freetraj
+    title: "FreeTraj: Tuning-Free Trajectory Control in Video Diffusion Models"
+    venue: arXiv
+    year: 2024
+    arxiv: "2406.16863"
+    status: notes_done
+    notes: notes/geometry_control/freetraj/critique.md
+    priority: P1
+    deps: [wan]
+    tags: [trajectory, zero_shot, video_control]
+    one_liner: 通过免训练的噪声与注意力操作实现轨迹控制
+
+  - id: trailblazer
+    track: geometry_control
+    slug: trailblazer
+    title: "TrailBlazer: Trajectory Control for Diffusion-Based Video Generation"
+    venue: SIGGRAPH Asia
+    year: 2024
+    arxiv: "2401.00896"
+    status: notes_done
+    notes: notes/geometry_control/trailblazer/critique.md
+    priority: P2
+    deps: [wan]
+    tags: [trajectory, bounding_box, zero_shot]
+    one_liner: 用关键帧边界框编辑注意力，实现无需微调的主体运动控制
+
+  - id: motion_i2v
+    track: geometry_control
+    slug: motion_i2v
+    title: "Motion-I2V: Consistent and Controllable Image-to-Video Generation with Explicit Motion Modeling"
+    venue: SIGGRAPH
+    year: 2024
+    arxiv: "2401.15977"
+    status: notes_done
+    notes: notes/geometry_control/motion_i2v/critique.md
+    priority: P1
+    deps: [wan]
+    tags: [trajectory, optical_flow, i2v]
+    one_liner: 显式预测参考图像像素运动，再用运动增强时序注意力生成视频
+
+  - id: imageconductor
+    track: geometry_control
+    slug: imageconductor
+    title: "Image Conductor: Precision Control for Interactive Video Synthesis"
+    venue: AAAI
+    year: 2025
+    arxiv: "2406.15339"
+    status: notes_done
+    notes: notes/geometry_control/imageconductor/critique.md
+    priority: P1
+    deps: [motionctrl]
+    tags: [trajectory, camera, object_motion, i2v]
+    one_liner: 用相机与物体 LoRA 解耦轨迹驱动的镜头运动和物体运动
+
+  - id: magicmotion
+    track: geometry_control
+    slug: magicmotion
+    title: "MagicMotion: Controllable Video Generation with Dense-to-Sparse Trajectory Guidance"
+    venue: arXiv
+    year: 2025
+    arxiv: "2503.16421"
+    status: notes_done
+    notes: notes/geometry_control/magicmotion/critique.md
+    priority: P1
+    deps: [wan]
+    tags: [trajectory, dense_to_sparse, video_control]
+    one_liner: 以稠密到稀疏轨迹训练视频控制，并构建 MagicBench
+
   - id: moright
     track: geometry_control
     slug: moright
@@ -614,6 +791,96 @@ papers:
     tags: [trajectory, camera, causality, dual_stream, wan, i2v]
     project: https://research.nvidia.com/labs/sil/projects/moright/
     one_liner: 双流把物体轨迹锁在静态规范视角，再迁到任意相机；只给主动或被动轨迹，补全另一侧因果运动
+
+  - id: symphomotion
+    track: geometry_control
+    slug: symphomotion
+    title: "SymphoMotion: Joint Control of Camera Motion and Object Dynamics for Coherent Video Generation"
+    venue: CVPR
+    year: 2026
+    arxiv: "2604.03723"
+    status: pending
+    priority: P1
+    deps: [cameractrl, wan]
+    tags: [camera, object_motion, 3d_trajectory, i2v, wan]
+    github: https://github.com/grenoble-zhang/SymphoMotion
+    code: code/geometry_control/symphomotion/
+    project: https://grenoble-zhang.github.io/SymphoMotion/
+    one_liner: 几何感知相机控制 + 3D 物体轨迹，联合控镜头与物体；配 RealCOD-25K
+
+  - id: unicamo
+    track: geometry_control
+    slug: unicamo
+    title: "UniCaMo: Unified Camera and Motion Control for Video Diffusion Models"
+    venue: arXiv
+    year: 2026
+    arxiv: "2611.00810"
+    status: pending
+    priority: P1
+    deps: [wan_move]
+    tags: [camera, object_motion, noise_warp, lora, i2v]
+    project: https://phongnhhn.info/Unicamo/
+    one_liner: 把 3D 相机/物体运动编进扩散初噪声，LoRA 微调、不改架构
+
+  - id: comovi
+    track: geometry_control
+    slug: comovi
+    title: "CoMoVi: Co-Generation of 3D Human Motions and Realistic Videos"
+    venue: arXiv
+    year: 2026
+    arxiv: "2601.10632"
+    status: pending
+    priority: P1
+    deps: [wan, echomotion]
+    tags: [human_motion, smpl, dual_branch, wan, joint_generation]
+    github: https://github.com/IGL-HKUST/CoMoVi
+    code: code/geometry_control/comovi/
+    project: https://igl-hkust.github.io/CoMoVi/
+    one_liner: 双分支在同一去噪循环里联合生成人体视频与 3D 运动
+
+  - id: moge4d
+    track: geometry_control
+    slug: moge4d
+    title: "Geometry-Aware Single-Image 4D Synthesis via Dense Trajectory Generation"
+    venue: ECCV
+    year: 2026
+    arxiv: "2512.05044"
+    status: pending
+    priority: P1
+    deps: [motioncrafter]
+    tags: [4d, trajectory, single_image, novel_view]
+    github: https://github.com/Zhangyr2022/MoGe4D
+    code: code/geometry_control/moge4d/
+    one_liner: 单图生成稠密 4D 点轨迹再渲染任意视角（MoGe4D / MoRe4D）
+
+  - id: scenescribe_1m
+    track: geometry_control
+    slug: scenescribe_1m
+    title: "SceneScribe-1M: A Large-Scale Video Dataset with Comprehensive Geometric and Semantic Annotations"
+    venue: CVPR
+    year: 2026
+    arxiv: "2604.07990"
+    status: pending
+    priority: P2
+    deps: []
+    tags: [dataset, geometry, camera, point_track, depth]
+    project: https://wangyunnan.github.io/SceneScribe-1M
+    one_liner: 百万野外视频，带文本、相机、深度与 3D 点轨迹标注
+
+  - id: worldflow
+    track: geometry_control
+    slug: worldflow
+    title: "WorldFlow: Joint Video and 3D Motion Prediction via Large-Scale Pretraining"
+    venue: arXiv
+    year: 2026
+    arxiv: "2610.39278"
+    status: pending
+    priority: P1
+    deps: [wan]
+    tags: [3d_motion, world_model, joint_generation, mot]
+    project: https://worldflow-rbs.github.io/
+    github: https://github.com/worldflow-rbs/worldflow
+    one_liner: 视频与查询点 3D 位移 token 在 MoT 里联合去噪；实现尚未开源
 
   # ---------- multi_view ----------
   - id: zero123

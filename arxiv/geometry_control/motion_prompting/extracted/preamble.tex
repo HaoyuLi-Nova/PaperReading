@@ -1,0 +1,41 @@
+\usepackage[dvipsnames]{xcolor}
+
+
+\newif\ifdrafting
+\draftingtrue %
+\ifdrafting
+   \newcommand{\chen}[1]{\textcolor{cyan}{{[CS: #1]}}}
+   \newcommand{\daniel}[1]{\textcolor{red}{DG: #1}}
+   \newcommand{\ds}[1]{\textcolor{red}{[ds: #1]}}
+   \newcommand{\red}[1]{\textcolor{red}#1}
+   \newcommand{\cih}[1]{{\color{green}{[CIH: #1]}}}
+   \newcommand{\fc}[1]{\textcolor{blue}{{[FC: #1]}}}
+   \newcommand{\ao}[1]{\textcolor{purple}{{[AO: #1]}}}
+   \newcommand{\jh}[1]{\textcolor{cyan}{{[JH: #1]}}}
+   \newcommand{\TODO}[1]{\textbf{\color{red}[TODO: #1]}}
+\else
+   \newcommand{\chen}[1]{}    
+   \newcommand{\daniel}[1]{}    
+   \newcommand{\ds}[1]{}
+   \newcommand{\cih}[1]{}
+   \newcommand{\fc}[1]{}
+   \newcommand{\ao}[1]{}
+   \newcommand{\jh}[1]{}
+   \newcommand{\red}[1]{#1}
+   \newcommand{\todo}[1]{#1}
+   \newcommand{\TODO}[1]{#1}
+\fi
+
+\newcommand{\supparxiv}[2]{#2}
+
+\newcommand{\ignore}[1]{}
+
+\newcommand{\ci}[1]{\scriptsize{\textcolor{gray}{~($\pm #1$)}}}
+
+\newcommand{\aftertab}{\vspace{-1.5em}}
+\newcommand{\afterfig}{\vspace{-1em}}
+
+\newcommand{\aftersec}{\vspace{-.4em}}
+\newcommand{\aftersubsec}{\vspace{-.2em}}
+\newcommand{\aftertabcaption}{\vspace{-0.75em}}
+\newcommand{\beforetfigcaption}{\vspace{-1em}}

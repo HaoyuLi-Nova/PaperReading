@@ -1,0 +1,35 @@
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Predictive World Models: From Pixels to Actions}
+A fundamental objective of visual world modeling is to predict future physical states from current observations. In the visual domain, large-scale video generators establish rich appearance and motion priors to enable coherent future synthesis~\citep{wan2025wan,seedance2026seedance2}, driven by architectural and training efficiencies~\citep{huang2025selfforcing,chen2025sanavideo}, and extending toward physical-world prediction, interactive simulation, and semantic control~\citep{nvidia2025cosmos,robbyant2026lingbotworld,chen2026h3world,bian2025videoasprompt}. To bridge visual futures with robotic behavior, World Action Models (WAMs) directly incorporate the robot's action space into predictive modeling, jointly forecasting future observations and actions to support end-to-end policy learning and interactive closed-loop control~\citep{ye2026dreamzero,li2026lingbotva}, while expanding toward in-context task generalization~\citep{zhou2026zerowam}, fast inference~\citep{yuan2026fastwam}, and cross-embodiment transfer~\citep{li2026egowam}. Paralleling these efforts, unified multimodal models integrate visual understanding with multi-modal generation~\citep{deng2025bagel}, paving the way for comprehensive frameworks that jointly process language, pixels, and actions for physical-world modeling~\citep{nvidia2026cosmos3}.
+
+\subsection{3D Motion Modeling: From Tracking to Forecasting}
+Point tracking stands as a classic paradigm focused on resolving dense, pixel-level correspondences and spatial linkages over observable video sequences~\citep{lu2026track4world,karhade2026any4d,karaev23cotracker,Karaev_2025_ICCV,Xiao_2025_ICCV,tapip3d,luo20264rc}. Although these trackers provide direct measurements of surface history, they operate strictly on immediate visual evidence and remain susceptible to severe error accumulation under complex occlusions or non-rigid deformations. Concurrently, predictive motion forecasting has recently emerged to offer fresh research motivations tailored for downstream embodied and robotic applications. As a generative geometric interface, 3D motion flow bypasses immediate frame matching to predict future physical dynamics directly across objects and embodiments.
+Early work, General Flow~\citep{yuan2024general}, learned
+language-conditioned 3D point trajectories from human RGB-D videos
+as transferable manipulation affordances.
+NovaFlow~\citep{li2025novaflow} and
+Dream2Flow~\citep{dharmarajan2025dream2flow} leveraged video generation
+to obtain motion priors, recovering actionable 3D object flow
+through tracking and geometric reconstruction.
+Alongside these video-based pipelines, direct motion models
+predict future geometry without synthesizing videos.
+TraceGen~\citep{lee2026tracegen} models compact 3D traces,
+while PointWorld~\citep{huang2026pointworld} predicts
+action-conditioned full-scene flow and
+ObjectForesight~\citep{soraki2026objectforesight} forecasts
+rigid-object pose trajectories.
+More recently, RoboFlow4D~\citep{lin2026roboflow4d},
+$\mu_0$~\citep{lee2026mu_0}, and
+MolmoMotion~\citep{zhang2026molmomotion} advanced
+flow-guided planning, interaction-trace generation,
+and language-conditioned object-point forecasting, respectively.
+Flow representations have also become integral to policy
+learning and visual world modeling:
+LaMP~\citep{wang2026lamp} introduces a latent 3D motion prior
+for action generation,
+EgoWAM~\citep{li2026egowam} studies 3D flow as a world-prediction
+target for human-to-robot transfer, and
+Hydra-0~\citep{li2026hydra} uses image-plane action flow
+to condition video prediction and support robot control.

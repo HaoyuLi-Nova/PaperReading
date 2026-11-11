@@ -1,0 +1,11 @@
+\begin{abstract}
+We introduce \method, a transformer-based model that tracks a large number of 2D points in long video sequences.
+Differently from most existing approaches that track points independently, \method tracks them jointly, accounting for their dependencies.
+We show that joint tracking significantly improves tracking accuracy and robustness, and allows \method to track occluded points and points outside of the camera view.
+We also introduce several innovations for this class of trackers, including using token proxies that significantly improve memory efficiency and allow \method to track 70k points jointly and simultaneously at inference on a single GPU\@.
+\method is an online algorithm that operates causally on short windows.
+However, it is trained utilizing unrolled windows as a recurrent network,  maintaining tracks for long periods of time even when points are occluded or leave the field of view.
+Quantitatively, \method substantially outperforms prior trackers on standard point-tracking benchmarks.
+ Code and model weights are available at \href{https://co-tracker.github.io/}{https://co-tracker.github.io/}
+\keywords{Point tracking \and Motion estimation \and Optical flow}
+\end{abstract}

@@ -1,0 +1,136 @@
+\section{Training Details}
+\label{sec:supp-training}
+
+\subsection{Data Sampling and Curriculum}
+
+The second stage is initialized from the EMA weights of the SpatialCog
+warm-start checkpoint, with optimizer and scheduler states reset.
+We detail the source-sampling strategy, curriculum transitions, structured
+text conditioning, and learning-rate schedule used during its 51,100
+optimization steps.
+
+\paragraph{Hierarchical source sampling.}
+We organize the training sources into five sampling domains.
+Simulation combines Sim7 and MolmoSpaces; Molmo-real comprises DROID,
+EgoDex, Stereo4D, and Xperience; Outdoor contains YT-VIS; and Real3 and
+SpatialCog retain their collection-level definitions.
+These groups determine curriculum sampling and differ from the four
+data collections described in the main paper.
+
+At optimization step $k$, the probability of selecting source $s$
+in domain $d$ is
+\begin{equation}
+p_k(s)
+=
+p_k(d)
+\frac{N_s^{\alpha_d}}
+{\sum_{s' \in d} N_{s'}^{\alpha_d}},
+\qquad
+\alpha_d =
+\begin{cases}
+0.8, & d = \mathrm{Real3}, \\
+0.5, & \text{otherwise}.
+\end{cases}
+\label{eq:supp-source-sampling}
+\end{equation}
+Here, $p_k(d)$ is the curriculum-dependent domain probability, and $N_s$
+is the source count used to compute the sampler's within-domain
+probabilities.
+The sublinear exponent reduces the dominance of larger sources within
+each domain. Sim7 is treated as a single source and retains the natural
+proportions of its constituent datasets.
+
+\paragraph{Curriculum intervals.}
+Table~\ref{tab:supp-curriculum} specifies five sampling intervals that
+implement the three phases described in the main paper: simulation-focused
+training, mixed real-world adaptation, and SpatialCog refinement.
+Real-world adaptation first emphasizes Molmo-real, briefly introduces
+Outdoor data, and then prioritizes Real3. Each interval retains
+cross-domain replay.
+
+We linearly interpolate adjacent domain-probability vectors over windows
+centered at steps 12,000, 24,000, 24,100, and 48,100, with widths of
+1,000, 50, 50, and 1,000 steps, respectively.
+Outside these transition windows, domain probabilities remain fixed at
+the values in Table~\ref{tab:supp-curriculum}.
+With a global batch size of 128, the nominal second-stage budget is
+6,540,800 sample draws, including repeated visits to the same clips.
+
+\begin{table}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular*}{\linewidth}
+{@{\extracolsep{\fill}}lrrrrrr@{}}
+\toprule
+Interval
+& Steps
+& Simulation
+& Molmo-real
+& Outdoor
+& Real3
+& SpatialCog \\
+\midrule
+Simulation-focused
+& $[0,12{,}000)$
+& 80\% & 5\% & 0\% & 10\% & 5\% \\
+
+Molmo-real adaptation
+& $[12{,}000,24{,}000)$
+& 10\% & 70\% & 0\% & 15\% & 5\% \\
+
+Outdoor adaptation
+& $[24{,}000,24{,}100)$
+& 5\% & 20\% & 50\% & 25\% & 0\% \\
+
+Real3 adaptation
+& $[24{,}100,48{,}100)$
+& 10\% & 10\% & 0\% & 75\% & 5\% \\
+
+SpatialCog refinement
+& $[48{,}100,51{,}100)$
+& 5\% & 10\% & 0\% & 35\% & 50\% \\
+\bottomrule
+\end{tabular*}
+\caption{Target domain-sampling probabilities for the second-stage
+curriculum. Adjacent distributions are linearly interpolated near interval
+boundaries using the windows specified in the text. Within each domain,
+sources are sampled according to Eq.~\eqref{eq:supp-source-sampling}.}
+\label{tab:supp-curriculum}
+\end{table}
+
+\paragraph{Structured text conditioning.}
+Each prompt consists of the original task instruction followed by a
+context block with four categorical fields.
+Data origin distinguishes simulated from real-world observations.
+Actor type is specified as robot, human, mixed, or none.
+Camera context distinguishes egocentric, fixed external, and moving
+external views. Environment is specified as indoor, outdoor, or mixed.
+These attributes provide explicit context for interpreting the requested
+motion across heterogeneous sources.
+
+We use sample-level context metadata when available and predefined
+source-level defaults otherwise. The context fields follow a fixed order:
+origin, actor, view, and scene. Training and inference use the same prompt
+format, which excludes dataset identifiers and flow-normalization values.
+
+\paragraph{Learning-rate schedule.}
+Figure~\ref{fig:supp-curriculum} shows the second-stage learning-rate
+schedule. The learning rate increases linearly to $10^{-4}$ over the first
+500 steps and remains at this level during the main simulation-focused
+interval. Near the transition to real-world adaptation, it decreases to
+$8\times10^{-5}$ and remains at this plateau until step 42,100, including
+the brief Outdoor interval. It then decays to $2\times10^{-5}$ at step
+48,100 and reaches $5\times10^{-6}$ at the end of SpatialCog refinement.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]
+{supplementary/figures/training_curriculum.pdf}
+\caption{Learning-rate schedule for second-stage training.
+Background bands indicate the curriculum intervals. The narrow gold band
+marks the 100-step Outdoor interval, during which the learning rate remains
+at $8\times10^{-5}$.}
+\label{fig:supp-curriculum}
+\end{figure}

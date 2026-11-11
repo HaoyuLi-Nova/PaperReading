@@ -1,0 +1,237 @@
+\vspace{-3.0mm}
+\section{Experiments}
+\label{sec:experiments}
+
+\subsection{Experimental Setup}
+\label{sec:exp_setup}
+\paragraph{Implementation details.}
+In all experiments, we leverage the image-to-video variant of Stable Video Diffusion~\citep{blattmann2023stable} to generate videos with 14 frames and $576 \times 1024$ resolution. 
+The default discrete Euler scheduler~\citep{karras2022elucidating} is applied with $T=50$ sampling steps.
+We extract feature maps from the last two self-attention layers from the middle stage in the denoising U-Net. %
+We optimize \cref{eq:feature-optimization} at the early denoising timesteps $t \in [45, 44, ..., 30]$ for $5$ iterations per timestep.
+We use the AdamW optimizer~\citep{adamw} with a learning rate of $0.21$.
+All these design choices are carefully ablated and analyzed in \cref{sec:ablation}.
+During loss calculation, Gaussian heatmap $\bm{G}_{b}$ is constructed following \citep{wu2024draganything}, where a heatmap for a bounding box of size $(h_b, w_b)$ is created by Gaussian distribution with standard deviation $\sigma = (0.2h_b, 0.2w_b)$.
+For the low-pass filter $\mathbf{H}_\gamma$, we set the cut-off frequency $\gamma$ to $0.5$. %
+
+\paragraph{Baselines.}
+We compare with methods that enable motion control on existing images and have publicly available code.
+Specifically, we compare with supervised baselines \textit{DragNUWA}~\citep{yin2023dragnuwa} and \textit{DragAnything}~\citep{wu2024draganything}, which both add motion adapters to SVD.
+We also compare with \textit{Image Conductor}~\citep{li2024image}, which is based on AnimateDiff~\citep{AnimateDiff}.
+Since all supervised baselines are fine-tuned to generate videos at a lower resolution, we resize the generated videos from all the methods to $320 \times 576$ for a fair comparison. %
+Since no previous methods exist for zero-shot trajectory-controlled image-to-video generation, we adopt techniques from text-to-video methods to create new baselines.
+Specifically, \textit{FreeTraj$^\dagger$} incorporates the noise initialization technique from \citep{qiu2024freetraj} by copy-pasting the initial noise on the first frame to other frames along the trajectories.
+\textit{DragDiffusion$^\dagger$} is inspired by the image editing method in~\citep{shi2024dragdiffusion}, which utilizes feature maps extracted from the outputs of upsampling blocks to guide the generation process without feature alignment. \textit{MOFT$^\dagger$} instead utilizes feature maps derived from \textit{Content Correlation Removal} proposed by \citet{MOFT} known to encode motion information.
+
+\vspace{-2.0mm}
+\paragraph{Datasets and evaluation metrics.} 
+Following prior works~\citep{wu2024draganything,zhou2024trackgo}, we evaluate our method on the validation set of the VIPSeg dataset~\citep{vipseg}.
+We test on the same control regions and target trajectories as DragAnything, where the size of our bounding boxes is the same as the diameter of the circles in their work. %
+For quantitative metrics, we report Frechet Inception Distance (FID)~\citep{FID} and Frechet Video Distance (FVD)~\citep{FVD} to measure the visual quality, and ObjMC~\citep{wu2024draganything} to measure the motion fidelity. %
+ObjMC computes the average distance between generated and target trajectories, where Co-Tracker~\citep{cotracker} is used to estimate the trajectory of generated videos.
+
+
+\vspace{-3mm}
+\subsection{Qualitative Results}
+
+\cref{fig:teaser} presents the versatile control ability of our method.
+We can control foreground objects to perform rigid motions, such as trains moving, and non-rigid motions, such as the movement of human hairs.
+In addition, we can control non-physical entities such as smoke and fire.
+The moved scene elements naturally adapt to the new location while preserving their original identity.
+Thanks to our general formulation of trajectories, camera motion control is also supported.
+We highly encourage the reader to view \href{https://kmcode1.github.io/Projects/SG-I2V\#obj-motion-results}{\textit{our project page}} for additional results.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\textwidth]{imgs/figure_baseline_labeled.jpg}
+\caption{\textbf{Failure cases in supervised baselines.}
+We observe that DragNUWA tends to distort objects rather than move them, and DragAnything is weak at part-level control as it is designed for entity-level control. 
+In contrast, our method can generate videos with natural motion for diverse object and camera trajectories.
+Please see \href{https://kmcode1.github.io/Projects/SG-I2V\#baseline-comparison}{\textit{our project page}} for additional comparisons.}
+\label{fig:results_baseline}
+\vspace{-1.5mm}
+\end{figure}
+
+
+\begin{table*}[!t]
+\vspace{-1.5mm}
+\caption{\textbf{Quantitative comparison on the VIPSeg dataset.}
+Despite being a zero-shot method, we achieve small gaps in motion fidelity (ObjMC) to supervised baselines without degrading video quality (FID, FVD).
+Furthermore, our approach outperforms zero-shot baselines across all metrics.
+}
+\label{tab:baseline}
+\begin{center}
+    \resizebox{1.0\textwidth}{!}{
+    \begin{tabular}{lcccccc}
+        \toprule
+        \textit{Method}  & FID ($\downarrow$) & FVD ($\downarrow$) & ObjMC ($\downarrow$) & Zero-shot & Resolution & Backbone \\
+        \midrule
+        Image Conductor & 48.81 & 463.21 & 21.07& & \textbf{$256 \times 384$} & AnimateDiff v3 \\
+        DragNUWA v1.5 & 30.73 & 253.57 & 10.84 & & $320 \times 576$ & SVD \\
+        DragAnything & 30.81 & 268.47 & 11.64 &  & $320 \times 576$ & SVD  \\
+        \midrule
+        SVD (No Control) &30.50 & 340.52 & 39.59 & 
+        \checkmark & \textbf{$576 \times 1024$} & SVD\\
+        FreeTraj$^\dagger$ & 46.61 &  394.14 & 36.43 & \checkmark & \textbf{$576 \times 1024$} & SVD \\
+        MOFT$^\dagger$ & 30.76 & 402.09 & 33.58 & \checkmark & \textbf{$576 \times 1024$} & SVD\\
+        DragDiffusion$^\dagger$ & 30.93 & 458.29 & 31.49 & \checkmark & \textbf{$576 \times 1024$} & SVD \\
+        \midrule
+        \textbf{SG-I2V} & 28.87 & 298.10 & 14.43 & \checkmark & \textbf{$576 \times 1024$} & SVD \\
+        \bottomrule
+    \end{tabular}}
+    \end{center}
+    \begin{flushleft}\vspace{-0.25em}
+    \footnotesize{$^\dagger$~indicates methods adapted to our image-to-video setting.}\end{flushleft}
+\vspace{-1em}
+\end{table*}
+
+\vspace{-2.0mm}
+\subsection{Quantitative Assessment}
+\label{sec:baseline}
+
+
+
+\paragraph{Comparison with supervised baselines.}
+We provide quantitative comparisons to baselines in \cref{tab:baseline}.
+Despite being trained on large-scale datasets, Image Conductor underperforms our method by a large margin, mainly because of the limited capacity of the base model AnimateDiff.
+Compared to methods that also build upon SVD, we achieve competitive performance in visual quality, with slightly worse motion fidelity.
+Yet, these methods are trained to generate low-resolution (i.e., $320 \times 576$) videos due to the high cost of fine-tuning at high resolution. At the same time, our tuning-free approach can maintain the original resolution of SVD (i.e., $576 \times 1024$).
+\cref{fig:results_baseline} illustrates comparison in failure cases of supervised baselines.
+Similar to observations in \citep{wu2024draganything}, DragNUWA tends to distort objects rather than naturally move them, while our method can generate more natural movements. 
+DragAnything is weak at part-level motion control (e.g., closing a cat's mouth) as it is only trained on datasets annotated with entity-level control, such as object segmentation masks.
+In contrast, our approach can handle different granularities of control regions.
+
+
+\vspace{-2.0mm}
+\paragraph{Comparison with adapted zero-shot baselines.}
+The noise initialization technique in FreeTraj$^\dagger$ improves motion control slightly compared to original videos but significantly degrades visual quality. %
+This indicates that motion prior can not be easily incorporated into initial noises of SVD by a hand-crafted algorithm. 
+DragDiffusion$^\dagger$ and MOFT$^\dagger$ leverages feature maps that are not semantically corresponding across frames.
+As a result, the motion fidelity is much lower than ours.
+Overall, SG-I2V significantly outperforms zero-shot baselines across all metrics.
+This highlights that zero-shot techniques applied in text-to-video diffusion models do not necessarily transfer to image-to-video models.
+
+
+\subsection{Ablation Studies}
+\label{sec:ablation}
+
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{imgs/ablation_featuremap-crop.pdf}
+\caption{\textbf{Performance across U-Net feature maps used to compute loss in \cref{eq:feature-optimization}.}
+For all metrics, lower values are better.
+\textit{Temporal} and \textit{spatial} refer to the temporal and spatial self-attention layers. 
+We find that features extracted from self-attention layers generally perform better than those from upsampling blocks and temporal attention layers.
+In addition, using the feature maps of our modified self-attention layer achieves the best results, since they are semantically aligned across frames.
+Corresponding qualitative visuals are presented in \cref{fig:results_attn} and \href{https://kmcode1.github.io/Projects/SG-I2V\#ablation-unet-featuremap}{\textit{our project page.}}
+}
+\label{tab:results_attn}
+\vspace{-2mm}
+\end{figure}
+\vspace{-0.5mm}
+
+
+
+
+
+\paragraph{Feature map selection.}
+In \cref{tab:results_attn}, we analyze the effect of the choice of U-Net feature map in the optimization of \cref{eq:feature-optimization}.
+DIFT~\citep{tang2023emergent} pointed out that outputs from the U-Net upsampling block in image diffusion models have strong semantic correspondence across \textit{spatial} dimensions, which is used in image editing methods~\citep{shi2024dragdiffusion}. %
+However, we find them to have inferior correspondence across the \textit{temporal} dimension, and optimizing them leads to inaccurate object trajectories, as indicated by the high ObjMC value.
+Next, we examine features in temporal self-attention layers.
+However, using these features also leads to inferior motion guidance, as indicated by the high ObjMC errors.
+This may be because the temporal layers in SVD always attend to the same spatial location, thus focusing less on each frame's spatial layout.
+Finally, we study each component in spatial self-attention layers.
+As discussed in \cref{sec:motion_estimation}, the lack of cross-frame correspondence in the original self-attention is problematic---in \cref{tab:results_attn}, we see that this results in worse ObjMC and FVD scores. %
+Overall, optimizing outputs from our modified self-attention operation achieves the best motion fidelity, showing the importance of feature alignment.
+
+\begin{figure}[!t]
+\vspace{-8mm}
+\centering
+\includegraphics[width=\textwidth]{imgs/ablation_layer.pdf}
+\caption{\textbf{Performance across U-Net layers used to extract feature maps.} %
+Lower is better for all metrics.
+\textit{Bottom}, \textit{mid}, and \textit{top} indicate the three resolution levels in the U-Net's upsampling path, each containing three self-attention layers numbered 1, 2, and 3.
+for example ``M2-3'' means applying the loss to features from both mid-resolution layers 2 and 3.
+We observe that mid-resolution feature maps perform best for trajectory guidance.
+In addition, using features from both M2 and M3 leads to the best result.
+See \href{https://kmcode1.github.io/Projects/SG-I2V\#ablation-unet-layer}{\textit{our project page}} for visualizations.}
+\label{tab:results_layer}
+\vspace{-3.0mm}
+\end{figure}
+\vspace{-2.0mm}
+\paragraph{Cut-off frequency in post-processing.}
+We study the cut-off frequency in our high-frequency-preserving post-processing step in \cref{tab:results_fft}.
+Naively keeping the optimized latent ($\gamma = 1$) degrades the visual quality drastically, as shown by the higher FID and FVD.
+Yet, discarding part of the high-frequency component has negligible impact on motion control while eliminating most artifacts.
+We thus choose $\gamma = 0.5$ as a sweet spot for effective video quality restoration.
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\textwidth]{imgs/figure_fft_labeled.jpg}
+\vspace{1mm}
+\caption{\textbf{Effect of high-frequency preservation in post-processing.}
+Videos without post-processing tend to demonstrate oversmoothing and have artifacts.
+In contrast, our post-processing technique retains videos with sharp details and eliminates most of the artifacts.
+See \href{https://kmcode1.github.io/Projects/SG-I2V\#ablation-post-processing}{\textit{our project page}} for more examples.
+}
+\label{fig:results_fft}
+\vspace{-8.0mm}
+\end{figure}
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\textwidth]{imgs/ablation_fft.pdf}
+\caption{\textbf{Study of the cut-off frequency in post-processing.}
+Lower is better for all metrics.
+The value $\gamma$ indicates the cut-off frequency. 
+Fully keeping the optimized latent ($\gamma = 1$) results in degraded video quality, as shown by high FID and FVD values.
+On the other hand, replacing too many frequency components diminishes motion control, as indicated by the increasing ObjMC.
+}
+\label{tab:results_fft}
+\vspace{-3.0mm}
+\end{figure}
+
+\vspace{-2.0mm}
+\paragraph{U-Net layer.}
+\cref{tab:results_layer} ablates from which layer to extract the feature maps.
+The upsampling path of SVD's U-Net contains three stages (bottom, mid, top), each with three spatial self-attention layers (indexed 1, 2, 3).
+We observe that blocks at the middle-resolution level capture most semantically meaningful information, which aligns with prior work in image diffusion models~\citep{shi2024dragdiffusion,tang2023emergent}.
+We also try joint optimization of several layers, which gives the best performance.
+
+
+\begin{figure}[!t]
+\vspace{-4mm}
+\centering
+\includegraphics[width=\textwidth]{imgs/ablation_lr.pdf}
+\caption{\textbf{Ablation on optimization learning rates.} Larger learning rates lead to video quality degradation (i.e., higher FID and FVD), while smaller learning rates result in lower motion fidelity (i.e., higher ObjMC). We choose the learning rate considering this tradeoff. %
+}
+\label{tab:results_lr}
+\vspace{-2.5mm}
+\end{figure}
+
+\vspace{-2.0mm}
+\paragraph{Learning rate.}
+\cref{tab:results_lr} examines the effect of learning rate under a fixed number of optimization steps. 
+We observe a clear trade-off between visual quality and motion fidelity of generated videos.
+This is because a large learning rate quickly leads to noisy latents that are out of distribution. %
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\textwidth]{imgs/ablation_individual_timestep.pdf}
+\caption{\textbf{Effect of optimizing latent at individual denoising timesteps.}
+For all metrics, lower values are better.
+Here, we optimize \cref{eq:feature-optimization} on a single denoising timestep ($t=50$ corresponds to standard Gaussian noise), and we find middle timesteps (e.g. $t=30$) achieve the best motion fidelity while maintaining visual quality.
+More results on optimizing the latent at multiple timesteps can be found in \cref{tab:results_timesteps_range}.
+See \cref{fig:results_timesteps} and \href{https://kmcode1.github.io/Projects/SG-I2V\#ablation-denoising-timestep}{\textit{our project page}} for qualitative comparisons.
+}
+\label{tab:results_timesteps}
+\vspace{-2.5mm}
+\end{figure}
+\vspace{-3.0mm}
+\paragraph{Denoising timesteps.}
+\cref{tab:results_timesteps} summarizes the effects of optimizing features across different denoising timesteps ($t=50$ corresponds to standard Gaussian noise).
+Lower timesteps (e.g., $t=20,1$) significantly impair visual quality, motivating us to optimize only on earlier denoising steps.
+Conversely, timesteps for  $t>45$ degrade motion fidelity due to the lack of detailed semantic information at extremely high noise levels.
+Notably, ObjMC improves at $t \in [20, 1]$, but due to the Co-tracker tracking moving artifacts \href{https://kmcode1.github.io/Projects/SG-I2V/gallery_timestep2.html}{\textit{(e.g., see project webpage)}}.
+Based on these observations, we optimize feature maps extracted between timesteps 30--45 to balance visual quality and motion fidelity.
+
+

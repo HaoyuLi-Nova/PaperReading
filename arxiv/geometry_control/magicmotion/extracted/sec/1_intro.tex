@@ -1,0 +1,41 @@
+
+
+\section{Introduction}
+\label{sec:intro}
+With the rapid development of diffusion models, video generation has witnessed significant progress in recent years. 
+In contrast to images, videos~\cite{xing2023svformer, tu2023implicit, wang2022bevt, wang2023masked} capture dynamic temporal changes and offer a richer representation of semantic content.
+Earlier video generation approaches, such as AnimateDiff~\cite{guo2023animatediff} and SVD~\cite{blattmann2023stable}, primarily rely on the UNet~\cite{ronneberger2015u} structure, which results in videos with limited length and quality. 
+Sora~\cite{videoworldsimulators2024} has demonstrated the powerful capabilities of the DiT~\cite{Peebles2022DiT} architecture in text-to-video (T2V) generation. 
+Following this breakthrough, subsequent models leveraging the DiT architecture~\cite{zheng2024open,yang2024cogvideox,kong2024hunyuanvideo} have achieved higher quality outputs and extended video duration.
+
+While DiT-based models~\cite{yang2024cogvideox,kong2024hunyuanvideo, zheng2024open} excel at producing high-quality and longer videos, many text-to-video approaches~\cite{guo2023animatediff, xing2024simda, xing2024survey} lack precise control over attributes like object movement and camera motion~\cite{guo2023animatediff, xing2024simda, yang2024cogvideox}.  Fine-grained trajectory-controllable video generation emerges as a solution, which is especially critical for generating controllable videos in real-world scenarios.
+
+Previous trajectory-controllable video generation methods can be categorized based on the type of control signals they use. 
+These include points-based control~\cite{wang2024motionctrl,wang2025levitor,geng2024motionprompting,zhou2025trackgo}, 
+optical flow-based control~\cite{zhang2025tora, burgert2025go, yin2023dragnuwa, li2025image, shi2024motion}, 
+bounding boxes-based control~\cite{wang2024boximator, wei2024dreamvideo,yang2024direct, qiu2024freetraj, wu2024motionbooth, jain2023peekaboo,namekata2024sgi2v}, 
+masks-based control~\cite{yariv2025through}, 
+and 3D trajectories-based control~\cite{fu20243dtrajmaster, gu2025das,wang2025cinemaster}.
+However, these methods exhibit several limitations. 
+First, the trajectory control conditions used by these methods are unitary. Each method only support a single type of control signal.
+However, sparse trajectories (\emph{e.g.}, points and optical flow) result in imprecise control over object shape and size, 
+while dense trajectories (\emph{e.g.}, masks and 3D trajectories) are challenging for users to provide.
+Second, a publicly available large-scale dataset for trajectory-controllable video generation is lacking. 
+Existing VOS (Video Object Segmentation) datasets suffer from short video lengths~\cite{xu2018youtube, miao2021vspw, miao2022large}, small scales~\cite{Perazzi2016, MeViS, MOSE, Hong_2023_ICCV}, or few foreground objects~\cite{fan2021lasot}. 
+Third, a unified benchmark for evaluating different methods is absent. Besides, previous work focuses solely on video quality and trajectory accuracy while neglecting the impact of the number of moving objects. We argue that controlling fewer or more objects presents different challenges, making it essential to include this factor in the evaluation metrics.
+
+To address these issues, we propose MagicMotion, a controllable video generation  framework with dense-to-sparse trajectory guidance. To inject trajectory conditions into the generation process, we utilize an architecture similar to ControlNet~\cite{zhang2023adding} called \textbf{Trajectory ControlNet} to encode the trajectory information, which is later added to the original DiT model through a zero-initialized convolution layer.
+MagicMotion supports three types of trajectory conditions: masks, boxes, and sparse boxes using a progressive training strategy. Experiments show that the model can leverage the knowledge learned in the previous stage to achieve better performance than training from scratch. 
+Additionally, we propose a novel latent segment loss that helps the video generation model better understand the fine-grained shape of objects with minimal computation. 
+
+We also construct MagicData, a high-quality public dataset comprising 23K video samples, each annotated with a $ \texttt{<video, text, trajectory>}$ triplet. 
+We design a data pipeline that uses a large language model~\cite{touvron2023llama} to extract the main moving objects in the video, and Segment Anything Model (SAM2)~\cite{ren2024grounded, ravi2024sam} to annotate the segmentation masks and bounding boxes of these objects. 
+Furthermore, we introduce MagicBench, a large-scale comprehensive trajectory-controllable video generation benchmark. It categorizes all videos into 6 classes based on the number of foreground objects and evaluates models separately for each category in terms of both video generation quality and trajectory control accuracy.
+
+In conclusion, the main contributions of our work are summarized as follows:
+
+\begin{itemize}
+    \item We present MagicMotion, a trajectory-controllable image-to-video generation model that supports three types of control signals: masks, boxes, and sparse boxes.
+    \item We introduce a data curation and filtering mechanism, and construct MagicData, the first public dataset for trajectory-controlled video generation.
+    \item We propose MagicBench, a comprehensive benchmark for evaluating trajectory-controllable video generation models for both video quality and trajectory control accuracy across different numbers of controlled objects.
+\end{itemize}

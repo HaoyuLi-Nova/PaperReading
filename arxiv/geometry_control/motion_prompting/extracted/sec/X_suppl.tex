@@ -1,0 +1,96 @@
+\clearpage
+\appendix
+\setcounter{page}{1}
+\maketitlesupplementary
+\setcounter{figure}{0}
+\renewcommand{\thefigure}{A\arabic{figure}}
+\setcounter{table}{0}
+\renewcommand{\thetable}{A\arabic{table}}
+
+\supparxiv{Thank you for reading the supplementary material. \textbf{We highly encourage the reviewers to view sampled videos in the included website,} as many of our results cannot be fully appreciated as a sequence of static frames on paper. }{}
+
+\section{Implementation Details}
+\label{apdx:implementation}
+
+\subsection{Architecture and Training}
+
+We train our model for 70,000 steps using Adafactor~\cite{shazeer2018adafactor} with a learning rate of $1 \times 10^{-4}$. We do not use any learning rate decay. For the ControlNet, we copy Lumiere's encoder stack, add in zero convolutions as in~\cite{zhang2023adding}, and replace the first convolutional layer with a new layer that accepts a $T\times H \times W \times C$ conditioning signal. From the constraints of the base architecture, we have $T=80$ and $H = W = 128$. We set $C=64$. During training, we sample the number of input tracks uniformly from 1000 to 2000 inclusive. For each track we randomly assign a sinusoidal positional encoding~\cite{vaswani2017attention}, of 64 dimensions, by sampling integers without replacement from 0 to 16384 -- the maximum number of tracks for a $128 \times 128$ image, and using the corresponding positional embedding for that integer. Note that the encoding is completely randomly assigned. In particular, its spatial location has no bearing on its embedding. 
+
+
+All sampled videos are passed through Lumiere's spatial super resolution (SSR) model, resulting in a $1024 \times 1024$, 80 frame video at 16 frame per second, for a total of 5 seconds. We use Lumiere's SSR model as is, without finetuning it for motion conditioning, as we find that the $128 \times 128$ output of the base model already contains all of the motion conditioned dynamics.
+
+\mypar{Data. } We train on an internal dataset of 2.2 million videos. We precompute trajectories on this dataset by center cropping each video to a square, resizing it to $256\times 256$, and then running BootsTAP~\cite{doersch2024bootstap} with a dense gird of query points, resulting in 16,384 tracks per video.  During training, a video is sampled, and then tracks are randomly sampled from this dataset.  During the Lumiere fine-tuning, videos are resized to match Lumiere's $128 \times 128$ input and output size. 
+
+
+\input{figtabs/figure_details.tex}
+
+\subsection{Qualitative Results}
+
+We provide additional details for qualitative results in \cref{tbl:figure_details}, including text prompt and licensing information. All images and videos are used with permission and under open and free licenses. In addition, as can be seen we construct text prompts to describe the scene but not the motion, in order to limit the influence of text conditioning on the motion as much as possible.
+
+\subsection{Mouse GUI}
+\label{apdx:gui}
+
+\input{figtabs/gui.tex}
+
+We record mouse motions through a simple HTML GUI, which is shown in \cref{fig:gui}. It consists of a {\tt canvas} element which displays the first frame conditioning, labels that indicate the position of the mouse in the canvas, and whether or not it is currently being clicked, a button to start the recording, a countdown timer which gives three seconds before recording starts, and a second countdown timer which shows when the recording will end. We record 80 frames of mouse input to match the five seconds of video that our model outputs at 16 frames per second. For each frame we record the mouse $(x, y)$ position, and a flag indicating whether the mouse is being clicked.
+
+\subsection{Interacting with and Drag Editing Images}
+
+In order to feed mouse motions to our model, we create a grid of tracks that is centered on the mouse whenever it is being dragged. The user may choose the stride of these tracks, and the size of the grid. We use a square grid of tracks for simplicity. In addition, a user may choose to have the tracks ``persist," in that before and after the mouse drag the tracks remain. This is useful in cases where objects should stay in place after a drag. A user may also place down a grid of tracks to ``pin" the background in place. Note that this setup is identical to how we obtain the ``drag-based image editing" results.
+
+\subsection{Geometric Primitives}
+
+To make spherical tracks we take points on a sphere and follow them as the sphere is spun. This gives us a trajectory of 3D points, which when orthographically projected gives us 2D tracks. The density of the points, the radius of the sphere, and the location of the sphere are determined by the user. Mouse motions are converted to sphere spins by rotating the sphere through a single axis such that the initial mouse location matches with the current mouse location at each frame. This uniquely defines a rotation and ensures that the sphere tracks the mouse.
+
+\subsection{Camera Control}
+In order to obtain camera control, we run a monocular depth estimator on the first frame input to the model. This gives us camera intrinsics as well as depths, allowing us to un-project into a point cloud. We then project this point cloud onto a sequence of camera poses forming the desired camera trajectory, resulting in 2D point tracks. In addition, we run z-buffering to determine occlusions, where only the closest point that has been projected to some neighborhood is visible while all other points in that neighborhood are occluded---unless that point is sufficiently close to the visible point. This requires choosing a radius for the neighborhood size, and a threshold for a point to remain visible if it is close enough to the visible point. Both are set manually to constant values that we find to work well for all examples.
+
+We also discuss translating mouse motion to camera motion. This is done by having the camera move in such a way that the mouse is always above the same point. Because this is underdetermined, we also add the constraint that the camera should stay fixed in the vertical plane. Note that this is not the only constraint possible. Other constraints may restrict the camera to the surface of a sphere around the scene for example.
+
+\subsection{Track Sparsity}
+
+For camera control and motion transfer motion prompts, we obtain a dense set of tracks. Empirically, we find that it is helpful to randomly subsample these tracks, as using too many tracks suppresses the video model's learned priors from working, while using too few affords too little control. Somewhere in the middle is a sweet spot. For example, for the majority of the depth-based motion prompts, we use 1024 tracks, which we find offers a good balance between control and emergent video prior effects. In other cases, such as transferring the motion of the person's face in \cref{fig:motion_transfer}, we find that fewer tracks is helpful in dealing with misalignments between the source video and the input first frame. Finally, for out-of-domain motion transfer as in the {\it monkey chewing} example in \cref{fig:motion_transfer}, we find that very dense tracks help. We use 1500 tracks, as we need a lot of control to apply such an unnatural motion to the first frames.
+
+\subsection{Davis Eval}
+We conduct a quantitative evaluation of first frame, text, and track conditioned video generation using the DAVIS validation dataset, with a subset of results in \cref{tbl:davis_eval_abridged} and full results in \cref{tbl:davis_eval_full}. The validation dataset contains 30 videos from a wide range of scenes, involving subjects from sports to humans to animals to cars. In order to create inputs for the models, we extract tracks using BootsTAP~\cite{doersch2024bootstap}. First frame inputs are square crops of the first frames of the videos, and text prompts are the titles of the videos given by the dataset and typically consist of a word or two. For each evaluation for a given number of tracks, we randomly sample that number of tracks for conditioning.
+
+To ensure a fair comparison, we make the following accommodations for baselines. In addition to a first frame, tracks, and a text prompt, DragAnything requires segmentation masks for objects that the tracks move. To get this, we use the provided ground truth segmentations in the DAVIS dataset. Image Conductor is a finetuned version of AnimateDiff and is trained on videos of resolution $384 \times 256$. We initially gave the model $256 \times 256$ images, and found that we got reasonable results. However, we experimented with reflection padding the input frame to $384 \times 256$ and cropping the output, which gave slightly better results which we report. 
+
+\input{figtabs/losses.tex}
+
+\subsection{Human Studies}
+
+To perform the human studies, we handcraft 30 inputs with diverse image subjects and input motions. Motions consist of a single uninterrupted trajectory. Text prompts are designed to describe the image, but not the desired motion, to factor out the influence of text as much as possible. DragAnything requires masks, which we obtain by running SAM~\cite{kirillov2023segany} on the first frame with the initial location of the tracks as query points. For our method, we turn the trajectory into a grid of tracks as described above. We then feed these inputs to the models and take a single random sample. We follow the same protocol as above for Image Conductor. This results in 30 samples for each model and 90 samples in total. 
+
+We run a two alternative forced choice (2AFC) test between our model and the baselines. We display a sample from our method and a sample from the baseline in a random order with a video of the corresponding motion conditioning in the middle, visualized as a moving red dot. Participants are then asked three questions. Verbatim, we ask (1) {\it Which video better follows the motion of the red dot?} (2) {\it Which video has the more realistic motion?} (3) {\it Which video is of higher visual quality?} These questions are designed to measure the adherence of the motion to the conditioning, the quality of the motion, and the overall visual quality of video, respectively. This results in a total of 180 questions.
+
+We recruit participants for our study through Amazon Mechanical Turk (MTurk). To ensure responses are of high quality, we add three ``vigilance" questions with clearly correct answers. We discard all responses that fail any of these three questions. Each question is conducted as a separate study, and the resulting number of participants are $N=103$, $N=103$, and $N=115$ for each question respectively. This results in a total of 19,260 answers.
+
+
+\section{Training Observations}
+\label{apdx:training}
+
+In training, we observe similar behavior as noted in ControlNet~\cite{zhang2023adding} and ControlNext~\cite{peng2024controlnext}: 1) training loss does not directly correlate with model performance, and 2) ``sudden convergence'' where in a few epochs the model goes from not adhering to control signal to full adherence. ControlNext identifies both of these behaviors as coming from the zero initialization and offers cross normalization as a potential solution. We believe this and other future control scheme is a promising avenue for future work in track conditioned video generation. We show training loss and test metrics in \cref{fig:losses}. As can be seen, the training loss is fairly inscrutable, while the test losses do not begin to decrease until step 20,000.
+
+\section{Full Quantitative Results}
+\label{apdx:quantitative}
+
+In \cref{sec:quantitative} we present DAVIS evaluation results for $N = \{1, 16, 512, 2048\}$. In \cref{tbl:davis_eval_full} we present results for $ N = 4 $ and $ N = 64 $ as well, which we omit from the main paper for brevity.
+
+\input{figtabs/davis_eval.tex}
+
+\section{Human Pose Control}
+\label{apdx:human_pose}
+
+We show results on using our method to control humans through human pose estimated keypoints in \cref{fig:pose}. To do this, we first estimate the pose with an off-the-shelf model, and then apply motions to desired keypoints and feed it to our model.
+
+\input{figtabs/human_pose}
+
+
+\section{Motion Magnification}
+\label{apdx:motionmag}
+
+One additional application of our model is motion magnification~\cite{liu2005motion,wu2012eulerian,wadhwa2013phase,oh2018learning,pan2023selfsupervised}. This task involves taking a video with subtle motions and generating a new video in which these motions have been magnified, so that they are easier to see. We do this by running a tracking algorithm~\cite{doersch2023tapir} on an input video, smoothing the tracks by applying a Gaussian blur over space and time, and then magnifying the resulting tracks. We then feed the first frame of the input video and the magnified tracks to our model. We show results, along with space-time slices, in \cref{fig:motionmag}. We found that smoothing was necessary to reduce noise in the estimated tracks. As a result the magnified tracks are not exactly at the specified magnification factor, but nonetheless are qualitatively useful in revealing subtle motions. We expect more accurate point tracking algorithms will remove the need for this smoothing step.
+
+\input{figtabs/motionmag.tex}

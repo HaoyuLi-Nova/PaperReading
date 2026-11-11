@@ -1,0 +1,13 @@
+
+
+\begin{abstract}
+Generating interactive and dynamic 4D scenes from \textit{a single static image} remains a core challenge. Most existing \textit{generate-then-reconstruct} and \textit{reconstruct-then-generate} methods decouple geometry from motion, causing spatiotemporal inconsistencies and poor generalization. To address these, 
+we present \textbf{\ours} (\textbf{Mo}tion and \textbf{Ge}ometry-Aware image-to-\textbf{4D} Synthesis), a geometry-conditioned framework for single-image 4D synthesis that models a scene as dense 4D point trajectories. Instead of treating geometry and dynamics as two disconnected stages, our method starts from an initial geometric prior inferred from the input image and predicts future time-varying trajectories in a diffusion process, improving spatiotemporal coherence while preserving structural stability.
+To support this task, we first introduce TrajScene-60K, a large-scale dataset of 60,000 video samples with dense 4D point trajectories, addressing the scarcity of high-quality training data for scene-level 4D generation. Built on this, our diffusion-based 4D Scene Trajectory Generator (4D-STraG) predicts geometry-consistent and motion-plausible trajectory fields conditioned on the input image, with a depth-guided motion normalization strategy to reduce scale ambiguity and a Motion Perception Module (MPM) to inject motion-aware priors.
+We further propose a 4D View Synthesis Module (4D-ViSM) to render the generated 4D representation into videos under arbitrary camera trajectories. Experiments show that \ours produces high-quality 4D scenes with strong temporal coherence, favorable geometry-aware consistency, and compelling novel-view synthesis from a single image. Code: \url{https://github.com/Zhangyr2022/MoGe4D}.
+
+
+\keywords{4D Generation \and Dense Trajectories \and Geometry-Aware \and Novel View Synthesis \and Diffusion Models }
+\end{abstract}
+
+

@@ -1,0 +1,17 @@
+\vspace{-3.0mm}
+\section{Conclusion}
+\label{sec:conclusion}
+\vspace{-2.0mm}
+Our work introduces the first framework for zero-shot trajectory control in image-to-video generation.
+Our thorough analysis of diffusion features reveals that the knowledge acquired in the pre-trained image-to-video diffusion models can guide them to generate videos with desired motions. %
+Quantitative and qualitative results demonstrate the effectiveness of our approach, both on synthetic and real-world images.
+We hope our findings can shed light on the inner mechanism of image-to-video diffusion models and inspire better architecture designs in the future.
+
+\vspace{-2.0mm}
+\paragraph{Limitations and future work.}
+Since our pipeline works in a zero-shot and self-guided manner, the base video diffusion model bounds the quality of generated videos, e.g., for subjects with large motion or complex physical interactions~\citep{blattmann2023stable}.
+Another area for improvement is the out-of-distribution issue when optimizing the latent code. %
+Although we have incorporated frequency-based post-processing to mitigate it, we sometimes still observe artifacts when we set the learning rate higher.
+How to alter the denoising process while keeping in-distribution latents is an open problem itself~\citep{he2023manifold,ReNoiseInversion}.
+With the recent rapid progress in video generators~\citep{Sora,WALT}, we also expect our framework could be extended to newly released models to achieve improved generation quality. %
+

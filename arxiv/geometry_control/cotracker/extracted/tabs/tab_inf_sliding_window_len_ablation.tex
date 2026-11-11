@@ -1,0 +1,15 @@
+\begin{tabular}{ cccc }
+\toprule
+ \multirow{2}{*}{Window size} & \multicolumn{3}{c}{DAVIS First} \\
+\cmidrule(lr){2-4}
+                              & AJ                              &  \! \! \! $< \delta^x_{avg}$\! & OA            \\
+\midrule
+4                             & 54.9                            &  70.8                          & 83.2          \\
+\textbf{8}                    & \textbf{62.2}                   &  \textbf{75.7}                 & \textbf{89.3} \\
+16                            & 54.6                            &  68.8                          & 82.9          \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Inference sliding window size}. The model is trained with sliding window size $T=8$.
+The same window size gives the best results.}%
+\label{tab:tab_inf_sliding_window_len_ablation}
+\vspace{2em}

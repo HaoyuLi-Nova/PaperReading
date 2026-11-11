@@ -1,0 +1,20 @@
+%\setlength\tabcolsep{.4em}
+\begin{table}[t]
+\centering
+\footnotesize
+\caption{ \textbf{Training sliding window size}. We train and evaluate \method with the varying window lengths. As the training data only contains sequences of length 24, larger window sizes are difficult to train.}%
+\label{tab:window_size}
+\begin{tabular}{ lccccc }
+\toprule
+\multirow{2}{*}{Window size} & \multicolumn{3}{c}{DAVIS First} & \multicolumn{2}{c}{BADJA} \\
+\cmidrule(lr){2-4}
+\cmidrule(lr){5-6}
+           & AJ            & $< \delta^x_{avg}$ & OA            & seg-based     & \! \! $< \delta^{3px}$ \! \! \\ \midrule
+4          & 57.9          & 73.2               & 87.0          & 64.6          & 18.2                         \\
+\textbf{8} & \textbf{60.6} & \textbf{75.4}      & \textbf{89.3} & 63.6          & 18.0                         \\
+12         & 58.8          & \textbf{75.4}      & 87.6          & \textbf{65.1} & 17.7                         \\
+16         & 57.8          & 75.2               & 86.7          & 64.1          & \textbf{18.4}                \\
+20         & 57.3          & 74.0               & 85.9          & 64.9          & 18.3                         \\ \bottomrule
+\end{tabular}
+\end{table}
+

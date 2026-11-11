@@ -1,0 +1,414 @@
+\begin{thebibliography}{81}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Beauchemin and Barron(1995)]{beauchemin1995computation}
+Steven~S. Beauchemin and John~L. Barron.
+\newblock The computation of optical flow.
+\newblock \emph{ACM computing surveys (CSUR)}, 27\penalty0 (3):\penalty0 433--466, 1995.
+
+\bibitem[Bhat et~al.(2023)Bhat, Birkl, Wofk, Wonka, and M{\"{u}}ller]{ZoeDepth}
+Shariq~Farooq Bhat, Reiner Birkl, Diana Wofk, Peter Wonka, and Matthias M{\"{u}}ller.
+\newblock Zoedepth: Zero-shot transfer by combining relative and metric depth.
+\newblock \emph{CoRR}, abs/2302.12288, 2023.
+
+\bibitem[Bian et~al.(2023)Bian, Huang, Shi, Dong, Li, and Li]{bian2023context}
+Weikang Bian, Zhaoyang Huang, Xiaoyu Shi, Yitong Dong, Yijin Li, and Hongsheng Li.
+\newblock Context-tap: Tracking any point demands spatial context features.
+\newblock \emph{arXiv preprint arXiv:2306.02000}, 2023.
+
+\bibitem[Biggs et~al.(2018)Biggs, Roddick, Fitzgibbon, and Cipolla]{BADJA}
+Benjamin Biggs, Thomas Roddick, Andrew~W. Fitzgibbon, and Roberto Cipolla.
+\newblock Creatures great and {SMAL:} recovering the shape and motion of animals from video.
+\newblock In \emph{Asian Conf. Comput. Vis.}, pages 3--19. Springer, 2018.
+
+\bibitem[Birkl et~al.(2023)Birkl, Wofk, and M{\"u}ller]{birkl2023midas}
+Reiner Birkl, Diana Wofk, and Matthias M{\"u}ller.
+\newblock Midas v3. 1--a model zoo for robust monocular relative depth estimation.
+\newblock \emph{arXiv preprint arXiv:2307.14460}, 2023.
+
+\bibitem[Black and Anandan(1993)]{black1993framework}
+Michael~J Black and Padmanabhan Anandan.
+\newblock A framework for the robust estimation of optical flow.
+\newblock In \emph{Int. Conf. Comput. Vis.}, pages 231--236. IEEE, 1993.
+
+\bibitem[Bo{\v{z}}i{\v{c}} et~al.(2021)Bo{\v{z}}i{\v{c}}, Palafox, Zollh{\"o}fer, Thies, Dai, and Nie{\ss}ner]{bozic2021neuraldeformationgraphs}
+Alja{\v{z}} Bo{\v{z}}i{\v{c}}, Pablo Palafox, Michael Zollh{\"o}fer, Justus Thies, Angela Dai, and Matthias Nie{\ss}ner.
+\newblock Neural deformation graphs for globally-consistent non-rigid reconstruction.
+\newblock \emph{CVPR}, 2021.
+
+\bibitem[Brox et~al.(2009)Brox, Bregler, and Malik]{brox2009large}
+Thomas Brox, Christoph Bregler, and Jitendra Malik.
+\newblock Large displacement optical flow.
+\newblock In \emph{IEEE Conf. Comput. Vis. Pattern Recog.}, pages 41--48, 2009.
+
+\bibitem[Carreira and Zisserman(2017)]{kinetics}
+Joao Carreira and Andrew Zisserman.
+\newblock Quo vadis, action recognition? a new model and the kinetics dataset.
+\newblock In \emph{proceedings of the IEEE Conference on Computer Vision and Pattern Recognition}, pages 6299--6308, 2017.
+
+\bibitem[Chan et~al.(2022)Chan, Lin, Chan, Nagano, Pan, De~Mello, Gallo, Guibas, Tremblay, Khamis, et~al.]{chan2022efficient}
+Eric~R Chan, Connor~Z Lin, Matthew~A Chan, Koki Nagano, Boxiao Pan, Shalini De~Mello, Orazio Gallo, Leonidas~J Guibas, Jonathan Tremblay, Sameh Khamis, et~al.
+\newblock Efficient geometry-aware 3d generative adversarial networks.
+\newblock In \emph{IEEE Conf. Comput. Vis. Pattern Recog.}, pages 16123--16133, 2022.
+
+\bibitem[Doersch et~al.(2022)Doersch, Gupta, Markeeva, Recasens, Smaira, Aytar, Carreira, Zisserman, and Yang]{tap-vid}
+Carl Doersch, Ankush Gupta, Larisa Markeeva, Adri{\`a} Recasens, Lucas Smaira, Yusuf Aytar, Jo{\~a}o Carreira, Andrew Zisserman, and Yi Yang.
+\newblock Tap-vid: A benchmark for tracking any point in a video.
+\newblock \emph{Adv. Neural Inform. Process. Syst.}, 35:\penalty0 13610--13626, 2022.
+
+\bibitem[Doersch et~al.(2023)Doersch, Yang, Vecer{\'{\i}}k, Gokay, Gupta, Aytar, Carreira, and Zisserman]{Tapir}
+Carl Doersch, Yi Yang, Mel Vecer{\'{\i}}k, Dilara Gokay, Ankush Gupta, Yusuf Aytar, Jo{\~{a}}o Carreira, and Andrew Zisserman.
+\newblock {TAPIR:} tracking any point with per-frame initialization and temporal refinement.
+\newblock \emph{CoRR}, abs/2306.08637, 2023.
+
+\bibitem[Fischer et~al.(2015)Fischer, Dosovitskiy, Ilg, H{\"a}usser, Haz{\i}rba{\c{s}}, Golkov, Van~der Smagt, Cremers, and Brox]{fischer2015flownet}
+Philipp Fischer, Alexey Dosovitskiy, Eddy Ilg, Philip H{\"a}usser, Caner Haz{\i}rba{\c{s}}, Vladimir Golkov, Patrick Van~der Smagt, Daniel Cremers, and Thomas Brox.
+\newblock Flownet: Learning optical flow with convolutional networks.
+\newblock \emph{arXiv preprint arXiv:1504.06852}, 2015.
+
+\bibitem[Greff et~al.(2022)Greff, Belletti, Beyer, Doersch, Du, Duckworth, Fleet, Gnanapragasam, Golemo, Herrmann, Kipf, Kundu, Lagun, Laradji, Liu, Meyer, Miao, Nowrouzezahrai, {\"{O}}ztireli, Pot, Radwan, Rebain, Sabour, Sajjadi, Sela, Sitzmann, Stone, Sun, Vora, Wang, Wu, Yi, Zhong, and Tagliasacchi]{kubric}
+Klaus Greff, Francois Belletti, Lucas Beyer, Carl Doersch, Yilun Du, Daniel Duckworth, David~J. Fleet, Dan Gnanapragasam, Florian Golemo, Charles Herrmann, Thomas Kipf, Abhijit Kundu, Dmitry Lagun, Issam~H. Laradji, Hsueh{-}Ti~Derek Liu, Henning Meyer, Yishu Miao, Derek Nowrouzezahrai, A.~Cengiz {\"{O}}ztireli, Etienne Pot, Noha Radwan, Daniel Rebain, Sara Sabour, Mehdi S.~M. Sajjadi, Matan Sela, Vincent Sitzmann, Austin Stone, Deqing Sun, Suhani Vora, Ziyu Wang, Tianhao Wu, Kwang~Moo Yi, Fangcheng Zhong, and Andrea Tagliasacchi.
+\newblock Kubric: {A} scalable dataset generator.
+\newblock In \emph{IEEE Conf. Comput. Vis. Pattern Recog.}, pages 3739--3751. {IEEE}, 2022.
+
+\bibitem[Gu et~al.(2019)Gu, Wang, Wu, Lee, and Wang]{gu2019hplflownet}
+Xiuye Gu, Yijie Wang, Chongruo Wu, Yong~Jae Lee, and Panqu Wang.
+\newblock Hplflownet: Hierarchical permutohedral lattice flownet for scene flow estimation on large-scale point clouds.
+\newblock In \emph{Proceedings of the IEEE/CVF conference on computer vision and pattern recognition}, pages 3254--3263, 2019.
+
+\bibitem[Hadfield and Bowden(2011)]{hadfield2011kinecting}
+Simon Hadfield and Richard Bowden.
+\newblock Kinecting the dots: Particle based scene flow from depth sensors.
+\newblock In \emph{2011 International Conference on Computer Vision}, pages 2290--2295. IEEE, 2011.
+
+\bibitem[Harley et~al.(2022)Harley, Fang, and Fragkiadaki]{pips}
+Adam~W. Harley, Zhaoyuan Fang, and Katerina Fragkiadaki.
+\newblock Particle video revisited: Tracking through occlusions using point trajectories.
+\newblock In \emph{Eur. Conf. Comput. Vis.}, pages 59--75. Springer, 2022.
+
+\bibitem[Herbst et~al.(2013)Herbst, Ren, and Fox]{herbst2013rgb}
+Evan Herbst, Xiaofeng Ren, and Dieter Fox.
+\newblock Rgb-d flow: Dense 3-d motion estimation using color and depth.
+\newblock In \emph{2013 IEEE international conference on robotics and automation}, pages 2276--2282. IEEE, 2013.
+
+\bibitem[Horn and Schunck(1981)]{horn1981determining}
+Berthold~KP Horn and Brian~G Schunck.
+\newblock Determining optical flow.
+\newblock \emph{Artificial intelligence}, 17\penalty0 (1-3):\penalty0 185--203, 1981.
+
+\bibitem[Hornacek et~al.(2014)Hornacek, Fitzgibbon, and Rother]{hornacek2014sphereflow}
+Michael Hornacek, Andrew Fitzgibbon, and Carsten Rother.
+\newblock Sphereflow: 6 dof scene flow from rgb-d pairs.
+\newblock In \emph{Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition}, pages 3526--3533, 2014.
+
+\bibitem[Huang et~al.(2022)Huang, Shi, Zhang, Wang, Cheung, Qin, Dai, and Li]{huang2022flowformer}
+Zhaoyang Huang, Xiaoyu Shi, Chao Zhang, Qiang Wang, Ka~Chun Cheung, Hongwei Qin, Jifeng Dai, and Hongsheng Li.
+\newblock Flowformer: A transformer architecture for optical flow.
+\newblock In \emph{European Conference on Computer Vision}, pages 668--685. Springer, 2022.
+
+\bibitem[Huguet and Devernay(2007)]{huguet2007variational}
+Fr{\'e}d{\'e}ric Huguet and Fr{\'e}d{\'e}ric Devernay.
+\newblock A variational method for scene flow estimation from stereo sequences.
+\newblock In \emph{2007 IEEE 11th International Conference on Computer Vision}, pages 1--7. IEEE, 2007.
+
+\bibitem[Hui et~al.(2018)Hui, Tang, and Loy]{hui2018liteflownet}
+Tak-Wai Hui, Xiaoou Tang, and Chen~Change Loy.
+\newblock Liteflownet: A lightweight convolutional neural network for optical flow estimation.
+\newblock In \emph{IEEE Conf. Comput. Vis. Pattern Recog.}, pages 8981--8989, 2018.
+
+\bibitem[Ilg et~al.(2017)Ilg, Mayer, Saikia, Keuper, Dosovitskiy, and Brox]{ilg2017flownet}
+Eddy Ilg, Nikolaus Mayer, Tonmoy Saikia, Margret Keuper, Alexey Dosovitskiy, and Thomas Brox.
+\newblock Flownet 2.0: Evolution of optical flow estimation with deep networks.
+\newblock In \emph{IEEE Conf. Comput. Vis. Pattern Recog.}, pages 2462--2470, 2017.
+
+\bibitem[Irani(1999)]{irani1999multi}
+Michal Irani.
+\newblock Multi-frame optical flow estimation using subspace constraints.
+\newblock In \emph{Int. Conf. Comput. Vis.}, pages 626--633, 1999.
+
+\bibitem[Jaegle et~al.(2021)Jaegle, Borgeaud, Alayrac, Doersch, Ionescu, Ding, Koppula, Zoran, Brock, Shelhamer, et~al.]{jaegle2021perceiver}
+Andrew Jaegle, Sebastian Borgeaud, Jean-Baptiste Alayrac, Carl Doersch, Catalin Ionescu, David Ding, Skanda Koppula, Daniel Zoran, Andrew Brock, Evan Shelhamer, et~al.
+\newblock Perceiver io: A general architecture for structured inputs \& outputs.
+\newblock \emph{arXiv preprint arXiv:2107.14795}, 2021.
+
+\bibitem[Jaimez et~al.(2015)Jaimez, Souiai, Gonzalez-Jimenez, and Cremers]{jaimez2015primal}
+Mariano Jaimez, Mohamed Souiai, Javier Gonzalez-Jimenez, and Daniel Cremers.
+\newblock A primal-dual framework for real-time dense rgb-d scene flow.
+\newblock In \emph{2015 IEEE international conference on robotics and automation (ICRA)}, pages 98--104. IEEE, 2015.
+
+\bibitem[Janai et~al.(2018)Janai, Guney, Ranjan, Black, and Geiger]{janai2018unsupervised}
+Joel Janai, Fatma Guney, Anurag Ranjan, Michael Black, and Andreas Geiger.
+\newblock Unsupervised learning of multi-frame optical flow with occlusions.
+\newblock In \emph{Eur. Conf. Comput. Vis.}, pages 690--706, 2018.
+
+\bibitem[Karaev et~al.(2023)Karaev, Rocco, Graham, Neverova, Vedaldi, and Rupprecht]{cotracker}
+Nikita Karaev, Ignacio Rocco, Benjamin Graham, Natalia Neverova, Andrea Vedaldi, and Christian Rupprecht.
+\newblock Cotracker: It is better to track together.
+\newblock \emph{CoRR}, abs/2307.07635, 2023.
+
+\bibitem[Kasten et~al.(2021)Kasten, Ofri, Wang, and Dekel]{kasten2021layered}
+Yoni Kasten, Dolev Ofri, Oliver Wang, and Tali Dekel.
+\newblock Layered neural atlases for consistent video editing.
+\newblock In \emph{SIGGRAPH Asia}, 2021.
+
+\bibitem[Keller et~al.(2013)Keller, Lefloch, Lambers, Izadi, Weyrich, and Kolb]{keller2013real}
+Maik Keller, Damien Lefloch, Martin Lambers, Shahram Izadi, Tim Weyrich, and Andreas Kolb.
+\newblock Real-time 3d reconstruction in dynamic scenes using point-based fusion.
+\newblock In \emph{2013 International Conference on 3D Vision-3DV 2013}, pages 1--8. IEEE, 2013.
+
+\bibitem[Kennedy and Taylor(2015)]{kennedy2015optical}
+Ryan Kennedy and Camillo~J Taylor.
+\newblock Optical flow with geometric occlusion estimation and fusion of multiple frames.
+\newblock In \emph{Energy Minimization Methods in Computer Vision and Pattern Recognition: 10th International Conference, EMMCVPR 2015, Hong Kong, China, January 13-16, 2015. Proceedings 10}, pages 364--377. Springer, 2015.
+
+\bibitem[Lee et~al.(2021)Lee, Devin, Zhou, Lampe, Bousmalis, Springenberg, Byravan, Abdolmaleki, Gileadi, Khosid, et~al.]{rgb-stacking}
+Alex~X Lee, Coline~Manon Devin, Yuxiang Zhou, Thomas Lampe, Konstantinos Bousmalis, Jost~Tobias Springenberg, Arunkumar Byravan, Abbas Abdolmaleki, Nimrod Gileadi, David Khosid, et~al.
+\newblock Beyond pick-and-place: Tackling robotic stacking of diverse shapes.
+\newblock In \emph{5th Annual Conference on Robot Learning}, 2021.
+
+\bibitem[Lei and Daniilidis(2022)]{lei2022cadex}
+Jiahui Lei and Kostas Daniilidis.
+\newblock Cadex: Learning canonical deformation coordinate space for dynamic surface representation via neural homeomorphism.
+\newblock In \emph{IEEE Conf. Comput. Vis. Pattern Recog.}, pages 6624--6634, 2022.
+
+\bibitem[Lin et~al.(2022)Lin, Zheng, Yong, and Xu]{lin2022occlusionfusion}
+Wenbin Lin, Chengwei Zheng, Jun-Hai Yong, and Feng Xu.
+\newblock Occlusionfusion: Occlusion-aware motion estimation for real-time dynamic 3d reconstruction.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, pages 1736--1745, 2022.
+
+\bibitem[Liu et~al.(2019)Liu, Qi, and Guibas]{liu2019flownet3d}
+Xingyu Liu, Charles~R Qi, and Leonidas~J Guibas.
+\newblock Flownet3d: Learning scene flow in 3d point clouds.
+\newblock In \emph{Proceedings of the IEEE/CVF conference on computer vision and pattern recognition}, pages 529--537, 2019.
+
+\bibitem[Lowe(2004)]{lowe2004distinctive}
+David~G Lowe.
+\newblock Distinctive image features from scale-invariant keypoints.
+\newblock \emph{Int. J. Comput. Vis.}, 60:\penalty0 91--110, 2004.
+
+\bibitem[Lucas and Kanade(1981)]{lucas1981iterative}
+Bruce~D Lucas and Takeo Kanade.
+\newblock An iterative image registration technique with an application to stereo vision.
+\newblock In \emph{International Joint Conference on Artificial Intelligence}, pages 674--679, 1981.
+
+\bibitem[Ma et~al.(2019)Ma, Wang, Hu, Xiong, and Urtasun]{ma2019deep}
+Wei-Chiu Ma, Shenlong Wang, Rui Hu, Yuwen Xiong, and Raquel Urtasun.
+\newblock Deep rigid instance scene flow.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, pages 3614--3622, 2019.
+
+\bibitem[Mayer et~al.(2016)Mayer, Ilg, H{\"a}usser, Fischer, Cremers, Dosovitskiy, and Brox]{MIFDB16}
+N. Mayer, E. Ilg, P. H{\"a}usser, P. Fischer, D. Cremers, A. Dosovitskiy, and T. Brox.
+\newblock A large dataset to train convolutional networks for disparity, optical flow, and scene flow estimation.
+\newblock In \emph{IEEE International Conference on Computer Vision and Pattern Recognition (CVPR)}, 2016.
+\newblock arXiv:1512.02134.
+
+\bibitem[Menze and Geiger(2015)]{menze2015object}
+Moritz Menze and Andreas Geiger.
+\newblock Object scene flow for autonomous vehicles.
+\newblock In \emph{Proceedings of the IEEE conference on computer vision and pattern recognition}, pages 3061--3070, 2015.
+
+\bibitem[Neoral et~al.(2023)Neoral, {\v{S}}er{\`y}ch, and Matas]{neoral2023mft}
+Michal Neoral, Jon{\'a}{\v{s}} {\v{S}}er{\`y}ch, and Ji{\v{r}}{\'\i} Matas.
+\newblock Mft: Long-term tracking of every pixel.
+\newblock \emph{arXiv preprint arXiv:2305.12998}, 2023.
+
+\bibitem[Newcombe et~al.(2011)Newcombe, Izadi, Hilliges, Molyneaux, Kim, Davison, Kohi, Shotton, Hodges, and Fitzgibbon]{newcombe2011kinectfusion}
+Richard~A Newcombe, Shahram Izadi, Otmar Hilliges, David Molyneaux, David Kim, Andrew~J Davison, Pushmeet Kohi, Jamie Shotton, Steve Hodges, and Andrew Fitzgibbon.
+\newblock Kinectfusion: Real-time dense surface mapping and tracking.
+\newblock In \emph{2011 10th IEEE international symposium on mixed and augmented reality}, pages 127--136. Ieee, 2011.
+
+\bibitem[Newcombe et~al.(2015)Newcombe, Fox, and Seitz]{dynamicfusion}
+Richard~A. Newcombe, Dieter Fox, and Steven~M. Seitz.
+\newblock Dynamicfusion: Reconstruction and tracking of non-rigid scenes in real-time.
+\newblock In \emph{IEEE Conf. Comput. Vis. Pattern Recog.}, pages 343--352. {IEEE} Computer Society, 2015.
+
+\bibitem[Niemeyer et~al.(2019)Niemeyer, Mescheder, Oechsle, and Geiger]{niemeyer2019occupancy}
+Michael Niemeyer, Lars Mescheder, Michael Oechsle, and Andreas Geiger.
+\newblock Occupancy flow: 4d reconstruction by learning particle dynamics.
+\newblock In \emph{Proceedings of the IEEE/CVF international conference on computer vision}, pages 5379--5389, 2019.
+
+\bibitem[Niklaus and Liu(2020)]{softsplat}
+Simon Niklaus and Feng Liu.
+\newblock Softmax splatting for video frame interpolation.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)}, 2020.
+
+\bibitem[Pedregosa et~al.(2011)Pedregosa, Varoquaux, Gramfort, Michel, Thirion, Grisel, Blondel, Prettenhofer, Weiss, Dubourg, Vanderplas, Passos, Cournapeau, Brucher, Perrot, and Duchesnay]{scikit-learn}
+F. Pedregosa, G. Varoquaux, A. Gramfort, V. Michel, B. Thirion, O. Grisel, M. Blondel, P. Prettenhofer, R. Weiss, V. Dubourg, J. Vanderplas, A. Passos, D. Cournapeau, M. Brucher, M. Perrot, and E. Duchesnay.
+\newblock Scikit-learn: Machine learning in {P}ython.
+\newblock \emph{Journal of Machine Learning Research}, 12:\penalty0 2825--2830, 2011.
+
+\bibitem[Peng et~al.(2020)Peng, Niemeyer, Mescheder, Pollefeys, and Geiger]{peng2020convolutional}
+Songyou Peng, Michael Niemeyer, Lars Mescheder, Marc Pollefeys, and Andreas Geiger.
+\newblock Convolutional occupancy networks.
+\newblock In \emph{Computer Vision--ECCV 2020: 16th European Conference, Glasgow, UK, August 23--28, 2020, Proceedings, Part III 16}, pages 523--540. Springer, 2020.
+
+\bibitem[Pons et~al.(2007)Pons, Keriven, and Faugeras]{pons2007multi}
+Jean-Philippe Pons, Renaud Keriven, and Olivier Faugeras.
+\newblock Multi-view stereo reconstruction and scene flow estimation with a global image-based matching score.
+\newblock \emph{International Journal of Computer Vision}, 72:\penalty0 179--193, 2007.
+
+\bibitem[Pont-Tuset et~al.(2017{\natexlab{a}})Pont-Tuset, Perazzi, Caelles, Arbel{\'a}ez, Sorkine-Hornung, and Van~Gool]{davis}
+Jordi Pont-Tuset, Federico Perazzi, Sergi Caelles, Pablo Arbel{\'a}ez, Alex Sorkine-Hornung, and Luc Van~Gool.
+\newblock The 2017 davis challenge on video object segmentation.
+\newblock \emph{arXiv preprint arXiv:1704.00675}, 2017{\natexlab{a}}.
+
+\bibitem[Pont-Tuset et~al.(2017{\natexlab{b}})Pont-Tuset, Perazzi, Caelles, Arbel{\'a}ez, Sorkine-Hornung, and Van~Gool]{pont20172017}
+Jordi Pont-Tuset, Federico Perazzi, Sergi Caelles, Pablo Arbel{\'a}ez, Alex Sorkine-Hornung, and Luc Van~Gool.
+\newblock The 2017 {DAVIS} challenge on video object segmentation.
+\newblock \emph{arXiv preprint arXiv:1704.00675}, 2017{\natexlab{b}}.
+
+\bibitem[Quiroga et~al.(2014)Quiroga, Brox, Devernay, and Crowley]{quiroga2014dense}
+Julian Quiroga, Thomas Brox, Fr{\'e}d{\'e}ric Devernay, and James Crowley.
+\newblock Dense semi-rigid scene flow estimation from rgbd images.
+\newblock In \emph{Computer Vision--ECCV 2014: 13th European Conference, Zurich, Switzerland, September 6-12, 2014, Proceedings, Part VII 13}, pages 567--582. Springer, 2014.
+
+\bibitem[Ranftl et~al.(2021)Ranftl, Bochkovskiy, and Koltun]{ranftl2021vision}
+Ren{\'e} Ranftl, Alexey Bochkovskiy, and Vladlen Koltun.
+\newblock Vision transformers for dense prediction.
+\newblock In \emph{Proceedings of the IEEE/CVF international conference on computer vision}, pages 12179--12188, 2021.
+
+\bibitem[Ren et~al.(2019)Ren, Gallo, Sun, Yang, Sudderth, and Kautz]{ren2019fusion}
+Zhile Ren, Orazio Gallo, Deqing Sun, Ming-Hsuan Yang, Erik~B Sudderth, and Jan Kautz.
+\newblock A fusion approach for multi-frame optical flow estimation.
+\newblock In \emph{IEEE Winter Conf. Appl. Comput. Vis.}, pages 2077--2086, 2019.
+
+\bibitem[Rubinstein et~al.(2012)Rubinstein, Liu, and Freeman]{rubinstein2012towards}
+Michael Rubinstein, Ce Liu, and William~T Freeman.
+\newblock Towards longer long-range motion trajectories.
+\newblock In \emph{Brit. Mach. Vis. Conf.}, 2012.
+
+\bibitem[Sand and Teller(2006)]{PartVid}
+Peter Sand and Seth~J. Teller.
+\newblock Particle video: Long-range motion estimation using point trajectories.
+\newblock In \emph{IEEE Conf. Comput. Vis. Pattern Recog.}, pages 2195--2202. {IEEE} Computer Society, 2006.
+
+\bibitem[Sevilla-Lara et~al.(2016)Sevilla-Lara, Sun, Jampani, and Black]{sevilla2016optical}
+Laura Sevilla-Lara, Deqing Sun, Varun Jampani, and Michael~J Black.
+\newblock Optical flow with semantic segmentation and localized layers.
+\newblock In \emph{Proceedings of the IEEE conference on computer vision and pattern recognition}, pages 3889--3898, 2016.
+
+\bibitem[Shi et~al.(1994)]{shi1994good}
+Jianbo Shi et~al.
+\newblock Good features to track.
+\newblock In \emph{IEEE Conf. Comput. Vis. Pattern Recog.}, pages 593--600. IEEE, 1994.
+
+\bibitem[Shi et~al.(2023)Shi, Huang, Li, Zhang, Cheung, See, Qin, Dai, and Li]{shi2023flowformer++}
+Xiaoyu Shi, Zhaoyang Huang, Dasong Li, Manyuan Zhang, Ka~Chun Cheung, Simon See, Hongwei Qin, Jifeng Dai, and Hongsheng Li.
+\newblock Flowformer++: Masked cost volume autoencoding for pretraining optical flow estimation.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, pages 1599--1610, 2023.
+
+\bibitem[Sun et~al.(2010)Sun, Sudderth, and Black]{sun2010layered}
+Deqing Sun, Erik Sudderth, and Michael Black.
+\newblock Layered image motion with explicit occlusions, temporal consistency, and depth ordering.
+\newblock In \emph{Adv. Neural Inform. Process. Syst.}, 2010.
+
+\bibitem[Sun et~al.(2018)Sun, Yang, Liu, and Kautz]{sun2018pwc}
+Deqing Sun, Xiaodong Yang, Ming-Yu Liu, and Jan Kautz.
+\newblock Pwc-net: Cnns for optical flow using pyramid, warping, and cost volume.
+\newblock In \emph{IEEE Conf. Comput. Vis. Pattern Recog.}, pages 8934--8943, 2018.
+
+\bibitem[Teed and Deng(2020)]{teed2020raft}
+Zachary Teed and Jia Deng.
+\newblock Raft: Recurrent all-pairs field transforms for optical flow.
+\newblock In \emph{Computer Vision--ECCV 2020: 16th European Conference, Glasgow, UK, August 23--28, 2020, Proceedings, Part II 16}, pages 402--419. Springer, 2020.
+
+\bibitem[Teed and Deng(2021)]{raft3D}
+Zachary Teed and Jia Deng.
+\newblock Raft-3d: Scene flow using rigid-motion embeddings.
+\newblock In \emph{IEEE Conf. Comput. Vis. Pattern Recog.}, pages 8375--8384, 2021.
+
+\bibitem[Tomasi and Kanade(1991)]{tomasi1991detection}
+Carlo Tomasi and Takeo Kanade.
+\newblock Detection and tracking of point.
+\newblock \emph{Int. J. Comput. Vis.}, 9:\penalty0 137--154, 1991.
+
+\bibitem[Vaswani et~al.(2017)Vaswani, Shazeer, Parmar, Uszkoreit, Jones, Gomez, Kaiser, and Polosukhin]{vaswani2017attention}
+Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan~N Gomez, {\L}ukasz Kaiser, and Illia Polosukhin.
+\newblock Attention is all you need.
+\newblock \emph{Advances in neural information processing systems}, 30, 2017.
+
+\bibitem[Vedula et~al.(1999)Vedula, Baker, Rander, Collins, and Kanade]{vedula1999three}
+Sundar Vedula, Simon Baker, Peter Rander, Robert Collins, and Takeo Kanade.
+\newblock Three-dimensional scene flow.
+\newblock In \emph{Proceedings of the Seventh IEEE International Conference on Computer Vision}, pages 722--729. IEEE, 1999.
+
+\bibitem[Vogel et~al.(2011)Vogel, Schindler, and Roth]{vogel20113d}
+Christoph Vogel, Konrad Schindler, and Stefan Roth.
+\newblock 3d scene flow estimation with a rigid motion prior.
+\newblock In \emph{2011 International Conference on Computer Vision}, pages 1291--1298. IEEE, 2011.
+
+\bibitem[Vogel et~al.(2013)Vogel, Schindler, and Roth]{vogel2013piecewise}
+Christoph Vogel, Konrad Schindler, and Stefan Roth.
+\newblock Piecewise rigid scene flow.
+\newblock In \emph{Proceedings of the IEEE International Conference on Computer Vision}, pages 1377--1384, 2013.
+
+\bibitem[Volz et~al.(2011)Volz, Bruhn, Valgaerts, and Zimmer]{volz2011modeling}
+Sebastian Volz, Andres Bruhn, Levi Valgaerts, and Henning Zimmer.
+\newblock Modeling temporal coherence for optical flow.
+\newblock In \emph{Int. Conf. Comput. Vis.}, pages 1116--1123. IEEE, 2011.
+
+\bibitem[Von~Luxburg(2007)]{von2007tutorial}
+Ulrike Von~Luxburg.
+\newblock A tutorial on spectral clustering.
+\newblock \emph{Statistics and computing}, 17:\penalty0 395--416, 2007.
+
+\bibitem[Wang et~al.(2023{\natexlab{a}})Wang, Chang, Cai, Li, Hariharan, Holynski, and Snavely]{wang2023tracking}
+Qianqian Wang, Yen-Yu Chang, Ruojin Cai, Zhengqi Li, Bharath Hariharan, Aleksander Holynski, and Noah Snavely.
+\newblock Tracking everything everywhere all at once.
+\newblock \emph{arXiv preprint arXiv:2306.05422}, 2023{\natexlab{a}}.
+
+\bibitem[Wang et~al.(2020)Wang, Li, Howard-Jenkins, Prisacariu, and Chen]{wang2020flownet3d++}
+Zirui Wang, Shuda Li, Henry Howard-Jenkins, Victor Prisacariu, and Min Chen.
+\newblock Flownet3d++: Geometric losses for deep scene flow estimation.
+\newblock In \emph{Proceedings of the IEEE/CVF winter conference on applications of computer vision}, pages 91--98, 2020.
+
+\bibitem[Wang et~al.(2023{\natexlab{b}})Wang, Zhou, Park, Paschalidou, You, Wetzstein, Guibas, and Kadambi]{wang2023alto}
+Zhen Wang, Shijie Zhou, Jeong~Joon Park, Despoina Paschalidou, Suya You, Gordon Wetzstein, Leonidas Guibas, and Achuta Kadambi.
+\newblock Alto: Alternating latent topologies for implicit 3d reconstruction.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, pages 259--270, 2023{\natexlab{b}}.
+
+\bibitem[Weinzaepfel et~al.(2013)Weinzaepfel, Revaud, Harchaoui, and Schmid]{weinzaepfel2013deepflow}
+Philippe Weinzaepfel, Jerome Revaud, Zaid Harchaoui, and Cordelia Schmid.
+\newblock {DeepFlow}: Large displacement optical flow with deep matching.
+\newblock In \emph{Int. Conf. Comput. Vis.}, pages 1385--1392, 2013.
+
+\bibitem[Wu et~al.(2020)Wu, Wang, Li, Liu, and Fuxin]{wu2020pointpwc}
+Wenxuan Wu, Zhi~Yuan Wang, Zhuwen Li, Wei Liu, and Li Fuxin.
+\newblock Pointpwc-net: Cost volume on point clouds for (self-) supervised scene flow estimation.
+\newblock In \emph{Computer Vision--ECCV 2020: 16th European Conference, Glasgow, UK, August 23--28, 2020, Proceedings, Part V 16}, pages 88--107. Springer, 2020.
+
+\bibitem[Xu et~al.(2017)Xu, Ranftl, and Koltun]{xu2017accurate}
+Jia Xu, Ren{\'e} Ranftl, and Vladlen Koltun.
+\newblock Accurate optical flow via direct cost volume processing.
+\newblock In \emph{Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition}, pages 1289--1297, 2017.
+
+\bibitem[Ye et~al.(2022)Ye, Li, Tucker, Kanazawa, and Snavely]{ye2022deformable}
+Vickie Ye, Zhengqi Li, Richard Tucker, Angjoo Kanazawa, and Noah Snavely.
+\newblock Deformable sprites for unsupervised video decomposition.
+\newblock In \emph{IEEE Conf. Comput. Vis. Pattern Recog.}, pages 2657--2666, 2022.
+
+\bibitem[Zach et~al.(2007)Zach, Pock, and Bischof]{zach2007duality}
+Christopher Zach, Thomas Pock, and Horst Bischof.
+\newblock A duality based approach for realtime tv-l 1 optical flow.
+\newblock In \emph{Pattern Recognition: 29th DAGM Symposium, Heidelberg, Germany, September 12-14, 2007. Proceedings 29}, pages 214--223. Springer, 2007.
+
+\bibitem[Zhang and Kambhamettu(2001)]{zhang20013d}
+Ye Zhang and Chandra Kambhamettu.
+\newblock On 3d scene flow and structure estimation.
+\newblock In \emph{Proceedings of the 2001 IEEE Computer Society Conference on Computer Vision and Pattern Recognition. CVPR 2001}, pages II--II. IEEE, 2001.
+
+\bibitem[Zhao et~al.(2022)Zhao, Zhao, Zhang, Zhou, and Metaxas]{zhao2022global}
+Shiyu Zhao, Long Zhao, Zhixing Zhang, Enyu Zhou, and Dimitris Metaxas.
+\newblock Global matching with overlapping attention for optical flow estimation.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, pages 17592--17601, 2022.
+
+\bibitem[Zheng et~al.(2023)Zheng, Harley, Shen, Wetzstein, and Guibas]{zheng2023pointodyssey}
+Yang Zheng, Adam~W Harley, Bokui Shen, Gordon Wetzstein, and Leonidas~J Guibas.
+\newblock Pointodyssey: A large-scale synthetic dataset for long-term point tracking.
+\newblock In \emph{Int. Conf. Comput. Vis.}, pages 19855--19865, 2023.
+
+\end{thebibliography}

@@ -1,0 +1,7 @@
+\section{Conclusion}
+In this paper, we proposed MagicMotion, a trajectory-controlled image-to-video generation method that uses a ControlNet-like architecture to integrate trajectory information into the diffusion transformer. We employed a progressive training strategy, allowing MagicMotion to support three levels of trajectory control: dense masks, bounding boxes and sparse boxes. We also utilized Latent Segment Loss to enhance the ability of the model to perceive fine-grained object shapes when only provided with sparse trajectory conditions.
+Additionally, we presented MagicData, a high-quality annotated dataset for trajectory-controlled video generation, created through a robust data pipeline.
+Finally, we introduced MagicBench, a large-scale benchmark for evaluating trajectory-controlled video generation. MagicBench not only assessed video quality and trajectory accuracy but also took the number of controlled objects into account.
+Extensive experiments on both MagicBench and DAVIS demonstrated the superiority of MagicMotion compared to previous works.
+\\
+\textbf{Acknowledge} This work was supported in part by the National Natural Science Foundation of China (Grant 62032006 and Grant 62472098).

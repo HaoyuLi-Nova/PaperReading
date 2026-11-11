@@ -1,0 +1,150 @@
+%  _____                      _                      _
+% | ____|_  ___ __   ___ _ __(_)_ __ ___   ___ _ __ | |_ ___
+% |  _| \ \/ / '_ \ / _ \ '__| | '_ ` _ \ / _ \ '_ \| __/ __|
+% | |___ >  <| |_) |  __/ |  | | | | | | |  __/ | | | |_\__ \
+% |_____/_/\_\ .__/ \___|_|  |_|_| |_| |_|\___|_| |_|\__|___/
+%            |_|
+\section{Experiments}
+\label{sec:exp}
+
+Here we briefly present some experiments and quantitative evaluations of our work. Please see our supplementary materials and the project video for full experiments, including implementation details, limitations, ablations, comparisons, and finer details. The figures show an evenly spaced temporal sampling of frames from the videos. 
+
+%  __  __       _
+% |  \/  | __ _(_)_ __
+% | |\/| |/ _` | | '_ \
+% | |  | | (_| | | | | |
+% |_|  |_|\__,_|_|_| |_|
+
+\subsection{Main result}
+
+\FigRef{fig:main_static} shows our main result on trajectory control of a  single subject. We compare \textit{TrailBlazer} to T2V-Zero \cite{text2video-zero} and Peekaboo \cite{jain2023peekaboo} using the same prompts, without conditioning guidance (e.g.,~edge or depth maps) to provide a fair comparison. T2V-Zero accepts motion guidance in the form of an (x,y) translation vector. We set this vector to (8,0) to produce horizontal motion. More detailed visual comparisons with Peekaboo under extreme conditions are depicted in \SecRef{supp:sec:peek} of the supplementary materials. The presented results for each method are visually selected as the best of a pool of 10 experiments conducted with different random seeds.
+
+In \FigRef{fig:main_static}, the results are generated from linearly interpolated bboxes starting at the left of the image and moving to the right. The results from TrailBlazer demonstrate anatomically plausible motion of the subject and a more accurate fitting of the subject within the bbox. Further, all subjects (e.g., cat, bee, astronaut, and clown fish) face in the direction that they move. However, this is not a common occurrence in T2V-Zero, as they directly apply the editing operation on the diffusion latents. This approach merely translates the subject without re-orienting it. Although the synthesized subject's motion generally follows the bbox in Peekaboo, it does not fit the bbox well. Occasionally, artifacts may emerge, such as a rectangular object following the astronaut. Moreover, our synthesized background exhibits better visual quality. In the competing methods, the background often appears plain, blurry, or lacks detail behind the subject (e.g., the area behind the subject path in Peekaboo).
+
+\begin{figure*}
+  \centering
+  \includegraphics[width=\textwidth]{assets/main_static_bbox-2.pdf}
+  \caption{\textbf{Main result: Rigid bbox moving from left to right.} \TitleLong and Peekaboo use identical bboxes, while T2V-Zero uses the corresponding motion vector instead. The same prompt is used across each method. The four prompts used (clockwise from top left): An \textbf{astronaut} walking on the moon; A macro video of a \textbf{bee} pollinating a flower; A \textbf{clown fish} swimming in a coral reef; A \textbf{cat} walking on the grass field. The bold text represents the directed object.}
+  \label{fig:main_static}
+\end{figure*}
+
+
+\FigRef{fig:main_dyn} illustrates the speed control, and dynamically changing the bbox size producing an effect of the subject moving toward or away from the virtual camera. In the top two rows of comparisons, the bbox setup is between the top-left corner and the bottom-right corner. The dynamically changing bbox size is annotated with a green box as illustrated on the left. Note that the generated subjects share the desirable characteristic that the subject naturally faces toward the virtual camera when the bbox transitions from small to large as seen in the top sequence and vice versa in the second sequence from the top.
+%In \FigRef{fig:main_dyn}, we depict the dynamic bbox in two experiments. Similar to \FigRef{fig:main_static}, the bbox configuration moves from the top-left corner to the bottom-right corner. Notably, we vary the bbox size, as indicated by the green box in each sub-figure. These figures illustrate a common observation shared across other generated videos: as the bbox transitions from small to large, the subject faces the camera, and conversely.
+%and conversely on the right. jp: on the lower two right figures the object is moving away, but in the top row on the right the cat is still facing. It's clear after realizing that the top row does not have small/large transition, but maybe confusing at first, and probably not necessary to say.
+The results also show a desirable perspective effect. Increasing or reducing the bbox size over time causes the synthesized object to produce the motion of ``coming to'' and ``going away from'' the camera as shown in the tiger example. We believe these effects arise naturally as a result of manipulating a model that was trained on video sequences rather than images. Peekaboo's tiger fails to produce these perspective effects when guided with identical bboxes.
+
+% For example, while a video where a side-facing car grows bigger is conceivable, for example if the camera is approaching the car from the side, it is much less common than videos where the car appears bigger due to its approach. 
+
+Furthermore, our method adeptly manages fast motion, outperforming Peekaboo in this regard. This is evident in the third row of both subfigures of \FigRef{fig:main_dyn}, which illustrate a cat rapidly running from one side to the other multiple times in the video clip, where $N_f = 24$. \KMtext{More precisely, the bbox is initially positioned at the left (1st keyframe), after which it is moved to the right (2nd keyframe), then left (3rd keyframe), right (4th keyframe), and left (5th keyframe).}
+
+
+\begin{figure*}
+  \centering
+  % \includegraphics[width=\textwidth]{assets/main_dyn_bbox.jpg}
+  \includegraphics[width=\textwidth]{assets/main_dyn_bbox-2.pdf}
+  \caption{\textbf{Main result: Dynamic moving bbox.} (Top/Middle row): The \textbf{tiger} walking on the street. (Bottom row): The \textbf{cat} running on the grass. The first column illustrates the bbox keyframes in the squared layout, where the green bbox is guided by the almond-colored motion vector. Note that there are five keyframes in the third row of each subfigure, with the bbox located on the left at the initial keyframe. The bbox used in top and the middle row are linearly interpolated with varied sizes. The bbox used in the last row has a static size with 5 keyframes moving back-and-forth. Please refer to the main text for more detail.}
+  \label{fig:main_dyn}
+\end{figure*}
+
+Multi-subject synthesis is generally challenging, particularly when the number of objects exceeds two. We delve into this issue in the supplementary materials. In \FigRef{fig:main_multi}, we present experiments with two subjects, a cat and a dog, guided by the green bbox in the sub-figure. The synthesis of the dog and cat in isolation is depicted in the top row on the left, serving as a sanity check with annotated image frame.
+%will be used for scene compositing with the complete prompt.
+% sort of implies that the final video is input to scene compositing,
+% but actually the video as it is constructed(denoised) is used...hard to explain briefly
+We also show six results combining environment prompts (e.g., ``... on the moon'') after composed prompt (e.g., ``A white cat and a yellow dog running...''). Each experiment demonstrates the flexibility of TrailBlazer in synthesizing subjects under varied environmental conditions. Notably, the interactions between the background and subjects appear plausible, as seen in reflections and splashes in the swimming pool case and consistent shadows across all samples. The results also show some artifacts such as extra limbs that are inherited from the underlying model. %Such artifacts are common in some diffusion models.
+
+\begin{figure}[tp]
+  \centering
+  % \includegraphics[width=\linewidth]{assets/main_multi.jpg}
+  \includegraphics[width=1.0\linewidth]{assets/main_multi-3.pdf}
+  \caption{\textbf{Main result: Subjects compositing.} Each set of the three sub-figures representing the first, middle, and the end frame of the synthesized video. The first row on the left with annotated frame shows the video synthesis of the two subjects: ``cat'' and the ``dog'' guided by the bbox directed by the annotated arrows, respectively. Next, each set of results show the varied post-fixed prompt.}
+  \label{fig:main_multi}
+\end{figure}
+
+%   ___                    _
+%  / _ \ _   _  __ _ _ __ | |_
+% | | | | | | |/ _` | '_ \| __|
+% | |_| | |_| | (_| | | | | |_
+%  \__\_\\__,_|\__,_|_| |_|\__|
+\subsection{Quantitative evaluation}
+\label{ssec:quant}
+
+Following the methodology in \cite{blattmann2023videoldm, hu2023videocontrolnet, jain2023peekaboo}, we report Fréchet Inception Distance \cite{FID} (FID), Fréchet Video Distance (FVD), Inception Score (IS), Kernel Inception Distance (KID), mean intersection of union (mIoU), and CLIP similarities (CLIPSim) metrics against the random selected 400 videos in AnimalKingdom dataset \cite{Ng_2022_CVPR} on all images of video sequences. As described in the supplementary materials, we evaluate both methods using the prompt set published in \cite{jain2023peekaboo}. The mIoU evaluation utilizes the OWL-ViT-large open-vocabulary object detector \cite{OWLViTlarge} to obtain the bbox of the synthesized subject.
+
+For a fair quantitative evaluation, we generated baseline results using Peekaboo \cite{jain2023peekaboo} and T2V-Zero \cite{text2video-zero} without additional conditioning input. Both TrailBlazer and Peekaboo share the same keyframed bbox, the motion vectors are used for T2V-Zero depending on the tasks below, and we use a 24-frame video sequence as our baseline comparison. We conducted two experiments with the associated random keyframing for our work: \emph{Static bbox}, and \emph{Dynamic bbox}.
+
+
+The bboxes in the \emph{Static bbox} experiments are constant across all keyframes, where the top left corner is randomly generated in the second quadrant, and the width and height is randomly selected between 25\% to 50\% of the image resolution. This experiments mainly evaluate the method without considering the bbox motion. The result is summarized in Table.~\ref{tab:quant:stt}. As observed, our performance is roughly equivalent across all metrics, while our FVD is significantly lower than that of T2V-Zero and Peekaboo. Motion vector $x=0, y=0$ is used in T2V-Zero.
+
+\begin{table}
+    % x $\pm$ x
+  \centering
+  \begin{tabular}{c c c c c c c}
+    \toprule
+    Method & FID($\downarrow$) & FVD($\downarrow$) & IS($\uparrow$) & KID($\downarrow$) & mIoU($\uparrow$) & CLIPSim($\uparrow$)\\
+    \midrule
+    T2V-Zero \cite{text2video-zero} 
+        & 198.45 & 2897.57 & 2.48 $\pm$ 0.31 & 4.39\% & - & \textbf{31.54} \\
+    Peekaboo \cite{jain2023peekaboo} 
+        & \textbf{159.55} & 1521.27 & 2.27 $\pm$ 0.49 & \textbf{2.75}\% & 0.23 & 31.31 \\
+    \TitleLong 
+        & 182.28 & \textbf{1220.98} & \textbf{2.91} $\pm$ 0.54 & 3.51\% & \textbf{0.26} & 30.93 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Quantitative results for static bbox.}
+  %on Cifar10 dataset} % jp it compares to cifar10, but I think saying "on cifar10" might be confusing
+  \label{tab:quant:stt}
+  \vspace{-2em}
+\end{table}
+
+Table.~\ref{tab:quant:dyna} presents the results of the \emph{Dynamic bbox} experiments. The bboxes were generated by randomly specifying 2 to 6 keyframes evenly in the video clip where the location is at the image boundary and its opposite as shown in \FigRef{fig:main_dyn}. The height and width of the particular bbox is between 10\% to 50\%. Thus the location and the size of all bboxes are varied in a video clip. Motion vector $x=8, y=0$ is used in T2V-Zero.
+
+In Table.~\ref{tab:quant:dyna}, the notable improvement is our mIoU score compared to Peekaboo, which can be attributed to the capabilities demonstrated in \FigRef{fig:main_dyn}, showcasing TrailBlazer's proficiency in generating a perspective view with dynamically changing bboxes. In comparison to Peekaboo, TrailBlazer's FID is better, while they exhibit better FVD. This discrepancy may be explained by the nature of the AnimalKingdom \cite{Ng_2022_CVPR} dataset, where creatures typically perform actions in a stationary setting (e.g., birds singing, animals walking). Notably, the running cat motion in \FigRef{fig:main_dyn} is generally absent in their dataset, contributing to the lower FVD score in our case. Our better FID score suggests that the individual frame quality in our video clip is better.
+
+\begin{table}
+    % x $\pm$ x
+  \vspace{2em}
+  \centering
+  \begin{tabular}{c c c c c c c}
+    \toprule
+    Method & FID($\downarrow$) & FVD($\downarrow$) & IS($\uparrow$) & KID($\downarrow$) & mIoU($\uparrow$) & CLIPSim($\uparrow$)\\
+    \midrule
+    T2V-Zero \cite{text2video-zero} 
+        & 153.36 & 2350.69 & \textbf{4.51} $\pm$ 1.36 & 3.01\% & - & 31.32 \\
+    Peekaboo \cite{jain2023peekaboo} 
+        & 165.88 & \textbf{1571.04} & 2.16 $\pm$ 0.57 & \textbf{2.86}\% & 0.25 & \textbf{31.92}\\
+    \TitleLong 
+        & \textbf{148.18} & 1721.08 & 2.45 $\pm$ 0.61 & 3.12\% & \textbf{0.37} & 30.71 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Quantitative results for dynamic bbox.}
+  %on Cifar10 dataset} % jp it compares to cifar10, but I think saying "on cifar10" might be confusing
+  \label{tab:quant:dyna}
+  \vspace{-2em}
+\end{table}
+
+In summary, the objective scores in Tables 1, 2 do not give a clear ordering of methods. However, recall that our goal is \emph{controlling movement}. TrailBlazer achieves this, showing significantly better mIoU scores. Equally important, TrailBlazer shows improved subjective movement, with moving objects facing in plausible directions and having realistic motion. Please refer to our video.
+
+% Unfortunately there is no standardized quantitative measure for our task. For example, while the image samples from Text2Video-Zero
+% % changed Text2Vid -> Text2Video  I think it is their official title?
+% in \FigRef{fig:main_static} appear visually reasonable, its synthesized video tends to exhibit temporal flickering, and the motion kinematics are not realistic (e.g., the cat moves to the left in \FigRef{fig:main_static} while consistently facing the observer). For a full and accurate assessment it is  essential to see the video results. Please refer to our supplementary material and the accompanying video.
+
+
+% t2z
+% Frechet Inception Distance: 348.87779897846406
+% Kernel Inception Distance: 0.1918843928543245 +/- 0.008380979891231231
+% inception_score_mean: 3.682649
+% inception_score_std: 0.1998614
+% frechet_inception_distance: 348.8778
+% kernel_inception_distance_mean: 0.1918844
+% kernel_inception_distance_std: 0.00838098
+
+% ours
+% Frechet Inception Distance: 317.35366998147856
+% Kernel Inception Distance: 0.18908718611900252 +/- 0.010211680222400649              inception_score_mean: 3.632916
+% inception_score_std: 0.2558593
+% frechet_inception_distance: 317.3537
+% kernel_inception_distance_mean: 0.1890872
+% kernel_inception_distance_std: 0.01021168
+
+

@@ -1,0 +1,362 @@
+\renewcommand{\thesubsection}{\Alph{subsection}}
+
+% \appendix
+
+\section*{Appendix}
+\subsection{Additional ablations}
+Here we provide additional ablation experiments that supplement the model choices from the main paper.
+
+\paragraph{Support points.}
+
+
+In addition to global and local support grids described in the paper, we also test using the SIFT detector~\cite{lowe04distinctive} to select support points in \cref{fig:accuracy_global_local_sift}.
+While adding SIFT support points is better than sampling points uniformly on a global regular grid, adding a local grid yields significantly better results.
+The combination of global and local grids is slightly better, and in  \cref{fig:accuracy_global_local} we further test this combination with different grid sizes ranging from 4 $\times$ 4 to 10 $\times$ 10.
+We find that a configuration of 25 global and 64 local points is optimal for TAP-Vid-DAVIS in terms of speed and accuracy.
+While there are differences in performance across these hyper-parameters, the overall impact on performance is less than one percentage point for a wide variety of configurations.
+We use the selected configuration for evaluation on all the TAP-Vid benchmarks.
+
+
+\begin{figure}[tb]
+    \begin{minipage}{.47\linewidth}
+        \centering
+        \setlength\tabcolsep{0.9pt}
+       \input{plot_global_local_sift}
+    \end{minipage}%
+    \hspace{0.02\linewidth}
+    \begin{minipage}{0.5\linewidth}
+        \centering
+        \setlength\tabcolsep{1pt}
+        \input{plot_global_local}
+    \end{minipage}
+\end{figure}
+
+\paragraph{Training sliding window size.}
+
+In, \cref{tab:tab_train_sliding_window_len_ablation} we ablate the sliding window size during training.
+While \method can benefit from larger window sizes, the length of our training sequences from Kubric~\cite{tapvid} is limited to 24 frames.
+Therefore, there is a trade-off between the context length and the ability to propagate predictions to future sliding windows.
+A sliding window of 8 is optimal for our training dataset.
+
+
+\paragraph{Inference sliding window size.}
+
+In \cref{tab:tab_inf_sliding_window_len_ablation}, we examine the impact of the sliding window size on the performance of a model trained with a sliding window of $T=8$.
+We find that the model performs best when the training and evaluation window sizes are identical.
+
+\begin{table}[tb]
+    \begin{minipage}{.47\linewidth}
+        \centering
+        \setlength\tabcolsep{0.9pt}
+       \input{tabs/tab_train_sliding_window_size}
+    \end{minipage}%
+    \hspace{0.02\linewidth}
+    \begin{minipage}{0.5\linewidth}
+        \centering
+        \setlength\tabcolsep{1pt}
+        \input{tabs/tab_inf_sliding_window_len_ablation}
+    \end{minipage}
+\end{table}
+
+\subsection{Efficiency}
+
+In \cref{fig:efficiency} we evaluate the efficiency of PIPs++~\cite{zheng2023pointodyssey}, TAPIR~\cite{doersch2023tapir} and \method on a 50-frame video of resolution $256\times256$ by running them on an A40 GPU\@.
+We track points sampled on a regular grid at the first frame of the video and report the time it takes to process the entire video sequence.
+CoTracker is slower than TAPIR but faster than PIPs++ (while achieving better accuracy than both).
+
+\subsection{Evaluation on TAP-Vid-Kinetics}
+
+In \cref{tab_kinetics} we evaluate \method on TAP-Vid-Kinetics, a dataset of 1144 videos of approximately 250 frames each from Kinetics~\cite{carreira2017quo}.
+Some of these videos are discontinuous, i.e., they are composed of continuous video chunks.
+\method is designed for continuous videos, and TAPIR contains a matching stage inspired by TAP-Net~\cite{tapvid}, which can help with such combined video chunks.
+This is why the performance gap between TAPIR and \method for this benchmark is smaller than for other benchmarks.
+
+\begin{table}[tb]
+    \begin{minipage}{.47\linewidth}
+        \centering
+        \setlength\tabcolsep{0.9pt}
+        \input{tabs/tab_kinetics}
+
+    \end{minipage}%
+    \hspace{0.02\linewidth}
+    \begin{minipage}{0.5\linewidth}
+        \centering
+        \setlength\tabcolsep{1pt}
+        \input{tabs/tab_model_stride_ablation}
+    \end{minipage}
+\end{table}
+\begin{figure}[tb]
+    \begin{minipage}{.47\linewidth}
+        \centering
+        \setlength\tabcolsep{0.9pt}
+       \input{plot_speed}
+    \end{minipage}%
+    \hspace{0.02\linewidth}
+    \begin{minipage}{0.5\linewidth}
+        \centering
+        \setlength\tabcolsep{1pt}
+        \input{plot_ablate_updates}
+    \end{minipage}
+\end{figure}
+\subsection{Implementation Details}
+
+In this section, we complete the description of implementation details from the main paper.
+We will release the code and models with the paper.
+
+\paragraph{Feature CNN.}
+
+Given a sequence of $T'$ frames with a resolution of 384$\times$512, we compute features for each frame using a 2-dimensional CNN\@.
+This CNN downsamples the input image by a factor of 4 (feature stride) and outputs features with 128 channels.
+Our CNN is the same as the one used in PIPs~\cite{pips}.
+It consists of one $7\times 7$ convolution with a stride of 2, eight residual blocks with $3\times 3$ kernels and instance normalization, and two final convolutions with $3\times 3$ and $1 \times 1$ kernels.
+In \cref{tab:tab_model_stride_ablation}, we train \method with two different feature downsampling factors (strides).
+
+\paragraph{Sliding windows.}
+
+When passing information from one sliding window to the next, we concatenate binary masks of shape $(N, T)$ with visibility logits that indicate where the model needs to make predictions.
+For example, masks in the first sliding window would be equal to 1 from the frame where we start tracking the point, and 0 before that.
+Masks for all the subsequent sliding windows will be equal to 1 for the first overlapping $T/2$ frames, and 0 for the remaining $T/2$.
+During training, tracking starts either from the first or from a random frame where the point is visible.
+If a point is not yet visible in the current sliding window, it will be masked out during the application of cross-track attention.
+
+\paragraph{Iterative updates.}
+
+We train the model with $M=4$ iterative updates and evaluate it with $M=6$.
+This setting provides a reasonable trade-off between speed and accuracy, as evaluated in \cref{fig:plot_ablate_updates}. Interestingly, the performance remains stable for 4--8 iterative updates and begins to degrade slowly thereafter.
+
+\paragraph{Training.}
+
+\method is trained with a batch size of 32, distributed across 32 GPUs.
+After applying data augmentations, we randomly sample 768 trajectories for each batch, with points visible either in the first or in the middle frame.
+We train the model for 50,000 iterations with a learning rate of $5e^{-4}$ and a linear 1-cycle~\cite{smith2019super} learning rate schedule, using the AdamW~\cite{loshchilov2017decoupled} optimizer.
+
+\paragraph{Augmentations.}
+
+During training, we employ Color Jitter and Gaussian Blur to introduce color and blur variations.
+We augment occlusions by either coloring a randomly chosen rectangular patch with its mean color or replacing it with another patch from the same image.
+Random scaling across height and width is applied to each frame to add diversity.
+
+\subsection{Broader societal impact}
+
+Motion estimation, whether in the guise of point tracking or optical flow, is a fundamental, low-level computer vision task.
+Many other tasks in computer vision build on it, from 3D reconstruction to video object segmentation.
+Ultimately, motion estimation algorithms are important components of a very large number of applications of computer vision in many different areas.
+Point tracking has no \emph{direct} societal impact; however, positive or negative effects on society can materialise through its use in other algorithms, depending on the final application.
+
+\subsection{Technical note}
+
+We work out the coordinate mappings between layers in a neural network.
+We assume that layers are 1D, as the generalization to several dimensions is immediate.
+
+Consider a tensor $x \in \mathbb{R}^{W}$ with $W_1$ components indexed by $i\in \Omega = \{0,\dots,W_1-1\}$.
+We also interpret each element in the tensor as a unit tile, collectively covering the interval $U = [0,W]$, and we denote via $u \in U$ the corresponding continuous coordinate.
+Mapping each index to the center of the corresponding tile, we have the correspondence:
+$$
+\Omega \rightarrow U,
+~~~
+i \mapsto u(i) = i + \frac{1}{2}.
+$$
+
+We interpret the tensor $x$ as providing information about image points $u \in U$.
+By reading off element $x_i$, we obtain information about location $u(i)$.
+
+\paragraph{Layers and transformations.}
+
+Next consider two tensors $x_1 = \phi(x_2)$ related by a neural network layer $\phi$.
+The layer establishes a mapping $i_1(i_2)$, or equivalently $u_1(u_2)$, between indices/coordinates of the two tensors.
+We write $i_1 = \alpha_{12} i_2 + \beta_{12}$, so that the following commutative diagram holds:
+\begin{center}
+\begin{tikzcd}
+u_2 \in U_2
+\arrow{d}[swap]{\alpha_{12} u_2 + \beta_{12} + \frac{1 - \alpha_{12}}{2}}  &
+i_2 \in \Omega_2
+\arrow{d}{\alpha_{12} i_2 + \beta_{12}}
+\arrow{l}{+\frac{1}{2}} \\
+u_1 \in U_1 & i_1 \in \Omega_1
+\arrow{l}[swap]{+\frac{1}{2}}
+\end{tikzcd}
+,
+\end{center}
+If we have chains of layers $x_0 \mapsto x_1 \mapsto x_2$, we can chain the corresponding diagrams:
+\begin{center}
+\begin{tikzcd}
+u_2 \in U_2
+\arrow{d}[swap]{\alpha_{12} u_2 + \beta_{12} + \frac{1 - \alpha_{12}}{2}}
+&
+i_2 \in \Omega_2
+\arrow{d}{\alpha_{12} i_2 + \beta_{12}}
+\arrow{l}{+\frac{1}{2}}
+\\
+u_1 \in U_1
+\arrow{d}[swap]{\alpha_{1} u_1 + \beta_{1} + \frac{1 - \alpha_{1}}{2}}
+& i_1 \in \Omega_1
+\arrow{l}[swap]{+\frac{1}{2}}
+\arrow{d}{\alpha_{1} i_1 + \beta_{1}}
+\\
+u_0 \in U_0
+& i_0 \in \Omega_0
+\arrow{l}[swap]{+\frac{1}{2}}
+\end{tikzcd}
+,
+\end{center}
+where for simplicity we denote $\alpha_{0i} = \alpha_i$ and $\beta_{0i} = \beta_i$.
+With this, we find the recurrent equation:
+$$
+\boxed{
+\alpha_n = \alpha_{n-1} \alpha_{n-1,n},
+~~~
+\beta_n = \beta_{n-1} + \alpha_{n-1} \beta_{n-1,n}
+}
+$$
+so that we can always refer any layer back to the input image as follows:
+$$
+i_0 = \alpha_n i_n + \beta_n,~~~
+u_0 = \alpha_n u_n + \beta_n + \frac{1-\alpha_{n}}{2}.
+$$
+
+Finally, we consider a sampling layer, implemented using, e.g., bilinear interpolation.
+Applied to an input tensor $x_1$, we can write the latter as reading off values $x_2(u_2)$ at designated coordinates $u_2$.
+This is similar to computing an output tensor $x_2$ as before, but with the ability of reading off values at arbitrary coordinates $u_2$ instead of fixed indices $i_2$.
+This is written down as a function
+$
+x_2(u_2) =\phi(x_1, u_2).
+$
+Just like before, we write correspondences:
+$$
+i_1 = \alpha_{12} i_2 + \beta_{12},~~~
+u_1 = \alpha_{12} u_2 + \beta_{12} + \frac{1-\alpha_{12}}{2}
+$$
+although, obviously, the index $i_2 = u_2 - 1/2$ is ``virtual''.
+
+\paragraph{Filter-like layers.}
+
+Next consider two tensors $x_1 = \phi(x_2)$ where $\phi$ is a neural network layer.
+Assume that the layer is a filter with filter size $F$, padding $P$ and stride $S$ (almost all layers in a neural network are of this kind, often special cases of this).
+Pixel $i_2$ is obtained by combinations of the values of pixels $i_1 \in \{ i_2 S - P,\dots,i_2 S - P + F-1 \}$ of the input.
+Hence, we can assume that the pixel of index $i_2$ corresponds to the center of this range, which has coordinate:
+$$
+u_1(i_1)
+= \frac{
+\left(u_1(i_2 S - P) - \frac{1}{2}\right) +
+\left(u_1(i_2 S - P + F-1) + \frac{1}{2}\right)
+}{2}
+= i_2 S - P + \frac{F-1}{2} + \frac{1}{2}.
+$$
+Hence:
+$$
+\boxed{\alpha_{12} = S,~~~
+\beta_{12} = \frac{F-1}{2} - P}.
+$$
+Note that we can make $\beta_{12} = 0$ by choosing $P = (F-1)/2$ (which requires odd-sized filters).
+By using the recurrence equation above, with a chain of such layers we obtain:
+$$
+\alpha_n = \prod_{i=1}^n S_n,~~~
+\beta_n = 0.
+$$
+
+\paragraph{Interpolation layers.}
+
+Next, we consider the interpolation layer $x_2 = \phi(x_1)$.
+With the \texttt{align\_corners} option set to \texttt{True}, pixels $i_1=0,W_1-1$ are mapped to pixels $i_2=0,W_2-1$.
+Hence:
+$$
+i_1
+= i_2 \frac{W_1-1}{W_2-1}
+= \alpha_{12}i_2 + \beta_{12}.
+$$
+Hence we have:
+$$
+\alpha_{12} = \frac{W_1-1}{W_2-1},~~~
+\beta_{12} = 0.
+$$
+With the \texttt{align\_corners} option set to \texttt{False}, coordinates $u_1=0,W_1$ are mapped to coordinates $u_2=0,W_2$.
+Hence:
+$$
+u_2
+= u_1 \frac{W_1}{W_2}
+= \alpha_{12} u_1
++ \beta_{12}
++ \frac{1 - \alpha_{12}}{2}.
+$$
+Hence:
+$$
+\alpha_{12} = \frac{W_1}{W_2},~~~
+\beta_{12} = - \frac{1 - \alpha_{12}}{2}
+= \frac{W_1-W_2}{2W_2}.
+$$
+
+\paragraph{Sampling layers.}
+
+Next, we figure out the sampling layer $x_2(u_2) = \phi(x_1,u_2)$.
+When we use bilinear sampling to sample features from $x_1$, we use the \texttt{grid\_sample} operator with \texttt{align\_corners} set to either \texttt{True} or \texttt{False}.
+
+We can model this as introducing a coordinate $u_2 \in U_2 = [-1,1]$ with the following mappings.
+If \texttt{align\_corners} is \texttt{False}, we align the extrema $-1,1$ of the output range to the edges of the input image, so that:
+$$
+u_1(u_2)
+=
+\frac{W_1}{2} (u_2 + 1)
+=
+\alpha_{12} u_1
++ \beta_{12}
++ \frac{1 - \alpha_{12}}{2}.
+$$
+i.e.,
+$$
+\alpha_{12} = \frac{W_1}{2},~~~
+\beta_{12} = \frac{W_1}{2} - \frac{1 - \alpha_{12}}{2} = - \frac{1}{2} - \frac{W_1}{4}.
+$$
+If \texttt{align\_corners} is \texttt{True}, we align the extrema of the output range $-1, 1$ with the centers of the input edge pixels, so that:
+$$
+i_1(u_2)
+=
+\frac{W_1-1}{2} (u_2 + 1)
+=
+\alpha_{12}u_2 + \beta_{12},
+$$
+i.e.,
+$$
+\alpha_{12} = \frac{W_1 - 1}{2},~~~
+\beta_{12} = \frac{W_1 - 1}{2}.
+$$
+
+\paragraph{Sampling layer, alt.~conventions.}
+
+In practice, we redefine the mapping layers in such a way that, if \texttt{align\_corners} is \texttt{False}, then $u_2 \in U_2 = [0, W_1]$ and the extrema $0, W_1$ align edges of the input image, so that:
+$$
+u_1(u_2)
+=
+u_2
+=
+\alpha_{12} u_1
++ \beta_{12}
++ \frac{1 - \alpha_{12}}{2}.
+$$
+i.e.,
+$$
+\alpha_{12} = 1,~~~
+\beta_{12} = 0,
+$$
+which means:
+$$
+u_1(u_2) = u_2, ~~~
+i_1(i_2) = i_2.
+$$
+With \texttt{align\_corners} is \texttt{True}, then $u_2 \in U_2 = [0, W_1-1]$ and we align the extrema $0, W_1-1$ to the center of the edge pixels, so that:
+$$
+i_1(u_2)
+=
+u_2
+=
+\alpha_{12}u_2 + \beta_{12} - \frac{1-\alpha_{12}}{2} - \frac{1}{2},
+$$
+i.e.,
+$$
+\alpha_{12} = 1,~~~
+\beta_{12} = \frac{1}{2},
+$$
+which means:
+$$
+u_1(u_2) = u_2 + \frac{1}{2},~~~
+i_1(i_2) = i_1 + \frac{1}{2}.
+$$

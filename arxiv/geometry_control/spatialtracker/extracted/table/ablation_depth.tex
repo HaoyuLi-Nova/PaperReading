@@ -1,0 +1,23 @@
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{8.5pt}
+\begin{tabular}{lccc}
+\toprule
+  Methods & AJ$\uparrow$ & $\deltaavg$$\uparrow$ & OA$\uparrow$ \\
+\midrule
+Ours \textit{w/o} ARAP  & 55.1 & 71.6 & 87.4 \\
+\midrule
+
+Ours \textit{w/} DPT~\cite{ranftl2021vision} & 51.4 & 70.7 & 83.3 \\
+Ours \textit{w/} MiDaS~\cite{birkl2023midas}  & 56.3  & 73.9 & 86.6  \\ 
+Ours \textit{w/} ZoeDepth~\cite{ZoeDepth} (default) & \textbf{61.1} & \textbf{76.3} & \textbf{89.5}\\
+\bottomrule
+\end{tabular}
+\vspace{-5pt}
+\caption{\textbf{Ablation Study on the DAVIS
+Dataset.} The Average Jaccard~(AJ), average position accuracy~($\deltaavg$), and Occlusion Accuracy (OA) are reported. We evaluate the effectiveness of the ARAP constraint and the influence of different monocular depth estimators (ZoeDepth~\cite{ZoeDepth}, MiDaS~\cite{birkl2023midas} and DPT~\cite{ranftl2021vision}). ``Ours \textit{w/} ZoeDepth" is the default model we use in our experiments.
+}
+\vspace{-4mm}
+\label{table:ablatio_depth}
+\end{table}
+    

@@ -1,0 +1,138 @@
+\section{Method}
+
+\subsection{Overview}
+Our work mainly focuses on trajectory-controllable video generation. Given an input image $I \in R^{H \times W \times 3}$, and several trajectory maps $C \in R^{T \times H \times W \times 3}$, the model can generate a video $V \in R^{T \times H \times W \times 3}$ in line with the provided trajectories, where T denotes the length of generated video.
+In the following sections, we first provide a detailed explanation of our model architecture in Section \ref{sec:architecture}. Next, we outline our progressive training procedure in Section \ref{sec:procedure}. In Section \ref{sec:latent segment loss}, we introduce the Latent Segmentation Loss and demonstrate how it enhances the model capabilities on fine-grained object shape. We then describe our dataset curation and filtering pipeline in Section \ref{sec:data pipeline}. Finally, we present an in-depth overview of MagicBench in Section \ref{sec:benchmark}.
+
+\subsection{Model Architecture}
+\label{sec:architecture}
+
+\begin{figure*}[ht]
+    \centering
+    \includegraphics[width=\linewidth]{Images/Architecture.pdf}
+     \caption{Overview of MagicMotion Architecture (text prompt and encoder are omitted for simplicity). 
+     MagicMotion employs a pretrained 3D VAE to encode the input trajectory, first-frame image, and training video into latent space. It has two separate branches: the video branch processes video and image tokens, and the trajectory branch uses Trajectory ControlNet to fuse trajectory and image tokens, which is later integrated to the video branch through a zero-initialized convolution layer.
+     Besides, diffusion features from DiT blocks are concatenated and processed by a trainable segment head to predict latent segmentation masks, which contribute to our latent segment loss.
+     }
+    \label{fig:model_architecture}
+\end{figure*}
+
+\paragraph{Base I2V generation model}
+We utilize CogVideoX-5B-I2V ~\cite{yang2024cogvideox} and Wan2.1 1.3B~\cite{wan2025} as our base image to video model. The models are built upon a DiT (Diffusion Transformer) architecture, incorporating 3D-Full Attention to generate high-quality videos.
+As shown in Fig.~\ref{fig:model_architecture}, the model takes an input image $I \in R^{H \times W \times 3}$ and a corresponding video $V \in R^{T \times H \times W \times 3}$ and encodes them into latent representations $Z_{image},Z_{video} \in R^{\frac{T}{4} \times \frac{H}{8} \times \frac{W}{8} \times 16}$ using a pretrained 3D VAE ~\cite{kingma2013auto}.
+Later, $Z_{image}$ is zero-padded to $T$ frames and concatenated with a noised version of $Z_{video}$ and then fed into the Diffusion Transformer, where a series of Transformer blocks iteratively denoise it over a predefined number of steps. 
+Finally, the denoised latent is decoded by a 3D VAE decoder to get the output video $V_{out} \in R^{T \times H \times W \times 3}$.
+
+\vspace{0.2cm}
+\noindent\textbf{Trajectory ControlNet}
+~~To ensure that the generated video follows the motion patterns given by the input trajectory maps $C \in R^{T \times H \times W \times 3}$, we adopt a design similar to ControlNet~\cite{zhang2023adding} to inject trajectory condition. 
+As shown in Fig.~\ref{fig:model_architecture}, we employ the 3D VAE encoder to encode the trajectory maps into $Z_{trajectory} \in R^{\frac{T}{4} \times \frac{H}{8} \times \frac{W}{8} \times 16}$, which is then concatenated with the encoded video $Z_{video}$ and serves as input to Trajectory ControlNet.
+Specifically, Trajectory ControlNet is constructed with a trainable copy of all pre-trained DiT blocks to encode the user-provided trajectory information. The output of each Trajectory ControlNet block is then processed through a zero-initialized convolution layer and added to the corresponding DiT block in the base model to provide trajectory guidance.
+
+\subsection{Dense-to-Sparse Training Procedure}   
+\label{sec:procedure}
+
+Dense trajectory conditions, such as segmentation masks, offer more precise control than sparse conditions like bounding boxes but are less user-friendly. To address this, MagicMotion employs a progressive training procedure, where each stage initializes its model with the weights from the previous stage. This enables three types of trajectory control ranging from dense to sparse. We found that this progressive training strategy helps the model achieve better performance compared to training from scratch with sparse conditions.
+Specifically, we adopt the following trajectory conditions across stages: stage1 uses segmentation masks, stage2 uses bounding boxes, and stage3 uses sparse bounding boxes, where fewer than 10 frames have box annotations.
+Additionally, we always set the first frame of the trajectory condition as a segmentation mask to specify the foreground objects that should be moving.
+
+Our model uses velocity prediction following~\cite{yang2024cogvideox}. Let $x_0$ be the initial video latents, $\epsilon$ be the gaussian noise, $x_t = \sqrt{\alpha_t} * x_0 + \sqrt{1 - \alpha_t} * \epsilon$ be the noised video latents, and $v_\theta$ be the model output. The diffusion loss can be written as:
+\begin{equation}
+\resizebox{0.9\hsize}{!}{$
+    \mathcal{L}_{diffusion}=
+    \mathbb{E}_{t,\epsilon \sim \mathcal{N}(0,I),x_{0}}
+    \Big[\left\| x_0 - \Big(\sqrt{\alpha_t}\,x_t - \sqrt{1-\alpha_t}\,v_\theta \Big)\right\|_2^2 \Big]
+$}
+\end{equation}
+
+\subsection{Latent Segmentation Loss}
+\label{sec:latent segment loss}
+Bounding box-based trajectory is able to control an object’s position and size but lacks fine-grained shape perception. To address this, we propose Latent Segmentation Loss, which introduces segmentation mask information during model training and enhances the model’s ability to perceive fine-grained object shapes. 
+
+Previous works~\cite{xu2023odise, zhao2023unleashing, bhat2025simgen, weng2024genrec} have leveraged diffusion generation models for perception tasks, demonstrating that the features extracted by diffusion models contain rich semantic information. However, these models generally operate in the pixel space, which leads to extensive computational time and substantial GPU memory.
+
+To incorporate dense trajectory information while keeping computational costs within a reasonable range, we propose utilizing a lightweight segmentation head to predict segmentation masks directly in the latent space, eliminating the need for decoding operations.
+Specifically, our segmentation head takes a list of diffusion features $Z_{feature} \in R^{\frac{T}{4} * \frac{H}{16} * \frac{W}{16} * 3072}$ from each DiT block, and outputs a latent segmentation mask $Z_{segment} \in R^{\frac{T}{4} * \frac{H}{8} * \frac{W}{8} * 16}$. We use a light-weight architecture inspired by Panoptic FPN~\cite{kirillov2019panoptic}. Each diffusion feature first passes through a convolution layer to extract visual features $P \in R^{\frac{T}{4} * \frac{H}{16} * \frac{W}{16} * 64}$. The resulting features are then concatenated and processed by another convolution layer followed by an upsampling layer to generate the final latent segmentation mask.
+We compute the latent segment loss as the Euclidean distance between $Z_{segment}$ and the ground truth mask trajectory latents $Z_{mask}$, which can be written as,
+\begin{equation}
+\mathcal L_{seg}=\mathbb{E}_{t,\epsilon \sim \mathcal{N}(0, I),z_{0}}[\left \|  Z_{segment} - Z_{mask}\right \| _{2}^{2} ]
+\end{equation}
+
+In practice, $\mathcal L_{seg}$ is only used in stage2 and stage3, providing the model with dense conditions information when trained with sparse conditions. In detail, we set the weight of $\mathcal L_{seg}$ as 0.5, and the original diffusion loss as 1. In total, our final loss function can be written as,
+\begin{equation}
+    \mathcal L = \mathcal L_{diffusion} + \lambda * \mathcal L_{seg}
+\end{equation}
+where $\lambda$ is set to 0 in stage1, and 0.5 in stage2 and stage3.
+
+\subsection{Data Pipeline}
+\label{sec:data pipeline}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\linewidth]{Images/Dataset_Pipeline.pdf}
+    \caption{Overview of the Dataset Pipeline. The Curation Pipeline is used to construct trajectory annotations, while the Filtering Pipeline filters out unsuitable videos for training.}
+    \label{fig:dataset_pipeline}
+\end{figure}
+
+Trajectory controllable video generation requires a video dataset with trajectory annotations. However, existing large-scale video datasets~\cite{bain2021frozen, chen2024panda, ju2024miradata} only provide text annotations and lack trajectory data. Moreover, almost all previous works~\cite{zhang2025tora, zhou2025trackgo, wang2024motionctrl, li2025image, yin2023dragnuwa} use privately curated datasets, which are not publicly available.
+
+We present a comprehensive and general data pipeline for generating high-quality video data with both dense (mask) and sparse (bounding box) annotations.
+As shown in Fig.~\ref{fig:dataset_pipeline}, the pipeline consists of two main stages: the Curation Pipeline and the Filtering Pipeline. The Curation Pipeline is responsible for constructing trajectory information from a video-text dataset, while the Filtering Pipeline ensures that unsuitable videos are removed before training.
+
+\vspace{0.2cm}
+\noindent\textbf{Curation Pipeline.} 
+~~We begin our dataset curation process with Pexels~\cite{Pexels-400k}, a large-scale video-text dataset containing 396K video clips with text annotations. It encompasses videos featuring diverse subjects, various scenes, and a wide range of movements.
+We utilize Llama3.1~\cite{touvron2023llama} to extract the foreground moving objects from the textual annotations of each video. As shown in Fig.~\ref{fig:dataset_pipeline}, we input the video’s caption into the language model and prompt it to identify the main foreground objects mentioned in the sentence. If the model determines that the sentence does not contain any foreground objects, it simply returns “empty” and such videos are filtered out.
+Next, we utilize Grounded-SAM2~\cite{ravi2024sam, ren2024grounded}, a grounded segmentation model that takes a video along with its main objects as input and generates segmentation masks for each primary object. Each object is consistently annotated with a unique color.
+Finally, bounding boxes are extracted from each segmentation mask using the coordinates of the top-left and bottom-right corners to draw the corresponding boxes. The color of the bounding box for each object remains consistent with its masks.
+
+\vspace{0.2cm}
+\noindent\textbf{Filtering Pipeline.} 
+~~Many videos contain only static scenes, which are not beneficial for training trajectory-controlled video generation models. To address this, we use optical flow scores to filter out videos with little motion and dynamics. Specifically, we utilize UniMatch~\cite{xu2023unifying} to extract optical flow maps between frames and compute the mean absolute value of these flow maps as the optical flow score, representing the video’s motion intensity. However, videos with background movement but static foreground can still have high motion scores. To address this, we further use UniMatch to extract optical flow scores for foreground objects based on segmentation masks and bounding boxes. Videos with low foreground optical flow scores are filtered out, ensuring MagicData includes only videos with moving foreground objects.
+
+The trajectory annotations generated by the curation pipeline require further refinement. As shown in Fig.~\ref{fig:dataset_pipeline}, some videos contain too many foreground objects annotations, or their sizes may be too large or too small. To address this, we regulate these factors within a reasonable range and filter out videos that fall outside the acceptable range.
+
+Specifically, based on extensive manual evaluation, we empirically set the optical flow score threshold to 2.0, limit the number of foreground object annotations from 1 to 3, and constrain the annotated area ratio to a range of 0.008 to 0.83. The whole data curation and filtering pipeline yields us with MagicData, a high quality dataset for trajectory controllable video generation containing 23K videos with both dense and sparse trajectory annotations.
+
+\begin{table*}[ht]
+\centering
+\resizebox{\linewidth}{!}{
+\begin{tabular}{@{}l|cccccccc@{}}
+\toprule
+\multirow{2}{*}{\textbf{Method}}                                                      & \multicolumn{4}{c}{\textbf{MagicBench}}                                                                  & \multicolumn{4}{c}{\textbf{DAVIS}}                                                  \\ \cmidrule(l){2-9} 
+                                                                                      & FID($\downarrow$) & FVD($\downarrow$) & M\_IoU\%($\uparrow$) & \multicolumn{1}{c|}{B\_IoU\%($\uparrow$)} & FID($\downarrow$) & FVD($\downarrow$) & M\_IoU\%($\uparrow$) & B\_IoU\%($\uparrow$) \\ \midrule
+Motion-I2V~\cite{shi2024motion}                                 & 39.31             & 354.10            & 56.19                & \multicolumn{1}{c|}{60.66}                & 94.14             & 1558.32           & 32.00                & 42.61                \\
+ImageConductor~\cite{li2025image}      & 49.95             & 331.76            & 51.76                & \multicolumn{1}{c|}{52.90}                & 91.71             & 1155.08           & 34.39                & 43.41                \\
+DragAnything~\cite{wu2024draganything}                          & 31.36             & 253.40            & 66.30                & \multicolumn{1}{c|}{70.85}                & 70.70             & 1166.22           & 40.13                & 53.60                \\
+LeViTor~\cite{wang2025levitor}                                  & 38.32             & 194.53            & 39.96                & \multicolumn{1}{c|}{46.36}                & 97.98             & 922.68            & 25.24                & 31.42                \\
+DragNUWA~\cite{yin2023dragnuwa}                                 & 39.73             & 185.52            & 66.88                & \multicolumn{1}{c|}{69.21}                & 84.61             & 1079.89           & 41.22                & 52.61                \\
+SG-I2V~\cite{namekata2024sgi2v}                                 & 32.60             & 168.82            & 68.78                & \multicolumn{1}{c|}{74.39}                & 90.93             & 1170.60           & 37.36                & 50.96                \\
+Tora~\cite{zhang2025tora} & 26.27             & 245.23            & 58.95                & \multicolumn{1}{c|}{64.03}                & 51.75             & 766.76            & 37.98                & 50.90                \\ \midrule
+\textbf{Ours (Stage1-Wan1.3B)}                                                        & \textbf{17.74}         & \textbf{129.79}         & \textbf{83.79}            & \multicolumn{1}{c|}{\textbf{80.96}}            & \textbf{46.65}         & \textbf{548.56}         & \textbf{42.83}           & \textbf{53.67}            \\
+\textbf{Ours (Stage2-Wan1.3B)}                                                        & \textbf{19.33}    & \textbf{143.07}   & \textbf{68.89}       & \multicolumn{1}{c|}{\textbf{71.74}}       & \textbf{48.33}    & \textbf{662.82}   & \textbf{44.75}       & \textbf{61.88}       \\ \midrule
+\textbf{Ours (Stage1-CogVideoX)}                                                      & \textbf{15.06}    & \textbf{112.69}   & \textbf{91.57}       & \multicolumn{1}{c|}{\textbf{87.75}}       & \textbf{45.06}    & \textbf{579.94}   & \textbf{81.33}       & \textbf{84.97}       \\
+\textbf{Ours (Stage2-CogVideoX)}                                                      & \textbf{15.17}    & \textbf{107.21}   & \textbf{76.61}       & \multicolumn{1}{c|}{\textbf{81.45}}       & \textbf{50.36}    & \textbf{760.95}   & \textbf{53.94}       & \textbf{72.84}       \\ \bottomrule
+\end{tabular}
+}
+\caption{Quantitative Comparison results on MagicBench and DAVIS. ``M\_IoU" and ``B\_IoU" refer to Mask\_IoU and Box\_IoU, respectively.}
+\label{tab:comparison}
+\end{table*}
+
+\begin{figure*}[ht]
+    \centering
+    \vspace{-0.8em}
+    \includegraphics[width=\linewidth]{Images/rader.pdf}
+    \caption{Comparison results of different object number on MagicBench. To present the results more clearly, we have negated the FVD and FID scores.}
+    \label{fig:comparisons_radar}
+    \vspace{-1.4em}
+\end{figure*}
+
+\subsection{MagicBench}
+\label{sec:benchmark}
+Previous works on trajectory-controlled video generation~\cite{zhang2025tora, li2025image, shi2024motion, objctrl2.5d, zhou2025trackgo, wu2024draganything, namekata2024sgi2v} have primarily been validated on DAVIS (which has a relatively small dataset size), VIPSeg (where the annotated frames per video are insufficient), or privately constructed test sets. Thus there is an urgent need for a large-scale, publicly available benchmark to enable fair comparisons across different models in this field.
+To merge this gap, we use the data pipeline mentioned in Sec.~\ref{sec:data pipeline} to construct MagicBench, a large-scale open benchmark consisting of 600 videos with corresponding trajectory annotations. MagicBench evaluates not only video quality and trajectory accuracy but also takes the number of controlled objects as a key evaluation factor. Specifically, it is categorized into 6 groups based on the number of controlled objects, ranging from 1 to 5 objects and more than 5 objects, with each category containing 100 high-quality videos.
+
+\vspace{0.2cm}
+\noindent\textbf{Metrics.}
+~~For evaluation metrics, we adopt FVD~\cite{ranftl2020towards} to assess video quality and FID~\cite{heusel2017gans} to evaluate image quality, following~\cite{zhou2025trackgo, wang2024motionctrl, wang2025levitor, wu2024draganything}. To quantify motion control accuracy, we use Mask\_IoU and Box\_IoU, which measure the accuracy of masks and bounding boxes, respectively.
+Specifically, given a generated video $V_{gen}$, we use the groundtruth masks of the first frame $M_{gt}(0)$ as input to SAM2~\cite{ravi2024sam} to predict the masks $M_{gen}$ of the foreground objects in $V_{gen}$. For each foreground object, we compute the Intersection over Union (IoU) between $M_{gen}(i)$ and groundtruth masks $M_{gt}(i)$ in each frame, then average these values to obtain Mask\_IoU. Similarly, we compute the IoU between the predicted and groundtruth bounding boxes for each foreground object in each frame and take the average as Box\_IoU.

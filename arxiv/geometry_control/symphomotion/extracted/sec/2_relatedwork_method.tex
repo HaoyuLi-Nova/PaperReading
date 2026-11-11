@@ -1,0 +1,252 @@
+\section{Related Work}
+\label{sec:Related}
+
+\noindent \textbf{Camera Controlled Video Diffusion Models.~}
+To enable camera pose control in video generation, CameraCtrl~\cite{he2024cameractrl} and I2VControl-Camera~\cite{feng2024i2vcontrol} inject camera parameters, such as Plücker embeddings~\cite{sitzmann2021light} or point trajectories, into pretrained video diffusion models.
+Building on these methods, CamCo~\cite{xu2024camco} incorporates epipolar geometry into attention layers to preserve multi-view consistency, while CamTrol~\cite{hou2024training} uses 3D point clouds to improve geometric awareness.
+AC3D~\cite{bahmani2025ac3d} further refines camera-representation injection, while Uni3C~\cite{cao2025uni3c} and VD3D~\cite{bahmani2024vd3d} extend camera control to transformer-based video diffusion architectures~\cite{menapace2024snap}.
+Beyond single-camera settings, CVD~\cite{kuang2024collaborative} and SyncCamMaster~\cite{bai2024syncammaster} support multi-camera synchronization and cross-view video generation. In addition, CameraCtrl II~\cite{he2025cameractrl} enables camera-controlled dynamic scene synthesis with a dedicated dataset.
+Despite this progress, these methods are limited to camera control and cannot manipulate object dynamics. In contrast, SymphoMotion enables controllable camera motion and dynamic object manipulation.
+
+
+
+\vspace{3mm}
+\noindent \textbf{Object Controlled Video Diffusion Models.~}
+Object-controllable video generation has recently attracted attention for enabling precise object control during video synthesis.
+Early approaches, including Motion-i2V~\cite{shi2024motion}, DragNUWA~\cite{yin2023dragnuwa}, and Tora~\cite{zhang2025tora}, incorporate optical flow into video generation frameworks to control object motion.
+Building on point-map guidance, TrackGo~\cite{zhou2025trackgo} represents objects with key points and integrates them through a custom adapter.
+Other methods, such as Peekaboo~\cite{jain2024peekaboo}, MagicMotion~\cite{li2025magicmotion}, and Boximator~\cite{wang2024boximator}, use 2D bounding boxes as explicit spatial priors for trajectory control. By encoding box coordinates into the diffusion process, they constrain object positions and scales across frames, enabling effective trajectory supervision.
+Inspired by GLIGEN~\cite{li2023gligen}, the training-free framework FreeTraj~\cite{qiu2024freetraj} incorporates bounding-box conditioning into video diffusion models by modifying attention layers or the initial noised video latents.
+Several studies~\cite{fu20243dtrajmaster,wang2025levitor} further explore 3D trajectory-based control for more sophisticated motion synthesis. LeViTor~\cite{wang2025levitor} uses depth-augmented keypoint trajectory maps to capture spatial structure, while 3DTrajMaster~\cite{fu20243dtrajmaster} designs customized 3D trajectories to model object motion.
+However, these methods focus on object motion while largely neglecting camera movement. In contrast, SymphoMotion jointly controls camera motion and object dynamics through dedicated mechanisms, providing unified fine-grained spatiotemporal control over video generation.
+
+\vspace{1mm}
+\noindent \textbf{Camera and Object Controlled Video Diffusion Models.~}
+Recent studies have advanced motion control by jointly modeling camera and object motion, representing a major step toward unified camera and object controlled video generation. MotionPrompting~\cite{geng2025motion}, ImageConductor~\cite{li2025image}, and ATI~\cite{wang2025ati} define motion priors through optical flow, 2D point tracking, or feature similarity, enabling users to interactively control both camera and object motion. However, this coupled camera–object control paradigm is effective only in scenarios involving limited motion amplitudes, where both camera and object dynamics remain relatively constrained.
+Several recent methods have further decoupled and refined the control of camera and object dynamics.
+Perception-as-Control~\cite{chen2025perception} trains separate modules for camera and object motion, enabling each to be optimized independently.
+VidCraft3~\cite{zheng2025vidcraft3} proposes a disentangled control framework spanning multiple motion modalities, enabling coordinated motion generation.
+MotionCtrl~\cite{wang2024motionctrl} injects extrinsic matrices into diffusion models to achieve camera pose control, while simultaneously processing point maps with a Gaussian filter and trainable encoders to represent object trajectories.
+Nevertheless, these approaches restrict object control to the two-dimensional plane, resulting in suboptimal motion control.
+To address this limitation, FMC~\cite{shuai2025free} employs 6D pose representations to more accurately capture object motion in three-dimensional space.
+Although this formulation improves geometric fidelity, the performance of FMC remains limited by its reliance on a synthetic dataset.
+Furthermore, its requirement for explicit 6D pose inputs increases operational complexity and reduces user intuitiveness, limiting its practicality in real-world scenarios.
+Compared with previous approaches, SymphoMotion, trained on the RealCOD-25K, provides a unified and flexible framework that not only enables precise and controllable camera motion in video generation but also supports more realistic and spatially-consistent object manipulation.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.99\textwidth]{images/fig2-method.pdf}
+\vspace{-3mm}
+\caption{
+{
+\textbf{Overview of SymphoMotion.} 
+Built on Wan-I2V~\cite{wang2025wan}, 
+SymphoMotion introduces two complementary mechanisms for simultaneous control of camera and object motion: Camera Trajectory Control (CTC) and Object Dynamics Control (ODC).
+Given a reference image, a text prompt, and the specified camera and object trajectories, CTC employs the Viewpoint Control Module (VCM) to integrate 3D geometric priors with camera motion for precise camera trajectory control. In parallel, ODC, powered by the Object Motion Module (OMM), combines 2D visual guidance with 3D motion cues to achieve dynamic and spatially coherent object manipulation.}
+}
+\vspace{-2.5mm}
+\label{fig:method}
+\end{figure*}
+
+
+\section{SymphoMotion}
+\label{sec:Method}
+
+
+
+Controlling both camera and object motion in video generation remains challenging, as it requires precise coordination of global and local spatial dynamics in 3D space. To tackle this challenge, we propose SymphoMotion, a diffusion-based framework that enables synchronized and disentangled control over 3D-aware camera and object motions. As shown in Fig.~\ref{fig:method}, the input to our method includes: a reference image $f\in\mathbb{R}^{3\times h\times w}$, a set of camera trajectories $\{C^i\}_{i=1}^N$ specifying the viewpoints of $N$ target frames, a text prompt $y$ consisting of $M$ moving objects $\{y_{i}\}_{i=1}^M$, and their associated 3D motion trajectories $\{ P_{i}^{j} \}_{i=1,\; j=1}^{M,\; N}$. Our framework introduces two mechanisms for motion control:
+(1) Camera Trajectory Control (CTC) which integrates 3D geometric priors for precise camera control (Section~\ref{sec:CMM}); and
+(2) Object Dynamics Control (ODC) that exploits both 2D and 3D spatial cues to model realistic object motion (Section~\ref{sec:OMM}).
+Training details are provided in Section~\ref{sec:Training}, and the inference pipeline is described in Section~\ref{sec:Inference}, following a review of the base diffusion model in Section~\ref{sec:perliminary}.
+
+\subsection{Preliminary}
+\label{sec:perliminary}
+\textbf{Video Diffusion Models.}
+Latent diffusion models perform the denoising process in a learned latent space rather than directly in pixel space, significantly improving both efficiency and scalability~\cite{rombach2022high}. 
+Given a training video $x$, we employ a pre-trained 3D variational autoencoder to encode it into a latent representation $z_0$. 
+The forward process gradually adds Gaussian noise $\epsilon \sim \mathcal{N}(0, I)$ to the latent variable over $T$ timesteps, generating intermediate noisy latent $z_t$ for $t \in [0, T]$. 
+The training objective is to optimize a denoising network $\epsilon_{\theta}$ to predict the added noise:
+\begin{equation}
+\label{eq:diffusion}
+\min_\theta \mathbb{E}_{z_0, t, \epsilon, c_{y}, c_{f}}
+\left[\|\epsilon_\theta(z_t, t, c_{y}, c_{f}) - \epsilon\|^2\right],
+\end{equation}
+where $c_{y}$ and $c_{f}$ denote the conditioning embeddings extracted from text $y$ and image $f$, respectively.
+Recently, most video diffusion models have employed Flow Matching~\cite{lipman2022flow} as an improved diffusion formulation, offering faster convergence and more stable training. 
+Based on the ordinary differential equations, Flow Matching defines the linear interpolation between $z_0$ and $z_1$:
+\begin{equation}
+z_t = t z_1 + (1 - t) z_0,
+\end{equation}
+where $t\in[0,1]$ is sampled from the logit-normal distribution.
+The ground-truth velocity is defined as $v_t = \frac{dz_t}{dt} = z_1 - z_0$, and the model is trained to predict it by minimizing: 
+% \li{really need $\epsilon$? $z_1$ maybe?}:
+\begin{equation}
+\label{eq:flow_matching}
+\min_\theta \mathbb{E}_{z_0, t, \epsilon, c_y, c_f}
+\left[\|v_\theta(z_t, t, c_y, c_f) - v_t\|^2\right].
+\end{equation}
+
+
+\noindent\textbf{Diffusion Transformer (DiT).}
+Recent work has explored transformer architectures for diffusion models in lieu of the traditional UNet backbone~\cite{ronneberger2015u}, which better capture long-range temporal dependencies. The Diffusion Transformer (DiT)~\cite{peebles2023scalable} adopts self-attention over spatio-temporal tokens to enhance video coherence and quality. We build upon Wan-I2V~\cite{wang2025wan}, which injects textual features from the multi-language encoder umT5~\cite{chung2023unimax} into Wan-I2V through cross-attention and incorporates visual features from CLIP’s image encoder~\cite{radford2021learning} to enhance image-to-video synthesis.
+
+\subsection{Camera Trajectory Control}
+\label{sec:CMM}
+\noindent\textbf{3D Geometric Priors.}
+Previous camera-controlled video generation methods typically encode camera embeddings using Pl{\"u}cker rays~\cite{bahmani2024ac3d, liang2024wonderland}. 
+However, such representations only capture the camera pose, lacking rich structural information about the underlying 3D scene. This makes it challenging to maintain geometric consistency. To address this, we draw inspiration from ViewCrafter~\cite{yu2024viewcrafter} and introduce point clouds as 3D geometric priors, providing complementary structural cues that enhance spatial coherence and geometric fidelity during camera control.
+Specifically, given a reference image $f$, we estimate its point cloud, camera intrinsics, and pose $C^f$ using Depth-Pro~\cite{bochkovskii2024depth}. 
+The camera is then navigated along a target pose sequence $\mathcal{C} = \{C^1, \ldots, C^N\}$, 
+with $C^1$ aligned to the reference pose $C^f$.
+By rendering the point cloud from these viewpoints, we obtain a set of geometry-aware frames 
+$\mathcal{V} = \{V^{1}, \ldots, V^{N}\}$, where $V^{1}$ corresponds to the reference image $f$.
+
+\vspace{1mm}
+\noindent\textbf{Camera Motion Injection.} 
+As illustrated in Fig.~\ref{fig:method}, we employ two encoders to capture camera motion and geometric context: a camera encoder and a Wan encoder. Their outputs are fused and fed into the Viewpoint Control Module (VCM), which injects camera motion into the video generation model to enable precise and controllable viewpoint transitions.
+Specifically, the camera encoder processes Pl{\"u}cker embeddings of the target pose sequence $\mathcal{C}$ to produce the motion representation $c_{{cam}}$, 
+using a canonical pose (with zero translation) for the first frame and relative poses for subsequent ones. 
+In parallel, the Wan encoder extracts geometry-aware features $c_{{pcd}}$ from the rendered point-cloud frames, capturing both 3D structure and visual context.
+%
+To fuse the two, $c_{{pcd}}$ is first concatenated with the noisy latent $z_t$ to enrich geometric awareness. Then, $c_{{cam}}$ is added to provide explicit motion cues. The resulting unified representation is passed to the VCM, which is implemented as a ControlNet $\phi_{\theta}$.
+The training objective is:
+\begin{equation}
+\label{eq:diffusion-cam-motion}
+\begin{aligned}
+    &\hspace{3em}
+    \min_\theta \; \mathbb{E}_{z_0, t, \epsilon, c_{y}, c_{f}, c_{cam}, c_{pcd}} \\
+    &\left[\|v_\theta(z_t, t, c_{y}, c_{f},
+    \phi_{\theta}(c_{cam}, c_{pcd})) - v_t\|^2\right].
+\end{aligned}
+\end{equation}
+
+\subsection{Object Dynamics Control}
+\label{sec:OMM}
+To achieve fine-grained control over object motion, we introduce a dedicated object dynamics control mechanism, guiding object movement using 3D object trajectories $\{ P_{i}^{j} \}_{i=1,\; j=1}^{M,\; N}$, where $P_i \in \mathbb{R}^{N \times N_p \times 3}$ denotes the positions of $N_p$ points sampled from the $i$-th object over $N$ frames.
+To enable accurate motion behavior, we leverage both 2D visual guidance and 3D motion information. 
+The 2D guidance establishes explicit spatial anchors in the image plane, 
+%regulating object localization to ensure alignment with the predefined visual trajectory.
+constraining object localization to follow the predefined visual trajectory.
+Meanwhile, the 3D motion trajectories provide geometry-aware supervision, maintaining coherent spatial relationships across views. 
+Together, these complementary signals enable reliable object motion.
+
+\vspace{1mm}
+\noindent\textbf{2D Visual Guidance.}
+For each moving object $i$, we derive a 2D trajectory ${P_{\text{2D}}}_i$ by projecting its 3D trajectory $P_i$ 
+onto the image plane using the target camera poses $\mathcal{C}$. 
+Based on the projected points ${P_{\text{2D}}}_i$, we fit per-frame bounding boxes that delineate the object’s expected position in pixel coordinates. 
+As illustrated in Fig.~\ref{fig:method}, these bounding boxes are directly rendered onto the point-cloud frames $\mathcal{V}$, serving as explicit spatial anchors that guide the model in localizing each object across frames.
+By overlaying motion boxes in the rendered input rather than encoding solely in latent space, we provide the model with strong visual cues to track the image-plane projection of each object’s 3D motion path.
+
+\vspace{1mm}
+\noindent\textbf{3D Trajectory Conditioning.}
+We further provide the 3D motion cues in object dynamics control via an Object Motion Module (OMM). As shown in Fig.~\ref{fig:method} (b), each object’s 3D trajectory $P_i$ is first transformed into the coordinate system of the reference camera $C^f$, and subsequently encoded into latent embeddings using a trajectory encoder composed of a linear projection layer and a temporal downsampler ($N$ frames to $\tilde{N}$ frames). 
+Meanwhile, the entity prompts $y_{i}$ are converted into semantic embeddings using the frozen language encoder.
+The two embeddings are fused through element-wise addition to produce motion-aware representations $c_{obj}$. The whole process can be formulated as:
+\begin{equation}
+c_{obj}
+= \psi_{\theta}\!\big(
+\{ P_{i}^{j} \}_{i=1,\; j=1}^{M,\; N}\;, \{y_{i}\}_{i=1}^M
+\big),
+\end{equation}
+where $\psi_{\theta}$ represents the fusion pipeline for objects' 3D motion trajectory and semantic identity.
+We then integrate $c_{obj}$ into the diffusion model by modifying each transformer block to cross-attend to it:
+\begin{equation}
+\begin{array}{l}
+Z'_i = Z_i + \mathrm{CrossAttn}\!\Big(
+Q = Z_i,
+K = c_{obj},
+V = c_{obj}
+\Big),
+\end{array}
+\end{equation}
+where $Z_i$ denotes the latent features at layer $i$. By attending to the motion-aware tokens, the model aligns its latent representation with the specified 3D trajectories, enabling consistent and controllable object motion during generation. The overall training objective is defined as:
+\begin{equation}
+\label{eq:diffusion-train}
+\begin{aligned}
+    &\hspace{3em}
+    \min_\theta \; \mathbb{E}_{z_0, t, \epsilon, c_{y}, c_{f}, c_{cam}, c_{pcd}}
+    \left[\|v_\theta(z_t, t, c_{y}, c_{f}, \right.\\
+    &\left. 
+    \phi_{\theta}(c_{cam}, c_{pcd}),
+    \psi_{\theta}\!(\{ P_{i}^{j} \}_{i=1,\; j=1}^{M,\; N}\;, \{y_{i}\}_{i=1}^M)) - v_t\|^2\right].
+\end{aligned}
+\end{equation}
+
+
+\subsection{Training Strategy}
+\label{sec:Training}
+
+\noindent\textbf{Data Construction.}
+To enable controllable camera motion and dynamic object manipulation, the training data must include video clips annotated with captions, camera poses, and object trajectories corresponding to given reference images and text prompts.
+Since no existing dataset provides such comprehensive annotations, we construct RealCOD-25K dataset, containing 25K high-quality video clips spanning diverse real-world scenes (see Section~\ref{sec:RealCOD-25K} for details).
+
+\vspace{1mm}
+\noindent\textbf{Training Procedure.}
+SymphoMotion is built upon the pre-trained Wan-I2V~\cite{wang2025wan}, which remains frozen during training.
+Training is performed on video sequences of 81 frames at a resolution of 832×480.
+Following MotionCtrl~\cite{wang2024motionctrl}, we adopt a two-stage strategy:
+(1) The CTC part is first trained to learn camera control;
+(2) The CTC is then frozen while the ODC part is trained for object motion control.
+All experiments are conducted on 32 NVIDIA H100 GPUs with a total batch size of 32.
+We use AdamW~\cite{loshchilov2017decoupled} as the optimizer.
+The learning rate is linearly warmed up to $1\times10^{-5}$ over the first 400 steps and kept constant thereafter.
+
+
+\subsection{Inference Pipeline}
+\label{sec:Inference}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.48\textwidth]{images/fig3-inference.pdf}
+\vspace{-7mm}
+\caption{\textbf{Inference pipeline of SymphoMotion.} Users can specify camera motion and interactively draw 3D trajectories of selected objects through our interface, and the system generates videos that align with the user-defined camera and object motion.}
+\vspace{-3mm}
+\label{fig:inference}
+\end{figure}
+
+We design an intuitive interactive system for inference, as shown in Fig.~\ref{fig:inference}. Given a single reference image, the system first reconstructs a dense point cloud using Depth-Pro~\cite{bochkovskii2024depth}. Users select objects via SAM2~\cite{ravi2024sam}; the selected 2D masks are lifted into 3D by projecting pixels onto the reconstructed point cloud, from which an initial 3D bounding box is fitted. Through an interactive panel (detailed in supplementary materials), users can drag and adjust this box in 3D space, and the system records the manipulated box positions as the object’s 3D motion trajectory. Users may simultaneously specify a camera path by defining poses relative to the reference camera. Given both object trajectories and camera motion, SymphoMotion generates a video that follows the user-defined 3D object dynamics and camera movement.
+
+\section{RealCOD-25K Dataset}
+\label{sec:RealCOD-25K}
+
+To support large-scale training and unified evaluation, we construct RealCOD-25K, a curated dataset tailored for controllable camera and object dynamics. As shown in Figure~\ref{fig:data_creation}, RealCOD-25K is built through two pipelines.
+
+\subsection{Curation Pipeline}
+
+\noindent\textbf{(1) Data Collection.}
+We collected one million real-world video clips through a combination of automated web crawling and manual curation from publicly available platforms such as YouTube, Mixkit, Pexels, and Pixabay, covering diverse scenes with rich camera and object motions.
+
+\noindent\textbf{(2) Automated Quality Filtering.}
+From the initial one million videos, we automatically filtered low-quality samples using the LAION aesthetic predictor and PaddleOCR~\cite{liao2022real}.
+The aesthetic predictor retained videos with scores above 5, while PaddleOCR reliably removed clips containing visibly excessive overlaid text, such as watermarks or subtitles. Extremely short or corrupted clips were further discarded.
+
+\noindent\textbf{(3) Motion-Based Filtering.}
+To ensure stable and reliable geometry information annotation in later stages, our motion filtering pipeline leverages the lightweight VMAF metric~\cite{li2016toward} to retain videos with sufficient motion diversity. In parallel, to guarantee adequate foreground dynamics and realistic motion patterns, the vision–language model Qwen-2.5-VL-72B~\cite{bai2025qwen2} removed videos lacking moving objects. This filtering reduced the dataset to approximately 35K clips exhibiting both camera and object motion.
+
+\noindent\textbf{(4) Manual Curation and Finalization.}
+Five researchers with expertise in computer vision manually reviewed the remaining videos over 120 person-hours to identify and remove residual low-quality samples. The manual inspection emphasized visual fidelity, motion consistency, and geometric plausibility, resulting in the RealCOD-25K dataset comprising 25K high-quality clips that consistently exhibit meaningful camera motion and coherent foreground object dynamics across diverse real-world scenes.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.47\textwidth]{images/fig4-dataset.pdf}
+\vspace{-3mm}
+\caption{\textbf{RealCOD-25K dataset construction pipeline.}
+}
+\vspace{-3mm}
+\label{fig:data_creation}
+\end{figure}
+
+\subsection{Annotation Pipeline}
+
+\noindent\textbf{(1) Motion Object Segmentation.}
+To annotate moving objects, we first employed SegAnyMo~\cite{huang2025segment}, which takes a video as input and effectively predicts segmentation masks for all moving foreground objects. For each distinct object, the model generates an initial mask on the first frame and assigns a unique identifier, enabling consistent object identity tracking across subsequent frames.
+
+\noindent\textbf{(2) Camera and Trajectory Tracking.}
+For geometric estimation, we adopt MegaSAM~\cite{li2025megasam} as the base pipeline and replace its original monocular and metric depth modules with Depth Anything V2~\cite{yang2024depth} and UniDepth V2~\cite{piccinelli2025unidepthv2}, respectively, to obtain more accurate and temporally consistent depth.
+Based on the recovered geometry, we further estimate object motion trajectories. Initialized with first-frame object masks, we apply SpatialTrackerV2~\cite{xiao2025spatialtrackerv2} to track object motion across frames. The tracker estimates per-object 2D trajectories conditioned on the geometry, which are then lifted to 3D space via back-projection.
+
+\noindent\textbf{(3) Semantic Description Generation.}
+To provide object-level semantic annotations, we employ the large vision–language model Qwen-2.5-VL-72B~\cite{bai2025qwen2} to generate detailed textual descriptions of each moving object, including its appearance, motion patterns, and surrounding scene context. These captions complement the estimated 3D object trajectories, yielding fine-grained, semantically grounded annotations naturally aligned with object-level dynamics.
+
+

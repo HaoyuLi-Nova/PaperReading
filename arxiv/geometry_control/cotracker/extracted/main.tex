@@ -1,0 +1,108 @@
+\documentclass[runningheads]{llncs}
+\usepackage[year=2024]{eccv}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{pifont}
+\usepackage{xspace}
+\usepackage{tabularx}
+\usepackage{eccvabbrv}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{microtype}
+\usepackage{multirow}
+\usepackage{nicefrac}
+\usepackage{pifont}
+\usepackage{url}
+\usepackage{wrapfig}
+\usepackage{xcolor}
+\usepackage{xspace}
+\usepackage{tikz-cd}
+\usepackage[accsupp]{axessibility}
+% \usepackage[pagebackref,breaklinks,colorlinks,citecolor=eccvblue]{hyperref}
+\usepackage[colorlinks]{hyperref}
+\usepackage{orcidlink}
+
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\todo}[1]{{\color{red}#1}}
+\newcommand{\TODO}[1]{\textbf{\color{red}[TODO\@: #1]}}
+
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+\newcommand{\av}[1]{\textbf{\color{red}[AV] #1}}
+\newcommand{\bg}[1]{\textbf{\color{cyan}[BG] #1}}
+\newcommand{\nk}[1]{\textbf{\color{blue}[NK] #1}}
+\newcommand{\nn}[1]{\textbf{\color{magenta}[NN] #1}}
+\newcommand{\chrr}[1]{\textbf{\color{blue}[CR] #1}}
+
+\newcommand{\method}{CoTracker\xspace}
+\newcommand{\davg}{\ensuremath{\delta_\text{avg}}\xspace}
+\newcommand{\davgocc}{\ensuremath{\delta_\text{avg}^\text{occ}}\xspace}
+\newcommand{\davgvis}{\ensuremath{\delta_\text{avg}^\text{vis}}\xspace}
+\newcommand{\ctimes}{\!\times\!}
+\newcommand{\ua}{$\uparrow$}
+
+\makeatletter
+\DeclareRobustCommand\onedot{\futurelet\@let@token\@onedot}
+\def\@onedot{\ifx\@let@token.\else.\null\fi\xspace}
+\def\eg{\emph{e.g}\onedot} \def\Eg{\emph{E.g}\onedot}
+\def\ie{\emph{i.e}\onedot} \def\Ie{\emph{I.e}\onedot}
+\def\cf{\emph{c.f}\onedot} \def\Cf{\emph{C.f}\onedot}
+\def\etc{\emph{etc}\onedot} \def\vs{\emph{vs}\onedot}
+\def\wrt{w.r.t\onedot} \def\dof{d.o.f\onedot}
+\def\etal{\emph{et al}\onedot}
+\makeatother
+
+\makeatletter
+\renewcommand{\paragraph}{%
+  \@startsection{paragraph}{4}%
+  {\z@}{-0.5em}{-0.5em}%
+  {\normalfont\normalsize\it}%
+}
+\makeatother
+
+\title{\method: It is Better to Track Together}
+\titlerunning{\method}
+\author{Nikita Karaev\inst{1,2} \and
+Ignacio Rocco\inst{1} \and
+Benjamin Graham\inst{1} \and
+Natalia Neverova\inst{1} \and
+Andrea Vedaldi\inst{1} \and
+Christian Rupprecht\inst{2}}
+\authorrunning{N.~Karaev et al.}
+\institute{Meta AI \and
+Visual Geometry Group, University of Oxford \\
+\url{https://co-tracker.github.io/} \\
+\email{nikita@robots.ox.ac.uk}}
+
+\begin{document}
+\maketitle
+\begin{center}
+\centering
+\captionsetup{type=figure}
+\includegraphics[width=\textwidth]{figures/figure_ims_2}
+\caption{\textbf{\method} is a new quasi-dense point tracker.
+It can track 70k points jointly on a single GPU, exploiting dependencies between different tracks to enhance performance.
+It has exceptional long-term tracking performance even in the presence of occlusions or when points leave the camera view (examples from DAVIS~\cite{pont20172017}, top row displays object tracks, bottom row shows displacements on a dense regular grid.
+In frame 30, \method successfully tracks the driver's head even when it exists the camera view).}%
+\label{fig:teaser}
+\end{center}
+
+\input{new/0_abstract}
+\input{new/1_intro}
+\input{new/2_related}
+\input{new/3_method}
+\input{new/4_experiments}
+\input{new/5_limitations}
+\input{new/6_conclusion}
+\input{new/7_acknowledgments}
+
+\bibliographystyle{splncs04}
+\bibliography{vedaldi_general,vedaldi_specific,refs}
+\input{supp_content}
+\end{document}

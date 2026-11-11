@@ -1,0 +1,210 @@
+% \clearpage
+\setcounter{page}{1}
+% \maketitlesupplementary
+
+\appendix
+\setcounter{figure}{0}
+\setcounter{table}{0}
+
+\section{More Implementation Details}
+\label{sec:more_implementation_detail}
+\begin{wraptable}{r}{0.48\textwidth}
+    \centering
+    \scriptsize
+    \setlength{\tabcolsep}{0.01pt}
+    \vspace{-20pt}
+    \begin{tabular}{lc}
+        \toprule
+        Hyper-parameter & Value\\
+        \midrule
+        Batch Size / GPU & 1 / 24\\
+        Accumulate Step & 4\\
+        Optimizer & AdamW\\
+        Weight Decay & 3e-2\\
+        Learning Rate & 2e-5\\
+        AdamW $\beta_1$ & 0.9\\
+        AdamW $\beta_2$ & 0.999\\
+        Scheduler & Constant with Warmup\\
+        Warmup Steps & 100\\
+        Training Steps & 6,000\\
+        Resolution & $704\times 1280$\\
+        Max Gradient Norm & 0.5 \\
+        Weighting Scheme & Uniform\\
+        Pre-trained Model & Wan2.2-I2V-5B\\
+        \midrule
+        Sampler & Flow Unipc\\
+        Sample Steps & 50\\
+        CFG Scale & 6.0\\
+        \midrule
+        Training Device & A100-SXM4-40G$\times$24\\
+        Training Strategy & ZeRO-3\\
+        Gradient Checkpointing & True\\
+        CPU Offload & True\\
+        Precision & bf16\\
+        \midrule
+        Training Speed & 280s per accumulation\\
+        Inference Speed & 15min per video in 5s\\
+        \bottomrule
+    \end{tabular}
+    \vspace{-2pt}
+    \caption{Hyper-parameters of our model training and inference.}
+    \label{tab:hyperparam}
+    \vspace{-10pt}
+\end{wraptable}
+
+The main paper outlines the primary training and experimental parameters. This section provides a comprehensive description of multiple stages of our model training, and the detailed procedures of the comparative experiments on motion and video generation tasks.
+
+\vspace{-2mm}
+\paragraph{\bf Training.}
+Our model training is conducted in two stages. The first stage adapts the copied motion DiT branch $\mathcal{D}^{\text{motion}}$ to our 2D motion representation domain using $\mathcal{L}^{\text{motion}}$ only. During this stage, only $\mathcal{D}^{\text{motion}}$ is enabled with gradient calculation and weight update, trained for 2,000 steps. In the second stage, we incorporate the mutually interactive zero-linear layers and 3D-2D cross-attention modules into the training process, using the total loss $\mathcal{L}^{\text{total}}$ to supervise it. To enhance training efficiency and reduce GPU memory consumption, at each training step we randomly select the latent features from three DiT layers, while consistently including the final layer of $\mathcal{D}^{\text{video}}$ and $\mathcal{D}^{\text{motion}}$, to operate feature fusion and perform cross-attention with the 3D motion query. The pre-trained weights of RGB DiT branch $\mathcal{D}^{\text{video}}$ are frozen, while the remaining components are updated over 4,000 steps at the second training stage. In total, the model is trained for 6,000 steps across both stages. Detailed hyperparameter configurations are provided in Tab.~\ref{tab:hyperparam}.
+
+\begin{figure*}[t!]
+    \centering
+    \includegraphics[width=\textwidth]{figure/data_processing.png}
+    \vspace{-20pt}
+    \caption{Curation pipeline of our CoMoVi-Dataset.}
+    \label{fig:data_curation}
+\vspace{-15pt}
+
+\end{figure*}
+
+\vspace{-2mm}
+\paragraph{\bf Experiments of Motion Generation.}
+For 3D human motion evaluation, we follow the 263-dimensional representation and use the pretrained motion and text encoder provided by HumanML3D~\cite{guo2022ml3d}. The metrics reported in the main paper are determined by the average of 20 independent inference results with a confidence interval of 95\% for each model.
+
+\begin{figure*}
+    \begin{widecodebox}
+        \texttt{\textbf{INPUT:}}\\
+        A dense caption \texttt{cap} of the input video.\\
+        \\
+        \texttt{\textbf{PROMPT:}}\\
+        ``\\
+        Read and understand the given caption of a video \{\texttt{cap}\}, then answer the following questions:\\
+        - Does the video capture humans?\\
+        - Does the video capture only one person?\\
+        - Does the video capture the whole body of the person all the time?\\
+        - Does the video capture interactions behavior between the person and surroundings, like objects or the scene?\\
+        \\
+        You MUST answer and only answer the given questions by saying `YES' or `NO'.\\
+        You MUST return your output in a list format. Here is an example: [`YES', `YES', `NO', `NO'].\\
+        "\\
+        \\
+        \texttt{\textbf{OUTPUT:}}\\
+        \text{[}``answer for question 1", ``answer for question 2", ``answer for question 3", ``answer for question 4"\text{]}
+    \end{widecodebox}
+    \vspace{-10pt}
+    \caption{Prompt instruction for Qwen3~\cite{qwen3} to analyze dense video captions.}
+\label{fig:qwen3_prompt}
+\vspace{-15pt}
+\end{figure*}
+
+\begin{figure*}
+    \begin{widecodebox}
+        \texttt{\textbf{INPUT:}}\\
+        The first frame \texttt{frame} of the input video.\\
+        \\
+        \texttt{\textbf{PROMPT:}}\\
+        ``\\
+        You will be given the image \{\texttt{frame}\}, answer `YES' if and only if the following conditions are met:\\
+        - There exists one and only one human in this image.\\
+        - The human is not a child.\\
+        - The whole body of the human is visible in the image, from head to feet.\\
+        - The human is not giving a talk, interview, presentation or speech.\\
+        - The image is not a game, television, movie, anime or cartoon screen.\\
+        Otherwise, answer `NO'.\\
+        \\
+        Remember, you MUST only answer `YES' or `NO'.\\
+        "\\
+        \\
+        \texttt{\textbf{OUTPUT:}}\\
+        `YES' or `NO'
+    \end{widecodebox}
+    \vspace{-10pt}
+    \caption{Prompt instruction for Qwen2.5-VL~\cite{qwen3} to analyze the first frame of video.}
+\label{fig:qwenvl_prompt}
+% \vspace{-15pt}
+\end{figure*}
+
+\begin{figure*}
+    \begin{widecodebox}
+        \texttt{\textbf{INPUT:}}\\
+        A video \texttt{video}.\\
+        \\
+        \texttt{\textbf{PROMPT:}}\\
+        ``\\
+        You will be shown a human video \{\texttt{video}\}. You should identify the most prominent subject in this video and describe the appearance and motion of that person only, ignore other people. You should also describe the objects interacting with or near to the human if any. Don't use plural words like `they/their/them', start your description with `A/The person/man/male/boy/woman/female/girl'. If you use the word `left' or `right', `forward' or `backward', you should always describe it relative to the person's body, not the camera or screen.\\
+        \\
+        You are required to return a short caption of \{\texttt{video}\}. Give a brief and accurate description of the human appearance, clothing, and motion in only one sentence. Describe the appearance and clothing first and then the motion with possible interactions with surronding objects. Use the specific and proper terms to describe the motion whenever possible.\\
+        "\\
+        \texttt{\textbf{OUTPUT:}}\\
+        A short caption.
+    \end{widecodebox}
+    \vspace{-10pt}
+    \caption{Prompt instruction for Gemini2.5-Pro to caption human motion in videos.}
+\label{fig:gemini_prompt}
+\vspace{-15pt}
+\end{figure*}
+
+\vspace{-2mm}
+\paragraph{\bf Experiments of Video Generation.}
+For fair comparative experiments of video generation task, all models are evaluated at their optimal resolutions ($768\times 1360$ for CogVideoX1.5-I2V-5B~\cite{yang2024cogvideox}, and $704\times 1280$ for Wan2.2-I2V-5B~\cite{wan2025wan} and ours), and each model is configured to generate video sequences of a unified length of 81 frames. All results are generated once using random seed 42 and CFG scale 6.0 without any cherry-picking.
+
+
+\section{CoMoVi-Dataset Curation}
+\label{sec:dataset_curation}
+In the main paper, we give an overview of our dataset construction process. Here, we elaborate on the detailed procedures. As illustrated in Fig.~\ref{fig:data_curation}, firstly, we curate a collection of high-quality videos sourced from the Internet and the Koala-36M dataset~\cite{wang2025koala}, and employ LLMs/VLMs~\cite{qwen3,qwen2.5} to selectively retain only those depicting single-person movements (Sec.~\ref{sec:stage1}). Subsequently, we apply 2D human pose detection model~\cite{redmon2016yolo,xu2022vitpose} to filter out videos where the subject is largely outside the frame or severely occluded (Sec.~\ref{sec:stage2}). The filtered videos are finally captioned (Sec.~\ref{sec:stage3}) and labeled with 3D motion (Sec.~\ref{sec:stage4}). We provide specific prompt instructions used at each filtering stage and our confirmation of dataset ethics (Sec.~\ref{sec:data_ethics}) below.
+
+
+\subsection{Multimodal Video Filtering}
+\label{sec:stage1}
+
+Given a large collection of publicly available videos, we ask the Qwen3 model~\cite{qwen3} to determine if the video contents satisfy our criteria according to the corresponding dense captions using the prompt instruction shown in Fig.~\ref{fig:qwen3_prompt}. We only keep the videos that are judged as ``\text{[}`Yes', `Yes', `Yes', `Yes'\text{]}" in this initial text-based filtering stage, and then process them using the Qwen2.5-VL model~\cite{qwen2.5}, which takes the first frame of each video and the prompt instruction specified in Fig.~\ref{fig:qwenvl_prompt} to make a visual confirmation. This multimodal filtering procedure effectively filters out non-human videos, multi-person videos, and contents such as movies, animations, and video games that may contain human-like characters but do not represent real-world human motions.
+
+\subsection{Human Tracking Filtering}
+\label{sec:stage2}
+
+To ensure a balanced data distribution and avoid overwhelming clips from long videos, we segment each video into non-overlapping 5-second clips, with a maximum of two clips retained per video. Subsequently, we apply human tracking utilizing YOLO~\cite{redmon2016yolo} and ViTPose~\cite{xu2022vitpose} for each clip. A series of confidence thresholds are established to flag frames with low-confidence human detections throughout a sequence. Clips containing an excessive number of such low-confidence frames are filtered out to ensure data quality.
+
+\subsection{Video Captioning}
+\label{sec:stage3}
+
+For all retained 5-second clips, the human motion captioning is performed by querying the Gemini-2.5-Pro API at 1 fps, adhering to the official recommendation. The prompt instruction provided for motion captioning is shown in Fig.~\ref{fig:gemini_prompt}. We also experiment with higher frame rates, which do not yield improvement in caption quality but substantially increase the cost of annotation.
+
+\subsection{3D Human Motion Annotation}
+\label{sec:stage4}
+
+We estimate the SMPL parameters~\cite{loper2023smpl} for each frame of the filtered human videos using CameraHMR~\cite{patel2025camerahmr}. Since these per-frame estimations are independent, which can lead to motion jitter due to occlusions or motion blur in videos, we apply the smoothing curve in Blender to post-process the estimated body motions to ensure temporal coherence. For consistency of body shape across the video sequence, the SMPL shape parameters estimated from the first frame are applied to all subsequent frames.
+
+\subsection{Dataset Ethics}
+\label{sec:data_ethics}
+We strictly adhere to the conference ethics guidelines and only collect publicly available videos from academic datasets and open social media platforms. We confirm that all collected data are used only for research purposes. This condition will also be explicitly stated upon the release of our dataset. We fully respect the privacy of the individuals appearing in the videos, so no personal information or metadata is retained. Furthermore, in compliance with video ownership rights, only video identifiers will be publicly released, rather than the original video files.
+
+\section{More Discussions}
+
+\subsection{How to Extend CoMoVi Results to World-Space}
+As shown in Fig. 7 in the main paper, a simple and deterministic kinematic approach can be employed to ``lift'' in-place motion generated by CoMoVi to world space via physical constraints of locomotion that leverages the zero-velocity assumption of the stance foot. Specifically, for each time step $t$, we identify the stance joint $k$ (e.g., the ankle or toe) as the end-effector exhibiting the minimal vertical elevation relative to the root. Assuming the stance foot remains static in the world coordinate system (i.e., $\mathbf{v}_{k}^{\text{world}} \approx 0$), the global linear velocity of the root joint, $\mathbf{v}_{\text{root}}$, can be derived by inverting the relative velocity of the stance foot: $\mathbf{v}_{\text{root}} \approx - \dot{\mathbf{p}}_{k}^{\text{local}}$, where $\mathbf{p}_{k}^{\text{local}}$ denotes the position of the stance foot in the root-relative coordinate system. The final global trajectory is obtained via temporal integration of these frame-wise velocities
+\begin{equation}
+\begin{aligned}
+    \mathbf{v}_{\text{root}}^{(t)} \approx - \dot{\mathbf{p}}_{k}^{\text{local}} &= - \left( \mathbf{p}_{k}^{(t)} - \mathbf{p}_{k}^{(t-1)} \right) / \Delta t\\
+    \mathbf{T}^{(t)} &= \mathbf{T}^{(t-1)} + \mathbf{R}^{(t-1)} \mathbf{v}_{\text{root}}^{(t)} \Delta t,
+\end{aligned}
+\end{equation}
+where $\mathbf{T}$ and $\mathbf{R}$ represents the root translation and orientation respectively.
+
+\subsection{Denoising Guidance of 3D Motion during Inference}
+During inference, the 3D guidance is provided by our 2D motion representation (see Fig.~\ref{fig:2d_motion_rgb}), which is 3D-aware (containing both body surface normals and semantics information) and pixel-aligned with the RGB video. We introduce the 3D-2D cross-attention module to learn to output 3D motion from DiT latents, achieving synchronous geneartion of 3D motion and 2D video. This design is also inspired by REPA~\cite{yu2024repa}, regularizing the diffusion training process via additional 3D regularization $\mathcal{L}^{\text{smpl}}$.
+
+\begin{figure*}[t!]
+    \centering
+    \includegraphics[width=\textwidth]{figure/2d_rgb.png}
+    \vspace{-20pt}
+    \caption{Synchronous and pixel-aligned generation of RGB video and our 3D-aware 2D motion representation sequence.}
+    \label{fig:2d_motion_rgb}
+\vspace{-15pt}
+\end{figure*}
+
+\subsection{Evaluating on Motion-X++ Benchmark}
+In the field of text-driven human motion generation, both HumanML3D~\cite{guo2022ml3d} and Motion-X++~\cite{lin2023motionx} are commonly used benchmarks. However, HumanML3D~\cite{guo2022ml3d} focuses solely on text-motion pairs, whereas Motion-X++~\cite{lin2023motionx} is a tri-modal dataset of text, image, and 3D human motion, which aligns the task investigated in this work. Moreover, the research problem of this work is co-generating 3D human motion and \textbf{realistic} video, which means synthetic data is undesired and \textbf{real-world} video data is required. We therefore adopt the Motion-X++ benchmark~\cite{lin2023motionx} for our evaluation of the motion generation task.
+
+\section{Limitations and Future Work}
+While our method offers significant advantages, it is constrained to generating fixed-length motion sequences, lacking the capacity for variable-length or infinite-length generation. Additionally, due to the inherently denser nature of video latents compared to 3D human motion data, our inference speed is relatively slower. Promising future directions include extending our framework to human-object interaction scenarios, employing distillation techniques for generation acceleration, and enabling the generation of variable-length sequences.

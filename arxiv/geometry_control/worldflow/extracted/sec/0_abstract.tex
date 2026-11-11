@@ -1,0 +1,43 @@
+\begin{abstract}
+% Predicting future physical states is a central challenge
+% in embodied intelligence.
+% Video world models leave 3D dynamics implicit, while
+% action-based formulations are often tied to specific
+% robot embodiments.
+% Explicit 3D motion offers a transferable geometric
+% representation, but flow-only supervision provides
+% a limited learning signal for physical dynamics,
+% motivating joint modeling of 3D motion and scene-level
+% visual evolution.
+% We introduce \method{}, a generative world model that
+% jointly predicts future video and query-conditioned
+% 3D object motion from an initial image, a language
+% instruction, and sparse 3D query points.
+% Motion is represented as continuous-valued displacement
+% tokens spatiotemporally aligned with video tokens.
+% A unified Mixture-of-Transformers (MoT) backbone jointly
+% denoises both modalities under a rectified-flow objective,
+% combining explicit trajectory supervision with
+% complementary visual supervision.
+% We train \method{} on approximately 1.44 million
+% object-level samples spanning simulated and real-world
+% domains and introduce WorldFlowBench, comprising three
+% evaluation sets, including SpatialCog for spatial reasoning.
+% Across all three sets, \method{} achieves the lowest
+% ADE and FDE among the evaluated learning-based methods.
+% On SpatialCog, \method{} reduces ADE by 55.9\% and FDE
+% by 68.5\% relative to the \method{} flow-only ablation,
+% which predicts 3D motion without jointly generating video.
+% Our code, pretrained models, and evaluation benchmarks
+% will be made publicly available.
+
+Predicting future physical states stands as a central challenge in embodied intelligence. Existing video world models leave 3D dynamics implicit, action-based formulations remain tied to specific robot configurations, and 3D motion prediction models use flow-only supervision, providing a limited learning signal for physical dynamics. To circumvent these limitations, we introduce \method{}, a generative world model that jointly predicts future video and query-based 3D trajectories. By parameterizing 3D motion as continuous displacement tokens aligned with the video grid, a unified Mixture-of-Transformers (MoT) backbone jointly denoises both modalities under a rectified-flow objective. This formulation couples explicit geometric dynamics with visual evolution, effectively unlocking the physical commonsense embedded within pretrained video models. To empirically scale and validate this unified architecture, we train \method{} on a heterogeneous mixture of 1.44 million object-level samples spanning simulated and real-world domains. We further introduce WorldFlowBench, comprising 1,678
+evaluation samples from 11 data
+sources across simulated and real-world interactions,
+including spatial reasoning tasks. Across all three
+evaluation sets, WorldFlow achieves the lowest average
+displacement error (ADE) and final displacement error
+(FDE) among the evaluated learning-based methods.
+Notably, on the challenging SpatialCog set, WorldFlow achieves an ADE of 0.060 m, a 54.2\% reduction compared with the strongest external baseline. It also reduces ADE and FDE by 55.9\% and 68.5\%, respectively, compared with its flow-only variant. Project page: \url{https://worldflow-rbs.github.io/}.
+
+\end{abstract}

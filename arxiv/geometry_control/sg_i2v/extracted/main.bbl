@@ -1,0 +1,458 @@
+\begin{thebibliography}{90}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Avrahami et~al.(2023)Avrahami, Hayes, Gafni, Gupta, Taigman, Parikh, Lischinski, Fried, and Yin]{SpaText}
+Omri Avrahami, Thomas Hayes, Oran Gafni, Sonal Gupta, Yaniv Taigman, Devi Parikh, Dani Lischinski, Ohad Fried, and Xi~Yin.
+\newblock {SpaText}: Spatio-textual representation for controllable image generation.
+\newblock In \emph{CVPR}, 2023.
+
+\bibitem[Bahmani et~al.(2024)Bahmani, Skorokhodov, Siarohin, Menapace, Qian, Vasilkovsky, Lee, Wang, Zou, Tagliasacchi, et~al.]{bahmani2024vd3d}
+Sherwin Bahmani, Ivan Skorokhodov, Aliaksandr Siarohin, Willi Menapace, Guocheng Qian, Michael Vasilkovsky, Hsin-Ying Lee, Chaoyang Wang, Jiaxu Zou, Andrea Tagliasacchi, et~al.
+\newblock Vd3d: Taming large video diffusion transformers for 3d camera control.
+\newblock \emph{arXiv preprint arXiv:2407.12781}, 2024.
+
+\bibitem[Balaji et~al.(2022)Balaji, Nah, Huang, Vahdat, Song, Zhang, Kreis, Aittala, Aila, Laine, et~al.]{balaji2022ediff}
+Yogesh Balaji, Seungjun Nah, Xun Huang, Arash Vahdat, Jiaming Song, Qinsheng Zhang, Karsten Kreis, Miika Aittala, Timo Aila, Samuli Laine, et~al.
+\newblock ediff-i: Text-to-image diffusion models with an ensemble of expert denoisers.
+\newblock \emph{arXiv preprint arXiv:2211.01324}, 2022.
+
+\bibitem[Blattmann et~al.(2023{\natexlab{a}})Blattmann, Dockhorn, Kulal, Mendelevitch, Kilian, Lorenz, Levi, English, Voleti, Letts, et~al.]{blattmann2023stable}
+Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, Yam Levi, Zion English, Vikram Voleti, Adam Letts, et~al.
+\newblock Stable video diffusion: Scaling latent video diffusion models to large datasets.
+\newblock \emph{arXiv preprint arXiv:2311.15127}, 2023{\natexlab{a}}.
+
+\bibitem[Blattmann et~al.(2023{\natexlab{b}})Blattmann, Rombach, Ling, Dockhorn, Kim, Fidler, and Kreis]{AlignYourLatents}
+Andreas Blattmann, Robin Rombach, Huan Ling, Tim Dockhorn, Seung~Wook Kim, Sanja Fidler, and Karsten Kreis.
+\newblock Align your latents: High-resolution video synthesis with latent diffusion models.
+\newblock In \emph{CVPR}, 2023{\natexlab{b}}.
+
+\bibitem[Brooks et~al.(2024)Brooks, Peebles, Holmes, DePue, Guo, Jing, Schnurr, Taylor, Luhman, Luhman, Ng, Wang, and Ramesh]{Sora}
+Tim Brooks, Bill Peebles, Connor Holmes, Will DePue, Yufei Guo, Li~Jing, David Schnurr, Joe Taylor, Troy Luhman, Eric Luhman, Clarence Ng, Ricky Wang, and Aditya Ramesh.
+\newblock Video generation models as world simulators.
+\newblock \emph{OpenAI technical reports}, 2024.
+\newblock URL \url{https://openai.com/research/video-generation-models-as-world-simulators}.
+
+\bibitem[Cao et~al.(2023)Cao, Wang, Qi, Shan, Qie, and Zheng]{MasaCtrl}
+Mingdeng Cao, Xintao Wang, Zhongang Qi, Ying Shan, Xiaohu Qie, and Yinqiang Zheng.
+\newblock {MasaCtrl}: Tuning-free mutual self-attention control for consistent image synthesis and editing.
+\newblock In \emph{ICCV}, 2023.
+
+\bibitem[Chefer et~al.(2023)Chefer, Alaluf, Vinker, Wolf, and Cohen-Or]{chefer2023attend}
+Hila Chefer, Yuval Alaluf, Yael Vinker, Lior Wolf, and Daniel Cohen-Or.
+\newblock Attend-and-excite: Attention-based semantic guidance for text-to-image diffusion models.
+\newblock \emph{ACM TOG}, 2023.
+
+\bibitem[Chen et~al.(2023)Chen, Xia, He, Zhang, Cun, Yang, Xing, Liu, Chen, Wang, Weng, and Shan]{VideoCrafter1}
+Haoxin Chen, Menghan Xia, Yingqing He, Yong Zhang, Xiaodong Cun, Shaoshu Yang, Jinbo Xing, Yaofang Liu, Qifeng Chen, Xintao Wang, Chao Weng, and Ying Shan.
+\newblock Videocrafter1: Open diffusion models for high-quality video generation.
+\newblock \emph{arXiv preprint arXiv:2310.19512}, 2023.
+
+\bibitem[Chen et~al.(2024{\natexlab{a}})Chen, Zhang, Cun, Xia, Wang, Weng, and Shan]{VideoCrafter2}
+Haoxin Chen, Yong Zhang, Xiaodong Cun, Menghan Xia, Xintao Wang, Chao Weng, and Ying Shan.
+\newblock Videocrafter2: Overcoming data limitations for high-quality video diffusion models.
+\newblock In \emph{CVPR}, 2024{\natexlab{a}}.
+
+\bibitem[Chen et~al.(2024{\natexlab{b}})Chen, Laina, and Vedaldi]{LayoutGuidanceAttn1}
+Minghao Chen, Iro Laina, and Andrea Vedaldi.
+\newblock Training-free layout control with cross-attention guidance.
+\newblock In \emph{WACV}, 2024{\natexlab{b}}.
+
+\bibitem[Cui et~al.(2024)Cui, Zhao, Zhang, Cao, Ma, and Wang]{cui2024stabledrag}
+Yutao Cui, Xiaotong Zhao, Guozhen Zhang, Shengming Cao, Kai Ma, and Limin Wang.
+\newblock Stabledrag: Stable dragging for point-based image editing.
+\newblock \emph{arXiv preprint arXiv:2403.04437}, 2024.
+
+\bibitem[Epstein et~al.(2023)Epstein, Jabri, Poole, Efros, and Holynski]{epstein2023diffusion}
+Dave Epstein, Allan Jabri, Ben Poole, Alexei Efros, and Aleksander Holynski.
+\newblock Diffusion self-guidance for controllable image generation.
+\newblock \emph{NeurIPS}, 2023.
+
+\bibitem[Feng et~al.(2023)Feng, He, Fu, Jampani, Akula, Narayana, Basu, Wang, and Wang]{LayoutGuidanceAttn2}
+Weixi Feng, Xuehai He, Tsu-Jui Fu, Varun Jampani, Arjun Akula, Pradyumna Narayana, Sugato Basu, Xin~Eric Wang, and William~Yang Wang.
+\newblock Training-free structured diffusion guidance for compositional text-to-image synthesis.
+\newblock In \emph{ICLR}, 2023.
+
+\bibitem[Garibi et~al.(2024)Garibi, Patashnik, Voynov, Averbuch-Elor, and Cohen-Or]{ReNoiseInversion}
+Daniel Garibi, Or~Patashnik, Andrey Voynov, Hadar Averbuch-Elor, and Daniel Cohen-Or.
+\newblock Renoise: Real image inversion through iterative noising.
+\newblock In \emph{ECCV}, 2024.
+
+\bibitem[Goel et~al.(2024)Goel, Peruzzo, Jiang, Xu, Sebe, Darrell, Wang, and Shi]{PairDiffusion}
+Vidit Goel, Elia Peruzzo, Yifan Jiang, Dejia Xu, Nicu Sebe, Trevor Darrell, Zhangyang Wang, and Humphrey Shi.
+\newblock {PAIR-Diffusion}: Object-level image editing with structure-and-appearance paired diffusion models.
+\newblock In \emph{CVPR}, 2024.
+
+\bibitem[Google(2023)]{aisafety}
+Google.
+\newblock Safety \& fairness considerations for generative models, 2023.
+\newblock URL \url{https://developers.google.com/machine-learning/resources/safety-gen-ai}.
+
+\bibitem[Guo et~al.(2024)Guo, Yang, Rao, Wang, Qiao, Lin, and Dai]{AnimateDiff}
+Yuwei Guo, Ceyuan Yang, Anyi Rao, Yaohui Wang, Yu~Qiao, Dahua Lin, and Bo~Dai.
+\newblock Animatediff: Animate your personalized text-to-image diffusion models without specific tuning.
+\newblock In \emph{ICLR}, 2024.
+
+\bibitem[Gupta et~al.(2023)Gupta, Yu, Sohn, Gu, Hahn, Fei-Fei, Essa, Jiang, and Lezama]{WALT}
+Agrim Gupta, Lijun Yu, Kihyuk Sohn, Xiuye Gu, Meera Hahn, Li~Fei-Fei, Irfan Essa, Lu~Jiang, and Jos{\'e} Lezama.
+\newblock Photorealistic video generation with diffusion models.
+\newblock \emph{arXiv preprint arXiv:2312.06662}, 2023.
+
+\bibitem[He et~al.(2024{\natexlab{a}})He, Xu, Guo, Wetzstein, Dai, Li, and Yang]{CameraCtrl}
+Hao He, Yinghao Xu, Yuwei Guo, Gordon Wetzstein, Bo~Dai, Hongsheng Li, and Ceyuan Yang.
+\newblock Cameractrl: Enabling camera control for text-to-video generation.
+\newblock \emph{arXiv preprint arXiv:2404.02101}, 2024{\natexlab{a}}.
+
+\bibitem[He et~al.(2016)He, Zhang, Ren, and Sun]{ResNet}
+Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun.
+\newblock Deep residual learning for image recognition.
+\newblock In \emph{CVPR}, 2016.
+
+\bibitem[He et~al.(2022)He, Yang, Zhang, Shan, and Chen]{LVDM}
+Yingqing He, Tianyu Yang, Yong Zhang, Ying Shan, and Qifeng Chen.
+\newblock Latent video diffusion models for high-fidelity video generation with arbitrary lengths.
+\newblock \emph{arXiv preprint arXiv:2211.13221}, 2022.
+
+\bibitem[He et~al.(2024{\natexlab{b}})He, Murata, Lai, Takida, Uesaka, Kim, Liao, Mitsufuji, Kolter, Salakhutdinov, et~al.]{he2023manifold}
+Yutong He, Naoki Murata, Chieh-Hsin Lai, Yuhta Takida, Toshimitsu Uesaka, Dongjun Kim, Wei-Hsiang Liao, Yuki Mitsufuji, J~Zico Kolter, Ruslan Salakhutdinov, et~al.
+\newblock Manifold preserving guided diffusion.
+\newblock In \emph{ICLR}, 2024{\natexlab{b}}.
+
+\bibitem[Hedlin et~al.(2024)Hedlin, Sharma, Mahajan, Isack, Kar, Tagliasacchi, and Yi]{hedlin2024unsupervised}
+Eric Hedlin, Gopal Sharma, Shweta Mahajan, Hossam Isack, Abhishek Kar, Andrea Tagliasacchi, and Kwang~Moo Yi.
+\newblock Unsupervised semantic correspondence using stable diffusion.
+\newblock \emph{NeurIPS}, 2024.
+
+\bibitem[Hertz et~al.(2023)Hertz, Mokady, Tenenbaum, Aberman, Pritch, and Cohen-Or]{PromptToPrompt}
+Amir Hertz, Ron Mokady, Jay Tenenbaum, Kfir Aberman, Yael Pritch, and Daniel Cohen-Or.
+\newblock Prompt-to-prompt image editing with cross attention control.
+\newblock In \emph{ICLR}, 2023.
+
+\bibitem[Heusel et~al.(2017)Heusel, Ramsauer, Unterthiner, Nessler, and Hochreiter]{FID}
+Martin Heusel, Hubert Ramsauer, Thomas Unterthiner, Bernhard Nessler, and Sepp Hochreiter.
+\newblock Gans trained by a two time-scale update rule converge to a local nash equilibrium.
+\newblock \emph{NeurIPS}, 2017.
+
+\bibitem[Ho et~al.(2020)Ho, Jain, and Abbeel]{DDPM}
+Jonathan Ho, Ajay Jain, and Pieter Abbeel.
+\newblock Denoising diffusion probabilistic models.
+\newblock In \emph{NeurIPS}, 2020.
+
+\bibitem[Ho et~al.(2022{\natexlab{a}})Ho, Chan, Saharia, Whang, Gao, Gritsenko, Kingma, Poole, Norouzi, Fleet, et~al.]{ImagenVideo}
+Jonathan Ho, William Chan, Chitwan Saharia, Jay Whang, Ruiqi Gao, Alexey Gritsenko, Diederik~P Kingma, Ben Poole, Mohammad Norouzi, David~J Fleet, et~al.
+\newblock Imagen video: High definition video generation with diffusion models.
+\newblock \emph{arXiv preprint arXiv:2210.02303}, 2022{\natexlab{a}}.
+
+\bibitem[Ho et~al.(2022{\natexlab{b}})Ho, Salimans, Gritsenko, Chan, Norouzi, and Fleet]{VideoDiffusionModels}
+Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, and David~J Fleet.
+\newblock Video diffusion models.
+\newblock \emph{NeurIPS}, 2022{\natexlab{b}}.
+
+\bibitem[Hou et~al.(2024{\natexlab{a}})Hou, Wei, Zeng, and Chen]{hou2024training}
+Chen Hou, Guoqiang Wei, Yan Zeng, and Zhibo Chen.
+\newblock Training-free camera control for video generation.
+\newblock \emph{arXiv preprint arXiv:2406.10126}, 2024{\natexlab{a}}.
+
+\bibitem[Hou et~al.(2024{\natexlab{b}})Hou, Liu, Zhang, Liu, Liu, and You]{hou2024easydrag}
+Xingzhong Hou, Boxiao Liu, Yi~Zhang, Jihao Liu, Yu~Liu, and Haihang You.
+\newblock Easydrag: Efficient point-based manipulation on diffusion models.
+\newblock In \emph{CVPR}, 2024{\natexlab{b}}.
+
+\bibitem[Hu et~al.(2022)Hu, Shen, Wallis, Allen-Zhu, Li, Wang, Wang, and Chen]{LoRA}
+Edward~J Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu~Wang, and Weizhu Chen.
+\newblock {LoRA}: Low-rank adaptation of large language models.
+\newblock In \emph{ICLR}, 2022.
+
+\bibitem[Hu(2024)]{AnimateAnyone}
+Li~Hu.
+\newblock {Animate Anyone}: Consistent and controllable image-to-video synthesis for character animation.
+\newblock In \emph{CVPR}, 2024.
+
+\bibitem[Hu et~al.(2024)Hu, Zhang, Yi, Wang, Huang, Weng, Wang, and Ma]{MotionMaster}
+Teng Hu, Jiangning Zhang, Ran Yi, Yating Wang, Hongrui Huang, Jieyu Weng, Yabiao Wang, and Lizhuang Ma.
+\newblock Motionmaster: Training-free camera motion transfer for video generation.
+\newblock \emph{arXiv preprint arXiv:2404.15789}, 2024.
+
+\bibitem[Jain et~al.(2024)Jain, Nasery, Vineet, and Behl]{jain2024peekaboo}
+Yash Jain, Anshul Nasery, Vibhav Vineet, and Harkirat Behl.
+\newblock Peekaboo: Interactive video generation via masked-diffusion.
+\newblock In \emph{CVPR}, 2024.
+
+\bibitem[Karaev et~al.(2024)Karaev, Rocco, Graham, Neverova, Vedaldi, and Rupprecht]{cotracker}
+Nikita Karaev, Ignacio Rocco, Benjamin Graham, Natalia Neverova, Andrea Vedaldi, and Christian Rupprecht.
+\newblock Cotracker: It is better to track together.
+\newblock In \emph{ECCV}, 2024.
+
+\bibitem[Karras et~al.(2022)Karras, Aittala, Aila, and Laine]{karras2022elucidating}
+Tero Karras, Miika Aittala, Timo Aila, and Samuli Laine.
+\newblock Elucidating the design space of diffusion-based generative models.
+\newblock \emph{NeurIPS}, 2022.
+
+\bibitem[Khachatryan et~al.(2023)Khachatryan, Movsisyan, Tadevosyan, Henschel, Wang, Navasardyan, and Shi]{Text2VideoZero}
+Levon Khachatryan, Andranik Movsisyan, Vahram Tadevosyan, Roberto Henschel, Zhangyang Wang, Shant Navasardyan, and Humphrey Shi.
+\newblock Text2video-zero: Text-to-image diffusion models are zero-shot video generators.
+\newblock In \emph{CVPR}, 2023.
+
+\bibitem[Kingma \& Welling(2013)Kingma and Welling]{VAE}
+Diederik~P Kingma and Max Welling.
+\newblock Auto-encoding variational bayes.
+\newblock \emph{arXiv preprint arXiv:1312.6114}, 2013.
+
+\bibitem[Kuang et~al.(2024)Kuang, Cai, He, Xu, Li, Guibas, and Wetzstein]{kuang2024collaborative}
+Zhengfei Kuang, Shengqu Cai, Hao He, Yinghao Xu, Hongsheng Li, Leonidas Guibas, and Gordon Wetzstein.
+\newblock Collaborative video diffusion: Consistent multi-video generation with camera control.
+\newblock \emph{arXiv preprint arXiv:2405.17414}, 2024.
+
+\bibitem[Li et~al.(2024)Li, Wang, Zhang, Wang, Yuan, Xie, Zou, and Shan]{li2024image}
+Yaowei Li, Xintao Wang, Zhaoyang Zhang, Zhouxia Wang, Ziyang Yuan, Liangbin Xie, Yuexian Zou, and Ying Shan.
+\newblock Image conductor: Precision control for interactive video synthesis.
+\newblock \emph{arXiv preprint arXiv:2406.15339}, 2024.
+
+\bibitem[Li et~al.(2023)Li, Liu, Wu, Mu, Yang, Gao, Li, and Lee]{GLIGEN}
+Yuheng Li, Haotian Liu, Qingyang Wu, Fangzhou Mu, Jianwei Yang, Jianfeng Gao, Chunyuan Li, and Yong~Jae Lee.
+\newblock {GLIGEN}: Open-set grounded text-to-image generation.
+\newblock In \emph{CVPR}, 2023.
+
+\bibitem[Ling et~al.(2023)Ling, Chen, Zhang, Chen, and Jin]{ling2023freedrag}
+Pengyang Ling, Lin Chen, Pan Zhang, Huaian Chen, and Yi~Jin.
+\newblock Freedrag: Point tracking is not you need for interactive point-based image editing.
+\newblock \emph{arXiv preprint arXiv:2307.04684}, 2023.
+
+\bibitem[Liu et~al.(2024)Liu, Xu, Yang, Zeng, and He]{liu2024drag}
+Haofeng Liu, Chenshu Xu, Yifei Yang, Lihua Zeng, and Shengfeng He.
+\newblock Drag your noise: Interactive point-based editing via diffusion semantic propagation.
+\newblock In \emph{CVPR}, 2024.
+
+\bibitem[Loshchilov \& Hutter(2019)Loshchilov and Hutter]{adamw}
+Ilya Loshchilov and Frank Hutter.
+\newblock Decoupled weight decay regularization.
+\newblock In \emph{ICLR}, 2019.
+
+\bibitem[Luo et~al.(2023)Luo, Dunlap, Park, Holynski, and Darrell]{luo2023dhf}
+Grace Luo, Lisa Dunlap, Dong~Huk Park, Aleksander Holynski, and Trevor Darrell.
+\newblock Diffusion hyperfeatures: Searching through time and space for semantic correspondence.
+\newblock In \emph{NeurIPS}, 2023.
+
+\bibitem[Ma et~al.(2023)Ma, Lewis, and Kleijn]{ma2023trailblazer}
+Wan-Duo~Kurt Ma, John~P Lewis, and W~Bastiaan Kleijn.
+\newblock Trailblazer: Trajectory control for diffusion-based video generation.
+\newblock \emph{arXiv preprint arXiv:2401.00896}, 2023.
+
+\bibitem[Materzynska et~al.(2023)Materzynska, Sivic, Shechtman, Torralba, Zhang, and Russell]{materzynska2023customizing}
+Joanna Materzynska, Josef Sivic, Eli Shechtman, Antonio Torralba, Richard Zhang, and Bryan Russell.
+\newblock Customizing motion in text-to-video diffusion models.
+\newblock \emph{arXiv preprint arXiv:2312.04966}, 2023.
+
+\bibitem[Miao et~al.(2022)Miao, Wang, Wu, Li, Zhang, Wei, and Yang]{vipseg}
+Jiaxu Miao, Xiaohan Wang, Yu~Wu, Wei Li, Xu~Zhang, Yunchao Wei, and Yi~Yang.
+\newblock Large-scale video panoptic segmentation in the wild: A benchmark.
+\newblock In \emph{CVPR}, 2022.
+
+\bibitem[Mou et~al.(2024{\natexlab{a}})Mou, Wang, Song, Shan, and Zhang]{mou2023dragondiffusion}
+Chong Mou, Xintao Wang, Jiechong Song, Ying Shan, and Jian Zhang.
+\newblock Dragondiffusion: Enabling drag-style manipulation on diffusion models.
+\newblock In \emph{ICLR}, 2024{\natexlab{a}}.
+
+\bibitem[Mou et~al.(2024{\natexlab{b}})Mou, Wang, Song, Shan, and Zhang]{mou2024diffeditor}
+Chong Mou, Xintao Wang, Jiechong Song, Ying Shan, and Jian Zhang.
+\newblock Diffeditor: Boosting accuracy and flexibility on diffusion-based image editing.
+\newblock In \emph{CVPR}, 2024{\natexlab{b}}.
+
+\bibitem[Namekata et~al.(2024)Namekata, Sabour, Fidler, and Kim]{namekata2024emerdiff}
+Koichi Namekata, Amirmojtaba Sabour, Sanja Fidler, and Seung~Wook Kim.
+\newblock Emerdiff: Emerging pixel-level semantic knowledge in diffusion models.
+\newblock In \emph{ICLR}, 2024.
+
+\bibitem[Pan et~al.(2023)Pan, Tewari, Leimk{\"u}hler, Liu, Meka, and Theobalt]{pan2023drag}
+Xingang Pan, Ayush Tewari, Thomas Leimk{\"u}hler, Lingjie Liu, Abhimitra Meka, and Christian Theobalt.
+\newblock Drag your gan: Interactive point-based manipulation on the generative image manifold.
+\newblock \emph{ACM TOG}, 2023.
+
+\bibitem[Qiu et~al.(2024)Qiu, Chen, Wang, He, Xia, and Liu]{qiu2024freetraj}
+Haonan Qiu, Zhaoxi Chen, Zhouxia Wang, Yingqing He, Menghan Xia, and Ziwei Liu.
+\newblock Freetraj: Tuning-free trajectory control in video diffusion models.
+\newblock \emph{arXiv preprint arXiv:2406.16863}, 2024.
+
+\bibitem[Radford et~al.(2021)Radford, Kim, Hallacy, Ramesh, Goh, Agarwal, Sastry, Askell, Mishkin, Clark, et~al.]{CLIP}
+Alec Radford, Jong~Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et~al.
+\newblock Learning transferable visual models from natural language supervision.
+\newblock In \emph{ICML}, 2021.
+
+\bibitem[Rombach et~al.(2022)Rombach, Blattmann, Lorenz, Esser, and Ommer]{LatentDiffusion}
+Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Bj{\"o}rn Ommer.
+\newblock High-resolution image synthesis with latent diffusion models.
+\newblock In \emph{CVPR}, 2022.
+
+\bibitem[Ronneberger et~al.(2015)Ronneberger, Fischer, and Brox]{U-net}
+Olaf Ronneberger, Philipp Fischer, and Thomas Brox.
+\newblock U-net: Convolutional networks for biomedical image segmentation.
+\newblock In \emph{MICCAI}, 2015.
+
+\bibitem[Shi et~al.(2024)Shi, Xue, Liew, Pan, Yan, Zhang, Tan, and Bai]{shi2024dragdiffusion}
+Yujun Shi, Chuhui Xue, Jun~Hao Liew, Jiachun Pan, Hanshu Yan, Wenqing Zhang, Vincent~YF Tan, and Song Bai.
+\newblock Dragdiffusion: Harnessing diffusion models for interactive point-based image editing.
+\newblock In \emph{CVPR}, 2024.
+
+\bibitem[Singer et~al.(2023)Singer, Polyak, Hayes, Yin, An, Zhang, Hu, Yang, Ashual, Gafni, et~al.]{Make-A-Video}
+Uriel Singer, Adam Polyak, Thomas Hayes, Xi~Yin, Jie An, Songyang Zhang, Qiyuan Hu, Harry Yang, Oron Ashual, Oran Gafni, et~al.
+\newblock Make-a-video: Text-to-video generation without text-video data.
+\newblock In \emph{ICLR}, 2023.
+
+\bibitem[Sohl-Dickstein et~al.(2015)Sohl-Dickstein, Weiss, Maheswaranathan, and Ganguli]{DiffusionModels}
+Jascha Sohl-Dickstein, Eric Weiss, Niru Maheswaranathan, and Surya Ganguli.
+\newblock Deep unsupervised learning using nonequilibrium thermodynamics.
+\newblock In \emph{ICML}, 2015.
+
+\bibitem[Tang et~al.(2023)Tang, Jia, Wang, Phoo, and Hariharan]{tang2023emergent}
+Luming Tang, Menglin Jia, Qianqian Wang, Cheng~Perng Phoo, and Bharath Hariharan.
+\newblock Emergent correspondence from image diffusion.
+\newblock \emph{NeurIPS}, 2023.
+
+\bibitem[Tumanyan et~al.(2023)Tumanyan, Geyer, Bagon, and Dekel]{tumanyan2023plug}
+Narek Tumanyan, Michal Geyer, Shai Bagon, and Tali Dekel.
+\newblock Plug-and-play diffusion features for text-driven image-to-image translation.
+\newblock In \emph{CVPR}, 2023.
+
+\bibitem[Unterthiner et~al.(2018)Unterthiner, van Steenkiste, Kurach, Marinier, Michalski, and Gelly]{FVD}
+Thomas Unterthiner, Sjoerd van Steenkiste, Karol Kurach, Raphael Marinier, Marcin Michalski, and Sylvain Gelly.
+\newblock Towards accurate generative models of video: A new metric \& challenges.
+\newblock \emph{arXiv preprint arXiv:1812.01717}, 2018.
+
+\bibitem[Vaswani et~al.(2017)Vaswani, Shazeer, Parmar, Uszkoreit, Jones, Gomez, Kaiser, and Polosukhin]{Transformer}
+Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan~N Gomez, {\L}ukasz Kaiser, and Illia Polosukhin.
+\newblock Attention is all you need.
+\newblock \emph{NeurIPS}, 2017.
+
+\bibitem[Wang \& Vastola(2023)Wang and Vastola]{DMProcessAnalyze}
+Binxu Wang and John~J Vastola.
+\newblock Diffusion models generate images like painters: an analytical theory of outline first, details later.
+\newblock \emph{arXiv preprint arXiv:2303.02490}, 2023.
+
+\bibitem[Wang et~al.(2024{\natexlab{a}})Wang, Zhang, Zou, Zeng, Wei, Yuan, and Li]{wang2024boximator}
+Jiawei Wang, Yuchen Zhang, Jiaxin Zou, Yan Zeng, Guoqiang Wei, Liping Yuan, and Hang Li.
+\newblock Boximator: Generating rich and controllable motions for video synthesis.
+\newblock \emph{arXiv preprint arXiv:2402.01566}, 2024{\natexlab{a}}.
+
+\bibitem[Wang et~al.(2023)Wang, Yuan, Zhang, Chen, Wang, Zhang, Shen, Zhao, and Zhou]{wang2023videocomposer}
+Xiang Wang, Hangjie Yuan, Shiwei Zhang, Dayou Chen, Jiuniu Wang, Yingya Zhang, Yujun Shen, Deli Zhao, and Jingren Zhou.
+\newblock Videocomposer: Compositional video synthesis with motion controllability.
+\newblock \emph{NeurIPS}, 2023.
+
+\bibitem[Wang et~al.(2024{\natexlab{b}})Wang, Darrell, Rambhatla, Girdhar, and Misra]{InstanceDiffusion}
+Xudong Wang, Trevor Darrell, Sai~Saketh Rambhatla, Rohit Girdhar, and Ishan Misra.
+\newblock {InstanceDiffusion}: Instance-level control for image generation.
+\newblock In \emph{CVPR}, 2024{\natexlab{b}}.
+
+\bibitem[Wang et~al.(2024{\natexlab{c}})Wang, Yuan, Wang, Li, Chen, Xia, Luo, and Shan]{MotionCtrl}
+Zhouxia Wang, Ziyang Yuan, Xintao Wang, Yaowei Li, Tianshui Chen, Menghan Xia, Ping Luo, and Ying Shan.
+\newblock Motionctrl: A unified and flexible motion controller for video generation.
+\newblock In \emph{ACM SIGGRAPH 2024 Conference Proceedings}, 2024{\natexlab{c}}.
+
+\bibitem[Wu et~al.(2023)Wu, Ge, Wang, Lei, Gu, Shi, Hsu, Shan, Qie, and Shou]{Tune-a-video}
+Jay~Zhangjie Wu, Yixiao Ge, Xintao Wang, Stan~Weixian Lei, Yuchao Gu, Yufei Shi, Wynne Hsu, Ying Shan, Xiaohu Qie, and Mike~Zheng Shou.
+\newblock Tune-a-video: One-shot tuning of image diffusion models for text-to-video generation.
+\newblock In \emph{ICCV}, 2023.
+
+\bibitem[Wu et~al.(2024{\natexlab{a}})Wu, Huang, Ji, Li, Cai, Kuang, Liu, Sun, and Ji]{wu2024tradiffusion}
+Mingrui Wu, Oucheng Huang, Jiayi Ji, Jiale Li, Xinyue Cai, Huafeng Kuang, Jianzhuang Liu, Xiaoshuai Sun, and Rongrong Ji.
+\newblock Tradiffusion: Trajectory-based training-free image generation, 2024{\natexlab{a}}.
+
+\bibitem[Wu et~al.(2024{\natexlab{b}})Wu, Si, Jiang, Huang, and Liu]{wu2023freeinit}
+Tianxing Wu, Chenyang Si, Yuming Jiang, Ziqi Huang, and Ziwei Liu.
+\newblock Freeinit: Bridging initialization gap in video diffusion models.
+\newblock In \emph{ECCV}, 2024{\natexlab{b}}.
+
+\bibitem[Wu et~al.(2024{\natexlab{c}})Wu, Li, Gu, Zhao, He, Zhang, Shou, Li, Gao, and Zhang]{wu2024draganything}
+Wejia Wu, Zhuang Li, Yuchao Gu, Rui Zhao, Yefei He, David~Junhao Zhang, Mike~Zheng Shou, Yan Li, Tingting Gao, and Di~Zhang.
+\newblock Draganything: Motion control for anything using entity representation.
+\newblock In \emph{ECCV}, 2024{\natexlab{c}}.
+
+\bibitem[Xiao et~al.(2024{\natexlab{a}})Xiao, Zhou, Yang, and Pan]{MOFT}
+Zeqi Xiao, Yifan Zhou, Shuai Yang, and Xingang Pan.
+\newblock Video diffusion models are training-free motion interpreter and controller.
+\newblock \emph{arXiv preprint arXiv:2405.14864}, 2024{\natexlab{a}}.
+
+\bibitem[Xiao et~al.(2024{\natexlab{b}})Xiao, Zhou, Yang, and Pan]{xiao2024video}
+Zeqi Xiao, Yifan Zhou, Shuai Yang, and Xingang Pan.
+\newblock Video diffusion models are training-free motion interpreter and controller.
+\newblock \emph{arXiv preprint arXiv:2405.14864}, 2024{\natexlab{b}}.
+
+\bibitem[Xing et~al.(2024)Xing, Xia, Zhang, Chen, Wang, Wong, and Shan]{DynamiCrafter}
+Jinbo Xing, Menghan Xia, Yong Zhang, Haoxin Chen, Xintao Wang, Tien-Tsin Wong, and Ying Shan.
+\newblock {DynamiCrafter}: Animating open-domain images with video diffusion priors.
+\newblock In \emph{ECCV}, 2024.
+
+\bibitem[Xu et~al.(2024{\natexlab{a}})Xu, Nie, Liu, Liu, Kautz, Wang, and Vahdat]{xu2024camco}
+Dejia Xu, Weili Nie, Chao Liu, Sifei Liu, Jan Kautz, Zhangyang Wang, and Arash Vahdat.
+\newblock Camco: Camera-controllable 3d-consistent image-to-video generation.
+\newblock \emph{arXiv preprint arXiv:2406.02509}, 2024{\natexlab{a}}.
+
+\bibitem[Xu et~al.(2024{\natexlab{b}})Xu, Zhang, Liew, Yan, Liu, Zhang, Feng, and Shou]{MagicAnimate}
+Zhongcong Xu, Jianfeng Zhang, Jun~Hao Liew, Hanshu Yan, Jia-Wei Liu, Chenxu Zhang, Jiashi Feng, and Mike~Zheng Shou.
+\newblock {MagicAnimate}: Temporally consistent human image animation using diffusion model.
+\newblock In \emph{CVPR}, 2024{\natexlab{b}}.
+
+\bibitem[Yang et~al.(2024)Yang, Hou, Huang, Ma, Wan, Zhang, Chen, and Liao]{DirectAVideo}
+Shiyuan Yang, Liang Hou, Haibin Huang, Chongyang Ma, Pengfei Wan, Di~Zhang, Xiaodong Chen, and Jing Liao.
+\newblock Direct-a-video: Customized video generation with user-directed camera movement and object motion.
+\newblock In \emph{ACM SIGGRAPH 2024 Conference Proceedings}, 2024.
+
+\bibitem[Ye et~al.(2023)Ye, Zhang, Liu, Han, and Yang]{ye2023ip}
+Hu~Ye, Jun Zhang, Sibo Liu, Xiao Han, and Wei Yang.
+\newblock Ip-adapter: Text compatible image prompt adapter for text-to-image diffusion models.
+\newblock \emph{arXiv preprint arXiv:2308.06721}, 2023.
+
+\bibitem[Yin et~al.(2023)Yin, Wu, Liang, Shi, Li, Ming, and Duan]{yin2023dragnuwa}
+Shengming Yin, Chenfei Wu, Jian Liang, Jie Shi, Houqiang Li, Gong Ming, and Nan Duan.
+\newblock Dragnuwa: Fine-grained control in video generation by integrating text, image, and trajectory.
+\newblock \emph{arXiv preprint arXiv:2308.08089}, 2023.
+
+\bibitem[Yu et~al.(2024)Yu, Fang, Zheng, Sigurdsson, Ordonez, Piramuthu, and Bansal]{Img2VidAnim-Zero}
+Shoubin Yu, Jacob~Zhiyuan Fang, Jian Zheng, Gunnar~A Sigurdsson, Vicente Ordonez, Robinson Piramuthu, and Mohit Bansal.
+\newblock Zero-shot controllable image-to-video animation via motion decomposition.
+\newblock In \emph{ACM MM}, 2024.
+
+\bibitem[Zhang et~al.(2024{\natexlab{a}})Zhang, Herrmann, Hur, Polania~Cabrera, Jampani, Sun, and Yang]{zhang2023tale}
+Junyi Zhang, Charles Herrmann, Junhwa Hur, Luisa Polania~Cabrera, Varun Jampani, Deqing Sun, and Ming-Hsuan Yang.
+\newblock A tale of two features: Stable diffusion complements dino for zero-shot semantic correspondence.
+\newblock \emph{NeurIPS}, 2024{\natexlab{a}}.
+
+\bibitem[Zhang et~al.(2023)Zhang, Rao, and Agrawala]{ControlNet}
+Lvmin Zhang, Anyi Rao, and Maneesh Agrawala.
+\newblock Adding conditional control to text-to-image diffusion models.
+\newblock \emph{ICCV}, 2023.
+
+\bibitem[Zhang et~al.(2024{\natexlab{b}})Zhang, Tang, Wei, Zhang, and Cao]{zhang2024dragentity}
+Wan Zhang, Sheng Tang, Jiawei Wei, Ruize Zhang, and Juan Cao.
+\newblock Dragentity:trajectory guided video generation using entity and positional relationships.
+\newblock In \emph{ACM Multimedia 2024}, 2024{\natexlab{b}}.
+
+\bibitem[Zhang et~al.(2024{\natexlab{c}})Zhang, Liu, Chen, and Xu]{zhang2024gooddrag}
+Zewei Zhang, Huan Liu, Jun Chen, and Xiangyu Xu.
+\newblock Gooddrag: Towards good practices for drag editing with diffusion models.
+\newblock \emph{arXiv preprint arXiv:2404.07206}, 2024{\natexlab{c}}.
+
+\bibitem[Zhang et~al.(2024{\natexlab{d}})Zhang, Liao, Li, Qin, and Wang]{zhang2024tora}
+Zhenghao Zhang, Junchao Liao, Menghao Li, Long Qin, and Weizhi Wang.
+\newblock Tora: Trajectory-oriented diffusion transformer for video generation.
+\newblock \emph{arXiv preprint arXiv:2407.21705}, 2024{\natexlab{d}}.
+
+\bibitem[Zhao et~al.(2024)Zhao, Guan, Fan, Xu, Lin, Pan, and Feng]{zhao2024fastdrag}
+Xuanjia Zhao, Jian Guan, Congyi Fan, Dongli Xu, Youtian Lin, Haiwei Pan, and Pengming Feng.
+\newblock Fastdrag: Manipulate anything in one step.
+\newblock \emph{arXiv preprint arXiv:2405.15769}, 2024.
+
+\bibitem[Zhou et~al.(2024)Zhou, Wang, Nie, Lin, Yu, Yu, and Wang]{zhou2024trackgo}
+Haitao Zhou, Chuang Wang, Rui Nie, Jinxiao Lin, Dongdong Yu, Qian Yu, and Changhu Wang.
+\newblock Trackgo: A flexible and efficient method for controllable video generation.
+\newblock \emph{arXiv preprint arXiv:2408.11475}, 2024.
+
+\bibitem[Zhou et~al.(2018)Zhou, Tucker, Flynn, Fyffe, and Snavely]{RealEstate10k}
+Tinghui Zhou, Richard Tucker, John Flynn, Graham Fyffe, and Noah Snavely.
+\newblock Stereo magnification: Learning view synthesis using multiplane images.
+\newblock \emph{ACM TOG}, 2018.
+
+\end{thebibliography}

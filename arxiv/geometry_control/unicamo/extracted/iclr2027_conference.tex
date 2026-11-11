@@ -1,0 +1,966 @@
+\ifdefined\arxivbuild\else\documentclass{article}\fi % For LaTeX2e
+
+% ICLR 2027 style. This one source file builds both versions of the paper:
+%   pdflatex iclr2027_conference.tex -> anonymous ICLR submission
+%   pdflatex arxiv.tex               -> de-anonymised arXiv preprint
+\usepackage{iclr2027_conference,times}
+% \iclrfinalcopy stays off for the ICLR submission. arxiv.tex defines
+% \arxivbuild before \input-ing this file, which turns it on: that
+% de-anonymises the authors and removes the submission line-number ruler.
+\ifdefined\arxivbuild\iclrfinalcopy\fi
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsmath}
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{pifont}       % \ding{51} tick, \ding{55} cross
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+% Revision highlighting: every newly added passage is wrapped in \rev{...}
+% so it typesets in red. Redefine as \newcommand{\rev}[1]{#1} to turn the
+% colouring off for the camera-ready version.
+\newcommand{\rev}[1]{\textcolor{red}{#1}}
+% natbib is loaded by iclr2027_conference.sty itself (author-year style);
+% loading it again here (as the NeurIPS version did, with [numbers]) would
+% clash, so that line is intentionally dropped for this format.
+% added package
+\usepackage{graphicx} % for \resizebox
+\usepackage{comment}
+\usepackage{hyperref}
+\usepackage[capitalise,nameinlink]{cleveref}
+\usepackage{placeins} % for \FloatBarrier — keeps floats from drifting past sections
+
+% Loosen float-placement constraints so LaTeX can put floats near their citations
+% instead of queueing them to the end of the document.
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.05}
+\renewcommand{\floatpagefraction}{0.7}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{5}
+% Note. For the workshop paper template, both \title{} and \workshoptitle{} are required, with the former indicating the paper title shown in the title and the latter indicating the workshop title displayed in the footnote.  
+%\title{Track the Noise, Move the World: \\3D-Grounded Motion-Consistent Noise for \\Controllable Video Generation}
+%\title{3D-Grounded Motion-Consistent Noise for \\Controllable Video Generation}
+% \title{Motion-and-View-Consistent Noise for Joint Object and Camera Control in Video Diffusion Models}
+\title{UniCaMo: Unified Camera and Motion Control for Video Diffusion Models}
+
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to break the
+% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
+% authors names on the first line, and the last on the second line, try using
+% \AND instead of \And before the third author name.
+
+
+\author{%
+  \textbf{Long Vu}\thanks{Equal contribution.}\quad
+  \textbf{Tan Ngo}\footnotemark[1]\quad
+  \textbf{Animesh Karnewar}\quad
+  \textbf{Amir Habibian} \\[3pt]
+  \textbf{Binh-Son Hua}\thanks{Binh-Son Hua is affiliated with Trinity College Dublin, Ireland. Work done under consultancy capacity.}\quad
+  \textbf{Hung Bui}\quad
+  \textbf{Minh Hoai Nguyen}\quad
+  \textbf{Phong Nguyen-Ha} \\[6pt]
+  Qualcomm AI Research\thanks{Qualcomm AI Research is an initiative of Qualcomm Technologies, Inc.} \\[3pt]
+  \texttt{\{vlong, tanngo, karnewar, ahabibia,} \\
+  \texttt{hson, hungbui, minhhoai, phongnh\}@qti.qualcomm.com}
+}
+
+
+% teaser rework base on introduction
+% related work - same
+% proposed method - same
+% experiment : add 2.1 FID + FVD , exclude 2.2
+% add ablation study : gflow + wan_move_tapip3d
+% supp : comparsion wan2.1 vs wan2.2, + vbench wanmove / ours wan2.1 / ours wan2.2, +structure_noise -> org wan (quali)
+% push w, w/o sphere from supp -> main
+% ablation : Page9 - UI = (i) object-motion-only vs. camera-motion-only vs. joint control
+% ablation : (ii) removing Track-the-Noise while keeping Move-the-World, (iii) removing Move-the-World while keeping Track-the-Noise, 3 rows : (ii), (iii), full
+
+\def\authornote#1#2#3{{\textcolor{#2}{\textsl{\small#1:[*#3*]}}}}
+\newcommand{\karnewar}[1]{\authornote{Animesh}{purple}{#1}} % Animesh's comments
+\newcommand{\son}[1]{\authornote{Son}{red}{#1}}
+
+\newcommand{\phong}[1]{\authornote{Phong}{green}{#1}}
+
+\begin{document}
+
+\input{definitions}
+\maketitle
+% Blank running header for the arXiv build: the style would otherwise print
+% "Published as a conference paper at ICLR 2027", which a preprint is not.
+\ifdefined\arxivbuild\lhead{}\fi
+
+
+
+\begin{abstract}
+We present \textbf{UniCaMo}, an unified framework for joint control of camera and object motion in image-and-text-to-video diffusion models. Given a reference image, text prompt, sparse 3D object trajectories, and a 3D camera trajectory, UniCaMo constructs motion-consistent input noise that directly encodes the desired motion. Our 3D-grounded noise construction combines reference-derived noise propagation with a spherical Gaussian noise representation for newly revealed regions, providing a simple and effective motion prior without requiring reconstruction of unseen scene geometry. UniCaMo requires no architectural modifications or dedicated control modules and can be adapted using lightweight LoRA fine-tuning with low training data volume. Experiments on standard controllable video generation benchmarks demonstrate state-of-the-art motion controllability and high visual quality with minimal inference overhead. \ifdefined\arxivbuild\textbf{Qualitative videos are available on our project page: \url{https://phongnhhn.info/Unicamo/}.}\else\textbf{Qualitative videos are presented on the HTML webpage provided in the submitted supplementary zip files.}\fi
+
+%Modern image-and-text-to-video diffusion models can synthesize highly realistic videos by iteratively denoising an initial Gaussian noise tensor conditioned on reference image and text inputs. However, existing approaches still lack precise and unified controllability over both object motion in complex 3D cases and camera motion within a single generation process. We present \textbf{UniCaMo}, a unified framework that enables simultaneous control of object trajectories and camera viewpoints by directly constructing the input noise of the diffusion model. Specifically, UniCaMo builds a shared \emph{3D-grounded motion-consistent noise space} across latent video frames. Sparse 3D point tracks are used to warp the Gaussian noise of the reference frame along desired object trajectories, while a virtual spherical noise representation provides globally consistent noise values for newly revealed scene regions under camera motion. By combining local track-guided noise warping with global sphere-based noise sampling, UniCaMo maintains geometric and temporal consistency under both object movement and viewpoint changes. Because UniCaMo modifies only the input noise, it requires no auxiliary adapters, control branches, or architectural changes to the underlying video diffusion model. With lightweight LoRA fine-tuning on large pretrained video diffusion models, including Wan 2.1 (14B), UniCaMo achieves state-of-the-art results in both video quality and motion controllability on standard controllable video generation benchmarks. \textbf{Qualitative videos are presented on the HTML webpage provided in the supplementary materials.}
+\end{abstract}
+
+
+
+\section{Introduction}
+
+
+
+Controllable video generation is important for applications ranging from visual content creation to robotics and embodied AI~\citep{wang2026robovip,jang2025dreamgen}, and has received increasing attention from the research community. Existing approaches generally start from a pretrained image-and-text-to-video diffusion model and finetune it to introduce controllability, broadly following two directions. One line of work adds adaptation or control modules that inject motion guidance into the generation process~\citep{chu2025wan,he2024cameractrl,bai2025recammaster,li2025magicmotion}. Motion constraints are typically injected late in the generation pipeline, when visual content has already begun to emerge, leaving limited flexibility to resolve motion ambiguity in a geometrically coherent manner while maintaining realism and temporal consistency. These methods also augment already large video diffusion models with additional architectural components, increasing model complexity and inference cost. An appealing alternative is to impose motion at the very beginning of generation by exploiting the input noise. Video diffusion models generate videos by progressively denoising an initial sequence of Gaussian noise maps; rather than modifying the model architecture, the desired motion can therefore be encoded directly into these input noise maps~\citep{burgert2025go,chang2025warped}.
+
+Existing input-noise-based methods, however, typically rely on 2D optical flow guidance and address object and camera motion separately. These limitations are closely related: the apparent motion of an object in a video is jointly determined by its 3D motion and the changing camera viewpoint, making it inherently ambiguous~\footnote{The HTML page provides a visualization of motion-noise between existing 2D and our 3D-aware approaches.} to specify and control the two independently in 2D image space. Moreover, complex motions—such as one person moving around another (Fig.~\ref{fig:teaser2})—are difficult to express without explicit depth and viewpoint information. These observations motivate the central question of this work: \emph{can we jointly control camera and object motions in 3D by manipulating only the input noise, without modifying the architecture of the underlying video diffusion model?}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=1.0\linewidth]{figures/teaser3.pdf}
+    
+    \caption{This teaser demonstrates a man walking and dancing around a woman while the camera pans to the right. UniCaMo jointly controls both object and camera motion through a 3D-grounded noise construction, enabling accurate occlusion handling and consistent appearance in unseen regions across frames, an effect that previous work with 2D cues~\citep{chu2025wan} cannot achieve.}
+    \label{fig:teaser2}
+    %\vspace{-0.8cm}
+\end{figure}
+
+%Video is a highly expressive visual medium, and precise control over generated content enables significant practical value. Beyond storytelling, controllable video generation is crucial for robotics and embodied AI~\citep{wang2026robovip,jang2025dreamgen}, enabling controllable data synthesis during training and predictive imagination at inference time. Meanwhile, state-of-the-art video generation models are becoming increasingly large, making the addition of extra parameters particularly costly in terms of inference efficiency.Motivated by this, we ask: \emph{can we build a video generation framework that simultaneously and precisely controls object and camera motion in 3D space without external adapters?}
+
+%Controllable video generation has gained increasing attention alongside advances in large-scale video diffusion models~\citep{wanvideo,lightx2v,cogvideo,cogvideox}. Recent works achieve strong control via point tracks, optical flow, camera trajectories, or auxiliary networks~\citep{chu2025wan,he2024cameractrl,bai2025recammaster,burgert2025go,chang2025warped,li2025magicmotion}. However, most methods treat object and camera motion separately—either animating objects from a fixed viewpoint or controlling camera motion with unconstrained scene dynamics. When both are specified, this separation often leads to motion ambiguity and entanglement artifacts. Since object and camera motion are inherently coupled, independent control limits expressiveness. In this work, we explicitly tackle joint object-and-camera motion control, enabling a key capability for modern image- and text-to-video frameworks.
+
+% To answer this question, we propose \textbf{UniCaMo}, a unified framework that achieves joint 3D object and camera motion control by constructing motion-consistent input noise for an image-and-text-to-video diffusion model. Given a reference image, we lift it into a 3D point cloud and allow users to specify sparse 3D point tracks for foreground objects together with a desired 3D camera trajectory. We then associate the reference image with Gaussian noise and propagate this noise in 3D according to the specified motions: foreground noise follows both object and camera motion, while background noise follows camera motion alone. However, object and camera motion may reveal regions that are not visible in the reference image and therefore have no corresponding noise values. To provide consistent noise for these regions, we surround the reference point cloud with a spherical Gaussian noise representation that provides persistent noise values across viewpoints. Combining reference-derived noise propagation with spherical noise sampling yields a complete sequence of 2D Gaussian noise maps whose cross-frame correspondences encode the desired object and camera motions. These noise maps directly initialize the video diffusion model, enabling joint motion control without introducing additional control modules or modifying the underlying model architecture.
+
+% Importantly, the constructed noise represents only one plausible realization consistent with the requested motion; it is not intended to reconstruct the true geometry of regions unseen in the reference image. Recovering such geometry from a single image is fundamentally ill-posed and, for our purpose, unnecessary. The spherical representation instead provides a simple mechanism for maintaining consistent noise correspondences across viewpoints, serving as a motion prior rather than a geometric constraint on the generated scene. The final video is jointly determined by this structured noise, the reference image, the text prompt, and the rich visual and motion priors learned by the video diffusion model. To teach the model to exploit the structured noise, we fine-tune a pretrained Wan2.1-I2V-14B model~\citep{wanvideo} using training videos whose depth, camera poses, foreground masks, and 3D point tracks are automatically extracted using off-the-shelf models. UniCaMo therefore requires no auxiliary control modules at inference time and introduces only approximately 0.2,s of noise-construction overhead per sample.
+
+To answer this question, we propose UniCaMo, a \underline{un}ified framework for joint \underline{ca}mera and object \underline{mo}tion control through view-and-motion-consistent input noise. UniCaMo lifts the reference image into 3D, where users specify the desired camera motion together with sparse 3D object trajectories. We construct the input noise according to these motions, using reference-derived noise where geometric correspondences are available and a spherical Gaussian noise representation to provide persistent noise for regions newly revealed by camera or object motion. Importantly, this construction need not recover the true geometry of unseen regions; it provides a plausible and geometrically consistent motion prior, while the pretrained video diffusion model supplies the visual and motion priors needed to synthesize realistic content. The resulting sequence of 2D noise maps directly initializes the video diffusion model, enabling joint 3D motion control without additional control modules or architectural modifications. Because the desired 3D motion is already explicitly encoded in the input noise, the model does not need to learn the motion-control mapping entirely from data, allowing effective adaptation with lightweight LoRA fine-tuning and a relatively small amount of computation for training.
+
+Overall, UniCaMo offers three key advantages over existing controllable video generation approaches: \textbf{(1)} \emph{unified 3D control with lightweight adaptation}: UniCaMo jointly controls object and camera motion directly in 3D, avoiding the ambiguity of 2D motion specification and separate treatment of the two motions, requiring only lightweight LoRA adaptation; \textbf{(2)} \emph{simple and effective motion representation}: its 3D-grounded noise construction provides a plausible and geometrically consistent motion prior without requiring explicit reconstruction of unseen scene geometry; and \textbf{(3)} \emph{state-of-the-art performance}: UniCaMo achieves superior controllability and video quality over the evaluated baselines.
+
+%\mhoai{WIP}
+
+%Having established the need for joint motion control, we examine how existing methods specify motion. Prior work~\citep{chu2025wan,li2025magicmotion,wang2024motionctrl} typically relies on sparse 2D point tracks, allowing users to drag image-plane points to indicate object or camera motion. While intuitive, this approach has two key limitations. First, 2D trajectories provide an incomplete and ambiguous description of underlying 3D dynamics: the same image-space motion can arise from multiple combinations of object motion and camera movement, and many motions—such as one person moving around another (Fig.~\ref{fig:teaser2})—are difficult to express without explicit depth or viewpoint information. Second, motion constraints are usually injected late in the generation pipeline, when visual content has already emerged. This leaves limited flexibility for resolving motion ambiguity in a geometrically coherent way while maintaining realism and temporal consistency. Together, these issues often lead to imprecise, entangled, or geometrically inconsistent motion control.
+
+% This observation motivates a different perspective: instead of injecting ambiguous motion guidance near the output, can we impose motion constraints directly at the input? Modern image-and-text-to-video diffusion models generate videos by iteratively denoising an initial Gaussian noise tensor conditioned on a reference image~\citep{wanvideo}. This suggests a reformulation of controllable video generation as the problem of constructing an input noise tensor that already encodes the desired scene dynamics. Rather than controlling the generation process itself, we control its input. Our approach is thus related to recent noise-warping methods~\citep{chang2025warped,burgert2025go}, which achieve strong object motion control by warping object-associated noise across frames. However, extending these methods to joint object-and-camera motion is fundamentally challenging. Under a static camera, object motion creates small, localized voids that diffusion models can often infer and inpaint using surrounding context. In contrast, camera motion exposes large unseen regions with no corresponding noise from the reference view. As the viewpoint diverges, these missing regions grow, making noise warping from a single reference-frame fundamentally insufficient for preserving temporal consistency and geometric coherence.
+
+% To address these challenges, we propose a motion-consistent noise representation that remains geometrically coherent under both object and camera motion. Instead of defining noise only on the reference image plane, we lift it into a shared spherical 3D representation parameterized by Gaussian noise, providing consistent noise values for all viewing directions. As the camera moves, each frame samples from this shared sphere based on its viewpoint, enabling temporally coherent synthesis of newly revealed regions. Within this space, user-specified point tracks locally warp noise along object trajectories, ensuring consistent object motion under changing viewpoints. This 3D formulation allows users to specify both object and camera motion directly in 3D, avoiding image-space ambiguity. Combining sphere-based noise sampling with track-guided warping, our method—UniCaMo—constructs a unified 3D-grounded motion-consistent noise space that enables precise joint control of object and camera motion while modifying only the input noise. UniCaMo add no extra parameters, supports lightweight LoRA fine-tuning of pretrained models such as Wan 2.1 (14B)~\citep{wanvideo}, adds only 0.2s per sample, and achieves state-of-the-art video quality and controllability~\citep{chu2025wan}.
+
+%In summary, our main contributions are: \textbf{(1)} we propose {UniCaMo}, a novel motion-consistent noise representation that combines 3D point tracks with sphere-projected Gaussian noise to jointly encode object and camera motion in a unified 3D space; \textbf{(2)} UniCaMo requires no auxiliary adapters or trainable control modules, introducing only negligible warping overhead (approximately 0.2s per sample) while preserving the runtime efficiency of the base diffusion architecture; and \textbf{(3)} extensive experiments on standard controllable video generation benchmarks, including MoveBench~\citep{chu2025wan}, demonstrate state-of-the-art controllability and high visual quality, particularly in scenarios involving complex coordinated object and camera motion.
+
+
+\section{Related Work}
+\label{sec:related}
+
+Video diffusion models have made remarkable progress since their early development based on 3D U-Net architectures~\citep{lumiere,svd,videocrafter1,animatediff}. Recent large-scale latent diffusion and transformer-based models~\citep{cogvideo,hunyuanvideo,wanvideo,cogvideox} achieve substantially improved visual fidelity, temporal coherence, and adherence to conditioning signals. As these models become increasingly capable, a natural next step is to provide finer control over the generated motion, particularly the motions of objects and the camera.
+
+Existing motion-controlled video generation methods differ primarily in the motion representation and how it is incorporated into the diffusion model. For object motion, masks, boxes, and keypoints provide coarse spatial guidance, whereas optical flow and point trajectories enable finer-grained control~\citep{wang2024boximator,li2025magicmotion,geng2025motion,yin2023dragnuwa,zhang2025tora}. Camera motion is commonly represented by 6DoF poses or trajectories and incorporated through dedicated conditioning mechanisms~\citep{he2024cameractrl,wang2024motionctrl,bahmani2025ac3d}. More recent methods pursue joint object and camera control using trajectory-based conditioning, geometry-aware representations, or richer 3D information~\citep{li2025magicmotion,geng2025motion,chu2025wan,zheng2026versecrafter,zhang2026symphomotion}. These approaches generally introduce motion control through additional conditioning signals or modifications within the denoising process.
+
+UniCaMo instead encodes object and camera motion directly into the input noise, connecting our work to structured noise initialization for controllable video generation. Noise-warping methods construct temporally correlated Gaussian noise by propagating noise according to motion fields. \citet{chang2025warped} highlight the importance of maintaining appropriate Gaussian noise statistics, while Go-with-the-Flow~\citep{burgert2025go} demonstrates efficient object motion control by warping input noise without an inference-time control module. Related work further shows that training with warped noise can induce useful equivariances and facilitate efficient sampling~\citep{liu2025equivdm}. These approaches, however, primarily operate with 2D motion fields or correspondences. UniCaMo extends this paradigm to joint 3D object and camera control by constructing view-and-motion-consistent noise: noise follows specified object trajectories while remaining consistent across changing viewpoints. A spherical noise representation provides persistent noise for newly revealed regions without explicitly reconstructing unseen scene geometry.
+
+
+%Diffusion-based video generation has advanced from early 3D U-Nets~\citep{lumiere,svd,videocrafter1,animatediff} to large-scale latent diffusion models with stronger spatiotemporal modeling. Transformer-based foundation video models further improve long-range coherence and fidelity via spatiotemporal attention~\citep{cogvideo,hunyuanvideo,wanvideo,cogvideox}.
+
+% Diffusion-based video generation has progressed rapidly from early 3D U-Net formulations \cite{lumiere, svd, videocrafter1, animatediff, vdm2022, imagen, moviegen} to large-scale latent video diffusion systems that leverage stronger spatiotemporal modeling and improved scalability.
+% Recent transformer-based backbones and foundation video models \cite{jin2024pyramidal, cosmosNVIDIA, cogvideo, hunyuanvideo, wanvideo, cogvideox} further improve long-range temporal coherence and visual fidelity. 
+% Notably, CogVideoX \cite{cogvideox} and HunyuanVideo \cite{hunyuanvideo} evidenced the importance of spatiotemporal attention for coherent video synthesis, and Wan \cite{wanvideo} introduces an open-source model with computationally efficient architecture supporting both text-to-video and image-to-video generation, making it attractive bases for downstream controllable generation and editing. Our work builds upon these pretrained video models and only requires structured modeling of the latent noise and network finetuning without any architectural changes, preserving the base model design and efficiency.
+
+%\noindent\textbf{Motion and camera control for video generation.} Motion-controlled I2V methods differ by motion cues and how they are injected: masks/boxes/keypoints enable coarse motion cues, while flow or trajectories provide finer guidance~\citep{wang2024boximator,li2025magicmotion,burgert2025go,geng2025motion,yin2023dragnuwa,zhang2025tora}. Among these methods, many rely on ControlNet-style adapters with higher cost, whereas Wan-Move~\citep{chu2025wan} edits conditioning features without architecture changes. 
+%
+% There are several works studying motion control for image-to-video (I2V) generation, differing mainly in (i) the \emph{motion representation} and (ii) \emph{motion injection} into a pretrained generator.
+% Early and widely used representations include sparse masks, bounding boxes or keypoints \cite{jain2024peekaboo, wang2024boximator, li2025magicmotion, zhong2024posecrafter}, which provide coarse object displacement but often lack fine-grained local control.
+% More recent methods adopt denser representations such as optical flow \cite{burgert2025go, koroglu2025onlyflow} and point trajectories \cite{geng2025motion, yin2023dragnuwa, zhang2025tora} to enable higher granularity motion guidance.
+% A common approach is to introduce additional encoders or fusion modules (e.g., ControlNet-like adapters) to integrate motion signal to the base model \cite{wang2024boximator, li2025magicmotion, geng2025motion, shi2024motion}, improving controllability at the cost of extra parameters and inference overhead.
+% In contrast, Wan-Move \cite{chu2025wan} shows that strong motion control can be achieved \emph{without} architectural changes by directly editing the image condition features along latent-space trajectories, enabling scalable fine-tuning while avoiding auxiliary motion encoders. More recent methods can jointly control camera and object motion, but they rely on additional 3D control adapters~\cite{editbytrack} or complex 3D‑primitive conditioning~\cite{zheng2026versecrafter}, which increases runtime.
+%
+%\noindent\textbf{Camera control for video generation.}Camera control in video diffusion is typically achieved by conditioning on 6DoF poses/trajectories, injected via dedicated modules~\citep{he2024cameractrl,wang2024motionctrl,bahmani2025ac3d}.
+
+% With the rapid progress of text/image-conditioned video diffusion models, incorporating camera signals for controllable viewpoint synthesis has been widely studied \cite{he2024cameractrl, wang2024motionctrl, bahmani2025ac3d, kuang2024collaborative}.
+% A common strategy is to encode 6DoF camera poses/trajectories and inject them into the diffusion backbone via dedicated camera modules, enabling generation under user-specified camera paths \cite{wang2024motionctrl, he2024cameractrl}.
+% Beyond single-video outputs, Collaborative Video Diffusion (CVD) targets multi-trajectory consistency by introducing cross-video synchronization (e.g., epipolar attention) to align corresponding content across videos rendered from different camera poses \cite{kuang2024collaborative}.
+% Recent analyses of camera control in diffusion transformers further show that careful pose-conditioning design (e.g., selective injection) can improve controllability without sacrificing visual fidelity \cite{bahmani2025ac3d}.
+% Video-to-video (V2V) re-rendering~\cite{bai2025recammaster, ren2025gen3c, bahmani2025lyra} enable reshots of a user-provided video under novel camera trajectories by leveraging strong pretrained video priors and an effective video conditioning scheme.
+% However, camera-only V2V methods typically aim to preserve the original scene/object dynamics, and are not designed for simultaneously editing object motion.
+
+%\noindent\textbf{Warped noise for controllable video generation.} A promising direction is to control diffusion by using structured initialization noise. Noise-warping methods create temporally correlated noise by warping Gaussian noise with motion fields (e.g., optical flow), injecting temporal structure while preserving per-frame spatial Gaussianity. Warped-noise priors such as HIWYN~\citep{chang2025warped} highlight the importance of this constraint, though large deformations can introduce artifacts and overhead. Go-with-the-Flow~\citep{burgert2025go} makes warped noise efficient and shows motion control can be added by changing only the noise/data pipeline, treating the diffusion model as a black box. Recent analysis further finds that training with warped noise promotes useful equivariances and can enable few-step sampling~\citep{liu2025equivdm}.
+
+% \noindent\textbf{Training-free methods.}
+% Training-free methods control video diffusion at inference by editing noise/latents, attention, or denoising schedules~\cite{camtrol,dvs,singer2025time}. Examples include CamTrol and DVS for camera/viewpoint control, and Time-to-Move for motion via region-wise schedules, but such methods often struggle with long-horizon, multi-object, or precise control~\cite{camtrol,dvs,singer2025time}.
+% Complementary to fine-tuning approaches, training-free methods steer pretrained video diffusion models by intervening directly in the sampling process---for example, by modifying noise initialization, latent trajectories, attention maps, or guidance schedules---to impose desired motion or viewpoint at inference time~\cite{camtrol,dvs,singer2025time}. For camera control, CamTrol demonstrates plug-and-play viewpoint manipulation by rearranging intermediate latents according to an explicit 3D camera motion model, without requiring camera-supervised fine-tuning~\cite{camtrol}. Relatedly, recent training-free view synthesis work formulates dynamic novel-view generation as an inverse problem and achieves camera-induced viewpoint changes by redesigning the noise or latent initialization of a pretrained video diffusion model, without weight updates or auxiliary modules~\cite{dvs}. For motion control, Time-to-Move~\cite{singer2025time} shows that strong motion control---and even camera control---can be achieved in a training-free manner through region-dependent denoising schedules guided by coarse user-provided animations (e.g., cut-and-drag or depth reprojection), offering a lightweight and backbone-agnostic alternative to trainable controllers. One limitation of training-free methods, however, is their struggle with long-horizon, multi-object, or highly precise motion control, due to their limited ability to robustly propagate detailed constraints throughout the full denoising trajectory.
+
+% \noindent\textbf{Unified control.}
+% Existing methods with joint camera and object control often rely on 3D adapters or 3D primitives, increasing runtime cost~\citep{li2025magicmotion,geng2025motion,chu2025wan,zheng2026versecrafter,zhang2026symphomotion}. 
+% Trajectory-based approaches pursue unified control by assigning background tracks to camera motion and foreground tracks to object motion, while others rely on geometry-aware adapters or richer 3D state; both typically add conditioning modules and inference cost~\citep{zhang2026symphomotion,zheng2026versecrafter}. In contrast, we target joint camera and object control through structured noise: we introduce no inference-time adapters~\citep{wang2024imageconductor,wang2024motionctrl} and avoid dense flow warping~\citep{burgert2025go}, instead combining sparse 3D tracks with sphere-projected noise to handle disocclusions while preserving per-frame Gaussianity.
+
+% ---------------------------------------------------------------
+
+\section{UniCaMo -- Joint Camera and Object Motion Control}
+\label{sec:method}
+
+This section describes UniCaMo, our unified framework for joint camera and object motion control in video diffusion through view-and-motion-consistent input noise. UniCaMo requires no architectural modifications to the underlying video diffusion model, enabling lightweight fine-tuning with modest training data while introducing minimal additional overhead at inference time. We first provide an overview of the framework, followed by the details of noise construction and model training.
+
+\subsection{Major components and overview}
+Our overall pipeline is shown in \cref{fig:overall_pipeline}, UniCaMo takes as input a reference image and a text prompt describing the desired scene and action, and outputs a generated video. In between, the framework comprises two stages: (1) an \emph{interactive interface} through which users specify the desired object and camera motions in 3D, and (2) a \emph{motion-guided generation model} that constructs motion-and-view-consistent noise from the reference image and specified motions to initialize an image-to-video diffusion model.
+
+The \emph{interactive interface} first lifts the reference 2D image into a 3D point cloud, allowing the scene to be viewed and interacted with directly in 3D. Users specify object motion using sparse 3D point tracks on objects of interest, together with a desired 3D camera trajectory. This is an important distinction from prior approaches that specify motion using 2D point tracks in the 2D image plane, which are inherently ambiguous with respect to depth and viewpoint and can be insufficient for expressing complex motions, particularly when multiple objects cross or move around one another. By operating directly in 3D, UniCaMo provides a more expressive and geometrically explicit representation for jointly specifying object and camera motion.
+
+The \emph{motion-guided generation model} builds upon a pretrained image-to-video diffusion model~\citep{wanvideo} that takes a sequence of Gaussian noise maps and progressively denoises them into video frames, conditioned on the reference image and text prompt. The input noise and output video therefore have a direct spatiotemporal correspondence: each noise map corresponds to an output frame, and spatial locations in the noise map influence corresponding regions of that frame. Prior work has shown that imposing coherent motion across the input noise maps can induce corresponding motion in the generated video \cite{burgert2025go, liu2025equivdm}. UniCaMo exploits this property by constructing \emph{motion-consistent noise maps} whose cross-frame correspondences reflect the user-specified 3D object and camera motions. Starting from a pretrained video diffusion model, we subsequently fine-tune it to better exploit these motion-consistent noise maps for controllable generation.
+
+The key challenge is to construct consistent noise correspondences across frames given only the reference image and the user’s sparse 3D object trajectories and camera poses. Prior methods \citep{burgert2025go, liu2025equivdm} commonly rely on ground‑truth video to compute dense optical flow, which creates a systematic training–inference mismatch when such video is unavailable; our approach seeks to eliminate this discrepancy entirely. While noise associated with the reference image can be propagated according to the specified object and camera motions, these motions may reveal regions that are not visible in the reference frame and therefore have no corresponding noise values. UniCaMo addresses this problem by surrounding the reference point cloud with a \emph{3D spherical noise representation}, which provides persistent noise anchors for such unseen regions. Combining the reference-derived and spherical noise allows UniCaMo to construct a complete sequence of 2D noise maps consistent with the desired object and camera motions.
+
+Importantly, the resulting noise sequence represents only \emph{one plausible realization} consistent with the desire motion. Recovering the true 3D geometry of occluded and out-of-view regions from a single reference image is fundamentally ill-posed and, more importantly, unnecessary for our purpose. Instead, the 3D sphere provides a simple and effective construction for assigning persistent noise values to otherwise undefined regions and maintaining their consistency across viewpoints. The sphere therefore does not represent the true scene geometry, nor does it constrain the generated scene to have spherical structure; it merely provides a geometrically consistent motion prior. The final video is determined jointly by this prior, the reference image, the text prompt, and the rich visual and motion statistics learned by the diffusion model from large-scale video data. Thus, rather than explicitly reconstructing unseen scene content, UniCaMo leverages the generative power of the pretrained model to synthesize plausible geometry and appearance while using the structured noise to guide the desired object and camera motions.
+
+%The remainder of this section details the construction of motion-consistent noise maps, followed by the training procedure of UniCaMo.
+
+%We now describe UniCamo, oour framework for generate video that jointly satisfy the desire motion of some objects and camera. UniCaMo is framework that contains two components: 1) an intuitive graphical user interface to allow users to specify how they want a video to be generated from a static input image a text prompt in terms of object and camera motion; and 2) a model that generate the final output video from those user-specified inputs: the image, text prompt, and specified object and camera motions. 
+
+%The first component is the graphical user interface, and what it does is to first lift the 2D static image into a 3D static point cloud that can be visualized from multiple perspectives and distances. That allows the user to specify the 3D trajectories of a sparse set of points on the foregournd object of interest that they want to control. That allows the user to specify the sequence of camera poses. Conceptually, this approach of lifting into 3D point clounds and using 3D point tracks are superior than some existing approaches that rely on 2D motiion vectors that are inherently ambiguous and inexpressive to specify complex 3D motions, especially when the user wants to specify the motions of multiple objects that might cross each other in the 2D world. The output of the step is a sparse set of target 3D point tracks per video frame $\mathcal{T}=\{ \mathbf{x}_i^t \in \mathbb{R}^3 \}_{i=\overline{1,N},\,t=\overline{1,T}}$, and (iii) target per-frame camera poses $\mathcal{C}=\{\mathbf{P}^t\}_{t=\overline{1,T}}$, with $N$ being the number of point tracks per frame and $T$ the number of video frames.
+
+%The second component of this framework is the model that takes the above inputs and then generate a video. This model can be built on the foundation of any image-and-text-to-video framework (e.g., Wan), taking advantages of a a large-scale video generation model that has been trained on large dataset, while addressing their missing capability of generating videos based on desire object and camera motions. In general such a foundational image-and-tex-to-video framework is a diffusion model, that works by repeatedly calling a denosing module to gradually denoising a sequence of noisy frames, conditioned on the input image as the starting frame and the text prompt that specifies the scene context. That denosing procedure can start from a sequene of purely random noise images, where each image is drawn from random noise and independent of each other. Impressively, even when these noise images are drawn randomly and independently, the foundational video diffusion model has the ability to generate the final output video that is good looking, and also conditioned on the input image frame and the text prompt. But the generated video, while visually pleasing and coherent, might not be the one that satisfy the user intent in terms how objects and camera should move. Our work addresses this problem starting from inspiration from a prior work that shows that there is co-variant nature between the motion in the generated videos and also the motion of the input noise images. In other word, if instead of having independent Gaussian noise images between video frames, if the noise images exhibit coherent motion patterns, then the output genereated video will generally also shows such a motion. Given this insight, we seek to control the generated video by initializing the process with the right seequence of Gaussian noise images; one that is consistent with the specified objects and camera motion by the user, therefore will generate the output video that is consisent with the motion patterns in the sequence of noisy images and therefore the final video will exhibit the desire object and camera motions.  
+
+%So the key step of this model is the process that starting from a 3D point cloud, a sparse set of 3D trajectories of some points in the point cloud for the movement of objects of interest, and the trajectory for the camera locations and its poses, and creating a sequence of 2D noise images that are consistent with those specified motions. To do so, the first frame can be just drawn purely from Gaussian noise, but the subsequence noise iamges must be tracked back to the previous frame, respecting the motion of the cemera and the objects. Each pixel of the noise image must be tracked back to the previous frame. In general, there are three type of pixels, one that is on the foreground object, which is under the control both the object movement and the camera movement. The second type is the pixels corresponding to backgorund region, that is unde rthe control of the camera movement only. The third type is the pixels corresponding to ones that are not on the original point cloud. In theory, for those pixels, we can just generate independent noise value, but those areas corresponding to occlueded or out of frame background of the first frame, can be independently drawn, but that runs the risk of inconsistent noise between the regions that are suppose to correspond the same object/part (even though they are not visible/seen from the first frame). 
+
+
+
+%To overcome this problem, our idea is to encapsulate the 3D point cloud of the first frame by a spherical point cloud. As the object moves and reveals the occluded (unseen) region or the camera pans away from the original point cloud, the points from the sphere can be used, solving the underfined problems and serving as consistent anchors for unknown/unseen/void regions in the subseuqne frames as the camera pans away. This leads to a sequene of 2D noise images that are consistent with the desire objects and camera motions by the user. Note that this is just one of many plausible sequence. Of course, predicting the depth or 3D points cloud of occluded areas and areas out of the view of the first frame is ill-posed problem; and so our aim is only to synthesize a plausible version of what the noise image sequences that are consistent with the user's specified motion. And that is actually good enough to act as a good guidance for object and camera motions, to initilize the video diffusion models, taking advantage of their ability to generate realistic looking videos, consistent with themselves, which have been learned from lots of video data. For the remaining of this section, we will elaborate the above components and procedures in details ... 
+
+
+
+
+
+
+
+
+% UniCaMo is built upon an image-and-text-to-video framework ~\citep{wanvideo}. 
+% It accepts the following input: (i) a source image $I$ and text prompt $y$, (ii) a sparse set of target 3D point tracks per video frame $\mathcal{T}=\{ \mathbf{x}_i^t \in \mathbb{R}^3 \}_{i=\overline{1,N},\,t=\overline{1,T}}$, and (iii) target per-frame camera poses $\mathcal{C}=\{\mathbf{P}^t\}_{t=\overline{1,T}}$, with $N$ being the number of point tracks per frame and $T$ the number of video frames. Note that during inference, both $\mathcal{T}$ and $\mathcal{C}$ are defined by the user using a graphical interface. Our goal is to generate a video with $T$ frames initialized from the content of the source image $I$ with motion dynamics following the target object and camera motion encoded by point tracks $\mathcal{T}$ and camera pose~$\mathcal{C}$.
+
+% \mhoai{I think how the user specify the motion should be explained in more detail here. This come very late; not until section 3.3. You should start explain what you need from the user, the expected input, and output of the model. Then talk about the inference, how the processing pipeline works. ONly then talk about training. Right now, things are mixed, and it is potentially confusing.  }
+
+% During training, we construct the input based on original video data as follows. For each video, we extract the first frame and use it as the source image $I$ and apply video captioning to extract text prompt $y$. We also use SAM3 \cite{carion2025sam3segmentconcepts} to extract foreground mask from the source image $I$. We then apply point tracks, camera pose and depth estimation on the video to obtain point tracks $\mathcal{T}$ and pose $\mathcal{C}$. Note that we only track the point fall within the foreground mask. During inference, we assume that the target 3D point tracks $\mathcal{T}$ and target camera poses $\mathcal{C}$ are specified by the user through a graphical user interface.
+% Son: We should discuss how precise we need for the tracks to work at inference later in the experiment section. 
+%(e.g., moving an object along a new 3D path while changing viewpoint).
+
+
+% Figure~\ref{fig:pipeline} summarizes our pipeline:
+% (1) We utilize vipe \cite{huang2025vipe} to extract the video's camera pose and depth map.
+% (2) We extract sparse 3D tracks from first frame using TAPIP3D \cite{tapip3d};
+% (3) We rasterize tracks into latent coordinates and propagate noise along these trajectories with depth-aware overwrite (\cref{sec:tracknoise});
+% (4) Notice that point tracks from first frame may not fully cover novel view region, we fill newly visible/disoccluded regions induced by camera motion via a sphere-projected noise field (\cref{sec:sphere});
+% (5) We leverage the strong generative prior of a pretrained T2V generation model \cite{wanvideo} to fine-tune a lightweight Lora. We run the standard denoising sampler starting from our structured-noise $\mathbf{Z}_T$ to generate the output video (\cref{sec:training_inference}).
+
+
+
+\begin{figure}[t]
+    \centering
+  \includegraphics[width=1.0\textwidth]{figures/overall_2.pdf}
+  \caption{The UniCamo pipeline begins with 3D-lifting the input reference image to a 3D point cloud, within which per-frame control signals are defined via an interactive GUI, producing 3D point tracks and camera trajectories. From these, a 3D-grounded scene representation from three noise components: \textcolor{blue}{foreground noise} derived from 3D point tracks, \textcolor{red}{background noise} from depth cues, and \textcolor{yellow}{3D spherical noise} for persistent out-of-view anchors, which is then merged by a depth-aware noise composition step. The 3D-grounded noise is consumed by a LoRA finetuned video diffusion model to generate a video exhibiting corresponding object and camera motion. 
+  }
+  \label{fig:overall_pipeline}
+\end{figure}
+% \mhoai{This figure should be redrawn. The reviewers are more confused with the inference pipelien rather than the training pipeline. So redraw this to focus on inference instead of training. Training steps in terms of loss, supervision signal can be added but the main highlight must be inference. For this figure, the inference is not clear: a reader wouldn't know where to start, which is the input/output of the inference pipeline.}
+  % During training, we extract the first frame of each video and derive motion guidance—3D point tracks and camera poses. We then apply guidance-based noise warping with two steps, Track-the-Noise and Move-the-World, to construct motion-consistent, 3D-grounded noise latents for video diffusion. At inference, the trained model supports independent or joint control of object and camera motion, producing high-quality videos that follow user-specified dynamics.
+
+
+
+%\subsection{Overview}
+%\label{sec:overview}
+% \son{This paragraph is out of place. Disable for now.}
+% Previous works~\cite{editbytrack, zheng2026versecrafter, he2024cameractrl, wang2024motionctrl,li2025magicmotion} on controllable video generation utilize the conditioning point tracks and target camera trajectories is to train an explicit conditioning network that injects motion cues throughout denoising.
+% In contrast, our method encodes the point tracks and camera poses $(\tilde{\mathcal{T}},\tilde{\mathcal{C}})$ directly into the \emph{noise latent initialization}, constructing a 3D-grounded noise latent $\mathbf{Z}_T$ for video diffusion.
+
+
+%\subsection{Track the Noise: Noise Initialization using 3D Point Tracks}
+%\label{sec:tracknoise}
+\subsection{Motion-Consistent Noise Construction}
+\label{sec:noise_construction}
+
+Given a reference image and the desired object and camera motions specified relative to it, our goal is to construct a sequence of 2D Gaussian noise maps whose cross-frame correspondences follow these motions. The motion specification consists of (i) a sparse set of target 3D point tracks $\mathcal{T}=\{\mathbf{x}_i^t\in\mathbb{R}^3\ | {i=\overline{1,N},t=\overline{1,T}}\}$ and (ii) a sequence of target camera poses $\mathcal{P}=\{\mathbf{P}^t | {t=\overline{1,T}}\}$, where $N$ is the number of point tracks and $T$ is the number of video frames. We first lift the reference image into a 3D point cloud using off-the-shelf 3D reconstruction methods~\cite{huang2025vipe,li2025megasam,wang2026vggtomega} and associate its points with Gaussian noise sampled for the reference frame.
+Foreground noise is then propagated according to the specified object trajectories $\mathcal{T}$ and camera poses $\mathcal{P}$, while background noise is propagated according to $\mathcal{P}$ alone. This determines consistent noise values for regions represented by the reference point cloud, but leaves regions that are occluded or outside the reference field of view undefined. To complete these regions, we surround the reference point cloud with a 3D spherical noise representation that provides persistent noise values across viewpoints. Together, these steps produce a complete sequence of motion-consistent noise maps used to initialize the video diffusion model.
+
+
+
+\noindent\textbf{Foreground noise propagation.}
+We obtain a foreground mask of the reference image~\citep{carion2025sam3segmentconcepts} and retain the 3D point tracks in $\mathcal{T}$ associated with the foreground objects of interest. For each frame $t$, we project each 3D point $\mathbf{x}_i^t$ onto the image plane using the corresponding camera pose $\mathbf{P}^t$ and rescale the projected coordinates to the latent resolution. Specifically, given an image resolution of $W{\times}H$ and a latent resolution of $W_{\mathrm{lat}}{\times}H_{\mathrm{lat}}$, we scale the projected coordinates by $W_{\mathrm{lat}}/W$ and $H_{\mathrm{lat}}/H$. Let $\mathbf{u}_i^t\in\mathbb{R}^2$ denote the resulting latent-space location of $\mathbf{x}_i^t$. Starting from i.i.d.\ Gaussian noise sampled for the reference frame, we propagate noise along each trajectory by copying a $(2R-1){\times}(2R-1)$ patch centered at $\mathbf{u}_i^1$ in the first frame to its corresponding location $\mathbf{u}_i^t$ in each subsequent frame. We use $R=2$ by default, corresponding to a $3{\times}3$ patch. In this way, foreground noise follows both the specified 3D object motion and the changing camera viewpoint.
+
+\noindent\textbf{Background noise propagation.}
+For the background, we use the 3D point cloud obtained by unprojecting the reference image with its estimated depth and associate each point with an i.i.d.\ Gaussian noise value in place of its RGB color. The background point cloud remains fixed in world coordinates and is rasterized into each target frame according to the corresponding camera pose $\mathbf{P}^t$. Its projected noise therefore moves solely according to the camera trajectory. Thus, foreground noise follows both object and camera motion, whereas background noise follows camera motion alone.
+
+\noindent\textbf{Spherical noise representation.}
+The foreground and background propagation described above, however, cannot assign noise to regions newly revealed by object or camera motion, as these regions have no corresponding points in the reference point cloud. To provide temporally consistent noise for such regions, we surround the reference point cloud with a 3D sphere centered at the camera center of the reference frame. Let $\mathbf{C}^t\in\mathbb{R}^3$ denote the camera center at frame $t$, and let $d_{\max}^{0}$ denote the maximum estimated depth of the reference image. We set the sphere radius to $
+r = \max\!\left( \tau \cdot \max_{t}\left\|\mathbf{C}^t-\mathbf{C}^1\right\|_2,\; d^{0}_{\max}\right)$, where $\tau=1.2$ provides a margin around the camera trajectory. We parameterize the sphere using latitude and longitude and assign its surface a fixed Gaussian noise texture $\mathbf{E}\in\mathbb{R}^{C\times H_{\mathrm{env}}\times W_{\mathrm{env}}}$, where $H_{\text{env}}$ and $W_{\text{env}}$ are proportional to the video resolution scaled by a factor $k=4$, and $C$ is the latent channel count of the video diffusion model.
+
+
+
+
+For each frame, we cast a ray from the camera center through each latent location and compute its intersection with the sphere. The intersection point is converted to latitude–longitude coordinates, which are used to sample the corresponding value from the fixed Gaussian noise texture $\mathbf{E}$. Because all frames sample from the same spherical noise texture, rays intersecting the same spherical location receive the same noise value across viewpoints. The sphere therefore provides persistent and view-consistent noise for regions that cannot be associated with the reference point cloud. Details of the ray–sphere intersection are provided in the appendix.
+
+
+\noindent\textbf{Depth-aware Noise Composition.}
+We finally combine the foreground, background, and spherical noise contributions into a complete noise map for each frame. Multiple foreground and background points may project to the same latent location, particularly under object motion, occlusion, and viewpoint changes. Rather than resolving such collisions through arbitrary ordering~\citep{chu2025wan} or averaging~\citep{burgert2025go}, we exploit their explicit 3D geometry. For each latent location receiving multiple contributions from the foreground trajectories or background point cloud, we apply a z-buffer rule and retain the contribution with the smallest camera-space depth, i.e., the point closest to the camera. This enforces a geometrically meaningful visibility ordering and prevents noise associated with occluded surfaces from overwriting visible ones. Wherever this propagation provides a valid noise value, we retain it; locations that remain undefined are filled with the corresponding noise sampled from the sphere. This preserves the explicit geometric correspondences available from the reference image while using the spherical representation only where such correspondences are unavailable. The result is a complete sequence of motion noise maps consistent with both the specified 3D object trajectories and camera poses, providing the motion-aware initialization for subsequent video generation. 
+
+
+
+%\noindent\textbf{Motivation.} Conventional video diffusion models~\citep{wanvideo,cogvideox} initialize generation with a single Gaussian noise latent, which effectively behaves as frame‑wise uncorrelated noise, lacking any temporal structure.
+%Yet real videos exhibit strong motion correlations, recoverable via dense optical flow~\citep{burgert2025go} or sparse point tracks~\citep{chu2025wan, wang2025ati}. Leveraging this as an inductive bias, we partially warp the initial noise using the estimated motion (Fig.~\ref{fig:noiselatents}(a)), producing a motion‑consistent noise prior that guides the model toward coherent video dynamics without any needs for external adapters.
+
+% \begin{figure}[t]
+%     \centering
+%   \includegraphics[width=0.8\textwidth]{figures/module.pdf}
+%   \caption{Noise representation in our two key steps, Track the Noise (a) and Move the World (b). (a) We track 3D points (see example triplets of X, Y, Z values) and resolve potential collisions in their trajectories using a depth test, favoring contributions from points closer to the camera. This step results in initial partial motion-visible noise. (b) We create a virtual 3D sphere with Gaussian‑textured noise and sample view‑consistent noise according to the target camera poses. By combining the outputs of (a) and (b), we obtain 3D-grounded, motion-consistent noise that replaces the randomly sampled noise used in standard video diffusion models.}
+%   \label{fig:noiselatents}
+% \end{figure}
+
+%\paragraph{3D point tracks.}
+
+
+%During training, we randomly sample 512-1024 point tracks from first frame and track them across all frames. \son{Explain why we need to sample in a range.}
+
+% \hoai{This section is unclear and underwhelm. First, there should be a couple of sentences explaining the purpose of this Track-the-Noise step (WHY), before explaining WHAT and HOW it is done. Second, I was expecting the mentioning of a 3D sphere (as shown in Figure 3) or how things are tracked, but I did not see this in the text. Also, since this is the main technical novelty of the method, try to elaborate on it a bit more and provide some insight to present it as a clever idea. Otherwise, we might be criticized for not having sufficient technical contribution. } \hoai{OK, now I see the 3D sphere is actually the next section. So, maybe my comments were a bit immature. However, this might be a source of confusion still. Somehow, by reading the title of the section, I expected the description about 3D sphere is in this section, not the next one.}
+
+% \noindent\textbf{Partial Noise Warping.} Let $\mathcal{T} = \{\mathbf{x}_i^t \in \mathbb{R}^3 \}$ denote the set of world-space 3D point tracks across video frames.
+% Compared to dense 2D optical flow \citep{raft}, sparse 3D tracks provide explicit depth cues and are robust to occlusion and viewpoint changes. We obtain a foreground mask of the source image ~\citep{carion2025sam3segmentconcepts} and track only the points that fall inside it, so that $\mathcal{T}$ describes object motion alone; the background is handled by the point cloud introduced below. 
+% We map the point tracks to latent feature map locations by first projecting them onto the image plane using the target camera poses $\{\mathbf{P}^t\}$, and then rescaling the projected coordinates to the latent feature map resolution. We use the scale ratio $W_{lat}/W$ and $H_{lat}/H$, where $W_{lat}, H_{lat}, W, H$ are latent and image dimensions, respectively. Through 3D-to-2D projection, let the 2D pixel trajectories be $\{ \mathbf{u}_i^t \in \mathbb{R}^2 \}$, corresponding to the 3D point tracks.
+
+% By initializing the latent representation of the first frame as i.i.d. Gaussian noise, we now propagate the noise to subsequent frames following the pixel trajectories $\{ \mathbf{u}_i^t \}$ constructed from 3D point tracks. 
+% We simply transfer (i.e., copy and write) noise within a square patch with dimension $2R - 1$ centered at each pixel in the trajectories from the first frame to the target frames. 
+% By default, we set $R = 2$, resulting in patch of size 3x3.
+% As the 3D point tracks encode motion in the video, this results in a video latent representation that exhibits motion-consistent noise, forming a strong guidance for generating motion dynamics during video synthesis. 
+
+% \vspace{0.5ex}\noindent\textbf{Background Point Cloud.}
+% The tracks above cover the foreground only. Rather than tracking the background as well, we unproject the source image into a 3D point cloud using its estimated depth, replace the RGB colour of every point with an i.i.d. Gaussian sample, and rasterise the cloud into each frame through the target camera poses $\mathcal{C}$. Because the cloud is static in world space, its rasterisation is driven purely by viewpoint change: background noise therefore follows the camera while foreground noise follows the object tracks. Both mechanisms write into the same latent, yielding a single noise map that is 3D-grounded across the whole frame.
+
+\begin{comment}
+\begin{align}
+\bar{\mathbf{x}}_i^t
+&=
+\begin{bmatrix}
+\mathbf{x}_i^t \\ 1
+\end{bmatrix}
+\in \mathbb{R}^4,
+\\
+\bar{\mathbf{x}}_{c,i}^t
+&=
+\mathbf{T}_{w\rightarrow c}^t \, \bar{\mathbf{x}}_i^t
+=
+\begin{bmatrix}
+x_{c,i}^t \\ y_{c,i}^t \\ z_{c,i}^t \\ 1
+\end{bmatrix},
+\\
+\tilde{u}_i^t
+&=
+f_x^t \frac{x_{c,i}^t}{z_{c,i}^t} + c_x^t,
+\\
+\tilde{v}_i^t
+&=
+f_y^t \frac{y_{c,i}^t}{z_{c,i}^t} + c_y^t,
+\end{align}
+
+We then map image coordinates $(\tilde{u}_i^t,\tilde{v}_i^t)$ to the latent grid
+$(H_{\text{lat}}, W_{\text{lat}})$ by scale factors
+$s_x=\frac{W_{\text{lat}}}{W}$ and $s_y=\frac{H_{\text{lat}}}{H}$:
+
+\begin{align}
+u_{i,\text{lat}}^t &= s_x \, \tilde{u}_i^t, \\
+v_{i,\text{lat}}^t &= s_y \, \tilde{v}_i^t, \\
+u_i^t &= \mathrm{clip}\!\left(\left\lfloor u_{i,\text{lat}}^t + \tfrac{1}{2}\right\rfloor,\, 0,\, W_{\text{lat}}-1\right),\\
+v_i^t &= \mathrm{clip}\!\left(\left\lfloor v_{i,\text{lat}}^t + \tfrac{1}{2}\right\rfloor,\, 0,\, H_{\text{lat}}-1\right).
+\end{align}
+\end{comment}
+
+\begin{comment}
+\paragraph{Patch copy--paste along trajectories.}
+We initialize the first-frame latent noise as i.i.d. Gaussian,
+\[
+\mathbf{Z}_T^{1} \sim \mathcal{N}(\mathbf{0}, \mathbf{I}).
+\]
+For each tracked point $\mathbf{x}_i^t$, let $\mathbf{u}_i^t$ represent its projected pixel coordinates in the latent map.
+Following the trajectories of 
+
+To propagate an identifiable noise ``fingerprint'' along the trajectory, we copy a small square patch around the track location in frame $1$ to the corresponding location in frame $t$.
+Using a patch radius $r{=}1$ (i.e., a $3\times 3$ patch), we write
+\begin{equation}
+\forall (\Delta u,\Delta v)\in\{-1,0,1\}:\quad
+\mathbf{Z}_T^{t}\!\left[u_i^t+\Delta u,\; v_i^t+\Delta v\right]
+\leftarrow
+\mathbf{Z}_T^{1}\!\left[u_i^1+\Delta u,\; v_i^1+\Delta v\right].
+\end{equation}
+Equivalently, this copies a $(2r{+}1)\times(2r{+}1)$ neighborhood with $r{=}1$.
+By transporting the same local noise pattern across time, motion becomes \emph{visible} to the denoiser: features correlated with that noise patch are encouraged to follow the specified 3D trajectory.
+\end{comment}
+
+% \myheading{Depth-aware Collision Tracking}. 
+% Foreground trajectories and rasterised background points may project to the same latent pixel; naive composition then leads to ambiguous assignments and inconsistent motion cues.
+% We therefore resolve collisions using a depth-aware z-buffer rule induced by the target tracks $\mathcal{T}$, the background point cloud, and the camera poses $\mathcal{C}$.
+% Among all candidates mapped to a latent pixel, whether they originate from a trajectory or from the point cloud, we select the contribution with the smallest camera depth (i.e., the point closest to the camera) and discard the rest. 
+% This choice enforces a physically plausible occlusion ordering and leverages the explicit depth information provided by 3D tracks to disambiguate visibility during noise propagation.
+
+% In contrast, prior motion-control pipelines often adopt simple but less effective heuristics for handling overlaps, such as selecting one contributor without geometric reasoning (e.g., by arbitrary ordering) \citep{chu2025wan}, or aggregating multiple contributors through averaging (sometimes followed by re-normalization to restore Gaussian statistics) \citep{burgert2025go}. 
+% By explicitly enforcing depth-consistent compositing, our construction yields geometrically coherent structured noise signals, improving the stability of the noise representation under occlusions and viewpoint changes.
+
+%\paragraph{Overlap resolution with depth-aware overwrite.}
+% \myheading{Depth-aware Collision Tracking}. When multiple point trajectories overlap and are projected to the same latent pixels, naive composition yields ambiguous assignments and can introduce inconsistent motion cues.
+% We therefore resolve collisions using a depth-aware z-buffer rule induced by the target tracks $\mathcal{T}$ and camera poses $\mathcal{C}$. 
+% Among all candidates mapped to a latent pixel, we select the contribution with the smallest camera depth (i.e., the point closest to the camera) and discard the rest.
+% This choice enforces a physically plausible occlusion ordering and leverages the explicit depth information provided by 3D tracks to disambiguate visibility during noise propagation. 
+
+% In contrast, prior motion-control pipelines often adopt a simple but not so effective heuristic for handling overlaps, such as selecting one contributor without geometric reasoning (e.g., by arbitrary ordering) \cite{chu2025wan}, or aggregating multiple contributors through averaging (sometimes followed by re-normalization to restore Gaussian statistics) \cite{burgert2025go}.
+% By explicitly enforcing depth-consistent compositing, our construction yields geometrically coherent structured noise signals, improving the stability of the noise representation under occlusions and viewpoint changes.
+
+% \subsection{Move-the-World: View-Consistent 3D-Sphere Noise Sampling}
+% \label{sec:sphere}
+
+% % \hoai{Now that I come to this section, think the term ``move-the-world'' might be misleading. This term is a catchy phrase, but I think you actually mean maintain-the-world or fix-the-world. Because this section talks about a fixed 3D texture sphere. }
+
+% \noindent\textbf{Motivation.} 
+% As the Track‑the‑Noise step transports first‑frame noise along point‑track trajectories, some regions remain unconstrained—especially areas that become newly visible as camera motion reveals previously unseen parts of the scene.
+% Filling these gaps with random Gaussian noise provides no camera motion cues, while interpolating first‑frame noise violates per-frame gaussianity property.
+% To address this, we introduce Move‑the‑World, which represents the scene as a 3D bounding sphere coated with Gaussian noise texture. The camera moves inside this sphere, and projecting the sphere’s noise into each view produces view‑consistent latents that preserve spatial Gaussianity (Fig.~\ref{fig:noiselatents}(b)). 
+
+% \noindent\textbf{3D Sphere Parameterization.}
+% Constructing a bounded 3D sphere requires definition of the center position and radius.  
+% In particular, we set the sphere center to the camera center of the first frame and choose a radius $r$ such that the sphere encloses the entire camera trajectory across frames while satisfying a conservative depth bound $d_{\max}$. The radius $r$ is defined as follows: $
+% r = \max\!\left( \tau \cdot \max_{t}\left\|\mathbf{C}^t-\mathbf{C}^1\right\|_2,\; d^{0}_{\max}\right)$ where $\mathbf{C}^t \in \mathbb{R}^3$ denote the camera center at frame $t$, $d^{0}_{\max}$ is the furthest depth value of the input image and $\tau = 1.2$. 
+% We represent the sphere surface by a latitude-longitude parameterization, which can be captured by a randomly sampled Gaussian noisy texture map  $\mathbf{E} \in \mathbb{R}^{C \times H_{\text{env}} \times W_{\text{env}}}$, where $H_{\text{env}}$ and $W_{\text{env}}$ are proportional to the video resolution scaled by a factor $k$ ($k = 4$), and $C$ matches the latent channel count of the video diffusion model~\citep{wanvideo,cogvideox}.
+
+% \noindent\textbf{Ray-sphere Intersection \& Noise Sampling. } To obtain 3D‑consistent noisy latents for each camera view, we cast rays from the camera through its view frustum and compute their intersections with a bounding sphere using a closed‑form ray–sphere intersection formula. For every ray that hits the sphere surface, we determine the latitude and longitude of the intersection point. These spherical coordinates are then used to perform nearest‑neighbor grid sampling on the previously defined noisy texture map $E$. This procedure produces noise latents that remain spatially Gaussian within each frame while staying consistent across different viewpoints. Additional details on the ray–sphere intersection computation can be found in the appendix section. 
+% and use the latitude and longitude coordinates at the intersection to sample noise in the tensor $\mathbf{E}$ following a nearest-neighbor lookup. 
+% This yields motion-consistent noise latents while being spatially Gaussian noise for each frame. More details on ray-sphere intersection are available in the Appendix. 
+
+\begin{comment}
+\paragraph{Ray construction (pixel $\rightarrow$ world ray).}
+For each pixel $(p_x,p_y)$ (we use pixel centers), we form a unit ray direction in camera coordinates using intrinsics $(f_x,f_y,c_x,c_y)$:
+\begin{align}
+\mathbf{d}_{c}(p_x,p_y) 
+&= 
+\frac{1}{\left\| \left(\frac{p_x-c_x}{f_x},\,\frac{p_y-c_y}{f_y},\,1\right) \right\|_2}
+\begin{bmatrix}
+\frac{p_x-c_x}{f_x}\\[2pt]
+\frac{p_y-c_y}{f_y}\\[2pt]
+1
+\end{bmatrix},
+\\
+\mathbf{d}_{w}(p_x,p_y) 
+&= \mathbf{R}^t \, \mathbf{d}_{c}(p_x,p_y),
+\end{align}
+where $\mathbf{R}^t$ is the rotation from $\mathbf{T}_{c\rightarrow w}^t$.
+
+\paragraph{Ray-sphere intersection and spherical UV.}
+Let $\mathbf{o}^t=\mathbf{C}^t$ be the ray origin in world coordinates, and define $\mathbf{oc}^t=\mathbf{o}^t-\mathbf{S}$.
+We intersect the ray $\mathbf{o}^t + \tau \mathbf{d}_{w}$ with the sphere $\|\mathbf{x}-\mathbf{S}\|_2=r$.
+With $b=\langle \mathbf{d}_w,\mathbf{oc}^t\rangle$ and $c=\|\mathbf{oc}^t\|_2^2-r^2$, the (non-negative) discriminant is
+\begin{equation}
+\Delta = b^2 - c,
+\end{equation}
+and we take the exiting intersection (consistent with the camera being inside or near the sphere):
+\begin{equation}
+\tau = -b + \sqrt{\max(\Delta,0)} .
+\end{equation}
+The hit point and outward normal are
+\begin{equation}
+\mathbf{P} = \mathbf{o}^t + \tau \mathbf{d}_w,
+\qquad
+\mathbf{n} = \frac{\mathbf{P}-\mathbf{S}}{r}.
+\end{equation}
+We convert the normal to spherical coordinates using longitude--latitude mapping:
+\begin{align}
+u &= \mathrm{fract}\!\left(\frac{\mathrm{atan2}(n_x, n_z)}{2\pi} + \frac{1}{2}\right),
+\\
+v &= \frac{\arccos(\mathrm{clip}(n_y,-1,1))}{\pi},
+\end{align}
+where $\mathrm{fract}(\cdot)$ wraps $u$ into $[0,1)$.
+
+\paragraph{Sampling sphere noise and downsampling to latent.}
+We sample the Gaussian envmap at the computed spherical coordinates using \emph{nearest-neighbor} lookup,
+yielding a per-frame noise image:
+\begin{equation}
+\mathbf{N}^t_{\text{rgb}}(p_x,p_y)
+\;=\;
+\mathbf{E}\!\left(u(p_x,p_y),\, v(p_x,p_y)\right)
+\in \mathbb{R}^{C}.
+\end{equation}
+This yields a camera-consistent noise field that remains approximately Gaussian per frame.
+\end{comment} 
+
+%\noindent\textbf{Noise Composition.} To combine the motion‑consistent noises produced independently by Track‑the‑Noise and Move‑the‑World, we apply a composition step that aggregates their outputs into a single final noise latent. We begin by initializing the final latent with the partial motion‑consistent noise obtained from the Track‑the‑Noise stage. Then, for regions where this step provides no coverage, we fill in the missing areas by copying the corresponding values from the Move‑the‑World output. This strategy yields a complete latent that is both 3D‑grounded and motion‑consistent, making it well‑suited for the subsequent video generation with the diffusion model. 
+
+% \animesh{If possible add a tiny sub-section here which connects the composition process to the EquiVDM paper. Basically we wish to leverage all the theoretical guarantees that the EquiVDM paper gives when deriving that the noise-warped Video Diffusion model (equivariant) is a subset of un-correlated noise video diffusion model.}
+ 
+% \hoai{Now the order of the steps are discussed: Move-the-World before Track-the-Noise. I think we should swap the positions of the two sectiosn. This would put the more important section (Move-the-World) first, and perhaps avoid some confusion.}
+
+% We use $\mathbf{Z}^t_{\text{sphere}}$ as the default initialization for frame $t$, and overwrite tracked regions with the copy--paste noise from \S\ref{sec:tracknoise} (with depth-aware conflict resolution).
+% Thus, tracked locations carry stable ``noise identity'' for motion guidance, while disoccluded locations receive viewpoint-consistent Gaussian noise induced by the camera trajectory.
+
+% Given a ground-truth training video, we first preprocess it using off-the-shelf models to obtain the signals needed for motion-consistent noise construction. Specifically, we estimate camera intrinsics, extrinsics, and depth using ViPE~\citep{huang2025vipe}, foreground masks using SAM3~\citep{carion2025sam3segmentconcepts}, and sparse 3D point tracks using TAPIP3D~\citep{tapip3d}. These quantities capture the object and camera motions of the target video and allow us to apply the procedure in Sec.~\ref{sec:noise_construction} to construct a sequence of 2D Gaussian noise maps whose cross-frame correspondences are consistent with those motions. This naturally defines a supervised training pair: the motion-consistent noise sequence serves as the input initialization to the video diffusion model, while the original video serves as the target output. Importantly, the extracted geometric and motion signals are used only to construct the noise initializer and are not provided to the model as additional conditioning inputs.
+
+% We curate 400K training clips from DynPose100K++, WSDG-1M, and 4DNeX~\citep{huang2025vipe,chen20254dnex}, and precompute and cache all signals required for noise construction. To standardize captions across data sources, we re-caption all clips using Qwen2.5-VL~\citep{bai2025qwen3}, following the Wan-Move prompt-extension protocol~\citep{chu2025wan}. We fine-tune a pretrained Wan2.1-I2V-14B model~\citep{wanvideo} using flow matching, with the motion-consistent noise sequence as initialization and the reference frame and text prompt as conditioning. We apply LoRA only to the DiT denoiser, while freezing the VAE and all encoders. We use a LoRA rank of 64 with $\alpha{=}1$ and train for 10K steps in bfloat16 with gradient checkpointing on 32 NVIDIA H100 GPUs, using a batch size of 1 per GPU, for approximately three days. To improve robustness to different guidance densities, we randomly sample 512–1024 points from the extracted 3D tracks during training. At inference time, we use classifier-free guidance with $\gamma{=}5.0$. UniCaMo introduces no additional model parameters at inference time and incurs only approximately 0.2,s of noise-construction overhead per sample, preserving the runtime efficiency of the base model.
+
+
+
+
+% \subsection{Training and Inference}
+% \label{sec:training}
+
+% \noindent\textbf{Training.}
+% Given a ground-truth training video, we first preprocess it using off-the-shelf models to estimate the depth maps, camera poses, foreground masks, and 3D point tracks~\citep{carion2025sam3segmentconcepts,huang2025vipe,tapip3d}. These quantities provide the object and camera motions of the target video and allow us to apply the procedure in Sec.~\ref{sec:noise_construction} to construct a sequence of 2D Gaussian noise maps whose cross-frame correspondences are consistent with those motions. This naturally defines a supervised training pair: the motion-consistent noise sequence serves as the input initialization to the video diffusion model, while the original video serves as the target output. We fine-tune the pretrained image-and-text-to-video diffusion model on such pairs, conditioned additionally on the reference frame and text prompt. Through this training, the model learns to exploit the correspondences encoded in the input noise sequence to reproduce the object and camera motions observed in the target video.
+
+
+% % \subsection{Training and Inference}
+
+% % Fig.~\ref{fig:overall_pipeline} summarizes our training pipeline. We first perform data pre-processing to obtain depth maps, camera poses, foreground mask and 3D point tracks of the target video using off-the-shelf models ~\citep{carion2025sam3segmentconcepts, huang2025vipe, tapip3d}. 
+
+% %We then apply a noise warping technique to obtain our 3D-grounded motion-consistent noise through two steps: (1) Track-the-Noise (Sec.~\ref{sec:tracknoise}), which creates partial motion-consistent noise that captures the motion inferred from 3D point tracks and first frame background geometry, and (2) Move-the-World (Sec.~\ref{sec:sphere}), which samples and propagates Gaussian noise on a virtual 3D sphere to produce view-consistent noise along a target camera trajectory. The combined representation results in 3D-grounded motion-consistent noise that can be used to initialize the latents of a video diffusion model to generate the final output video.
+
+% %Note : 3 more section : Camera control => depth warp , Object Control => foreground + background mask via sam3, background static, Joint Control => both. Add fix to Inference part. 
+
+% \label{sec:training_inference}
+% \noindent\textbf{Training data.}
+% We curate 300K training clips from DynPose100K++, WSDG-1M, and 4DNeX~\citep{huang2025vipe,chen20254dnex}. For each clip, we precompute and cache offline the signals needed for noise construction: camera intrinsics/extrinsics and depth from ViPE~\citep{huang2025vipe}, and sparse 3D point tracks from TAPIP3D~\citep{tapip3d}. These signals are used only to build the motion-consistent noise initializer (not as additional conditioning inputs). To standardize captions across sources, we re-caption all clips with Qwen2.5-VL~\citep{bai2025qwen3}, following the Wan-Move prompt-extension protocol to improve prompt consistency~\citep{chu2025wan}.
+% % We curate $400$K training samples by mixing DynPose100K++ \cite{huang2025vipe}, WSDG-1M \cite{huang2025vipe}, and 4DNeX \cite{chen20254dnex}.
+% % For each clip, we precompute the auxiliary signals used by our noise construction:
+% % (1) camera intrinsics and extrinsics $\{\mathbf{K}^t, \mathbf{T}^t_{w\rightarrow c}\}$ and depth maps $\{\mathbf{D}^t\}$ from ViPE \cite{huang2025vipe}, and
+% % (2) sparse 3D point tracks $\mathcal{T}=\{\mathbf{x}_i^t\}$ from TAPIP3D \cite{tapip3d}.
+% % By default, we extract 1024 points from TAPIP3D.
+% % All signals are cached offline and loaded on-the-fly during training, and are used only to construct the motion-consistent noise initializer (not as additional neural conditioning inputs). To standardize text format across mixed data sources, we re-caption each clip using Qwen2.5-VL \cite{bai2025qwen3}, producing long-form, scene-centric descriptions that follow the prompt protocol used in Wan-Move (i.e., prompt extension toward detailed, cinematic prompts) \cite{chu2025wan}.
+% % This recaptioning step reduces caption style mismatches and improves prompt consistency for training and evaluation.
+
+% \noindent\textbf{Training details.} We fine-tune a pretrained Wan I2V backbone~\citep{wanvideo} using flow matching to predict the velocity field that transports noise samples to the data distribution. We start from Wan2.1-I2V-14B weights and apply LoRA only to the DiT denoiser, freezing the VAE and all encoders. We use LoRA rank 64 with $\alpha{=}1$, and train for 10K steps in bfloat16 with gradient checkpointing on 32 NVIDIA H100s (batch size 1/GPU) for ~3 days. To improve robustness to varying guidance density, we randomly sample 512–1024 points from the extracted 3D tracks during training.
+
+% % We fine-tune a pretrained Wan backbone~\cite{wanvideo} for image-to-video generation by learning parameters $\theta$ (implemented as LoRA adapters) to predict the velocity field that transports samples from the noise distribution to the data distribution under flow matching.
+% % We optimize our model using the the standard flow-matching objective.
+% % In our implementation, we utilize the pretrained Wan2.1-I2V-A14B \cite{wanvideo} model weights and optimize such model via LoRA on the DiT denoiser only, while freezing the VAE and all encoders.
+% % We use LoRA rank $64$ with scaling $\alpha{=}1$ and train the model for $10$K steps in \texttt{bfloat16} with gradient checkpointing enabled, using 32 NVIDIA H100 GPUs with batch size 1 per GPU, for approximately three days.
+% % To make the model robust to varying number of point tracks, we randomly sample between 512 and 1024 points in the extracted 3D point tracks for training. 
+
+% \noindent\textbf{Inference.}
+% Given a single input image, we estimate monocular depth to obtain a 3D point cloud. The user selects target objects via a mask (manual or SAM3~\citep{carion2025sam3segmentconcepts}), then specifies 3D point tracks for these objects over time and optionally a camera trajectory via our simple 3D GUI. If the user wish to control the camera only, they can disable the motion mask. These signals are passed to our Guidance-based Noise Warping module to construct 3D-grounded, motion-consistent noise. We generate videos with classifier-free guidance ($\gamma = 5.0$). UniCaMo adds no extra parameters during inference and incurs only 0.2s warping overhead per sample, preserving the base model’s runtime. Additional qualitative results and demos are provided in the supplement/project page.
+
+%At inference, the user provides a single input image from which we estimate monocular depth to reconstruct a 3D point cloud. The user then specifies the object of interest via a mask—either manually or using SAM~\cite{carion2025sam3segmentconcepts}. To define controllable motion guidance, the user provides 3D point tracks for the selected objects across the video, and optionally specifies a desired camera trajectory.For simplicity, these signals could be obtained through a graphical user interface that supports 3D object movement and 3D camera control. These user‑defined 3D point tracks and the target camera path are fed into our Guidance‑based Noise Warping module to produce the 3D‑grounded, motion‑consistent noise described above. During generation, we use classifier‑free guidance by mixing conditional and unconditional predictions with guidance scale $\gamma = 5.0$. Because the method introduces no additional parameters and imposes minimal warping time (about 0.2s per sample), it remains computationally efficient and does not materially affect the base model’s runtime. Please refer to our supplement project page to more qualitative results and video demos.
+
+ 
+%
+% \begin{equation}
+% \hat{\epsilon}
+% \;=\;
+% \epsilon_{\mathrm{uncond}}
+% \;+\;
+% \gamma\big(\epsilon_{\mathrm{cond}}-\epsilon_{\mathrm{uncond}}\big),
+% \end{equation}
+%
+
+
+% ---------------------------------------------------------------
+\section{Experiments}
+\label{sec:experiments}
+
+We evaluate UniCaMo in three settings: object motion control, camera motion control, and joint object and camera motion control. For object motion control, we use MoveBench~\citep{chu2025wan}, a recent benchmark comprising approximately 1,000 diverse, high-quality videos. For camera motion control, we randomly sample unseen 300 clips from RealEstate10K (RE10K)~\citep{zhou2018stereo}. Finally, to evaluate joint control, for which no suitable benchmark currently exists, we curate unseen 300 real-world videos from publicly available sources~\citep{Pexels_dataset} spanning diverse object motions and camera trajectories, following the setup in previous work~\citep{chu2025wan,zhang2026symphomotion}.
+%\cite{Pexels_dataset, huang2025vipe, chu2025wan} 
+
+
+Using existing  protocol~\citep{chu2025wan,ren2025gen3c,wang2024motionctrl}, we evaluate three complementary aspects of the generated videos: \textbf{(i) visual quality}, measured by FID~\citep{fid}, FVD~\citep{fvd}, PSNR, and SSIM~\citep{ssim}; \textbf{(ii) object-motion fidelity}, measured by the endpoint error (EPE) of the generated trajectories~\citep{chu2025wan}; and \textbf{(iii) camera-motion fidelity}, measured by rotation error (RotErr), translation error (TransErr), and camera motion consistency (CamMC), which quantify the deviation between the generated and reference camera trajectories.
+
+% This section describes our experiments, where we evaluate UniCaMo in three settings: motion control, camera control, and joint camera--motion control. For motion control we use MoveBench~\citep{chu2025wan}, the modern benchmark for controllable video generation, containing about 1000 diverse high quality videos. For camera control we sample $300$ clips at random from RealEstate10K (RE10K) \citep{zhou2018stereo}. As no existing dataset provides both camera and object motion, we additionally curate $300$ real-world videos from publicly available sources, selected to span a wide range of camera trajectories and object dynamics.
+
+% Following prior work~\citep{chu2025wan, ren2025gen3c, wang2024motionctrl}, we evaluate along three axes:
+% \textbf{(i) visual quality}, using FID~\citep{fid}, FVD~\citep{fvd} and the reconstruction metrics PSNR and SSIM~\citep{ssim};
+% \textbf{(ii) motion-control fidelity}, using the end-point error (EPE) of the generated trajectories as defined in~\citep{chu2025wan}; and
+% \textbf{(iii) camera-control fidelity}, using rotation error (RotErr), translation error (TransErr) and camera motion consistency (CamMC), which quantify the deviation between the generated and the reference camera trajectories.
+
+%MoveBench~\cite{chu2025wan} provides only 2D tracks and first-frame masks, so we recover the required 3D tracks and camera poses using off-the-shelf TAPIP3D and ViPE~\cite{tapip3d,huang2025vipe}. Using the masks, we sample \(M\) object points (proportional to mask size) and \(N\!-\!M\) background points to match our training track count. \rev{We therefore evaluate two controlled baselines. \textit{Wan-Move + TAPIP3D tracks} projects the same 3D tracks used by UniCaMo back onto the image plane and feeds them to Wan-Move, matching the track source. \textit{Go-with-the-Flow (Wan2.1-14B)} retrains their noise warping on our own Wan2.1-14B backbone under an identical recipe --- same LoRA rank, data and training regime --- leaving the noise-warping method as the only difference.}
+
+%We compare against adapter-based controllers (Tora, ImageConductor, ATI, SymphoMotion, ), feature-warping Wan-Move, and flow-based noise-warping Go-with-the-Flow~\cite{zhang2025tora,wang2024imageconductor,chu2025wan,burgert2025go,zhang2026symphomotion,wang2025ati}. All methods use the same inputs and we report averages over full benchmark splits.
+
+%We evaluate UniCaMo on controllable image-to-video generation with an emphasis on \emph{joint} camera and object motion control.
+% We compare our model against a broad set of recent motion-controllable video generation approaches that span the main design space relevant to our work: (i) adapter-based trajectory controllers, including MagicMotion~\cite{li2025magicmotion}, Tora~\cite{zhang2025tora}, ImageConductor~\cite{wang2024imageconductor}, and LeviTor~\cite{wang2025levitor}; (ii) feature-warping-based methods built on a strong video backbone, namely Wan-Move~\cite{chu2025wan}; and (iii) noise-warping methods that utilize 2D optical flow as warping guidance, namely Go-with-the-Flow~\cite{burgert2025go}. Together, these baselines highlight the core challenge addressed by UniCaMo: maintaining high visual fidelity while simultaneously enforcing object and camera motion.
+% Unless otherwise stated, we use identical input prompts and input frames/videos across methods and report results averaged over the full benchmark splits.
+
+%\noindent\textbf{Benchmarks and Metrics.}
+%We report results on the modern controllable video benchmark, namely MoveBench \cite{chu2025wan}. 
+%We evaluate along two axes:
+%\textbf{(i) visual quality} using FID \cite{fid}, FVD \cite{fvd} and reconstruction-style metrics PSNR, SSIM \cite{ssim}, and
+%\textbf{(ii) control fidelity} using motion accuracy metrics such as end-point error (EPE) for trajectories. MoveBench~\cite{chu2025wan} provides only 2D tracks and first-frame masks, so we recover the required 3D tracks and camera poses using off-the-shelf TAPIP3D and ViPE~\cite{tapip3d,huang2025vipe}. Using the masks, we sample \(M\) object points (proportional to mask size) and \(N\!-\!M\) background points to match our training track count. \rev{We therefore evaluate two controlled baselines. \textit{Wan-Move + TAPIP3D tracks} projects the same 3D tracks used by UniCaMo back onto the image plane and feeds them to Wan-Move, matching the track source. \textit{Go-with-the-Flow (Wan2.1-14B)} retrains their noise warping on our own Wan2.1-14B backbone under an identical recipe --- same LoRA rank, data and training regime --- leaving the noise-warping method as the only difference.}
+
+% During evaluation, our method requires using
+% 3D point tracks and target camera poses, however, these inputs are not available in the MoveBench~\cite{chu2025wan} dataset. Since MoveBench~\cite{chu2025wan} only provides 2D point tracks and first-frame object masks, we use off-the-shelf models including TAPIP3D~\cite{tapip3d} for finding 3D point tracks and ViPE~\cite{huang2025vipe} for estimating camera poses.
+% Particularly, we use the provided first frame masks from MoveBench and sample $M$ points inside each mask for establishing 3D point tracks on the object of interest. We set $M$ proportionally to size of the masks. We then sample $N - M$ stationary points in the background to make sure that we have a total amount of $N$ point tracks that matches the settings that we are using during training. We note that our method takes 3D point tracks from TAPIP3D~\cite{tapip3d} as input, while Wan-Move~\cite{chu2025wan} is designed around 2D point tracks from CoTracker3. To provide an apple-to-apple comparison under matched track sources, we additionally evaluate a \textit{Wan-Move + TAPIP3D tracks} variant, in which we project the same 3D tracks used by UniCaMo onto the 2D image plane and feed them as input to Wan-Move.
+
+
+% \son{Say how we get the 3D point tracks and camera poses during our quantitative evaluation. MoveBench only gives us 2D point tracks and first-frame object masks, from CoTracker. During evaluation, we use TAPIP3D to track the mask across frames, and follow MoveBench protocol.}
+
+% \paragraph{Baselines.}
+% We compare against strong baselines spanning the main design space for controllable video generation.
+% For \textbf{noise-warping}, we include flow-driven warped-noise approaches that correlate temporal noise across frames \cite{burgert2025go}.
+% For \textbf{adapter-based} methods, we consider representative camera-control and motion-control systems that introduce additional condition encoders or adapters \cite{} \son{missing reference}.
+%  \son{Use a different wording: disocclusion is difficult to understand.}. 
+
+
+\subsection{Comparisons with State-of-the-Art Methods}
+
+We compare UniCaMo against a broad range of prior motion-controllable video generation methods, covering object motion control, camera motion control, and joint control. Among these, methods such as Wan-Move~\citep{chu2025wan} and SymphoMotion~\citep{zhang2026symphomotion} support both object and camera motion control, while methods such as Go-with-the-Flow~\citep{burgert2025go} and ImageConductor~\citep{wang2024imageconductor} focus on object motion control, and CamI2V~\citep{zheng2024cami2v} and CameraCtrl~\citep{he2024cameractrl} focus on camera motion control. We generally evaluate these methods using their publicly released models. To enable more controlled comparisons, however, we additionally construct variants of relevant baselines that match UniCaMo in either the motion specification or the underlying video diffusion model. In particular, \textit{Wan-Move + TAPIP3D tracks} projects the same 3D object tracks used by UniCaMo onto the image plane and provides the resulting 2D tracks to Wan-Move, thereby matching the quality of the input trajectories. \textit{Go-with-the-Flow (Wan2.1-I2V-14B)} uses the same Wan2.1-I2V-14B backbone as UniCaMo and is retrained on the same data with the same training recipe, including the LoRA rank and training schedule, leaving the noise-construction strategy as the primary difference. These variants help disentangle the benefits of UniCaMo’s 3D motion specification from those of its motion-and-view-consistent noise construction.
+
+
+
+% We compare UniCaMo against various prior motion-controllable video generation models. Some of them like Wan-Move~\citep{chu2025wan} and SymphoMotion~\citep{zhang2026symphomotion} can be used for controlling both camera and object motions, while some methods like Go-with-the-Flow~\citep{burgert2025go} and ImageConductor~\citep{wang2024imageconductor} are only applicable to control the object motion and mehthods like CamI2V~\citep{zheng2024cami2v} and CameraCtrl~\citep{he2024cameractrl} are only applicable for camera control. In general, we compare our method against the public released models of those methods. But UniCaMo's innovation is in both of its 3D trajectories for object and camera motions, as well as the motion-guided generation model, so when it is applicable, for the methods that might use similar things, we also consider variants of those methods, either with the same backbone or base model as ours, or using the same/similar type of specified object and camera motion trajectories (customized to work with their method). In particular, \textit{Wan-Move + TAPIP3D tracks} projects the same 3D tracks used by UniCaMo back onto the image plane and supplies them to Wan-Move, matching the track quality. \textit{Go-with-the-Flow (Wan2.1-I2V-14B)} retrains their noise warping on our own Wan2.1-I2V-14B backbone under an identical recipe --- same LoRA rank, data and training schedule --- leaving the noise-warping scheme as the only difference. 
+
+
+
+
+%~\citep{zhang2025tora,wang2024imageconductor,chu2025wan}. To enable an apples-to-apples comparison, we additionally construct two controlled baselines. \textit{Wan-Move + TAPIP3D tracks} projects the same 3D tracks used by UniCaMo back onto the image plane and supplies them to Wan-Move, matching the track quality. \textit{Go-with-the-Flow (Wan2.1-I2V-14B)} retrains their noise warping on our own Wan2.1-I2V-14B backbone under an identical recipe --- same LoRA rank, data and training schedule --- leaving the noise-warping scheme as the only difference. We then evaluate camera control against dedicated camera-control approaches~\citep{he2024cameractrl, ren2025gen3c, zhang2026symphomotion}; these are adapter-based models specialized for camera conditioning alone, which places a general joint-control model such as ours at a disadvantage. Finally, we compare against methods that claim both camera and object control~\citep{wang2025ati, chu2025wan, zhang2026symphomotion} in the joint-control setting.
+
+
+
+%We first evaluate UniCaMo under object motion control against prior controllable-generation methods~\citep{zhang2025tora,wang2024imageconductor,chu2025wan}. To enable an apples-to-apples comparison, we additionally construct two controlled baselines. \textit{Wan-Move + TAPIP3D tracks} projects the same 3D tracks used by UniCaMo back onto the image plane and supplies them to Wan-Move, matching the track quality. \textit{Go-with-the-Flow (Wan2.1-I2V-14B)} retrains their noise warping on our own Wan2.1-I2V-14B backbone under an identical recipe --- same LoRA rank, data and training schedule --- leaving the noise-warping scheme as the only difference. We then evaluate camera control against dedicated camera-control approaches~\citep{he2024cameractrl, ren2025gen3c, zhang2026symphomotion}; these are adapter-based models specialized for camera conditioning alone, which places a general joint-control model such as ours at a disadvantage. Finally, we compare against methods that claim both camera and object control~\citep{wang2025ati, chu2025wan, zhang2026symphomotion} in the joint-control setting.
+
+%Figure~\ref{fig:move-bench} shows representative examples in MoveBench under object motion control. 
+%Overall, UniCaMo generates temporally coherent videos that better preserve scene structure while following the specified object trajectories and camera motion.
+%Compared to the other baselines, our results exhibit fewer visuals artifacts and manages to follow the conditioning camera and object motions. Go-with-the-flow~\cite{burgert2025go} produces visible artifacts in small detail like human's head or feet, Wan-Move~\cite{chu2025wan} while exhibiting fewer artifacts in small detail, failed to generate motion that follow user's intention. Please see the included videos in the supplementary material for more scene details. 
+
+% \Cref{fig:dynamic-bench} demonstrates the generalization of our method on unseen samples from SpatialVID~\cite{wang2025spatialvid}. 
+% In the first example, we expect the white van to move leftward out of the video frame while the camera moves to the right. In this case, Wan-Move~\cite{chu2025wan} failed to generate plausible results. Our 3D-grounded motion-consistent noise representation represents such motion dynamics based on user-provided point tracks and camera trajectories, resulting in high-quality motion content.
+% In the second example, similarly, Wan-Move can pan the camera to the right but does not generate the cars in the correct moving direction. 
+% Contrastively, our method can generate realistic flows of the cars in the crowded street. 
+
+%\Cref{fig:dynamic-bench} demonstrates the generalization of our method on unseen in-the-wild samples with complex geometry and trajectory. 
+%In the first example, we expect the white van to move leftward out of the video frame while the camera moves to the right. In this case, Wan-Move~\cite{chu2025wan} failed to generate plausible results. Our 3D-grounded motion-consistent noise representation represents such motion dynamics based on user-provided point tracks and camera trajectories, resulting in high-quality motion content.
+%In the second example, similarly, Wan-Move can pan the camera to the right but does not generate the cars in the correct moving direction. 
+%Contrastively, our method can generate realistic flows of the cars in the crowded street. 
+% comment about new fig 5
+
+
+
+
+\begin{figure}[t]
+    \centering
+  \includegraphics[width=1.0\textwidth]{figures/movebench_qual.pdf}
+  \caption{Qualitative results on MoveBench between UniCaMo and recent approaches~\citep{chu2025wan, wang2025ati, zhang2026symphomotion}. 
+  }
+  \label{fig:move-bench}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+  \includegraphics[width=1.0\textwidth]{figures/re10k_qual.png}
+  \caption{Qualitative results on RE10K between UniCaMo and other baselines ~\citep{zhang2026symphomotion, ren2025gen3c}. Our method enable more precise camera control than the baselines.}
+  \label{fig:re10k_qual}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+  \includegraphics[width=1.0\textwidth]{figures/jointbench_qual.pdf}
+  \caption{Jointly control over camera and object motions. While other works struggles to generate realistic object dynamics and accurate camera poses, UniCaMo achieves high-quality  control.}
+  \label{fig:joint-bench}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+  \includegraphics[width=1.0\textwidth]{figures/abla_qual.pdf}
+  \caption{Qualitative results on ablation study of our 3D-aware structured motion noise.}
+  \label{fig:abla}
+\end{figure}
+
+% \begin{figure}[t]
+%     \centering
+%   \includegraphics[width=0.8\textwidth]{figures/dynbench_qual.pdf}
+%   \caption{Qualitative results on complex in-the-wild samples between our proposed UniCaMo and Wan-Move~\citep{chu2025wan}, Go-with-the-flow~\citep{burgert2025go}}
+%   \label{fig:dynamic-bench}
+% \end{figure}
+
+
+% \begin{figure}[t]
+%     \centering
+%   \vspace{-0.3cm}
+%   \includegraphics[width=0.8\textwidth]{figures/w_wo_sphere.pdf}
+%   \caption{Ablation results on the 3D sphere noise. Without 3D-consistent sphere noise sampling, the model tends to hallucinate random objects (red boxes) with implausible motion trajectories.}
+  
+%   \label{fig:sphere}
+% \end{figure}
+
+
+%\subsection{Quantitative Evaluation}
+
+
+\begin{table}[t]
+\centering
+%\vspace{-0.2cm}
+\caption{Evaluation results on MoveBench. We report quantitative comparisons on both the single-object and multi-object motion. Best results are shown in \textbf{bold}; second-best results are \underline{underlined}.}
+\label{tab:movebench}
+\setlength{\tabcolsep}{4pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l|ccccc|ccccc}
+\toprule
+& \multicolumn{5}{c|}{\textit{Test cases with single-object motion}}
+& \multicolumn{5}{c}{\textit{Test cases with multi-object motions}} \\
+Methods
+& FID $\downarrow$ & FVD $\downarrow$ & PSNR $\uparrow$ & SSIM $\uparrow$ & EPE $\downarrow$
+& FID $\downarrow$ & FVD $\downarrow$ & PSNR $\uparrow$ & SSIM $\uparrow$ & EPE $\downarrow$ \\
+\midrule
+%\hline 
+ImageConductor~\citep{wang2024imageconductor}
+& 34.51 & 424.11 & 13.43 & 0.49 & 15.66
+& 77.52  & 764.15 & 13.92 & 0.51 & 9.80 \\
+Tora~\citep{zhang2025tora}
+& 22.57 & 100.24 & 15.73 & 0.55 &  3.30
+& 53.27  & 350.00 & 14.50 & 0.54 & 3.50 \\
+ATI~\citep{wang2025ati}
+& 11.27 & 105.35 & 15.44 & 0.58 & 5.09
+& 30.72  & 278.91 & 16.19 & 0.62 & 3.17 \\
+Go-with-the-Flow (CogX-5B)~\citep{burgert2025go}
+& 12.49 & 216.90 & 15.80 & 0.62 &  3.04
+& 35.72  & 399.40 & 16.93 & 0.60 & 3.71 \\
+Go-with-the-Flow (Wan2.1-14B)
+& 12.31 &  96.14 & 17.60 & 0.64 &  2.71
+& 31.06 & 323.15 & 17.21 & 0.63 & 2.94 \\
+Wan-Move~\citep{chu2025wan}
+& 12.23 & \underline{83.50} & 17.80 & 0.64 &  2.60
+& 28.80  & \underline{226.33} & 16.70 & 0.62 & 2.20 \\
+Wan-Move + TAPIP3D tracks~\citep{chu2025wan}
+& 12.11 &  87.10 & 18.10 & 0.67 & 2.54
+& \underline{27.61}  & 294.80 & 16.50 & 0.65 & \underline{2.14} \\
+SymphoMotion~\citep{zhang2026symphomotion}
+& \textbf{9.92} & 89.27 & \textbf{18.50} & \textbf{0.74} & \underline{2.33} & 30.80 & 351.20 & \underline{17.57} & \underline{0.71} & 2.25 \\
+UniCaMo (Ours)
+& \underline{10.36} & \textbf{78.60} & \underline{18.40} & \underline{0.73} & \textbf{2.30}
+& \textbf{26.12}  & \textbf{215.20} & \textbf{18.15} & \textbf{0.72} & \textbf{1.92} \\
+\bottomrule
+\end{tabular}%
+}
+
+\end{table}
+\noindent\textbf{Object motion control.}
+\Tref{tab:movebench} reports quantitative results on MoveBench, with results reported separately for single-object and multi-object motion. UniCaMo outperforms prior motion-control methods across all metrics, achieving lower FID and FVD, higher PSNR and SSIM, and lower trajectory error (EPE). The advantage is particularly pronounced on the 192 multi-object cases, where UniCaMo achieves the lowest FVD and EPE, demonstrating stronger adherence to the specified motions in more complex multi-object scenarios. Qualitative comparisons are shown in \Fref{fig:move-bench}.
+
+%Table~\ref{tab:movebench} reports quantitative results on both MoveBench, spliting into two sets based on single-object or multi-object motioons; qualitative comparisons are shown in \Cref{fig:move-bench}.UniCaMo improves over prior motion-control methods on every metric, lowering FID and FVD, increasing PSNR and SSIM, and reducing trajectory error (EPE). On the $192$ multi-object cases the margin widens further: our method attains the lowest FVD and EPE, indicating that its adherence to the specified motion holds as scene geometry becomes more demanding.
+
+\begin{table}[t]
+\centering
+\caption{
+Camera-control evaluation on 300 randomly sampled clips from the RealEstate10K test set. We report rotation error (RotErr), translation error (TransErr), camera motion consistency (CamMC), and FID and FVD for visual quality. Best and second-best are \textbf{bolded} and \underline{underlined}.
+}
+\label{tab:camera}
+\setlength{\tabcolsep}{6pt}
+\scalebox{0.7915}{%
+\begin{tabular}{lccccc}
+\toprule
+Methods & FID $\downarrow$ & FVD $\downarrow$ & RotErr $\downarrow$ & TransErr $\downarrow$ & CamMC $\downarrow$ \\
+\midrule
+MotionCtrl~\citep{wang2024motionctrl}
+& 23.58 & 159.52 & 0.38 & 7.17 & 7.23 \\
+CamI2V~\citep{zheng2024cami2v}
+& 23.38 & 167.45 & \textbf{0.26} & 5.15 & 5.23 \\
+CameraCtrl~\citep{he2024cameractrl}
+& 23.80 & 165.37 & \underline{0.27} & 3.25 & 3.34 \\
+Gen3C~\citep{ren2025gen3c}
+& \underline{6.87} & \underline{52.39} & 0.33 & \underline{2.14} & \underline{2.28} \\
+SymphoMotion~\citep{zhang2026symphomotion}
+& 10.33 & 87.40 & 1.33 & 6.31 & 6.90 \\
+UniCaMo (Ours)
+& \textbf{5.99} & \textbf{39.93} & \textbf{0.26} & \textbf{1.89} & \textbf{1.98} \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\noindent\textbf{Camera control.}
+Table~\ref{tab:camera} summarizes the camera-control results. UniCaMo achieves the lowest TransErr ($1.89$) and CamMC ($1.98$), while matching the best RotErr ($0.26$) and achieving FID $5.99$ and FVD $39.93$. These results support our design of motion-and-view-consistent noise: the spherical noise representation provides persistent noise correspondences across changing viewpoints, including newly revealed regions, enabling the generated video to better follow the specified camera trajectory. Qualitative comparisons are shown in \Fref{fig:re10k_qual}.
+
+\begin{table}[t]
+\centering
+\caption{Evaluation of joint camera and object motion control on 300 clips randomly curated from publicly available sources, each containing simultaneous camera and object motion. Best results are shown in \textbf{bold}; second-best results are \underline{underlined}.}
+\label{tab:joint}
+\setlength{\tabcolsep}{6pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccc|ccc}
+\toprule
+Method
+& FID $\downarrow$ & FVD $\downarrow$ & PSNR $\uparrow$ & SSIM $\uparrow$ & EPE $\downarrow$
+& RotErr $\downarrow$ & TransErr $\downarrow$ & CamMC $\downarrow$ \\
+\midrule
+%\hline 
+ATI~\citep{wang2025ati}
+& 27.83 & 336.25 & 14.58 & 0.54 & 8.64 & 18.59 & 46.41 & 57.81 \\
+Wan-Move~\citep{chu2025wan}
+& 23.81 & 294.49 & 15.28 & 0.60 & 5.03 & 8.84 & 44.41 & 48.49 \\
+Wan-Move + TAPIP3D tracks~\citep{chu2025wan}
+& 24.17 & 288.52 & 15.16 & 0.58 & 4.92 & 8.12 & 42.11 & 46.63 \\
+SymphoMotion~\citep{zhang2026symphomotion}
+& \underline{20.67} & \underline{219.86} & \underline{17.95} & \underline{0.70} & \underline{3.28} & \underline{2.34} & \underline{20.88} & \underline{21.96} \\
+UniCaMo (Ours)
+& \textbf{18.19} & \textbf{192.43} & \textbf{18.88} & \textbf{0.72} & \textbf{2.95} & \textbf{1.23} & \textbf{16.27} & \textbf{16.74} \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\noindent\textbf{Joint camera and object motion control.}
+We evaluate joint control on our 300 curated clips, each containing simultaneous object and camera motion, and report both object- and camera-control metrics in Table~\ref{tab:joint}. We use this curated dataset because MoveBench and RealEstate10K evaluate object and camera motion control separately and therefore do not capture the joint setting for which UniCaMo is designed. UniCaMo achieves the best performance across all eight metrics, with particularly strong gains in this more challenging setting, where the specified object trajectories and camera motion must be satisfied simultaneously. Qualitative comparisons are shown in \Fref{fig:joint-bench}.
+
+% \noindent\textbf{Complex in-the-wild control.}
+% Real videos from publicly available datasets rarely combine demanding object and camera motion in the same clip. We therefore hand-author a set of harder joint-control cases, pairing complex 3D object trajectories with equally complex camera paths. \Cref{fig:dynamic-bench} shows representative examples: competing methods fail to produce a meaningful result under these conditions, while UniCaMo follows both the object and the camera trajectory.
+
+\noindent\textbf{Supplementary videos.} Please check our provided HTML page and appendices to see more videos and comparisons.
+
+
+
+%For camera-control benchmarks (RE10K, DL3DV), \son{missing sentence.}
+%Nevertheless, the trends observed in the available measurements and qualitative results consistently support the effectiveness of our sphere-projected noise construction for disocclusion handling and our depth-aware overlap resolution for geometry-consistent motion control. 
+
+% \begin{table}[!htbp]
+% \centering
+% \caption{Quantitative results on MoveBench (object motion control).}
+% \label{tab:quant}
+% \begin{tabular}{lccccc}
+% \toprule
+% Method & FID$\downarrow$ & FVD$\downarrow$ & PSNR$\uparrow$ & SSIM$\uparrow$ & EPE$\downarrow$ \\
+% \midrule
+% MagicMotion & 17.5 & 96.7 & 14.9 & 0.56 & 3.2 \\
+% Tora       & 22.5 & 100.4 & 15.7 & 0.55 & 3.3 \\
+% Wan-Move   & 12.2 & 83.5 & 17.8 & 0.64 & 2.6 \\
+% \midrule
+% \textbf{UnicaMo (Ours)} & \textbf{7.76} & \textbf{61.88} & \textbf{19.41} & \textbf{0.75} & \textbf{2.031} \\
+% \bottomrule
+% \end{tabular}
+% \end{table}
+
+
+
+
+
+% ---------------------------------------------------------------
+\subsection{Ablation Studies}
+\label{sec:ablation}
+
+\begin{table}[t]
+\centering
+\caption{Ablation study of our noise construction method on 300 clips containing simultaneous camera and object motion. Best in \textbf{bold}; second-best \underline{underlined}.}
+\label{tab:ablation_noise}
+\setlength{\tabcolsep}{3pt}
+\scalebox{0.7915}{%
+\begin{tabular}{l|cccc|ccccc|ccc}
+\toprule
+Setting
+& \shortstack{FG\\noise} & \shortstack{BG\\noise} & \shortstack{Sph.\\noise} & \shortstack{DA\\comp.}
+& FID $\downarrow$ & FVD $\downarrow$ & PSNR $\uparrow$ & SSIM $\uparrow$ & EPE $\downarrow$
+& RotErr $\downarrow$ & TransErr $\downarrow$ & CamMC $\downarrow$ \\
+\midrule
+A
+& \xmark & \xmark & \xmark & \xmark & 21.59 & 238.41 & 15.58 & 0.62 & 8.23 & 14.45 & 43.78 & 52.86 \\
+B
+& \cmark & \xmark & \xmark & \cmark & 19.38 & 210.29 & 17.32 & 0.66 & 3.98 & 7.76 & 30.45 & 34.68 \\
+C
+& \cmark & \cmark & \xmark & \cmark & \underline{18.32} & \textbf{191.51} & 18.15 & \textbf{0.73} & \underline{3.16} & \underline{1.51} & \underline{18.42} & \underline{19.11} \\
+D
+& \cmark & \cmark & \cmark & \xmark & 18.51 & 196.23 & \underline{18.85} & 0.71 & 3.35 & 1.74 & 18.85 & 19.56 \\
+E
+& \cmark & \cmark & \cmark & \cmark & \textbf{18.19} & \underline{192.43} & \textbf{18.88} & \underline{0.72} & \textbf{2.95} & \textbf{1.23} & \textbf{16.27} & \textbf{16.74} \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+To assess the contribution of each component, we begin from purely random Gaussian noise (Setting A) and introduce our components one at a time, measuring the gain each provides over the preceding setting. Results are reported in \Cref{tab:ablation_noise}.
+
+\noindent\textbf{Effect of foreground noise.}
+Propagating noise along the foreground 3D tracks (B) show significant improvements over fully independent Gaussian noise (A). It more than halves the trajectory error and substantially reduces every camera metric, while also lowering FID and FVD. Motion written into the initialisation is therefore inherited by the generated video. The top-left of \Fref{fig:abla} shows the corresponding qualitative result: random noise still produces a coherent video rather than collapsing outright, but it no longer follows the trajectories specified by the user.
+
+\noindent\textbf{Effect of background noise.}
+Extending propagation from the foreground alone (B) to the background point cloud (C) benefits camera control. This is expected, since the background carries information about scene geometry and layout, and therefore a camera signal that foreground tracks alone cannot supply. The top-right of \Fref{fig:abla} illustrates this: Setting B still reproduces the correct object motion, but the camera fails to follow the user's intention.
+
+\noindent\textbf{Effect of spherical noise.}
+Adding the spherical representation for regions absent from the reference point cloud (E) yields a further camera-control gain over C, while FID and FVD remain essentially unchanged, indicating that the gain is specific to camera fidelity rather than to appearance. The bottom-left of \Fref{fig:abla} shows where this matters most: when the camera translates over a long distance or rotates through a large angle, extensive novel-view regions are revealed, and the spherical noise supplies most of their content.
+
+\noindent\textbf{Effect of depth-aware noise composition.}
+Resolving collisions with the depth-aware z-buffer rather than compositing in 2D (D) improves performance across the board: EPE drops from $3.35$ to $2.95$, RotErr from $1.74$ to $1.23$, TransErr from $18.85$ to $16.27$ and CamMC from $19.56$ to $16.74$, with FID and FVD also improving. Ordering contributions by camera depth therefore matters throughout the sequence, not only in explicitly occluded regions. The bottom-right of \Fref{fig:abla} shows the failure mode: without depth-aware composition, the motion noise of the grinder is overwritten and washed out by the background, leaving the object static in Setting D.
+
+
+
+
+% \begin{table}[t]
+% \centering
+% \caption{Effect of the sphere-projected noise of Move-the-World, evaluated with camera-control metrics on the 300-clip RealEstate10K subset of Table~\ref{tab:camera}.}
+% \label{tab:movebench_ablation}
+% \renewcommand{\arraystretch}{1.15}
+% \setlength{\tabcolsep}{6pt}
+% \scalebox{0.7915}{%
+% \begin{tabular}{l|cc|ccc}
+% \toprule
+% \textbf{Setting}
+% & FID $\downarrow$ & FVD $\downarrow$
+% & RotErr $\downarrow$ & TransErr $\downarrow$ & CamMC $\downarrow$ \\
+% \midrule
+% Ours w/ sphere
+% & 5.99 & \textbf{39.93} & \textbf{0.26} & \textbf{1.89} & \textbf{1.98} \\
+% Ours w/o sphere
+% & \textbf{5.94} & 39.96 & 0.29 & 1.95 & 2.14 \\
+% \bottomrule
+% \end{tabular}
+% }
+% \vspace{-0.3cm}
+% \end{table}
+
+
+
+
+
+
+
+
+% \noindent\textbf{3D-sphere noise.}
+% We ablate the spherical noise representation by replacing sphere-sampled noise with independently sampled Gaussian noise in regions not covered by the reference point cloud. Without the persistent cross-frame correspondences provided by the sphere, newly revealed regions can become inconsistent across viewpoints, leading to less stable scene structure. As shown in \Cref{tab:movebench_ablation}, removing the sphere degrades all camera-control metrics (RotErr $0.29$ vs.\ $0.26$, TransErr $1.95$ vs.\ $1.89$, and CamMC $2.14$ vs.\ $1.98$), while visual quality remains largely unchanged (FID $5.94$ vs.\ $5.99$ and FVD $39.96$ vs.\ $39.93$). This suggests that the primary benefit of spherical noise is improved view consistency rather than visual quality.
+%We demonstrate the effectiveness of our 3D-sphere noise sampling qualitatively in \Cref{fig:sphere}.
+% Particularly, we build a baseline by disabling 3D-sphere noise sampling and substituting it with random noise.
+% Without 3D-sphere noise enforcing noise consistency across frames, the baseline produces severe hallucinations such as implausible objects and inconsistent placement in the scene.
+% In contrast, our method with 3D-sphere noise sampling activated as in the Move-the-World step generates convincing and realistic object movement.
+% To provide a closer look at how the sphere-projected noise affects video quality, we additionally report VBench-I2V~\cite{huang2023vbench} scores along with PSNR, SSIM, and EPE in \Cref{tab:movebench_ablation}~(a) on the MoveBench~\cite{chu2025wan} single-object motion split.
+% Enabling sphere noise improves PSNR ($19.28$ vs $19.10$) and EPE ($2.26$ vs $2.42$), and consistently raises Subject/Background Consistency, Aesthetic Quality, Temporal Flickering, and Motion Smoothness, confirming that the 3D-sphere noise is a critical component of UniCaMo.
+
+
+
+
+%Using purely constructed motion-noise ($\theta = 0.0$) yields best EPEs, but at the cost of degraded visual quality and consistency, as reflected by the VBench-I2V scores. On the other hand, blending too much Gaussian noise into the constructed motion-noise (e.g., $\theta = 0.5$) results in a substantial drop in performance across all metrics.
+%Consequently, we adopt $\theta = 0.2$ as the default setting in our experiments, as it achieves the most favorable trade-off between motion accuracy and visual fidelity.
+
+%\son{Need to also explain the benefit of 3D point tracks. Why 3D?}
+
+%\paragraph{Effect of patch dimension in noise propagation.}
+%Removing the sphere-orb sampling increases artifacts in disoccluded regions and weakens camera trajectory consistency.
+%This supports the hypothesis that camera-aware filling is crucial for joint control and for preserving per-frame Gaussianity.
+
+% ----------------------------------------------------------
+
+% ---------------------------------------------------------------
+\section{Conclusions}
+\label{sec:conclusion}
+We presented UniCaMo, a unified framework for joint 3D camera and object motion control in image-to-video diffusion models. UniCaMo encodes the desired motion directly into the diffusion initialization by combining noise propagation along 3D object trajectories with a spherical noise representation that maintains persistent noise correspondences across changing viewpoints and newly revealed regions. This view-and-motion-consistent noise enables precise control without additional adaptation modules or architectural modifications to the underlying video diffusion model, requiring only lightweight fine-tuning. Experiments across object motion, camera motion, and joint control demonstrate that UniCaMo achieves strong controllability and visual quality, establishing structured noise initialization as a simple and effective approach to unified 3D motion control in video generation.
+\FloatBarrier
+
+% TODO FINAL: Add acknowledgements in camera-ready version only.
+%\section*{Acknowledgements}
+%This section will be completed in the camera-ready version.
+
+% ---------------------------------------------------------------
+% ICLR 2027 requires an AI use statement at the end of the main text,
+% before the references. It does not count toward the page limit.
+\subsection*{AI use statement}
+In this study, generative AI tools were used exclusively to correct grammatical and spelling errors. All AI-assisted edits were reviewed, and every modification proposed by these tools was independently verified by two authors. The authors accept full responsibility for the final content of the manuscript, including any text, claims, or artifacts produced with the assistance of generative AI.
+
+% Recommended by ICLR 2027, placed after the AI use statement to follow the
+% template ordering. It does not count toward the page limit.
+\subsection*{Reproducibility statement}
+We have provided key algorithms in the main text and the appendices. Full codebase, model checkpoints and datasets will be publicly available upon acceptance.
+
+{
+\small
+\bibliographystyle{iclr2027_conference}
+\bibliography{main}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\appendix
+
+\clearpage
+\section*{Technical appendices and supplementary material}
+
+\input{sup}
+
+\end{document}

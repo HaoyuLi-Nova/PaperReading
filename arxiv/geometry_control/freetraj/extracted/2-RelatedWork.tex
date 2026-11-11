@@ -1,0 +1,30 @@
+\section{Related Work}
+\label{relatedwork}
+% \vspace{-0.5em}
+
+\noindent\textbf{Diffusion Models for Visual Generation.}
+%
+Diffusion models have revolutionized image and video generation, showcasing their ability to produce high-quality samples. 
+DDPM~\citep{ddpm} and Guided Diffusion~\citep{guided-diffusion} are groundbreaking works that show diffusion models can generate high-quality samples.
+%
+To improve efficiency, LDM~\citep{ldm} introduces latent space diffusion models that operate in a lower-dimensional space, reducing computational costs and training time, which serves as the foundation of Stable Diffusion. 
+%
+SDXL~\citep{sdxl} builds upon Stable Diffusion, achieving high-resolution image generation. 
+%
+Pixart-alpha~\citep{pixart-alpha} replaces the backbone with a pure transformer, resulting in high-quality and cost-effective image generation.
+%
+In terms of video generation, VDM~\citep{vdm} is the first video generation model that utilizes diffusion.
+LVDM~\citep{lvdm} takes it a step further by proposing a latent video diffusion model and hierarchical LVDM framework and achieves very long video generation.
+Align-Your-Latents~\citep{blattmann2023align} and AnimateDiff~\citep{guo2023animatediff} propose to insert temporal transformers into pre-trained text-to-image generation models to achieve text-to-video (T2V) generation.
+VideoComposer~\citep{videocomposer} presents a controllable text-to-video generation framework that is capable of controlling both spatial and temporal signals.
+VideoCrafter~\citep{chen2023videocrafter1, chen2024videocrafter2} and SVD~\citep{svd} scale up the latent video diffusion model to large datasets.
+Lumiere~\citep{lumiere} introduces temporal downsampling to the space-time U-Net.
+Sora~\citep{sora} is a closed-source video generator that has impressive results announced most recently and has garnered much attention.
+In this work, we choose VideoCrafter 2.0 (referred to as VideoCrafter in the rest of the paper) as our pre-trained base model, as it is a current state-of-the-art open-sourcing model based on the comprehensive evaluations from Vbench~\citep{vbench} and EvalCrafter~\citep{liu2023evalcrafter}.
+
+
+\noindent\textbf{Trajectory Control in Video Generation.}
+%
+Given the critical role of motion in video generation, research on motion control in generated videos has garnered increasing attention. One intuitive method involves utilizing motion extracted from reference videos~\citep{videop2p,dreamvideo,videocomposer,controlvideo}. For instance, approaches such as Tune-A-Video~\citep{tav}, MotionDirector~\citep{motiondirector}, and LAMP~\citep{lamp} use specific videos as references to generalize their motions to various generated videos. Although these methods achieve significant motion control in video generation, they require training for each reference motion. To circumvent the need for specific motion training, ControlNet-like structures, such as VideoComposer~\citep{videocomposer} and Control-A-Video~\citep{controlavideo}, employ depths, sketches, or moving vectors extracted from reference videos as conditions to control the motion of generated videos. However, these methods are limited to generating videos with pre-existing motions, constraining their creativity and customization.
+In contrast, controlling the motion of generated videos using trajectories or bounding boxes offers more flexibility and user-friendliness~\citep{mcdiff,dragvideo,boximator,directavideo,finegrained}. While training-based methods~\citep{mcdiff,dragnvwa,dragvideo,motionctrl,boximator} have demonstrated significant motion controllability, they demand substantial computing resources and are labor-intensive during data collection. Consequently, several training-free approaches~\citep{directavideo,finegrained} have emerged. These methods, such as Peekaboo~\citep{peekaboo} and TrailBlazer~\citep{trailblazer}, employ explicit attention control to direct the movement of generated objects according to specified trajectories. Our work also adopts a training-free approach. We enhance motion controllability in generated videos by imposing guidance on both noise construction and attention computation, resulting in improved performance in both motion control and video quality.
+

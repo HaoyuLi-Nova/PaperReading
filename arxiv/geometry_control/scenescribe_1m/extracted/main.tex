@@ -1,0 +1,91 @@
+% CVPR 2026 Paper Template; see https://github.com/cvpr-org/author-kit
+
+\documentclass[10pt,twocolumn,letterpaper]{article}
+
+%%%%%%%%% PAPER TYPE  - PLEASE UPDATE FOR FINAL VERSION
+\usepackage{cvpr}              % To produce the CAMERA-READY version
+%\usepackage[review]{cvpr}      % To produce the REVIEW version
+% \usepackage[pagenumbers]{cvpr} % To force page numbers, e.g. for an arXiv version
+\usepackage{bbding}
+\usepackage{multirow}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{makecell}
+
+% Import additional packages in the preamble file, before hyperref
+\input{preamble}
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+\newcommand{\tbd}{{\textcolor{red}{TBD}}}
+
+% It is strongly recommended to use hyperref, especially for the review version.
+% hyperref with option pagebackref eases the reviewers' job.
+% Please disable hyperref *only* if you encounter grave issues, 
+% e.g. with the file validation for the camera-ready version.
+%
+% If you comment hyperref and then uncomment it, you should delete *.aux before re-running LaTeX.
+% (Or just hit 'q' on the first LaTeX run, let it finish, and you should be clear).
+\definecolor{cvprblue}{rgb}{0.21,0.49,0.74}
+\usepackage[pagebackref,breaklinks,colorlinks,citecolor=cvprblue]{hyperref}
+\usepackage[misc]{ifsym} 
+
+%%%%%%%%% PAPER ID  - PLEASE UPDATE
+\def\paperID{} % *** Enter the Paper ID here
+\def\confName{CVPR}
+\def\confYear{2026}
+
+%%%%%%%%% TITLE - PLEASE UPDATE
+\title{SceneScribe-1M: A Large-Scale Video Dataset with Comprehensive \\  Geometric and Semantic Annotations}
+
+%%%%%%%%% AUTHORS - PLEASE UPDATE
+\author{Yunnan Wang\textsuperscript{1,2,4,5*}, Kecheng Zheng\textsuperscript{2*}, Jianyuan Wang\textsuperscript{3}, Minghao Chen\textsuperscript{3}, David Novotny, \\ Christian Rupprecht\textsuperscript{3},  Yinghao Xu\textsuperscript{2}, Xing Zhu\textsuperscript{2}, Wenjun Zeng\textsuperscript{4,5}, Xin Jin\textsuperscript{4,5}, Yujun Shen\textsuperscript{2 \text{\Letter}}\\
+\textsuperscript{1} Shanghai Jiao Tong University \quad \textsuperscript{2} Ant Group\quad \textsuperscript{3} Visual Geometry Group, University of Oxford\\
+ \textsuperscript{4} Ningbo Institute of Digital Twin, Eastern Institute of Technology, Ningbo \\ \textsuperscript{5} Zhejiang Key Laboratory of Industrial Intelligence and Digital Twin \\
+\rmfamily\href{https://wangyunnan.github.io/SceneScribe-1M}{https://wangyunnan.github.io/SceneScribe-1M}
+% For a paper whose authors are all at the same institution,
+% omit the following lines up until the closing ``}''.
+% Additional authors and addresses can be added with ``\and'',
+% just like the second author.
+% To save space, use either the email address or home page, not both
+}
+
+
+
+
+\begin{document}
+% \maketitle
+\twocolumn[{
+\renewcommand\twocolumn[1][]{#1}%
+\maketitle
+\vspace{-28pt}
+\begin{center}
+\includegraphics[width=0.99\textwidth]{figures/teaser2.pdf}
+\end{center}
+\vspace{-0.5cm}
+\captionof{figure}{\textbf{SceneScribe-1M} offers more than one million dynamic scenes spanning over 4,000 hours, featuring \textit{comprehensive semantic and geometric annotations} (\textit{i.e.}, detailed description, motion masks, camera poses, continuous video depths, and dynamic tracks). It supports \textit{diverse downstream tasks} (\textit{i.e.}, modular depth estimation, scene reconstruction, dynamic point tracking, and pose/text-to-video generation).}
+\label{teaser}
+\vspace{0.6cm}
+}]
+% \footnote{$^*$Equal contribution. \quad \text{\Letter} Corresponding author.}
+\def\thefootnote{*}\footnotetext{Equal Contribution. \ \textsuperscript{\text{\Letter}} Corresponding author.}
+% \def\thefootnote{\Letter}\footnotetext{Corresponding author.}
+\def\thefootnote{\arabic{footnote}} % 恢复默认数字编号
+
+\input{sec/0_abstract}    
+\input{sec/1_intro}
+\input{sec/2_related_work}
+\input{sec/3_data}
+\input{sec/4_experiments}
+\input{sec/5_conclution}
+% \newpage
+{
+    \small
+    \bibliographystyle{ieeenat_fullname}
+    \bibliography{main}
+}
+
+% WARNING: do not forget to delete the supplementary pages from your submission 
+% \input{sec/X_suppl}
+
+\end{document}

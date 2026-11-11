@@ -1,0 +1,97 @@
+name: Enforce English for issues
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  enforce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            // === 更稳健的中文检测：支持汉字 + 全角标点（需要 /u 标志）===
+            const CJK = /[\p{Script=Han}\u3000-\u303F\uFF00-\uFFEF]/u;
+
+            const issue = context.payload.issue || {};
+            const title = issue.title || "";
+            const body  = (issue.body || "").trim();
+
+            const text = `${title}\n${body}`;
+            const hasCJK = CJK.test(text);
+
+            // 日志：在 Actions 里直观看到检测结果
+            core.info(`en-only-issues: titleLen=${title.length}, bodyLen=${body.length}, hasCJK=${hasCJK}`);
+            core.info(`en-only-issues: title="${title.replace(/\n/g,' ')}"`);
+            // 不打印 body 全文，避免泄露隐私；如需，可打印前 N 字
+            core.info(`en-only-issues: bodyPreview="${body.slice(0,80).replace(/\n/g,' ')}${body.length>80?'…':''}"`);
+
+            if (!hasCJK) {
+              core.info('No CJK detected. Skipping.');
+              return;
+            }
+
+            const { owner, repo } = context.repo;
+            const number = issue.number;
+
+            // 确保标签存在（第一次会创建）
+            async function ensureLabel(name, color, description) {
+              try {
+                await github.rest.issues.getLabel({ owner, repo, name });
+                core.info(`Label "${name}" exists.`);
+              } catch {
+                core.info(`Label "${name}" not found. Creating...`);
+                try {
+                  await github.rest.issues.createLabel({ owner, repo, name, color, description });
+                  core.info(`Label "${name}" created.`);
+                } catch (e) {
+                  core.warning(`Create label failed (may exist): ${e.message}`);
+                }
+              }
+            }
+            await ensureLabel('non-english', 'B60205', 'Contains non-English text');
+
+            // 打标签
+            try {
+              await github.rest.issues.addLabels({
+                owner, repo, issue_number: number, labels: ['non-english']
+              });
+              core.info('Label applied.');
+            } catch (e) {
+              core.warning(`Add label failed: ${e.message}`);
+            }
+
+            // 机器人回复
+            try {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: number,
+                body: 'English only please. 此 Issue 含非英文内容，已自动关闭并锁定。请使用英文重新提交。'
+              });
+              core.info('Comment posted.');
+            } catch (e) {
+              core.warning(`Comment failed: ${e.message}`);
+            }
+
+            // 关闭
+            try {
+              await github.rest.issues.update({
+                owner, repo, issue_number: number, state: 'closed'
+              });
+              core.info('Issue closed.');
+            } catch (e) {
+              core.warning(`Close failed: ${e.message}`);
+            }
+
+            // 锁帖
+            try {
+              await github.rest.issues.lock({
+                owner, repo, issue_number: number, lock_reason: 'off-topic'
+              });
+              core.info('Issue locked.');
+            } catch (e) {
+              core.warning(`Lock failed: ${e.message}`);
+            }

@@ -1,0 +1,17 @@
+%\setlength\tabcolsep{.4em}
+\begin{table}[t]
+\centering
+\footnotesize
+\caption{  \textbf{Feature network}. Replacing the image encoder with a frozen pre-trained Vision Transformer decreases the performance. }\label{tab:dino_ablation}
+\begin{tabular}{ lcccccc }
+\toprule
+ \multirow{2}{*}{Feature Network}  & \multicolumn{3}{c}{DAVIS First} & \multicolumn{2}{c}{BADJA} \\
+\cmidrule(lr){2-4}
+\cmidrule(lr){5-6}
+             & AJ            & \! \! \! $< \delta^x_{avg}$\! & OA            & \! \! seg-based\! \! & \! \! $< \delta^{3px}$ \! \! \\
+\midrule
+\textbf{CNN} & \textbf{51.2} & \textbf{68.5}                 & \textbf{85.2} & 65.5                 & \textbf{15.4}                \\
+DINOv2       & 38.8          & 56.2                          & 83.6          & \textbf{67.3}        & 9.1                          \\
+\bottomrule
+\end{tabular}
+\end{table}

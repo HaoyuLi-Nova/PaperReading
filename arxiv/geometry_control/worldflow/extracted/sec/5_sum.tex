@@ -1,0 +1,37 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+We presented \method{}, a world model that jointly generates
+future video and metric 3D flow from a single observation,
+a language instruction, and 3D query points.
+Continuous flow tokens are grounded in video coordinates
+and initial point geometry, enabling both modalities to be
+jointly denoised by a shared rectified-flow generator.
+Experiments across diverse embodied domains demonstrate
+improved motion forecasting over direct flow predictors
+and video-generation-then-tracking pipelines.
+
+The current formulation requires predefined query points
+and inherits noise from automatically generated trajectory
+supervision.
+Future work will explore automatic query selection,
+multimodal futures, and joint generation of 3D flow and
+actions to study the benefits of explicit motion
+representations for policy learning.
+
+\section*{AI Use Statement}
+We used generative AI tools to assist with translation,
+provide feedback on experimental methodology, and
+interpret experimental results.
+Gemini 2.5 Pro was used to generate captions for
+Sim7 and Real3, as described in the dataset section.
+We additionally used AI tools to assist with manuscript
+drafting, language editing, organization, and LaTeX
+formatting.
+The authors reviewed the AI-assisted content and checked
+technical descriptions, numerical comparisons, and
+conclusions against the methodology and experimental
+records.
+The authors take full responsibility for the final
+content of this work, including all AI-assisted text,
+claims, and artifacts.

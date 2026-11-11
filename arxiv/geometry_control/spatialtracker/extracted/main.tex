@@ -1,0 +1,186 @@
+\documentclass[10pt,twocolumn,letterpaper]{article}
+
+
+\usepackage{cvpr}              % To produce the CAMERA-READY version
+% \usepackage[review]{cvpr}      % To produce the REVIEW version
+% \usepackage[pagenumbers]{cvpr} % To force page numbers, e.g. for an arXiv version
+
+
+\usepackage{capt-of}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{xspace}
+\usepackage{enumitem}
+\usepackage{amsmath,amssymb,amsbsy,amsfonts,dsfont,pifont,bm,bbm,mathrsfs,mathtools,nicefrac}
+\usepackage{algorithm,algpseudocode,listings}
+\usepackage{booktabs,multirow,adjustbox,diagbox,threeparttable,tabularray}
+\usepackage{bm}
+
+
+\input{define}
+
+\newcommand{\method}{\texttt{SpatialTracker}\xspace}
+\newcommand{\supp}{\textit{Supplementary Material}\xspace}
+\newcommand{\todo}[1]{{\color{red} [TODO: #1]}}
+\newcommand{\tomerge}[1]{{\color{green} [MERGE: #1]}}
+\newcommand{\tocheck}[1]{{\color{red} [CHECK: #1]}}
+\newcommand{\tofinish}[1]{{\color{red} [TO FINISH: #1]}}
+\newcommand{\tocite}[1]{{\color{red} [TO CITE]}}
+\newcommand{\sd}[2]{{\textcolor{cyan}{[Sida: (#1) \textcolor{gray}{#2}]}}}
+\newcommand{\qw}[1]{{\color{blue} [Qianqian: #1]}}
+\newcommand{\yx}[1]{{\color{purple} [Yuxi: #1]}}
+\newcommand{\nan}[1]{{\color{orange} [Nan: #1]}}
+\newcommand{\yj}[1]{{\color{cyan} [Yujun: #1]}}
+\newcommand\blfootnote[1]{%
+  \begingroup
+  \renewcommand\thefootnote{}\footnote{#1}%
+  \addtocounter{footnote}{-1}%
+  \endgroup
+}
+
+\definecolor{cvprblue}{rgb}{0.21,0.49,0.74}
+\usepackage[pagebackref,breaklinks,colorlinks,citecolor=cvprblue]{hyperref}
+% \usepackage{subfigure}
+\usepackage{wrapfig}
+\usepackage[capitalize]{cleveref}  % Should be loaded after 'hyperref', and works perfectly with 'subfigure'.
+\crefname{section}{Sec.}{Secs.}
+\Crefname{section}{Section}{Sections}
+\crefname{table}{Tab.}{Tabs.}
+\Crefname{table}{Table}{Tables}
+\crefname{figure}{Fig.}{Figs.}
+\Crefname{figure}{Figure}{Figures}
+\crefname{equation}{Eq.}{Eqs.}
+\Crefname{equation}{Equation}{Equations}
+\hyphenpenalty=1200
+
+
+\def\paperID{3369}
+\def\confName{CVPR}
+\def\confYear{2024}
+
+
+% Footnote without number.
+\newcommand\nonumfootnote[1]{%
+\begingroup%
+    \renewcommand\thefootnote{}\footnote{\hspace{-3.7pt}#1}%
+    \addtocounter{footnote}{-1}%
+\endgroup%
+}
+
+
+\begin{document}
+
+
+% \title{Lifting High-fidelity Image Translation to Video with Implicit Deformable Representations}
+% \title{Disentangled Video Representation with Hash Deformation Field}
+% \title{Hash Deformation Field: An Image-friendly Video Representation}
+% \title{Lifting Image Algorithms to Videos with Content Deformation Fields}
+% \title{SpatialTracker: Track Any Pixels in 3D with Any Pairs Rigid Affinity}
+% \title{Comet: Tracking Occluded Points in Videos via 3D Trajectory Estimation}
+\title{SpatialTracker: Tracking Any 2D Pixels in 3D Space}
+
+
+\author{
+    Yuxi Xiao\textsuperscript{1,3*} \quad
+    Qianqian Wang\textsuperscript{2*} \quad
+    Shangzhan Zhang\textsuperscript{1,3} \quad
+    Nan Xue\textsuperscript{3} \\[2pt]
+    Sida Peng\textsuperscript{1} \quad
+    Yujun Shen\textsuperscript{3} \quad
+    Xiaowei Zhou\textsuperscript{1}$^{\dagger}$ \quad
+    \\[5pt]
+    $^1$Zhejiang University \qquad
+    $^2$UC Berkeley \qquad
+    $^3$Ant Group \\[8pt]
+}
+
+
+
+\twocolumn[{
+\renewcommand\twocolumn[1][]{#1}
+\maketitle
+\begin{center}
+    \vspace{-21pt}
+    \includegraphics[width=1.0\linewidth]{figures/teaser.png}
+    \vspace{-50pt}
+    \captionsetup{type=figure}
+    \caption{% 
+        {\bf Tracking 2D pixels in 3D space.} 
+        To estimate 2D motion under the occlusion and complex 3D motion, we lift 2D pixels into 3D and perform tracking in the 3D space. Two cases of the estimated 3D and 2D trajectories of a waving butterfly (top) and a group of swimming dolphins (bottom) are illustrated.
+        % The first and third rows show the 3D trajectories of a waving butterfly and a group of swimming dolphins. And the second and forth rows are their 2D tracking respectively.  
+        % The 3D motion of the two wings can be approximated by rotations of rigid parts and satisfy the as-rigid-as-possible constraint.
+        % The 3D motion of the two wings can be approximated by two rigid groups, adhering to the as-rigid-as-possible constraint.
+        % The three rows show the 3D trajectories, 2D trajectories, and rigid part labels predicted by our model, respectively.
+        % The 2D motion field of a waving butterfly is complex, while its 3D motion can be approximated by rotations of rigid parts which are easier to track with the as-rigid-as-possible constraint. The three rows show the 3D trajectories, 2D trajectories, and rigid part labels predicted by our model, respectively.
+    }
+    \vspace{-4mm}
+    \label{fig:teaser}
+\end{center}
+}]
+
+\iffalse
+\twocolumn[{
+\renewcommand\twocolumn[1][]{#1}
+\maketitle
+\begin{center}
+    \vspace{-5pt}
+\iffalse
+    \begin{minipage}[c]{0.02\linewidth}\rotatebox{90}{\small 3D Trajectories}\end{minipage}
+    \begin{minipage}[c]{0.97\linewidth}
+    \includegraphics[width=0.24\linewidth]{figures/teaser-blender/0018.png}
+    \includegraphics[width=0.24\linewidth]{figures/teaser-butterfly-3d.png}
+    \includegraphics[width=0.24\linewidth]{figures/teaser-blender/0058.png}
+    \includegraphics[width=0.24\linewidth]{figures/teaser-blender/0084.png}
+    \end{minipage}\vspace{10pt}
+    
+    \begin{minipage}[c]{0.02\linewidth}\rotatebox{90}{\small 2D Trajectories}\end{minipage}
+    \begin{minipage}[c]{0.97\linewidth}
+    \includegraphics[width=0.24\linewidth]{figures/results/butterfly_ours-crop/00001.png}
+    \includegraphics[width=0.24\linewidth]{figures/results/butterfly_ours-crop/00018.png}
+    \includegraphics[width=0.24\linewidth]{figures/results/butterfly_ours-crop/00058.png}
+    \includegraphics[width=0.24\linewidth]{figures/results/butterfly_ours-crop/00090.png}
+    \end{minipage}\vspace{3pt}
+    
+    \begin{minipage}[c]{0.02\linewidth}\rotatebox{90}{\small Rigid Parts}\end{minipage}
+    \begin{minipage}[c]{0.97\linewidth}
+    \includegraphics[width=0.24\linewidth]{figures/rigid-motion-seg/00000.png} 
+    \includegraphics[width=0.24\linewidth]{figures/rigid-motion-seg/00040.png} 
+    \includegraphics[width=0.24\linewidth]{figures/rigid-motion-seg/00036.png} 
+    \includegraphics[width=0.24\linewidth]{figures/rigid-motion-seg/00032.png} 
+    \end{minipage}
+\fi
+    % \begin{minipage}[c]{0.97\linewidth}
+    \includegraphics[0.97\linewidth]{figures/teaser.png}
+    % \end{minipage}
+    \vspace{-3pt}
+    \captionsetup{type=figure}
+    \caption{% 
+        {\bf Tracking 2D pixels in 3D space.} To estimate the 2D motion of a waving butterfly, we propose to lift 2D pixels into 3D and perform tracking in the 3D space. 
+        % The 3D motion of the two wings can be approximated by rotations of rigid parts and satisfy the as-rigid-as-possible constraint.
+        The 3D motion of the two wings can be approximated by two rigid groups, adhering to the as-rigid-as-possible constraint.
+        The three rows show the 3D trajectories, 2D trajectories, and rigid part labels predicted by our model, respectively.
+        % The 2D motion field of a waving butterfly is complex, while its 3D motion can be approximated by rotations of rigid parts which are easier to track with the as-rigid-as-possible constraint. The three rows show the 3D trajectories, 2D trajectories, and rigid part labels predicted by our model, respectively.
+    }
+    \label{fig:teaser}
+    \vspace{8pt}
+\end{center}
+}]
+\fi
+
+\blfootnote{$^*$The first two authors contributed equally. The authors from Zhejiang University are affiliated with the State Key Lab of CAD\&CG. $^\dagger$Corresponding author: Xiaowei Zhou.}
+
+\input{sections/0.abs.tex}
+\input{sections/1.intro.tex}
+\input{sections/2.related.tex}
+\input{sections/3.method.tex}
+\input{sections/4.exp.tex}
+\input{sections/5.conclusion.tex}
+% \vspace{-0.5em}
+
+\vspace{6pt}\noindent{\large\bf Acknowledgement}
+\vspace{6pt} \\
+\noindent This work was partially supported by National Key Research and Development Program of China (No. 2020AAA0108900), Ant Group, and Information Technology Center and State Key Lab of CAD\&CG, Zhejiang University.
+
+\input{sections/6.ref.tex}
+
+
+\end{document}

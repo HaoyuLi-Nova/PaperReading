@@ -1,0 +1,36 @@
+\section{Related Work}
+\label{sec:related_work}
+
+\mypar{Video Diffusion Models.}
+Diffusion models~\cite{sohldickstein2015diffusion,ho2020denoising,song2020denoising} have demonstrated amazing capabilities for video generation, conditioned on natural language~\cite{ho2022video,ho2022imagen,guo2023animatediff,girdhar2023emu,bar2024lumiere} or by ``animating'' static images into videos~\cite{singer2022make,blattmann2023stable,xing2024dynamicrafter}.
+Beyond content creation~\cite{polyak2024movie}, they can be seen as a path to the ambitious goal of creating world simulators~\cite{videoworldsimulators2024}, showing preliminary success in visual planning for embodied agents~\cite{du2024learning,escontrela2024video,yang2024video}.
+Meanwhile, whether the video prior captures sufficient understanding of the physical world is still under debate~\cite{kang2024far}, and explicit integration of physics rules appears to be necessary~\cite{yuan2023physdiff,liu2024physgen,yu2024lucidsim}. 
+Our motion prompting technique, applicable to any video diffusion model, not only offers a more flexible and accurate interface to specify motion patterns for video generation, but also serves as a framework to probe %
+a trained generative model for their 3D or physics understanding.
+
+\mypar{Motion-conditioned Video Generation.}
+A pre-trained text-to-video model can be adapted to follow new motion patterns or additional motion conditioning signals.
+Low-rank adaptation (LoRA)~\cite{hu2021lora}, a generic technique for parameter fine-tuning, can be utilized for few-shot motion customization~\cite{ren2024customize,zhao2025motiondirector}.
+DreamBooth~\cite{ruiz2022dreambooth}, originally for personalized image generation, can also be applied to video generation~\cite{wu2024motionbooth} with motion control.
+
+Early work proposes video control through sparse motions~\cite{hao2018controllable,ardino2021click}. More recent work explores similar ideas with more powerful models. %
+The approaches vary in their design choices but often require certain complicated engineering techniques for stable training and better convergence.
+Tora~\cite{zhang2024tora}, MotionCtrl~\cite{wang2024motionctrl}, DragNUWA~\cite{yin2023dragnuwa}, Image Conductor~\cite{li2024image}, and MCDiff~\cite{chen2023mcdiff} adopt two-stage (\eg, finetuning with first dense and then sparse trajectories, or training adapters sequentially), specialized losses~\cite{li2024image,namekata2024sg}, architectures~\cite{xiao2024trajectory,feng2024i2vcontrol}, or multi-stage fine-tuning for multiple modules~\cite{2023videocomposer,chen2023mcdiff,shi2024motion}.
+MOFA-Video~\cite{niu2024mofa} requires separate adapters for different motion types, TrackGo~\cite{zhou2024trackgo} uses custom losses and layers, while other works~\cite{yin2023dragnuwa,wang2024motionctrl,niu2024mofa,li2024image,zhang2024tora} engineer data filtering pipelines.
+In contrast, we find that a simpler training recipe yields high quality results. Our model is trained in a single stage, with uniformly sampled dense trajectories, and without any specialized engineering efforts. %
+Yet it handles a wide range of tasks and motions, generalizing to both sparse and dense trajectories during inference.
+
+Other approaches use entity-centric control signals such as bounding boxes~\cite{wu2024motionbooth,wang2024boximator}, segmentation masks~\cite{wu2024draganything, dai2023finegrained}, human pose~\cite{hu2023animateanyone,xu2023magicanimate}, or camera pose~\cite{he2024cameractrl,watson2024controlling}.
+Zero-shot motion adaptation approaches (\eg,~SG-I2V~\cite{namekata2024sg}, Trailblazer~\cite{ma2023trailblazer}, FreeTraj~\cite{qiu2024freetraj}, and Peekaboo~\cite{jain2024peekaboo}) adopt a similar strategy, guiding the video generation based on the motion of entity-centric masks and thus avoiding training or fine-tuning video models.
+Our motion prompts offer a more flexible interface to control motion generation at various granularity. Unlike the test-time approaches which explicitly control the diffusion feature maps, our framework naturally balances the strength of controlling signals and that of the encoded video priors.
+
+\mypar{Motion Representations.} 
+As our goal is to condition a video generation model on motion of any type, it is crucial to choose a suitable motion representation. 
+The most common representation is optical flow~\cite{horn1981determining,lucas1981iterative,brox2010large,dosovitskiy2015flownet,sun2018pwc,teed2020raft}.
+While flow can be chained over time, errors can accumulate.
+The lack of occlusion handling also makes it unsuitable for our needs, which we find necessary for good camera control (\cref{sec:depth}).
+In contrast, long-range feature matching~\cite{jabri2020space,bian2022learning,shrivastava2024selfsupervised,jiang2021cotr} or point trajectories~\cite{harley2022particle,zheng2023point,karaev23cotracker,karaev2024cotracker3,doersch2023tapir,doersch2024bootstap} is a well-suited representation for our application. It can handle occlusions and allows for both sparse and dense tracking over any arbitrary temporal durations. 
+
+
+
+

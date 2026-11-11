@@ -1,0 +1,71 @@
+
+\documentclass{article} %
+\usepackage{iclr2025_conference,times}
+
+\input{math_commands.tex}
+
+\usepackage{hyperref}
+\usepackage{url}
+
+\usepackage{floatrow}
+\usepackage{comment}
+\usepackage{bbding}
+\usepackage{tabularx}
+\usepackage{colortbl}
+\usepackage{multirow}
+\usepackage{xspace}
+\usepackage[acronym]{glossaries}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{booktabs}
+
+\usepackage{textcomp}
+\usepackage{gensymb}
+\usepackage{mwe}
+\usepackage{subcaption}
+
+\usepackage[capitalize]{cleveref}
+\crefname{section}{Sec.}{Secs.}
+\Crefname{section}{Section}{Sections}
+\Crefname{table}{Table}{Tables}
+\crefname{table}{Tab.}{Tabs.}
+\Crefname{figure}{Figure}{Figures}
+\crefname{figure}{Fig.}{Figs.}
+
+\definecolor{Midori}{RGB}{0, 155, 0}
+\definecolor{amethyst}{rgb}{0.6, 0.4, 0.9}
+
+
+
+\title{SG-I2V: Self-Guided Trajectory Control \\ in Image-to-Video Generation}
+
+\author{Koichi Namekata$^{1}$, Sherwin Bahmani$^{1,2}$, Ziyi Wu$^{1,2}$, Yash Kant$^{1,2}$,
+Igor Gilitschenski$^{1,2}$,\\ \textbf{David B. Lindell}$^{1,2}$\\
+$^{1}$University of Toronto, $^{2}$Vector Institute\\
+}
+
+\iclrfinalcopy %
+\begin{document}
+
+\input{sec/teaser}
+\maketitle
+\input{sec/0_abstract}    
+\input{sec/1_intro}
+\input{sec/2_related}
+\input{sec/4_method}
+\input{sec/5_experiments}
+\input{sec/6_conclusion}
+\input{sec/ethics}
+
+\bibliography{egbib}
+\bibliographystyle{iclr2025_conference}
+
+
+\newpage
+\appendix
+
+\input{sec/7_appendix}
+
+\end{document}

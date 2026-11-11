@@ -1,0 +1,308 @@
+% Add to the main preamble (before \begin{document}):
+% \usepackage{amsmath,amssymb,booktabs,graphicx,array}
+% Input this file only after \maketitle.
+% Figures are stored in supplementary/figures/.
+
+\section{Data Processing Details and Dataset Statistics}
+\label{sec:supp-data}
+
+\subsection{Data Processing Details}
+
+The main paper provides an overview of the data pipeline;
+here, we describe the source-specific processing details.
+For Sim7, Real3, and SpatialCog, we extract trajectories
+directly from the original videos using a standardized
+configuration of 49 RGB frames and 64 query points per
+object record.
+Tracked pixels are back-projected using depth and camera
+intrinsics, and camera poses transform the resulting 3D
+points into the first-frame camera coordinate system.
+The object mask in the first frame defines the visible
+partial surface from which the query points are selected.
+RGB frames and point trajectories are generated at the
+same temporal indices and therefore require no subsequent
+temporal realignment.
+
+For MolmoMotion-1M, we reuse the released trajectories and
+associated geometry rather than extracting trajectories
+from the source videos.
+We transform the trajectories into the same first-frame
+camera coordinate system and standardize their point
+counts and temporal lengths.
+Records with fewer than eight valid object-point candidates
+are discarded.
+When more than 64 candidates are available, we use
+deterministic voxel-uniform sampling to maintain spatial
+coverage; for records with 8--63 candidates, we sample
+64 points with replacement using a fixed random seed.
+RGB frames and point trajectories are aligned using
+identical temporal indices.
+Intervals longer than 49 frames are uniformly subsampled,
+whereas intervals containing 8--48 frames are extended
+to 49 frames by repeating the final RGB frame and point
+positions.
+The resulting padded transitions have zero ground-truth
+displacement.
+The repeated RGB frames and their zero-displacement
+targets are included in training supervision.
+
+\paragraph{Quality control.}
+In addition to format standardization, we assess trajectory
+quality along four dimensions: geometric validity,
+temporal continuity, observation completeness, and motion
+plausibility.
+Geometric checks reject invalid camera parameters,
+non-finite 3D coordinates, and inconsistent depth--position
+changes.
+Temporal checks detect abrupt changes in point position,
+depth, or object extent.
+Observation checks limit the fractions of trajectories
+that leave the image or lack valid measurements.
+Motion checks identify implausible displacement, velocity,
+and spatial-scale changes.
+
+The criteria depend on the reliability of each source's
+geometry and scale.
+For motion magnitude, SpatialCog and Real3 retain peak
+displacements in $[0.05,3]$\,m, while metric MolmoMotion-1M
+subsets impose an upper limit of 3\,m.
+To detect temporal discontinuities, Real3 limits the
+99.5th percentile of frame-rate-normalized step displacement
+to 0.5\,m; metric MolmoMotion-1M subsets additionally cap
+individual steps at 1\,m and speed at 15\,m/s.
+DROID also rejects concurrent discontinuities in depth
+and 3D position.
+For spatial consistency, Real3 and metric MolmoMotion-1M
+subsets limit the increase in RMS spatial radius to 0.25\,m.
+For observation completeness, these sources cap the
+out-of-frame fraction at 5\%; metric MolmoMotion-1M subsets
+also cap the unobserved fraction at 5\%.
+
+For YT-VIS, which lacks a reliable metric scale, we instead
+use relative step-to-range, adjacent-depth, and spatial-radius
+statistics without absolute displacement or speed thresholds.
+Simulation records are screened for complete geometry and
+valid task annotations.
+All motion and continuity checks are evaluated before
+temporal padding.
+
+Figure~\ref{fig:supp-data-composition} summarizes the
+source-specific candidate counts and retention after
+formatting, quality control, and manifest validation,
+before the training/evaluation split.
+For SpatialCog, 82,831 post-prefilter candidate records
+yield 82,588 valid manifest records, corresponding to
+a retention rate of 99.7\%.
+This pool includes all 400 SpatialCog evaluation samples
+in WorldFlowBench.
+These samples are excluded at training time, leaving
+82,188 SpatialCog records for training.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]
+{supplementary/figures/data_composition.pdf}
+\caption{
+Initial data volume and retention across sources before
+the training/evaluation split.
+(a) Number of candidate object records entering the
+reported processing stage, shown on a logarithmic scale.
+(b) Fraction retained after formatting, quality control,
+and manifest validation, before benchmark exclusion.
+For SpatialCog, 82,831 candidate records yield 82,588
+valid records, corresponding to a retention rate of 99.7\%.
+Initial counts describe source-specific candidate pools
+rather than the full original datasets.
+Colors indicate the four collections defined in the main
+paper.
+All counts refer to object records rather than unique videos.
+}
+\label{fig:supp-data-composition}
+\end{figure}
+
+\subsection{Dataset Statistics}
+
+Table~\ref{tab:supp-training-data} summarizes the processed
+data inventory. Real3 and SpatialCog exclude WorldFlowBench
+records; Sim7 uses its QC inventory before runtime exclusion.
+The reported 1,438,379 standardized object clips comprise
+70,480,571 frame instances, or approximately 1,223.6 hours
+at 16 FPS. With 64 query points and 48 displacement steps
+per clip, they contain 92,056,256 point trajectories and
+4,418,700,288 3D displacement vectors.
+These totals precede Sim7 runtime exclusion and may include
+padded frames, repeated query points, and multiple object
+records sharing the same source video.
+
+\begin{table}[t]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{@{}ll>{\raggedright\arraybackslash}p{0.36\linewidth}rr@{}}
+\toprule
+Source
+& Collection
+& Description
+& \shortstack{Object\\clips}
+& \shortstack{Standardized\\duration (h)} \\
+\midrule
+Sim7
+& Sim7
+& Simulated robot manipulation drawn from seven simulation datasets.
+& 190,267 & 161.9 \\
+\cmidrule(lr){1-5}
+
+AgiBot World
+& Real3
+& Real-world robot manipulation across diverse environments and tasks.
+& 631,873 & 537.5 \\
+\cmidrule(lr){1-5}
+
+STH-V2
+& Real3
+& Human--object interactions covering a broad range of object motions.
+& 86,811 & 73.8 \\
+\cmidrule(lr){1-5}
+
+EPIC-KITCHENS
+& Real3
+& Egocentric human activities and object interactions in kitchens.
+& 5,337 & 4.5 \\
+\cmidrule(lr){1-5}
+
+SpatialCog
+& SpatialCog
+& Tabletop and household interactions emphasizing spatial relations.
+& 82,188 & 69.9 \\
+\cmidrule(lr){1-5}
+
+MolmoSpaces
+& MolmoMotion-1M
+& Simulated interactive scenes with released 3D motion annotations.
+& 164,970 & 140.3 \\
+\cmidrule(lr){1-5}
+
+DROID
+& MolmoMotion-1M
+& Real-world robot manipulation collected across multiple environments
+and tasks.
+& 19,739 & 16.8 \\
+\cmidrule(lr){1-5}
+
+EgoDex
+& MolmoMotion-1M
+& Egocentric dexterous human--object interactions.
+& 126,850 & 107.9 \\
+\cmidrule(lr){1-5}
+
+Stereo4D
+& MolmoMotion-1M
+& Dynamic real-world scenes reconstructed from stereo observations.
+& 15,879 & 13.5 \\
+\cmidrule(lr){1-5}
+
+Xperience
+& MolmoMotion-1M
+& Egocentric videos of human activities and object interactions.
+& 112,992 & 96.1 \\
+\cmidrule(lr){1-5}
+
+YT-VIS
+& MolmoMotion-1M
+& Diverse Internet videos with non-metric object trajectories.
+& 1,473 & 1.3 \\
+\midrule
+Total
+& ---
+& ---
+& 1,438,379
+& 1,223.6 \\
+\bottomrule
+\end{tabular}
+\caption{
+Composition of the processed data inventory.
+Real3 and SpatialCog counts exclude WorldFlowBench evaluation
+records; Sim7 uses its QC inventory before runtime benchmark
+exclusion.
+Each object clip contains 49 frames standardized to 16 FPS.
+Standardized duration in hours is computed as
+$N_{\mathrm{clips}} \times 49 / (16 \times 3600)$,
+where $N_{\mathrm{clips}}$ denotes the reported number of
+object clips.
+This measures standardized data volume rather than
+deduplicated source-video duration, since different object
+records may share the same underlying video interval.
+}
+\label{tab:supp-training-data}
+\end{table}
+
+The MolmoMotion-1M sources exhibit substantial variation
+in their native temporal coverage.
+Figure~\ref{fig:supp-native-length} reports their interval
+lengths before conversion to the common 49-frame
+representation and the fraction of records requiring
+tail padding.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]
+{supplementary/figures/native_trajectory_lengths.pdf}
+\caption{
+Native temporal coverage of the six retained MolmoMotion-1M
+subsets before conversion to 49 frames.
+(a) Native interval-length distributions; thin lines
+indicate P5--P95, thick bars indicate the interquartile
+range, and circles indicate the median.
+The dashed line marks the target length of 49 frames.
+(b) Percentage of records requiring tail padding.
+Intervals longer than 49 frames are uniformly subsampled.
+}
+\label{fig:supp-native-length}
+\end{figure}
+
+To characterize the scale of the motion targets, we define
+the component RMS of record $r$ as
+\begin{equation}
+m_r
+=
+\left(
+\frac{1}{48\cdot64\cdot3}
+\sum_{t=1}^{48}
+\sum_{i=1}^{64}
+\left\lVert\mathbf{f}_{r,i,t}\right\rVert_2^2
+\right)^{1/2}.
+\label{eq:supp-motion-rms}
+\end{equation}
+Figure~\ref{fig:supp-motion-statistics} reports the
+distribution of $m_r$ within each source together with
+the source-level aggregate RMS,
+$\sqrt{\mathbb{E}_r[m_r^2]}$.
+These statistics are computed before flow normalization
+and include zero-motion transitions introduced by temporal
+padding.
+They characterize the numerical scale of the motion targets
+rather than physical speed or endpoint displacement.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]
+{supplementary/figures/motion_statistics.pdf}
+\caption{
+Pre-normalization motion-scale statistics.
+Left: median, 90th percentile, and 99th percentile of
+the per-record component RMS.
+Right: source-level aggregate component RMS.
+Both horizontal axes use logarithmic scales.
+SpatialCog statistics use 82,188 records after excluding
+all 400 evaluation samples; Real3 statistics also exclude
+benchmark records.
+Sim7, marked with an asterisk, uses its QC inventory before
+runtime benchmark exclusion and provides aggregate moments
+but no per-record percentile summary.
+Statistics include zero-motion transitions introduced by
+temporal padding.
+YT-VIS values follow the non-metric scale of its annotations.
+}
+\label{fig:supp-motion-statistics}
+\end{figure}

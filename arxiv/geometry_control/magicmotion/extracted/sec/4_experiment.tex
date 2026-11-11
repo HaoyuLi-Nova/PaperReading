@@ -1,0 +1,113 @@
+\section{Experiment}
+
+\subsection{Experiment Settings}
+\paragraph{Implementation details.}
+We employ CogVideoX 5B~\cite{yang2024cogvideox} and Wan2.1 1.3B~\cite{wan2025} as our base image-to-video model, which is trained to generate video based on an input image.  
+Each stage of MagicMotion was trained on MagicData for one epoch.
+The training process consists of three stages. stage1 trains Trajectory ControlNet from scratch. In stage2, Trajectory ControlNet is further refined using the weights from stage1, while Segment Head is trained from scratch. Finally, in stage3, both Trajectory ControlNet and Segment Head continue training initialized with the weights from stage2.
+All training experiments were conducted on 4 NVIDIA A100-80G GPUs. We employed AdamW ~\cite{loshchilov2017decoupled} as the optimizer, training with a learning rate of $1e-5$ and a batch size of 1 on each GPU.
+During inference, we set steps to 50, the guidance scale to 6, and the weight of Trajectory ControlNet to 1.0 by default.
+
+\vspace{-0.5cm}
+
+\paragraph{Datasets.}
+During training, we use MagicData as our training set. MagicData is annotated with dense to sparse trajectory information using the data pipeline described in Section~\ref{sec:data pipeline}. It comprises a total of 23K video samples, annotated with text and trajectory.
+For evaluation, we evaluate all methods on both MagicBench and DAVIS~\cite{Perazzi2016}, using the comparison metrics illustrated in Sec~\ref{sec:benchmark}.
+
+
+\begin{figure*}[h]
+    \centering
+    \includegraphics[width=\linewidth]{Images/comp.pdf}
+    \caption{MagicMotion successfully controls the main objects moving along the provided trajectory, while all other methods exhibit significant defects marked with the orange box.}
+    \label{fig:comparisons}
+\end{figure*}
+
+
+\subsection{Comparison with Other Approaches}
+For thorough and fair comparisons, we compare our methods against 7 public trajectory controllable I2V methods~\cite{zhang2025tora, wang2025levitor, yin2023dragnuwa, wu2024draganything, shi2024motion, li2025image, namekata2024sgi2v}. Quantitative comparison and qualitative comparison results are shown below.
+
+
+
+\vspace{-0.5em}
+\paragraph{Quantitative comparison.}
+To compare MagicMotion with previous works, we use the first 49 frames of each video from DAVIS and MagicBench as the ground truth video. Since some methods~\cite{namekata2024sgi2v, wang2025levitor, yin2023dragnuwa, wu2024draganything, shi2024motion, li2025image} do not support video generation up to 49 frames in length, we uniformly sample N frames from these 49 frames for evaluation, where N represents the video length that each method support.
+We leverage the mask and box annotations from these selected frames as trajectory inputs for mask or box-based methods. 
+The center point of each frame's mask is extracted as input for point or flow-based methods~\cite{zhang2025tora, wang2025levitor, yin2023dragnuwa, wu2024draganything, shi2024motion, li2025image}. 
+
+As shown in Table~\ref{tab:comparison}, our method outperforms all previous approaches across all metrics both on MagicBench and DAVIS, demonstrating its ability to produce higher-quality videos and more precise trajectory control.
+Additionally, we evaluate each method’s performance on MagicBench based on the number of controlled objects. As shown in Fig.~\ref{fig:comparisons_radar}, our method achieves the best results across all object number categories, demonstrating the superiority of our approach. 
+
+
+\vspace{-0.5cm}
+\paragraph{Qualitative comparison.}
+Qualitative comparison results are shown in Fig.~\ref{fig:comparisons}, with the input image, prompt and trajectory provided. 
+As shown in Fig.~\ref{fig:comparisons}, Tora~\cite{zhang2025tora} accurately controls the motion trajectory but struggles to maintain the shape of the objects. While DragAnything~\cite{wu2024draganything}, ImageConductor~\cite{li2025image}, and MotionI2V~\cite{shi2024motion} have difficulty preserving the consistency of the original subject, resulting in substantial deformation in subsequent frames. Meanwhile, DragNUWA~\cite{yin2023dragnuwa}, LeviTor~\cite{wang2025levitor}, and SG-I2V~\cite{namekata2024sgi2v} frequently produce artifacts and inconsistencies in fine details. In contrast, MagicMotion allows moving objects to follow the specified trajectory smoothly while preserving high video quality.
+
+\subsection{Ablation Studies}
+In this section, we present ablation studies to validate the effectiveness of our MagicData dataset. Additionally, we demonstrate how our progressive training procedure and latent segment loss enhance the model’s understanding of precise object shapes under sparse control conditions, thereby improving trajectory control accuracy.
+
+\vspace{0.2cm}
+\noindent\textbf{Ablations on Dataset.}
+~~To verify the effectiveness of MagicData, we constructed an ablation dataset by combining two public VOS datasets, MeViS~\cite{MeViS} and MOSE~\cite{MOSE}.
+For a fair comparison, we trained MagicMotion stage2 for one epoch using either MagicData or the ablation dataset as the training set, both initialized with the same stage1 weights. We then evaluated the models on both MagicBench and DAVIS.
+
+As shown in Table~\ref{tab:ablation dataset}, the model trained on MagicData outperforms the one trained on the ablation dataset across all metrics. Qualitative comparisons are shown in Fig.~\ref{fig:ablation dataset}. In this case, we aim to gradually move the boy in the lower right corner to the center of the image. However, not using MagicData results to an unexpected child appears next to the boy.
+In contrast, the model trained with MagicData performs well, moving the boy along the specified trajectory while maintaining video quality.
+
+\begin{table}[h]
+\resizebox{\linewidth}{!}{
+\begin{tabular}{@{}l|llll@{}}
+\toprule
+\multirow{2}{*}{\textbf{Method}} & \multicolumn{4}{c}{\textbf{MagicBench/DAVIS}}                                                 \\ \cmidrule(l){2-5} 
+                                 & FID($\downarrow$)     & FVD($\downarrow$)      & M\_IoU\%($\uparrow$) & B\_IoU\%($\uparrow$) \\ \midrule
+w/o MagicData                    & 24.24/50.91          & 125.19/768.27          & 73.39/50.95             & 78.66/70.05            \\ \midrule
+Ours                             & \textbf{15.17/50.35} & \textbf{107.21/760.95} & \textbf{76.61/53.94}    & \textbf{81.45/72.84}   \\ \bottomrule
+\end{tabular}
+}
+\caption{Ablation Study on MagicData. The model trained with MagicData outperforms the one trained without it across all metrics.}
+\label{tab:ablation dataset}
+\end{table}
+
+\begin{figure}[ht]
+    \centering
+    \vspace{-1.4em}
+    \includegraphics[width=\linewidth]{Images/Dataset_Ablation.pdf}
+    \caption{Ablation Study on MagicData. Not using MagicData causes the model to generate an unexpected child.}
+    \label{fig:ablation dataset}
+    \vspace{-1.4em}
+\end{figure}
+
+\vspace{0.2cm}
+\noindent\textbf{Ablations on Progressive Training Procedure.}
+~~Progressive Training Procedure allows the model to leverage the weights learned in the previous stage, incorporating dense trajectory control information when trained with sparse trajectory conditions.
+To validate the effectiveness of this approach, we train the model from scratch for one epoch using bounding boxes as trajectory conditions. We then compare its performance with MagicMotion stage2.
+
+As shown in Table~\ref{tab:ablation progressive & latent}, excluding Progressive Training Procedure weakens the model’s ability to perceive object shapes, ultimately reducing the accuracy of trajectory control. Qualitative comparisons in Fig.~\ref{fig:ablation training} further illustrate these effects, where the model trained without Progressive Training Procedure turns the woman’s head entirely into hair.
+
+\begin{table}[ht]
+\resizebox{\linewidth}{!}{
+\begin{tabular}{@{}l|ll|ll@{}}
+\toprule
+\multirow{2}{*}{\textbf{Method}} & \multicolumn{2}{c|}{\textbf{MagicBench}}                                              & \multicolumn{2}{c}{\textbf{DAVIS}}                                                   \\ \cmidrule(l){2-5} 
+                                 & \multicolumn{1}{c}{M\_IoU\%($\uparrow$)} & \multicolumn{1}{c|}{B\_IoU\%($\uparrow$)} & \multicolumn{1}{c}{M\_IoU\%($\uparrow$)} & \multicolumn{1}{c}{B\_IoU\%($\uparrow$)} \\ \midrule
+w/o LSL                          & 74.65                                      & 78.02                                      & 49.19                                      & 64.19                                     \\
+w/o PT                           & 74.61                                      & 79.49                                      & 49.22                                      & 67.34                                     \\ \midrule
+Ours                             & \textbf{76.61}                             & \textbf{81.45}                             & \textbf{53.94}                             & \textbf{72.84}                            \\ \bottomrule
+\end{tabular}
+}
+\caption{Ablation Study on Progressive Training (PT) and Latent Segment Loss (LSL). Experimental results demonstrate that these techniques enhance the model with better comprehension on fine-grained object shapes.}
+\label{tab:ablation progressive & latent}
+\end{table}
+
+\begin{figure}[ht]
+    \centering
+    \vspace{-0.8em}
+    \includegraphics[width=\linewidth]{Images/Progressive_Ablation.pdf}
+    \caption{Ablation study on the progressive training procedure. Without it, the generated head shapes become noticeably distorted.}
+    \label{fig:ablation training}
+    \vspace{-1.4em}
+\end{figure}
+
+\noindent\textbf{Ablations on Latent Segment Loss.}
+~~Latent Segment Loss makes the model predict dense segmentation masks while training with sparse trajectories, enhancing its ability to perceive fine-grained object shapes under sparse conditions. To evaluate the effectiveness of this technique, we train the model from stage1 for one epoch using bounding boxes as trajectory conditions and compare its performance with MagicMotion stage2.
+Table~\ref{tab:ablation progressive & latent} shows that the absence of Latent Segment Loss reduces the model’s ability on object shapes, leading to less precise trajectory control.  

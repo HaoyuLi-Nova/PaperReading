@@ -1,0 +1,118 @@
+\section{Auxiliary Motion Objectives}
+\label{sec:supp-aux}
+
+The auxiliary objectives supervise frame-to-frame displacement,
+cumulative displacement direction, and final displacement,
+all in normalized coordinates.
+
+\subsection{Clean-Flow Reconstruction}
+
+We reconstruct clean displacements from the predicted rectified-flow
+vector field for auxiliary supervision. Let $\mathbf{x}_0$ denote the
+noise-free displacement sequence and $\sigma\in[0,1]$ the noise level.
+Under the linear interpolation
+$\mathbf{x}_{\sigma}=(1-\sigma)\mathbf{x}_0+\sigma\boldsymbol{\epsilon}$,
+the target vector field is
+$\mathbf{u}=\boldsymbol{\epsilon}-\mathbf{x}_0$.
+The clean-flow estimate is
+\begin{equation}
+\widehat{\mathbf{x}}_0
+=\mathbf{x}_{\sigma}-\sigma\mathbf{v}_{\theta}.
+\label{eq:supp-clean-reconstruction}
+\end{equation}
+The network retains its vector-field parameterization;
+auxiliary losses act on the reconstructed sequence.
+Here, $x_0$ denotes the noise-free sequence, not the first video frame.
+
+Substituting $\mathbf{x}_{\sigma}=\mathbf{x}_0+\sigma\mathbf{u}$
+into Eq.~\eqref{eq:supp-clean-reconstruction} gives
+$\widehat{\mathbf{x}}_0-\mathbf{x}_0
+=-\sigma(\mathbf{v}_{\theta}-\mathbf{u})$, and hence
+\begin{equation}
+\|\widehat{\mathbf{x}}_0-\mathbf{x}_0\|_F^2
+=\sigma^2\|\mathbf{v}_{\theta}-\mathbf{u}\|_F^2.
+\label{eq:supp-clean-error}
+\end{equation}
+Thus, squared displacement supervision is exactly a noise-dependent
+reweighting of the vector-field squared error.
+
+\subsection{Motion Supervision}
+
+Let $\mathbf{f}_{ti}$ and $\widehat{\mathbf{f}}_{ti}$ denote the
+ground-truth and reconstructed normalized displacements of point $i$
+at step $t$. Their cumulative displacements from the initial position
+are $\mathbf{d}_{ti}=\sum_{\tau=1}^{t}\mathbf{f}_{\tau i}$ and
+$\widehat{\mathbf{d}}_{ti}
+=\sum_{\tau=1}^{t}\widehat{\mathbf{f}}_{\tau i}$.
+Each sequence contains $T=48$ displacement steps and $N=64$ points.
+We omit the batch index below for readability.
+
+\paragraph{Adjacent-displacement loss.}
+The displacement loss penalizes the squared difference between predicted
+and ground-truth motion at each step:
+\begin{equation}
+\ell_{\mathrm{vmag}}(t,i)
+=\|\widehat{\mathbf{f}}_{ti}-\mathbf{f}_{ti}\|_2^2.
+\label{eq:supp-vmag}
+\end{equation}
+This loss supervises both magnitude and direction of local 3D
+displacements, with its relation to vector-field supervision given
+by Eq.~\eqref{eq:supp-clean-error}.
+
+\paragraph{Cumulative-direction loss.}
+Small local errors can accumulate into an incorrect overall direction.
+We therefore compare the directions of the cumulative displacements:
+\begin{equation}
+\ell_{\mathrm{dir}}(t,i)
+=1-\operatorname{cos}_{\varepsilon}
+(\widehat{\mathbf{d}}_{ti},\mathbf{d}_{ti}).
+\label{eq:supp-dir}
+\end{equation}
+Each error is weighted by the ground-truth magnitude
+$\|\mathbf{d}_{ti}\|_2$, reducing the contribution of points with little
+net displacement. For numerical stability,
+$\operatorname{cos}_{\varepsilon}$ computes the dot product divided by
+the product of the two vector norms, with each norm clamped below at
+$\varepsilon=10^{-6}$.
+
+\paragraph{Relative endpoint loss.}
+To constrain the final predicted position, we measure endpoint error
+relative to the ground-truth net displacement:
+\begin{equation}
+\ell_{\mathrm{end}}(i)
+=\frac{
+\|\widehat{\mathbf{d}}_{Ti}-\mathbf{d}_{Ti}\|_2
+}{\max(\|\mathbf{d}_{Ti}\|_2,\delta)},
+\qquad \delta=0.1.
+\label{eq:supp-end}
+\end{equation}
+Only points satisfying $\|\mathbf{d}_{Ti}\|_2\geq\delta$ contribute.
+This excludes small-net-displacement trajectories, including stationary
+motion and motion that returns close to its starting position, for which
+relative endpoint error is unstable. The threshold is defined in normalized
+coordinates.
+
+\paragraph{Weighting and reduction.}
+For sample $b$, all three objectives use the noise weight
+$w_b=1-\sigma_b$. The displacement loss averages
+$\ell_{\mathrm{vmag}}$ over samples, steps, and points with weights $w_b$.
+The direction loss averages $\ell_{\mathrm{dir}}$ over the same indices
+with weights $w_b\|\mathbf{d}_{bti}\|_2$.
+The endpoint loss averages $\ell_{\mathrm{end}}$ over eligible sample--point
+pairs with weights $w_b$. Each weighted sum is divided by its total weight
+plus $10^{-6}$; if no endpoint is eligible, its loss is zero.
+
+This weighting gives high-noise samples relatively less influence within
+each batch. For the squared displacement term, the coefficient on
+vector-field squared error before batch normalization is
+$\sigma^2(1-\sigma)$, by Eq.~\eqref{eq:supp-clean-error}.
+The direction and endpoint terms impose additional trajectory-level
+constraints; they do not share the squared-error equivalence.
+Their effects are evaluated through the ablation experiments in the
+main paper.
+
+\paragraph{Training configuration.}
+For second-stage training, the reduced losses use
+$\lambda_{\mathrm{dir}}=0.1$,
+$\lambda_{\mathrm{vmag}}=0.1$, and
+$\lambda_{\mathrm{end}}=0.05$.

@@ -1,0 +1,41 @@
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Diffusion-based image-to-video generation.}
+With the recent advances in diffusion models~\citep{DiffusionModels,DDPM}, image animation has achieved tremendous progress~\citep{wang2023videocomposer,VideoCrafter1,VideoCrafter2,AnimateDiff}.
+Early methods inflate pre-trained text-to-image models~\citep{LatentDiffusion} to add motions to an image~\citep{Tune-a-video,Text2VideoZero,Make-A-Video}.
+A notable example is AnimateDiff~\citep{AnimateDiff}, which learns low-rank adapters~\citep{LoRA}  for different motions.
+Later works seek to inject a conditioning frame into a pre-trained text-to-video model~\citep{VideoDiffusionModels,ImagenVideo,LVDM}.
+VideoCrafter1~\citep{VideoCrafter1} leverages a dual cross-attention layer to condition on features of both the image and the text prompt.
+DynamicCrafter~\citep{DynamiCrafter} further improves it by concatenating the input image with noisy latent.
+Stable Video Diffusion (SVD)~\citep{blattmann2023stable} instead works in an image-only manner, which replaces the CLIP~\citep{CLIP} text embedding of the text prompt with the CLIP image embedding of the conditioning frame.
+However, none of these models support direct trajectory control of scene elements, and rather require multiple attempts to obtain a desired result.
+In this work, we aim to enable intuitive motion control in animating a pre-existing image.
+Since SVD only takes in an image without any text prompt, we utilize it as the base model following prior work~\citep{yin2023dragnuwa,wu2024draganything}.
+
+
+
+
+
+\paragraph{Spatial control in image diffusion models.}
+One common way to incorporate spatial control into the image generation process is to fine-tune pre-trained models to incorporate conditioning on depth maps or bounding boxes~\citep{ControlNet,ye2023ip,SpaText,GLIGEN,PairDiffusion,InstanceDiffusion}.
+While these methods demonstrate high fidelity, they require excessive computing resources and labor-intensive data annotations. 
+Therefore, several tuning-free approaches have been proposed~\citep{MasaCtrl,LayoutGuidanceAttn1,LayoutGuidanceAttn2,PromptToPrompt}.
+Self-Guidance~\citep{epstein2023diffusion} Attend-and-Excite~\citep{chefer2023attend} , and TraDiffusion~\citep{wu2024tradiffusion} control the image layout by manipulating intermediate attention maps. %
+They first estimate the generated objects' positions using the attention maps produced from text--image cross-attention layers and then optimize the latent to increase the attention values at specific positions.
+However, these approaches require associating the control target with a specific token in the text prompt and thus cannot be directly applied to image-only editing.
+Closest to ours are methods that alter image layouts without text input~\citep{pan2023drag,mou2023dragondiffusion,mou2024diffeditor,ling2023freedrag,liu2024drag,zhang2024gooddrag,cui2024stabledrag,hou2024easydrag,zhao2024fastdrag,shi2024dragdiffusion}.
+They enforce similarity between semantically correlated feature maps extracted from the upsampling blocks of a denoising U-Net~\citep{tang2023emergent,namekata2024emerdiff,hedlin2024unsupervised,zhang2023tale,luo2023dhf}.
+In contrast, we show that the cross-frame semantic correspondence of upsampling feature maps in image-to-video diffusion models~\citep{blattmann2023stable} is weak. Thus, optimization directly based on these feature maps leads to sub-optimal results.
+
+
+\paragraph{Motion control in video diffusion models.}
+Several recent works have studied camera pose control in video diffusion models~\citep{CameraCtrl,xu2024camco,kuang2024collaborative,MotionMaster,xiao2024video,hou2024training,bahmani2024vd3d,li2024image,zhang2024dragentity}.
+The representative work MotionCtrl~\citep{MotionCtrl} fine-tunes pre-trained video generators to follow camera trajectory input. 
+However, video datasets with accurate camera pose annotations are limited~\citep{RealEstate10k}, and fine-tuning video models requires high computation costs.
+Another line of work focuses on object trajectory control~\citep{wang2023videocomposer,yin2023dragnuwa,wu2024draganything,zhou2024trackgo,wang2024boximator,zhang2024tora}, among which our work is particularly related to the tuning-free variants~\citep{qiu2024freetraj,ma2023trailblazer,DirectAVideo,jain2024peekaboo,Img2VidAnim-Zero}.
+Yet, all of these methods focus on text-based generation. In contrast, our method uses an image-to-video model and thus can turn existing, real-world images into controllable videos.
+Moreover, we can control camera motion by specifying trajectories of background regions. %
+
+
+

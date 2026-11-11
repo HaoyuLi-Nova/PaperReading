@@ -16,6 +16,15 @@
 | `echomotion` | EchoMotion | 2512.18814 |
 | `motioncrafter` | MotionCrafter | 2602.08961 |
 | `fulldit` | FullDiT | 2503.19907 |
+| `wan_move` | Wan-Move | 2512.08765 |
+| `moright` | MoRight | 2604.07348 |
+| `motion_prompting` | Motion Prompting | 2412.02700 |
+| `symphomotion` | SymphoMotion | 2604.03723 |
+| `unicamo` | UniCaMo | 2611.00810 |
+| `comovi` | CoMoVi | 2601.10632 |
+| `moge4d` | Geometry-Aware Single-Image 4D Synthesis (MoGe4D) | 2512.05044 |
+| `scenescribe_1m` | SceneScribe-1M | 2604.07990 |
+| `worldflow` | WorldFlow | 2610.39278 |
 
 译本：`translations/geometry_control/<slug>/paper_zh.md`  
 阅读笔记：`notes/geometry_control/<slug>/{QA,critique,note}.md`  

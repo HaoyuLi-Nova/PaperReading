@@ -1,0 +1,16 @@
+
+
+\section{Conclusion}
+\label{sec:cond}
+
+\iffalse
+Inspired by the visualization of spatial and temporal cross-attention in video-based Stable Diffusion (SD) models, this paper introduces a solution to enhance the controllability of desired subject synthesis built upon the pre-trained temporal models, ZeroScope. Our contributions are multi-faceted. Firstly, spatial direction of the subject can be guided through bounding boxes. Secondly, bounding boxes and prompts can be animated via keyframes, enabling users to alter the trajectory and coarse behavior of the subject along the timeline, enhancing the pipeline for storytelling video synthesis with precise motion control. Additionally, flexibility is paramount in our method, allowing users to seamlessly modify the environment with specific synthesized objects. Lastly, our approach requires no model finetuning, training, or online optimization, ensuring computational efficiency and a good user experience.
+\fi
+
+%The analysis of cross-attention in T2I diffusion models resulted in methods providing high-level bounding box control of synthesized object position in pre-trained models such as Stable Diffusion.
+%Inspired by this, we introduce a combined spatial+temporal attention guidance %algorithm, and illustrate it using the pre-trained ZeroScope model.
+We have addressed the problem of controlling the motion of objects in a diffusion-based text-to-video model. Specifically, we introduced a combined spatial and temporal attention guidance algorithm, \textit{TrailBlazer}, operating in the pre-trained ZeroScope model. 
+%Our contributions are several. % save space
+%Firstly, 
+The spatial location of a subject can be guided through simple bounding boxes. %Secondly, 
+Bounding boxes and prompts can be animated via keyframes, enabling users to alter the trajectory and coarse behavior of the subject along the timeline. The resulting subject(s) fit seamlessly in the specified environment, providing a viable approach to video storytelling by casual users.  Our approach requires no model finetuning, training, or online optimization, ensuring computational efficiency and a good user experience. Lastly, the results are natural, with desirable effects such as perspective, motion with the correct object orientation, and the interactions between object and environment arising automatically.

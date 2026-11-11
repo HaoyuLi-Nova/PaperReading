@@ -1,0 +1,358 @@
+\section{SceneScribe-1M Curation}
+
+
+
+
+As depicted in Figure~\ref{fig:framework}, the curating pipeline for SceneScribe-1M consists of three key steps: collection, pre-processing, and annotation.
+In the following sections, we describe each step in detail:
+(\textbf{\romannumeral1}) the raw video source and the selection criteria  (Section~\ref{sec:s1});
+(\textbf{\romannumeral2}) the pre-processing procedures, including quality filtering and temporal segmentation (Section~\ref{sec:s2});
+(\textbf{\romannumeral3}) the multi-modal annotation pipeline, covering textual descriptions, precise camera parameters, dense depth maps, motion masks, and consistent 3D point tracks (Section~\ref{sec:s3});
+(\textbf{\romannumeral4}) the sampling strategy for filtering a multi-view subset SceneScribe-MVS  (Section~\ref{sec:s4}).
+
+
+
+\subsection{Source Video Collection}
+\label{sec:s1}
+
+\noindent\textbf{Video Source for SceneScribe-1M}.
+To ensure the diversity and scale of SceneScribe-1M, we start by incorporating publicly available large-scale text-video paired datasets, \textit{i.e.}, HD-VILA-100M~\cite{xue2022advancing}, Panda-70M~\cite{chen2024panda}, and Koala-36M~\cite{wang2025koala}.
+With initial quality screening and extensive validation in both understanding and generation tasks, these resources offer a robust foundation for SceneScribe-1M.
+Specifically, each source contributes distinct strengths: HD-VILA-100M supplies large-scale videos covering diverse categories; Panda-70M provides extensive video-caption pairs with rich semantics; and Koala-36M brings precise temporal segmentation.
+In Table~\ref{tab:source_video}, we summarize statistics of these datasets.
+While these large-scale datasets provide substantial diversity, our assessment suggests they exhibit certain limitations in the motion varieties of both the camera and objects.
+As a result, there is a sharp decrease in dataset scale after filtering for motion diversity.
+To address this issue, we further curate the Pexels-Video dataset by sourcing videos from Pexels, a platform renowned for its extensive and diverse video resources.
+In particular, we employ the OpenVideo~\cite{openvideo} toolbox to harvest a dataset of $668$k high-quality videos from the official Pexels website.
+
+\begin{figure}[t]
+  \centering
+      \begin{minipage}[b]{0.12\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/resolution.png}
+    \centerline{(a) Resolution\&FPS}
+    \label{fig:left9}
+  \end{minipage}%
+      \hspace{0.04\textwidth}
+  \begin{minipage}[b]{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/dur.png}
+    \centerline{(b) Duration (second)}
+    \label{fig:left10}
+  \end{minipage}%
+  \vspace{-0.4cm}
+  \caption{\textbf{Statistics of Raw Video Specification} after filtering, including Resolution, Frame Per Second (FPS), and Duration. }
+   \vspace{-0.5cm}
+    \label{fig:video_s}
+\end{figure}
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.45\textwidth]{figures/motion.png}
+   \vspace{-0.4cm}
+  \caption{\textbf{Statistics of Raw Video Content} after filtering. These charts demonstrate that the raw videos exhibit sufficient diversity of motion while eliminating the lighting interference.}
+    \vspace{-0.5cm}
+    \label{fig:s_vc}
+\end{figure}
+
+% \noindent\textbf{Manually Collected Video}. 
+%While existing high-quality datasets, \textit{e.g.}, Panda70M~\cite{chen2024panda}, have undergone extensive filtering processes to improve quality, our assessment suggests that they are still inadequate to meet the requirements of our study.
+% The primary shortcomings of these datasets are their constrained camera perspectives and insufficient diversity in motion types. 
+% To align with the requirements of our study, we further filtered and processed videos from these sources, ensuring high-quality and diverse scene coverage within SceneScribe-1M.
+% 
+
+
+
+\noindent\textbf{Selection Criteria}. 
+To ensure precise annotation in SceneScribe-1M, we rigorously filter raw videos according to several criteria, including resolution, frame rate, and duration.
+Specifically, we first select videos with spatial resolutions greater than 1080p to preserve fine-grained details.
+Since low frame rates may hinder reliable motion detection and scene reconstruction, we prioritize videos with higher frame rates ($\geq10$ frames per second), which provide smoother transitions and enable accurate temporal alignment.
+In addition, to facilitate comprehensive scene coverage, we opt for videos with durations spanning 5 seconds to 1 minute.
+This is because shorter videos often lack sufficient scene variability, while longer videos substantially increase the costs of data processing and annotation.
+% This inital selection process helps guarantee that the resulting dataset provides reliable and high-quality input for precise SceneScribe-1M annotation.
+
+
+
+
+
+
+
+
+\subsection{Video Pre-processing and Filtering}
+\label{sec:s2}
+%Video 
+\noindent\textbf{Quality Filtering}.
+Despite an initial video screening by hard parameters, the content quality of the videos (\textit{e.g.}, camera perspective and object motion intensity) are not examined.
+To optimize video suitability for both 3D geometric perception and video synthesis, we implement a comprehensive content filtering procedure, utilizing a powerful multimodal large language model (i.e., Qwen2.5-VL-72B~\cite{bai2025qwen2}) as an automated evaluator.
+Specifically, we meticulously craft question templates across six critical dimensions to assess the source video content, as exemplified in Figure~\ref{fig:framework}.
+Please refer to the \textbf{Supplementary Materials} for the detailed question templates.
+%Based on these assessments, candidate labels are assigned to each video segment. 
+Given these assessments, videos that fail to meet specific content quality thresholds, such as those exhibiting unknown motion intensity, visible watermarks, strong camera distortion,  or strong lighting artifacts, are excluded from the curated dataset. 
+%This content-based approach allows for scalable and consistent video content evaluation, significantly improving the quality and reliability of the resulting dataset. 
+%non-continuous scene transitions
+
+
+
+\begin{figure}[!t]
+  \centering
+  \begin{minipage}[b]{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/length.png}
+    \centerline{(a) Caption Lengths (words)}
+    \label{fig:left7}
+  \end{minipage}%
+  %\hspace{0.01\textwidth}
+  \begin{minipage}[b]{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/word2.png}
+    \centerline{(b) Word Cloud}
+    \label{fig:right8}
+  \end{minipage}
+      \vspace{-0.8cm}
+  \caption{\textbf{Caption Statistics}: (a) The average caption length is adequate to capture the details within each scene, and (b) Key words (\textit{e.g.,} \textit{atmosphere}, \textit{subject}, and \textit{take place}) effectively cover aspects such as the scene context, primary objects, and actions.}
+  \label{fig:caption_s}
+      \vspace{-0.1cm}
+\end{figure}
+
+%分镜
+\noindent\textbf{Temporal Segmentation for Non-Continuous Videos}.
+Videos tagged as ``Non-Continuous" are inappropriate for both 3D vision (\textit{e.g.}, consistent 3D point tracking) and video generation.
+Therefore, accurately partitioning these videos into temporal segments plays a vital role in dataset construction.
+To achieve automatic and robust shot transition detection (\textit{e.g.}, hard cuts and gradual changes), we utilize TransNetV2~\cite{soucek2024transnet}, a model that achieves state-of-the-art results on respected benchmarks, enabling efficient processing of extensive video archives.
+Effective segmentation along scene boundaries ensures that individual clips are semantically coherent, while these clips are subsequently re-filtered with the quality criteria. In Figure~\ref{fig:video_s} and~\ref{fig:s_vc}, we show the statistics of video parameters and content after filtering.
+
+
+\subsection{Geometric and Semantic Annotation}
+\label{sec:s3}
+To facilitate comprehensive annotation of SceneSribe-1M, our pipeline integrates three distinct models, each optimized for a specific modality:
+Qwen2.5-VL-72B~\cite{bai2025qwen2} for textual descriptions, MegaSaM~\cite{li2025megasam} for 3D geometric labeling, and TAPIP3D~\cite{zhang2025tapip3d} for dynamic point tracks. This multi-model framework guarantees extensive and high-quality annotation, thereby supporting diverse downstream applications in both 3D geometric perception and video synthesis.
+
+
+
+
+
+
+
+\noindent\textbf{Semantic Annotation.}
+We adopt Qwen2.5-VL-72B~\cite{bai2025qwen2} as the semantic annotation engine. 
+% Compared to other large vision-language models, Qwen2.5-VL-72B offers several specific advantages for video textual annotation tasks. 
+Our choice is motivated by its performance, which is comparable to leading models such as GPT-4o~\cite{hurst2024gpt} and Gemini-2-Flash~\cite{deepmind2024gemini2} on various authoritative benchmarks, while excelling in visual understanding assessments.
+By utilizing dynamic resolution processing and absolute temporal encoding, Qwen2.5-VL-72B is capable of handling long videos while precisely capturing events. This capability satisfies semantic requirements that demand extended temporal context and fine-grained action localization.
+% As shown in Figure~\ref{fig:llm_templete}, we devise a prompt template for Qwen2.5-VL-72B, instructing the model to focus on scene settings, primary subjects or characters, and significant actions occurring. 
+For each video, the model produces a comprehensive, structured scene description that clearly delineates scene settings, primary subjects or characters, and significant actions occurring.
+Please refer to the \textbf{Supplementary Materials} for the detailed question templates.
+
+
+
+\begin{algorithm}[!t]
+    \caption{Multi-View Reprojection with Depth}
+    \label{alg:reproj}
+    \begin{algorithmic}[1] % 每行加行号
+        \Require Reference depth $D_{r}$, Reference intrinsic $K_{r}$, Reference extrinsic $E_{r}$, Source depth $D_{s}$, Source Image $I_{s}$, Source intrinsic $K_{s}$, Source extrinsic $E_{s}$
+        \Ensure Reprojected depth $D_{s2r}$, Reprojected image $I_{s2r}$, and Reprojected 2d coordinates $(x_{s2r}, y_{s2r})$
+        \For{each pixel $(x_r, y_r)$ in $D_{r}$}
+        \Statex {{\textit{Step \textcolor{red}{1}: Projecting 2D Points in Reference Pixel Coordinate to 3D Reference Camera Coordinate}}}
+            \State $P_{r2c} \gets K_{r}^{-1} [x_r, y_r, 1]^T \cdot D_{r}(x_r, y_r)$
+        \Statex {{\textit{Step \textcolor{red}{2}:  Projecting 3D Points in Reference Camera Coordinate to 2D Source Pixel Coordinate}}}
+            \State $[P_{r2s};1] \gets E_{s} E_{r}^{-1} [P_{r2c};1]$
+            \State $[u, v, w] \gets K_{s} \cdot P_{r2s}$
+            \State $x_{r2s} \gets u/w$, $y_{r2s} \gets v/w$
+        \Statex {{\textit{Step \textcolor{red}{3}: Sampling Source Depth Points and Projecting these Points to 3D Source Camera Coordinate}}}
+            \State $I_{s2r} \gets I_{s}(x_{r2s}, y_{r2s})$
+            \State $D'_{s} \gets D_{s}(x_{r2s}, y_{r2s})$
+            \State $P_{s2c} \gets K_{s}^{-1} [x_{r2s}, y_{r2s}, 1]^T \cdot D'_{s}$
+        \Statex {{\textit{Step \textcolor{red}{4}: Projecting 3D Points in Source Camera Coordinate to 2D Reference Pixel Coordinate}}}
+            \State $[P_{s2r}; 1] \gets E_{r} E_{s}^{-1} [P_{s2c}; 1]$
+            \State $[u', v', w'] \gets K_{r} \cdot P_{s2r}$
+            \State $x_{s2r} \gets u'/w'$, $y_{s2r} \gets v'/w'$
+            \State $D_{s2r} \gets P_{s2r}[2]$
+            \State collect $(D_{s2r}, I_{s2r}, x_{s2r}, y_{s2r})$
+        \EndFor
+        \State \Return $D_{s2r}, I_{s2r}, x_{s2r}, y_{s2r}$
+    \end{algorithmic}
+    \label{alg:1}
+\end{algorithm}
+
+
+\noindent\textbf{Geometric  Annotation}. 
+% Given the requirements for large-scale and robust geometric labeling, we choose an annotator based on both prediction accuracy and inference efficiency.
+Given the demand for a robust geometric annotator capable of handling large-scale videos, we select MegaSaM~\cite{li2025megasam} that balances both efficiency and accuracy.
+We investigate open-source geometric annotation solutions, \textit{i.e.}, 
+DROID-SLAM~\cite{teed2021droid},
+DPVO~\cite{teed2023deep},
+Fast3r~\cite{yang2025fast3r},
+MonST3R~\cite{zhang2024monst3r},
+and VGGT~\cite{wang2025vggt}.
+In contrast to deep visual SLAM systems~\cite{teed2021droid,teed2023deep} that estimate correspondences across frames, MegaSaM is particularly effective in situations involving dynamic scenes and restricted camera parallax.
+Additionally, by integrating the differentiable SLAM system with the intermediate predictions of dynamic scenes, MegaSaM outperforms 3D reconstruction schemes~\cite{teed2021droid,teed2023deep} that utilize point cloud representations from DuST3~\cite{wang2024dust3r}.
+Moreover, while VGGT provides faster inference speed, MegaSAM delivers more robust performance when feature points are scarce.
+% Following the systematic comparisons, we select MegaSaM as the default annotation scheme, with subsequent optimization and parallelization to improve both accuracy and efficiency.
+%depth anything
+%unidepth
+%flow
+%camer pose
+%cvd
+
+
+
+
+\begin{figure*}[t]
+  \centering
+  \begin{minipage}[b]{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/1_s1.png}
+    \centerline{(a) $s_1$ score}
+    \label{fig:left3}
+  \end{minipage}%
+  \hspace{0.03\textwidth}
+\begin{minipage}[b]{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/2_s2.png}
+    \centerline{(b) $s_2$ score}
+    \label{fig:right1}
+  \end{minipage}
+    \hspace{0.05\textwidth}
+  \begin{minipage}[b]{0.31\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/3_vis.png}
+    \centerline{(c) Visibility Radio of Tracks}
+    \label{fig:right2}
+  \end{minipage}
+  \vspace{-0.55cm}
+  \caption{\textbf{Statistics of Object Motion Metrics}. It can be observed that both object motion metrics in SceneScribe-MVS after applying the sampling strategy exhibit a greater static degree than the thresholds. This demonstrates that our sampling not only facilitates effective dynamic mask generation within SceneScribe-1M, but also improves control over the proportion of dynamics.}
+    \vspace{-0.4cm}
+  \label{fig:mvs}
+\end{figure*}
+
+\begin{figure*}[t]
+  \centering
+  \begin{minipage}[b]{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/4_dis.png}
+    \centerline{(a) Distance}
+    \label{fig:left4}
+  \end{minipage}%
+  \hspace{0.03\textwidth}
+\begin{minipage}[b]{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/5_rot.png}
+    \centerline{(b) Rotation}
+    \label{fig:right5}
+  \end{minipage}
+    \hspace{0.05\textwidth}
+  \begin{minipage}[b]{0.31\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/6_turns.png}
+    \centerline{(c) Turn Counts}
+    \label{fig:right6}
+  \end{minipage}
+    \vspace{-0.55cm}
+  \caption{\textbf{Statistics of Camera Motion Metrics}. The similar distributions of camera motion metrics in SceneScribe-1M and SceneScribe-MVS indicate that we disentangle camera and object motion, enabling control over object dynamics while preserving camera diversity.}
+      \vspace{-0.45cm}
+  \label{fig:camera}
+\end{figure*}
+
+
+
+
+With systematic comparisons, we employ MegaSAM for geometric annotation across three distinct aspects: 
+(\textbf{\romannumeral 1}) \textit{Dynamic Motion Masks}: To efficiently handle dynamic scenes involving both camera and object motion, MegaSaM first predicts an object movement probability map, which is learned jointly with optical flow and uncertainty.
+(\textbf{\romannumeral 2}) \textit{Precise Camera Parameters}: 
+Building upon the DROID-SLAM~\cite{teed2021droid}, MegaSaM then integrates object movement maps and priors from mono-depth estimation (\textit{i.e.}, Depth Anything~\cite{yang2024depth} and UniDepth~\cite{piccinelli2024unidepth}) into the bundle adjustment (BA) layer, allowing for fast and robust camera tracking for unconstrained dynamic scenes;
+and, (\textbf{\romannumeral 3}) \textit{Consistent Depth Maps}: 
+Given the estimated camera parameters, MegaSAM optimizes the initial low-resolution disparity estimates into high-resolution video depth maps that are more accurate and temporally consistent.
+%Given the estimated camera parameters, MegaSAM optimizes the initial low-resolution disparity estimates into more accurate and temporally consistent video depth maps at higher resolution, partially following the approach of CasualSAM~\cite{zhang2022structure}.
+Overall, we modified the official MegaSaM repository to facilitate parallel inference on over $1,000$ GPUs across multiple machines, significantly boosting the efficiency and scale of annotation. Altogether, we annotated over 4191 hours of video.
+
+
+
+\noindent\textbf{Consistent 3D Point Tracks.} While MegaSAM produces annotations suitable for depth estimation, camera pose estimation, and scene reconstruction, it does not directly support dynamic point tracking tasks. To provide more comprehensive annotations, we further generated consistent 3D point tracks by TAPIP3D~\cite{zhang2025tapip3d}. 
+% To accommodate the output format of MegaSAM, we empirically select TAPIP3D~\cite{zhang2025tapip3d} as our 3D point tracking annotator.
+Utilizing the depth and camera pose estimates from MegaSaM, TAPIP3D projects 2D video features into 3D world space, effectively compensating for camera motion.
+Within this camera-stabilized spatio-temporal representation, TAPIP3D produces robust long-term 3D point tracks by iteratively refining motion estimates across multiple frames.
+To facilitate compatibility with 2D tracking, we further project the 3D tracks from TAPIP3D onto the image plane using camera parameters.
+
+
+
+
+\subsection{Multi-View Subset Sampling}
+\label{sec:s4}
+SceneScribe-1M comprises over 4,191 hours of video with diverse camera and object motions. Nonetheless, highly dynamic object motion is typically incompatible with multi-view tasks that prefer static objects.
+% SceneScribe-1M comprises over 4191 hours of video, thereby incurring significant computational costs for model training.
+To this end, we devise a multi-view re-projection that disentangles the motion of the camera and object. 
+In addition to providing object motion masks for all scenes, we devise a sampling strategy to construct a compact subset, SceneScribe-MVS, which controls dynamic object inclusion while preserving the intensity of camera motion. 
+Specifically, for each \textit{reference frame} in frame sequences,  we first select its surrounding frames within a sliding window of size $N$ as \textit{source frames} to form the \textit{sliding window pairs} $F$. 
+% Specifically, we first generate sliding window pairs $F$" for frame sequences, \textit{i.e.}, for each \textit{reference frame}, its surrounding frames within a sliding window of size $N$ are selected as \textit{source frames} to form the pairs. 
+Subsequently, we evaluate geometric and photometric consistency for each pair by utilizing annotated camera parameters and continuous video depths.
+The evaluation procedure consists of four key steps, as described in Algorithm~\ref{alg:1}. 
+% The evaluation process consists of four key steps:
+% (\textbf{\romannumeral1}) The 2D pixel coordinates in the reference view are projected into 3D space utilizing its camera intrinsics and depth map;
+% (\textbf{\romannumeral2}) The 3D points from the reference frame are transformed into the source coordinate and then projected back to the 2D pixel coordinates of the source view;
+% (\textbf{\romannumeral3}) The depth values are sampled at the positions corresponding to the projected pixel coordinates in the source view, and these points are subsequently projected into 3D space;
+% and (\textbf{\romannumeral4}) The 3D points sampled from the source view are reprojected into the reference view, allowing for comparison with the original coordinates.
+% The transformation procedure is described in Algorithm~\ref{alg:1}. 
+Then, we calculate geometric and photometric errors according to the reprojected results:
+\begin{align}
+e_{2d} &= \sqrt{(x_{s2r} - x_r)^2 + (y_{s2r} - y_r)^2} \\
+e_{3d} &= \left| D_{s2r} - D_r\right| / D_r, \quad e_{rgb} = \left\|\, I_{s2r} -  I_{r} \, \right\|_2 
+\end{align}
+
+
+
+
+
+
+
+
+
+
+
+
+The above errors measure the labeling consistency. Consequently, we define the motion mask by applying thresholds to filter out points exhibiting excessive errors:
+\begin{align}
+M_{motion} &= ({e_{2d} < \tau_{1}}) \land (e_{3d} < \tau_{2}) \land  ({e_{rgb} < \tau_{3}})
+\end{align}
+where $\tau_1$, $\tau_2$, and $\tau_3$ denote the thresholds. 
+% $M_{motion}$ is the object motion mask, which determines the accurately annotated and static areas within each scene.
+Based on the object motion mask $M_{motion}$ that determines the accurately annotated and static areas, we assess each scene with a score $s_1$ obtained by aggregating the mask values. Moreover, by leveraging the dynamic tracks provided by SceneScribe-1M, we calculate the average motion distance of visible points in each scene, which serves as an additional score $s_2$ for object motion intensity. Given these scores, we sample SceneScribe-MVS with thresholds $\tau_4$ and $\tau_5$. The statistics of the full set and subset are shown in Figures~\ref{fig:mvs}. The results indicate that the two scores reinforce each other, thereby substantiating the rationality of the definitions.
+
+Additionally, we investigate the diversity of camera motion from three distinct perspectives: 
+(\textbf{\romannumeral 1}) \textit{Distance} of camera trajectory;
+(\textbf{\romannumeral 2}) \textit{Rotation} cumulation in camera viewing direction;
+and, (\textbf{\romannumeral 3}) \textit{Turns} in camera trajectory, which counts local extrema in the sequence of angles between each frame and the start-end reference line. In Figure~\ref{fig:camera}, we present the statistics of these camera metrics. Notably, the distribution of the SceneScribe-MVS closely resembles that of the original dataset, confirming the effectiveness of the sampling strategy in disentangling camera and object motion.
+
+
+
+
+
+
+
+
+
+
+% $M_{geo}$ and $M_{rgb}$ is the geometric and photometric masks determined by the thresholds, respectively. 
+% Finally, we compute the $s=\sum M_{geo} * M_{rgb}$ scores for each windows, and perform video-level sampling with threshold $\tau$.
+
+
+
+
+
+% Nonetheless, this approach is better suited for scenes in which the objects remain static while the camera moves.
+% Table generated by Excel2LaTeX from sheet 'Sheet1'
+
+
+
+
+
+
+
+
+% \section{SceneScribe Statistics}
+% \textbf{Video} Figure~\ref{fig:video_s}
+
+% \textbf{Caption} Figure~\ref{fig:caption_s}
+
+% \textbf{Camera Motion}
+
+% \textbf{Object Motion}
+

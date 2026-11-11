@@ -1,0 +1,134 @@
+\section{Experiments}%
+\label{sec:experiments}
+
+\input{evaluation_sampling}
+\input{cotracker_pips_vis}
+
+We evaluate \method on several standard real and synthetic tracking benchmarks.
+After discussing implementation details, datasets and benchmarks, we compare \method to the state of the art (\cref{sec:sota}) and ablate our design, demonstrating the importance of joint tracking and other innovations (\cref{sec:ablations})
+
+\paragraph{Datasets and benchmarks.}
+
+We train the model on \textbf{TAP-Vid-Kubric}~\cite{tapvid}, as in~\cite{tapvid,doersch2023tapir}.
+It consists of sequences of 24 frames showing 3D rigid objects falling to the ground under gravity and bouncing, generated using the Kubric engine~\cite{greff2022kubric}.
+Point tracks are selected randomly, primarily on objects and some on the background.
+Objects occlude each other and the background as they move.
+
+For evaluation, we consider \textbf{TAP-Vid-DAVIS}~\cite{tapvid}, containing 30 real sequences of about 100 frames, and \textbf{TAP-Vid-RGB-Stacking}~\cite{tapvid} with 50 synthetic sequences with objects being moved by robots of 200--300 frames each.
+Points are queried on random objects at random times and evaluation assesses both predictions of positions and visibility flags.
+This uses two evaluation protocols.
+In the ``first'' protocol, each point is queried only once in the video, at the first frame where it becomes visible.
+The tracker is expected to operate causally, predicting positions only for future frames.
+In the ``strided'' protocol, points are queried every five frames, and tracking is bidirectional.
+Given that most trackers (ours, PIPs, PIPs++) are causal, we run them twice, on the video and its reverse.
+We assess tracking accuracy using the TAP-Vid metrics~\cite{tapvid}:
+Occlusion Accuracy (OA\@; accuracy of occlusion prediction treated as binary classification),
+\davgvis (fraction of visible points tracked within 1, 2, 4, 8 and 16 pixels, averaged over thresholds), and
+Average Jaccard (AJ, measuring jointly geometric and occlusion prediction accuracy).
+Following~\cite{tapvid}, the \davgvis and AJ tracking thresholds are applied after virtually resizing images to $256\times 256$ pixels.
+Note that TAP-Vid benchmarks evaluate only \textit{visible} points.
+
+We also evaluate on \textbf{PointOdyssey}~\cite{zheng2023pointodyssey}, a more recent synthetic benchmark dataset for long-term tracking.
+It contains 100 sequences that are several thousand frames long, with objects and characters moving around the scene.
+Scenes are much more realistic than TAP-Vid-Kubric.
+We train and evaluate \method on PointOdyssey and report \davgvis and \davgocc, \davg.
+The last two are the same as \davgvis, but for occluded and all points, respectively;
+they can be computed because the dataset is synthetic so the ground-truth positions of invisible points are known.
+We also report their \emph{Survival} rate, which is the average fraction of video frames until the tracker fails (detected when the tracking error exceeds 50 pixels).
+
+\textbf{Dynamic Replica}~\cite{karaev2023dynamicstereo} is a synthetic dataset for 3D reconstruction that contains long-term tracking annotations.
+It consists of 500 300-frame sequences of articulated models of people and animals.
+We evaluate models trained on Kubric and measure \davgvis and \davgocc on the ``valid'' split of this dataset.
+
+\paragraph{Implementation details.}
+
+Here we provide important implementation details and refer to the sup.~mat.~for others.
+We \textbf{train} the model for 50,000 iterations on 6,000 TAP-Vid-Kubric sequences of $T'=24$ frames using sliding window size $T=8$, which takes 40 hours.
+We use $32$ NVIDIA A100 80GB GPUs with a batch size of 1.
+Training tracks are sampled preferentially on objects.
+During training, we construct batches of $N=768$ tracks with visible points either in the first or middle frames of the sequence to train the tracker to handle both cases.
+In a similar manner, we also train a second version of \method on the train split of PointOdyssey, using 128 tracks randomly sampled from sequences of length $T'=56$.
+
+A technical difficulty is that the number of tracks $N$ varies from window to window, as new points can be added to the tracker at any time.
+While conceptually, this is handled by simply adding more tokens when needed, in practice, changing the number of tokens makes batching data for training difficult.
+Instead, we allocate enough tokens for all the tracked points, regardless of which window they are added in, and use masking to ignore tokens that are not yet used.
+
+The video \textbf{resolution} can also affect tracking performance.
+For evaluation on TAP-Vid, we follow their protocol and downsample videos to $256\times 256$, which ensures that no more information than expected is passed to the tracker.
+However, each tracker has a different native resolution at which it is trained ($384 \times 512$ for PIPs and \method; $512 \times 896$ for PIPs++).
+We thus resize videos from $256\times 256$ to the native resolution of each tracker before running it to ensure fairness.
+For Dynamic Replica and PointOdyssey, we resize videos to the native tracker resolution, as there is no prescribed resolution.
+
+\input{tabs/tab_comparison}
+\input{tabs/tab_comparison_pointodyssey}
+
+\subsection{Comparisons to the State of the Art}%
+\label{sec:sota}
+
+We compare \method to state-of-the-art trackers on TAP-Vid-DAVIS and TAP-Vid-RGB-Stacking in \cref{tab:tab_comparison}.
+For fairness, we use the same configuration of support points identified in the ablations (see \cref{sec:ablations}) across all benchmarks.
+We also evaluate \method on PointOdyssey in \cref{tab:tab_comparison_pointodyssey} and on Dynamic Replica in \cref{tab:tab_comparison_dr} by tracking jointly all the target points.
+\method improves most metrics by substantial margins on the TAP-Vid benchmarks while generalizing well from synthetic Kubric to real DAVIS\@.
+\method also improves tracking accuracy \davgvis in all cases.
+On PointOdyssey, despite using a window size of only 8 frames, \method has a better survival rate than PIPs++, which uses a 128-frame sliding window.
+This shows the power of unrolled training, which trains the model to propagate information across a long series of sliding windows.
+The gap between \method and other methods in \cref{tab:tab_comparison_pointodyssey} and \cref{tab:tab_comparison_dr} for \davgocc is higher than for \davgvis, which shows that \method excels in tracking occluded points thanks to jointly tracking groups of points.
+
+\subsection{Ablations}%
+\label{sec:ablations}
+
+\paragraph{Tracking together is better.}
+
+In \cref{tab:tab_joint_tracking_ablation}, we demonstrate the importance of tracking points jointly, which is the main motivation of \method.
+This is achieved by removing cross-track attention from the tracker, thus ignoring the dependencies between tracks entirely.
+For fairness, rather than simply removing the six cross-track attention layers, we maintain the same model size and replace them with twelve time-attention layers, resulting in a comparable model size.
+On Dynamic Replica, joint tracking improves the accuracy of occluded points \davgocc 28.8 $\rightarrow$ 37.6 (+30.6\%) more than the accuracy of visible points \davgvis 62.4 $\rightarrow$ 68.9 (+10.4\%), showing the effectiveness of joint tracking in understanding the scene motion, including currently invisible points.
+
+\input{tabs/tab_space_time_ablation_new}
+
+\paragraph{Importance of unrolled training.}
+
+We design \method for tracking in a windowed manner, and in \cref{tab:tab_unrolling}, we thus assess the effect of unrolling windows during training (\cref{sec:unrolled_training}).
+Switching off unrolled training decreases performance by 18 AJ points.
+Hence, unrolled training helps to track over long periods of time, $>10\times$ longer than the sequences used in training.
+
+\paragraph{Effect of proxy tokens on scalability.}
+
+In \cref{tab:tab_ablate_clusters}, we assess the benefits of using proxy tokens during inference.
+For a fixed memory budget (80 GB), using proxy tokens instead of full self-attention allows us to track $\times 7.4$ more points than without them;
+in fact, we can track a whole 263 $\times$ 263 grid, which is quasi-dense for the input video resolution.
+Moreover, proxy tokens also reduce the time complexity of the model and make it $\times 7$ faster at inference time for the maximum number of tracked points.
+The number of proxy tokens does not affect scalability but affects performance, with the best results obtained using 64 proxy tokens.
+In short, \emph{proxy tokens allow to track almost one order of magnitude more tracks with higher accuracy than the naive self-attention}.
+
+\begin{table}[tb]
+    \begin{minipage}{.50\linewidth}
+        \centering
+        \setlength\tabcolsep{0.9pt}
+       \input{tabs/tab_ablate_clusters}
+    \end{minipage}%
+    \hspace{0.02\linewidth}
+    \begin{minipage}{0.45\linewidth}
+        \centering
+        \setlength\tabcolsep{1pt}
+        \input{tabs/tab_space_time_ablation}
+    \end{minipage}
+\end{table}
+
+\paragraph{Optimal support point configurations.}
+
+We compare the effect of choosing different configurations of support points from \cref{fig:evaluation_sampling_fig} in \cref{tab:tab_joint_tracking_ablation_global_local}.
+In order to do so, we take a single benchmark point at a time and add additional support points (\cref{sec:point_selection}) to allow the model to perform joint tracking.
+This protocol, where a single benchmark point is tracked each time, is also important for fairness when compared to the state-of-the-art.
+This is because the benchmark points might be biased for objects, which is particularly evident in TAP-Vid-DAVIS (\cref{fig:evaluation_sampling_fig}).
+Passing more than one such biased point at the same time to a joint tracker like ours could help it by revealing the outline of objects to the tracker.
+By considering one benchmark point at a time, we ensure that no such ground-truth information can leak into it.
+We use this scheme for the TAP-Vid benchmarks, which explicitly prohibits tracking more than one ground-truth point at a time.
+
+Adding any configurations of support points helps, but the local configuration helps much more than the global, presumably because the model uses dependencies with other points located on the same object.
+The combination of global and local context works best, likely because the model can track both the camera motion and the object motion in this case.
+
+\input{figure_lab}
+
+
+

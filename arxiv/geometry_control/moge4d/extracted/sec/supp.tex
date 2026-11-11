@@ -1,0 +1,268 @@
+
+\renewcommand\thesection{\Alph{section}} 
+\renewcommand\thetable{\Alph{table}}
+\renewcommand\thefigure{\Alph{figure}}
+\setcounter{section}{0}
+\setcounter{figure}{0}
+\setcounter{table}{0}
+
+
+\noindent In this Appendix, we provide:
+\begin{itemize}
+    \item Additional experimental settings and evaluation details (Section \ref{sec:a}).
+    \item Additional discussions and comparisons (Section \ref{sec:b}).
+    \item Extended visualization results (Section \ref{sec:c}).
+    \item Dataset curation and comparison details (Section \ref{sec:d}).
+    \item Baseline introductions (Section \ref{sec:e}).
+    \item Implementation details (Section \ref{sec:f}).
+    \item Applications and future directions (Section \ref{sec:g}).
+    \item Prompt for VLM-based 4D evaluation (Section \ref{sec:prompt}).
+\end{itemize}
+
+\section{More Experiment Settings}
+\label{sec:a}
+
+
+\subsection{VBench Metrics}
+
+\label{app:vbench_metrics}
+
+In Table 1, we selected VBench~\cite{vbench} for quantitative evaluation as it offers a standardized and efficient framework to access perceptual video quality across diverse baselines, whereas 4D geometric metrics are computationally intensive and incompatible with many baseline methods. VBench comprehensively evaluates six critical dimensions:
+
+\begin{itemize}
+    \item {Subject Consistency}: Measures identity and appearance coherence of the primary subject over time.
+    \item {Background Consistency}: Assesses temporal stability and coherence of background elements.
+    \item {Motion Smoothness}: Evaluates the naturalness and fluidity of object and camera motion.
+    \item {Dynamic Degree}: Quantifies the intensity and extent of dynamic changes in the scene.
+    \item {Aesthetic Quality}: Judges overall visual appeal, composition, and stylistic merit.
+    \item {Imaging Quality}: Rates technical image attributes like sharpness, noise, and artifacts.
+\end{itemize}
+
+This multi-dimensional analysis ensures a fair and holistic comparison of performance on 4D generation from a single image. 
+
+\subsection{Details on VLM-based 4D Evaluation}
+
+To address this evaluation gap, we leverage a Vision-Language Model (VLM) for systematic quality assessment in the main paper, Table 2. We uniformly sample 8 frames from each video generated under the settings of Table~1 in the main paper and feed them to Qwen2.5-VL-72B-Instruct~\cite{bai2025qwen2}, which rates the sequence on a 1-5 scale across five critical dimensions: (a detailed prompt is provided at the end section~\ref{sec:prompt})
+
+\begin{itemize}
+\item 3D Geometric Consistency: assesses 3D coherence during camera motion.
+\item Temporal Texture Stability: evaluates texture stability without flickering.
+\item Subject Identity Preservation: ensures subjects retain identity and shape.
+\item Motion-Geometry Coupling: checks motion alignment with 3D geometry.
+\item Background Stability: measures background static behavior.
+\end{itemize}
+
+\subsection{Details on 3D Geometry-Aware Evaluations}
+\label{app:geometry_metrics}
+
+While standard video evaluation metrics (such as VBench) provide comprehensive assessments of 2D perceptual quality and temporal smoothness, they often fail to penalize 3D-specific artifacts such as geometric structural collapse or ``texture swimming.'' To explicitly validate the 3D spatial coherence of our generated 4D scenes, we introduce two rigorous geometry-aware quantitative metrics.
+
+\noindent\textbf{Average Trajectory Error.}
+We employ the DELTA tracking model under its default settings to extract dense 3D point trajectories from both generated and ground-truth videos. The metric is defined as the average $L_2$ distance between predicted and ground-truth 3D point locations over all valid tracked frames:
+\begin{equation}
+    e_{\text{traj}} = \frac{1}{\sum_{t,i} \mathbf{M}_{i,t}} \sum_{t=1}^{T} \sum_{i=1}^{N} \mathbf{M}_{i,t} \left\| \hat{\mathbf{P}}_{i,t} - \mathbf{P}^*_{i,t} \right\|_2
+\end{equation}
+where $\hat{\mathbf{P}}_{i,t}$ and $\mathbf{P}^*_{i,t}$ are the 3D coordinates of point $i$ at frame $t$ in generated and ground-truth videos respectively, and $\mathbf{M}_{i,t} \in \{0, 1\}$ denotes point visibility. This metric strictly penalizes unnatural movements and spatial drift.
+
+\noindent\textbf{3D Reprojection Error.}
+To quantify rigid 3D structural stability, we adopt the dense reprojection error metric following WorldScore~\cite{duan2025worldscore} in Table 3(a). We utilize DROID-SLAM~\cite{teed2021droid}, which employs a differentiable Dense Bundle Adjustment (DBA) layer to continuously refine camera poses and per-pixel depth estimates. The reprojection error is then computed across all co-visible points between consecutive frames:
+\begin{equation}
+    e_{\text{reproj}} = \frac{1}{|\mathcal{V}|} \sum_{(i,j) \in \mathcal{V}} \left\| \mathbf{p}^*_{ij} - \Pi(\mathbf{P}_{ij}) \right\|_2^2
+\end{equation}
+where $\mathcal{V}$ is the set of co-visible pixel pairs, $\mathbf{p}^*_{ij}$ is the observed 2D coordinate in the target frame, $\mathbf{P}_{ij}$ is the reconstructed 3D point from refined depth and camera pose, and $\Pi(\cdot)$ denotes the camera projection. Since DROID-SLAM aligns all available pixels rather than relying on sparse features, a low $e_{\text{reproj}}$ rigorously confirms that the generated sequence maintains coherent 3D geometry across frames.
+
+
+
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=1\textwidth]{./assets/vggt_comp_sup.pdf}
+\vspace{-20pt}
+\caption{\textbf{An example comparing our geometry-conditioned 4D-STraG framework (top row) against sequential pipelines.} For each sample, rows 2-4 show results from a cascaded approach: Wan2.1-I2V video generation, followed by DELTA tracking or VGGT reconstruction. Our method yields superior spatio-temporal coherence, while sequential approaches exhibit fragmentation from error accumulation. All samples are consistently rendered from the fixed camera viewpoint for fair comparison.}
+\label{fig:comp}
+\vspace{-6pt}
+\end{figure}
+
+
+
+
+\section{More Discussions}
+\label{sec:b}
+
+\noindent\textbf{Geometry-Conditioned vs. Sequential 4D Generation.} To validate the effectiveness of our {geometry-conditioned trajectory generation paradigm}, we conduct an additional ablation study against alternative sequential pipelines that decompose the task into two stages: first generating a video from the source image, then performing 3D reconstruction or tracking as post-processing to obtain 4D representations. Specifically, we construct two baseline pipelines: (1) video generation using Wan2.1-I2V-14B~\cite{wan2025wan} followed by DELTA~\cite{delta}, the same dense point tracking model used in our dataset construction pipeline; and (2) the same video generation followed by VGGT~\cite{vggt}, a state-of-the-art feed-forward 3D transformer designed for robust 4D scene reconstruction.
+
+As illustrated in Figure~\ref{fig:comp}, where results are visualized under a fixed rendering viewpoint to reveal geometric consistency, our geometry-aware framework demonstrates substantially superior spatio-temporal coherence. The generated point clouds maintain structurally coherent geometry and physically plausible motion throughout the sequence. In contrast, sequential pipelines exhibit notable failure modes: stationary background regions exhibit spurious motion (e.g., drifting water and crowds), while dynamic foreground objects suffer from geometric fragmentation and discontinuous trajectories (e.g., unrealistic body part detachment). These artifacts stem from spatial inconsistencies introduced during video generation—since standard video diffusion models like Wan-I2V lack explicit 3D geometric constraints, the synthesized videos contain frame-to-frame appearance variations, motion blur, and perspective inconsistencies that violate rigid scene structure. When fed into subsequent reconstruction or tracking modules, these visual inconsistencies are incorrectly interpreted as 3D motion or deformation, causing severe error accumulation.
+
+Our method fundamentally mitigates these issues by conditioning dense trajectory prediction on the geometric prior within a unified diffusion backbone. This enables geometry-guided motion synthesis: the static structural constraints effectively regularize the denoising process toward spatial consistency, while visual features inform the trajectory prediction for temporal coherence. By learning to evolve scene dynamics directly from the base geometry, our approach ensures that every frame is both visually plausible and geometrically self-consistent under the fixed viewpoint. This prevents the error accumulation plaguing sequential approaches, ensuring robust and high-fidelity 4D content creation with coherent structure, realistic appearance, and accurate motion dynamics.
+
+\section{More Visualization Results}
+\label{sec:c}
+
+\begin{figure*}[t!]
+\centering
+\includegraphics[width=0.95\textwidth]{./assets/demo_new.pdf}
+\vspace{-10pt}
+\caption{\textbf{Qualitative results of our model.} 
+We visualize the generated results for two more samples. 
+The first row shows the 4D point cloud generated by our 4D-STraG. The second, third rows show the videos rendered by our 4D-ViSM under three distinct, user-defined camera trajectories. }
+\label{fig:demo}
+\vspace{-15pt}
+\end{figure*}
+
+\subsection{Qualitative Results of MoGe4D}
+
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{./assets/VAE.pdf}
+\vspace{-15pt}
+\caption{\textbf{Qualitative results of Motion-Sensitive VAE.}  The figure presents two examples. For each, the top row shows pseudo-GT from the original camera view, while the bottom is the corresponding VAE rendering at the same pose. The close visual alignment demonstrates our VAE's high-fidelity reconstruction capability.
+}
+\vspace{-5pt}
+\label{fig:vae}
+\end{figure*}
+
+
+Figure~\ref{fig:demo} presents two samples of the visualizations for MoGe4D. They are evaluated under distinct user-defined camera trajectories: top-down viewing, forward-backward movement, right-hand circling, and left-hand circling. These trajectories are designed to provide comprehensive multi-perspective observations. The rendered videos demonstrate that our approach consistently produces temporally coherent motion and maintains high-fidelity visual details across all viewpoints. The high-quality 4D point clouds produced by 4D-STraG provide a robust geometric foundation for rendering. The results further demonstrate the strong capability of our 4D-ViSM renderer in synthesizing consistent, high-fidelity videos under diverse camera paths, confirming its flexibility and generalization.
+
+\begin{figure}[t]
+  \centering
+  % \vspace{-10pt}
+  \includegraphics[width=\linewidth]{assets/ood.pdf}
+  \vspace{-10pt}
+  \caption{Examples showing generalization to OOD styles.}
+   \label{fig:OOD}
+   \vspace{-15pt}
+\end{figure}
+
+\subsection{Qualitative Results of Motion-Sensitive VAE}
+
+Figure~\ref{fig:vae} shows the reconstruction results using the fine-tuned VAE on a subset of samples during inference. The reconstructed points are rendered from the original camera viewpoint, demonstrating that they effectively preserve the structural and motion consistency with the input. More specifically, the model exhibits robust representation learning capabilities, enabling effective extraction of latent space representations that accurately capture both geometric and dynamic properties of the observed scenes.
+
+
+\subsection{OOD Generalization}
+
+
+
+Figure ~\ref{fig:OOD} demonstrates that \ours generalizes effectively to out-of-distribution stylized inputs, including cartoons and paintings, provided the underlying geometric structure remains sufficiently discernible. These findings suggest that our framework's generalization stems from its geometry-grounded representation, while robustness to photometric extremes and unstructured scenes remains an open challenge for future work.
+
+
+
+
+
+
+\begin{figure*}[t!]
+\centering
+\includegraphics[width=0.95\textwidth]{./assets/appendix_prompt.pdf}
+\vspace{-10pt}
+\caption{\textbf{Our input prompt} used to query the model for identifying and counting self-initiated and articulated motion.
+}
+\label{fig:appendix_prompt}
+\vspace{-10pt}
+\end{figure*}
+
+
+
+
+
+\section{Dataset Curation}
+\label{sec:d}
+\subsection{Video Filtering and Annotation}
+
+We initiated our process with approximately 200,000 video candidates from the WebVid-10M~\cite{webvid} dataset. To automate the selection of content suitable for 4D dynamic scene modeling, we implemented a two-stage pipeline. First, we employed the multimodal large language model CogVLM2~\cite{cogvlm2} to generate a detailed English caption for each video. Subsequently, these captions were fed into the DeepSeek-V3~\cite{deepseekv3} model, which used a carefully designed prompt to assess content suitability. The core evaluation criteria were: (1) the presence of one or more clearly countable entities, and (2) the exhibition of self-initiated, non-rigid, or articulated motion, as opposed to random movements driven by external forces (e.g., wind, water) or dominant camera motion. This process effectively filtered out videos featuring unstructured dynamics, such as crowd movements, water ripples, or swaying foliage. Our prompt is shown in Figure \ref{fig:appendix_prompt}.
+
+
+\subsection{4D Trajectory Quality Control}
+
+After extracting the raw 4D trajectories, we applied a strict quality filtering process to eliminate samples compromised by depth estimation failures or extreme motion. The specific criteria were as follows: (1) We removed samples where a significant portion of point cloud trajectories contained invalid or anomalous depth values (e.g., near-infinite or zero) at any timestep. (2) We discarded samples exhibiting an excessively large standard deviation in scene depth, which indicates potential errors in the global depth estimation. (3) We performed a scale consistency check. Since uniformly scaling a point cloud should yield an identical rendering from the original camera perspective, we removed samples where this transformation resulted in significant visual changes, flagging them as geometrically inconsistent. This comprehensive filtering pipeline yielded the final 60,000 high-quality samples that constitute the TrajScene-60K dataset.
+
+
+
+\begin{table*}[t]
+\centering
+\caption{\textbf{Comprehensive comparison of 3D scene understanding datasets.} Our TrajScene-60K dataset significantly surpasses existing benchmarks in scale, providing orders of magnitude more frames and 3D point annotations, while offering dense tracking and depth information across diverse real-world indoor and outdoor environments.}
+\vspace{-3mm}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lcccccccc}
+\toprule
+\textbf{Dataset} & \textbf{Year} & \textbf{Frames} & \textbf{Resolution} & \textbf{3D Points} & \textbf{Dense Track} & \textbf{Depth}& \textbf{Caption} & \textbf{Description} \\
+\midrule
+FlyingThings3D~\cite{flyingthing3D} & CVPR'15 & $2.6\times10^4$ & $960\times540$ & $3\times10^8$ & \checkmark & \checkmark &$\times$ & Synthetic, object-level \\
+ScanNet~\cite{scannet} & CVPR'17 & $2.5\times10^6$ & $1296\times968$ & $0$ & $\times$ & \checkmark &$\times$& Real, indoor scenes \\
+Kubric~\cite{greff2022kubric} & CVPR'22 & Flexible & $256\times256$ & Flexible & \checkmark & $\times$ &$\times$& Synthetic, object-level \\
+TAPVid~\cite{tapvid} & NeurIPS'22 & $3\times10^5$ & Multiple & $0$ & \checkmark & $\times$ &$\times$& Real + synthetic videos \\
+TAPVid-3D~\cite{tapvid3d} & NeurIPS'24 & $5\times10^5$ & Multiple & $1\times10^6$ & $\times$ & \checkmark &$\times$& Real-world scenes \\
+\midrule
+TrajScene-60K & - & $3\times10^6$ & $596\times336$ & $1.2\times10^{10}$ & \checkmark & \checkmark & \checkmark& Real, indoor/outdoor \\
+\bottomrule
+\end{tabular}%
+}
+\vspace{-5mm}
+\label{tab:dataset_comparison}
+\end{table*}
+
+\subsection{Comparison with Previous Datasets}
+
+Our TrajScene-60K dataset fills a critical gap in the landscape of resources for 4D dynamic scene understanding and generation. As summarized in Table~\ref{tab:dataset_comparison}, existing datasets are often limited in scale, realism, or the richness of provided annotations. For instance, while synthetic datasets like FlyingThings3D~\cite{flyingthing3D} and Kubric~\cite{greff2022kubric} offer precise ground-truth motion and geometry, their domain gap with real-world imagery hinders generalization. Real-world datasets like ScanNet~\cite{scannet} provide dense 3D reconstructions but are static and lack temporal dynamics. Recent video tracking benchmarks like TAPVid~\cite{tapvid} and TAPVid-3D~\cite{tapvid3d} offer real-world point trajectories but are orders of magnitude smaller in scale and do not provide semantic descriptions crucial for conditional generation.
+
+TrajScene-60K distinguishes itself by combining large-scale, real-world video content with dense, occlusion-aware 4D trajectories and high-quality text captions. It provides over \textbf{3 million frames} and approximately \textbf{12 billion 3D point annotations}, significantly surpassing predecessors in volume. Crucially, we provide dense 4D tracking, per-frame depth, and language descriptions for dynamic scenes across diverse indoor and outdoor environments. This unique combination of scale, realism, and multi-modal annotation makes it an enabling resource for training and evaluating complex 4D scene generation or tracking models, facilitating a more holistic understanding of dynamic 3D worlds.
+
+
+\subsection{Dataset Bias and Release}
+
+TrajScene-60K is built from WebVid-10M~\cite{webvid} using LLM/VLM-based caption filtering, and therefore inherits both the demographic and content biases of the source videos and the filtering models. For example, certain object categories, body types, or geographic regions may be under-represented, and the motion statistics may be skewed towards popular online content. While our work focuses on the technical aspects of 4D scene generation, we acknowledge these biases and will release the dataset and filtering prompts to facilitate transparency and future audits. We also encourage downstream users to carefully consider fairness and representational biases when deploying models trained on TrajScene-60K.
+
+
+
+
+
+
+
+\section{Baseline Introduction}
+\label{sec:e}
+We compare our method with the following leading methods focusing on 4D generation from a single image. 
+
+\noindent\textbf{4Real}:~\cite{4real} generates photorealistic 4D scenes using video diffusion models trained on real data. It first creates a reference video, then learns its 3D canonical representation and temporal deformations, avoiding synthetic 3D priors.
+
+\noindent\textbf{GenXD}:~\cite{genXD} introduces a real-world 4D dataset and multi-view temporal modules to disentangle camera and object motion, enabling joint learning from 3D/4D data for arbitrary scene generation.
+
+\noindent\textbf{Gen3C}:~\cite{gen3c} guides video generation via a 3D cache from predicted point clouds, ensuring precise camera control and 3D consistency by focusing generation on unobserved regions.
+
+\noindent\textbf{DimensionX}:~\cite{dimensionX} reconstructs 3D/4D scenes from a single image by decoupling spatio-temporal factors in a controllable video diffusion framework, allowing precise manipulation of structure and dynamics.
+
+\noindent\textbf{Free4D}:~\cite{free4d} proposes a tuning-free framework that distills foundation models to generate consistent 4D scenes from one image, enabling strong generalization without expensive training.
+
+Among these, 4Real, GenXD, DimensionX, and Free4D follow a \textit{generate-then-reconstruct} pipeline, while Gen3C adopts a \textit{reconstruct-then-generate} strategy.
+
+
+
+
+\section{ Implementation Details}
+\label{sec:f}
+\subsection{Motion-Sensitive VAE Architecture}
+
+Before training the DiT in the 4D-STraG module, we finetune a specialized, motion-sensitive VAE to effectively adapt our generative backbone for trajectory synthesis. This VAE is designed to process and reconstruct trajectory information encoded as RGB-like motion maps. Inspired by Geo4D~\cite{geo4d}, the architecture of both the VAE encoder and decoder is intentionally kept shallow to preserve fine-grained motion details. The Trajectory Encoder and Decoder that process these motion maps are constructed as shallow ResNets~\cite{resnet}. This minimalist design ensures that the VAE learns a compact and efficient latent space for motion patterns without aggressively downsampling the spatial features, which is critical for the precise reconstruction of trajectories by the Trajectory Decoder. When finetuning Motion-Sensitive VAE, we trained the Trajectory Encoder, Trajectory Decoder, and the VAE Decoder, while freezing the VAE Encoder. This approach allows the model to fully adapt to the motion input while preserving the integrity of the pre-trained visual representations.
+
+
+\subsection{Details of 4D-ViSM Architecture}
+Our 4D-ViSM model adapts a pre-trained video Diffusion Transformer (DiT) for dynamic video inpainting, specifically to fill holes in novel-view videos rendered from our 4D representation. During fine-tuning, the model is conditioned on the incomplete video. For each step, the rendered video with holes is encoded into a latent representation $z_{\text{rendered}}$, and its binary occlusion mask is downsampled to $m_{\text{latent}}$. The denoising network's input is a channel-wise concatenation of the noisy latent $z_t$, $z_{\text{rendered}}$, and $m_{\text{latent}}$, formulated as 
+$$z = \text{concat}([z_t, z_{\text{rendered}}, m_{\text{latent}}]).$$
+This explicitly provides the model with the known visual context and the missing regions, enabling coherent video completion.
+
+
+\subsection{Inference Pipeline}
+
+Given a single image and a text prompt, our model first acquires geometric information by estimating depth through the 4D-STraG module. Specifically, we utilize the UniDepthv2~\cite{unidepthv2} model to infer depth information, ensuring consistency with the estimation method used for the DELTA tracking model during training. The VAE then encodes the image and depth map into a latent space, while MPM extracts motion features. Subsequently, DiT generates latent representations, which are decoded into relative motion latents. These latents are de-normalized by reversing our depth-guided motion normalization strategy and then fused with the initial point cloud's spatial coordinates to construct a 4D scene representation. Finally, this representation allows for rendering from arbitrary camera poses, and our 4D-ViSM synthesizes a spatio-temporally consistent 4D video aligned with the desired camera trajectory.
+
+
+\section{Applications and Future Work}
+\label{sec:g}
+
+Our image-to-4D generation framework opens up numerous possibilities across various domains. It can serve as a powerful tool for digital content creation, enabling artists and designers to bring static images to life as dynamic 3D assets for films, games, and advertising. Furthermore, this technology holds significant potential for populating virtual and augmented reality (VR/AR) environments with dynamic objects, creating more immersive and interactive digital experiences. Looking ahead, we identify two primary directions for future research. First, we plan to explore more deeply unified architectures that further entangle motion and appearance generation, potentially within a single, non-autoregressive model, to achieve even greater spatio-temporal consistency. Second, a critical challenge in this field is the lack of standardized evaluation protocols. We aim to develop novel metrics specifically designed to quantify the 4D consistency of generative models, providing a more reliable and automated way to measure geometric and textural stability over time.
+
+\section{Prompt of VLM-based 4D Evaluation}
+\label{sec:prompt}
+
+We present the comprehensive prompt for VLM-based 4D evaluation. The detailed prompt is as follows:
+
+\lstinputlisting{sec/prompt.txt}

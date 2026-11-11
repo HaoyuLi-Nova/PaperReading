@@ -1,0 +1,38 @@
+\begin{table}[t]
+    \begin{center}
+    \caption{{\bf Ablation.} We ablate the density of tracks during training and find that training on dense tracks works best for our model.
+    }
+    
+    \label{tbl:ablations}
+    \setlength\tabcolsep{3pt}
+    \resizebox{0.82\linewidth}{!}{
+    \begin{tabular}{llccccc}
+    \toprule
+     
+    \# Tracks & Method & PSNR $\uparrow$ & SSIM $\uparrow$ & LPIPS $\downarrow$ & FVD $\downarrow$ & EPE $\downarrow$ \\
+    \midrule
+
+    \multirow{ 3}{*}{N = 4} & Sparse & 15.075 & 0.241 & 0.384 & \textbf{1209.2} & 30.712 \\
+    & Dense + Sparse & 15.162 & 0.252 & 0.379 & 1230.6 & 29.466 \\
+    & Dense & \textbf{15.638} & \textbf{0.296} & \textbf{0.349} & 1254.9 & \textbf{24.553} \\
+    \cmidrule(lr){1-7}
+    
+    \multirow{ 3}{*}{N = 2048} & Sparse & 15.697 & 0.284 & 0.355 & 1322.0 & 26.724 \\
+    & Dense + Sparse & 15.294 & 0.246 & 0.375 & 1267.8 & 27.931 \\
+    & Dense & \textbf{19.197} & \textbf{0.582} & \textbf{0.230} & \textbf{729.0} & \textbf{4.806} \\
+    
+    \bottomrule
+    \end{tabular}
+   }
+    \end{center}
+\aftertab    
+\end{table}
+
+
+
+
+
+
+
+
+
