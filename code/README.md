@@ -59,6 +59,20 @@ rm -rf code/<track>/<slug>/.git
 | SymphoMotion | [`geometry_control/symphomotion/`](geometry_control/symphomotion/) | [grenoble-zhang/SymphoMotion](https://github.com/grenoble-zhang/SymphoMotion) |
 | CoMoVi | [`geometry_control/comovi/`](geometry_control/comovi/) | [IGL-HKUST/CoMoVi](https://github.com/IGL-HKUST/CoMoVi) |
 | MoGe4D | [`geometry_control/moge4d/`](geometry_control/moge4d/) | [Zhangyr2022/MoGe4D](https://github.com/Zhangyr2022/MoGe4D) |
+| Gen4P | [`geometry_control/gen4p/`](geometry_control/gen4p/) | [yitongx/Gen4P](https://github.com/yitongx/Gen4P) |
+| D4RT | [`geometry_control/d4rt/`](geometry_control/d4rt/) | 非官方 [Lijiaxin0111/Open-d4rt](https://github.com/Lijiaxin0111/Open-d4rt) |
+| DVD | [`geometry_control/dvd/`](geometry_control/dvd/) | [EnVision-Research/DVD](https://github.com/EnVision-Research/DVD) |
+| SpatialTrackerV2 | [`geometry_control/spatialtracker_v2/`](geometry_control/spatialtracker_v2/) | [henry123-boy/SpaTrackerV2](https://github.com/henry123-boy/SpaTrackerV2) |
+| TAPIP3D | [`geometry_control/tapip3d/`](geometry_control/tapip3d/) | [zbw001/TAPIP3D](https://github.com/zbw001/TAPIP3D) |
+| St4RTrack | [`geometry_control/st4rtrack/`](geometry_control/st4rtrack/) | [HavenFeng/St4RTrack](https://github.com/HavenFeng/St4RTrack) |
+| MonST3R | [`geometry_control/monst3r/`](geometry_control/monst3r/) | [Junyi42/monst3r](https://github.com/Junyi42/monst3r) |
+| VGGT | [`geometry_control/vggt/`](geometry_control/vggt/) | [facebookresearch/vggt](https://github.com/facebookresearch/vggt) |
+| 4RC | [`geometry_control/four_rc/`](geometry_control/four_rc/) | [Luo-Yihang/4RC](https://github.com/Luo-Yihang/4RC) |
+| V-DPM | [`geometry_control/vdpm/`](geometry_control/vdpm/) | [eldar/vdpm](https://github.com/eldar/vdpm) |
+| Any4D | [`geometry_control/any4d/`](geometry_control/any4d/) | [Any-4D/Any4D](https://github.com/Any-4D/Any4D) |
+| Trace Anything | [`geometry_control/traceanything/`](geometry_control/traceanything/) | [ByteDance-Seed/TraceAnything](https://github.com/ByteDance-Seed/TraceAnything) |
+| TrackCraft3R | [`geometry_control/trackcraft3r/`](geometry_control/trackcraft3r/) | [cvlab-kaist/TrackCraft3r](https://github.com/cvlab-kaist/TrackCraft3r) |
+| Track2View | [`geometry_control/track2view/`](geometry_control/track2view/) | [mvrl/Track2View](https://github.com/mvrl/Track2View)（目前仅 README / assets） |
 
 ## Multi view
 

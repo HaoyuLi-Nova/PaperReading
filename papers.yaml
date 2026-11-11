@@ -882,6 +882,267 @@ papers:
     github: https://github.com/worldflow-rbs/worldflow
     one_liner: 视频与查询点 3D 位移 token 在 MoT 里联合去噪；实现尚未开源
 
+  # ---------- Gen4P 系：4D 感知 / 3D 轨迹生成 ----------
+  - id: gen4p
+    track: geometry_control
+    slug: gen4p
+    title: "Gen4P: Video Generators are 4D Perceivers"
+    venue: arXiv
+    year: 2026
+    arxiv: "2610.22371"
+    status: pending
+    priority: P1
+    deps: [wan, motioncrafter, d4rt, dvd]
+    tags: [4d, tracking, wan, lora, query]
+    github: https://github.com/yitongx/Gen4P
+    code: code/geometry_control/gen4p/
+    project: https://gen4p.github.io/
+    one_liner: 把 Wan2.1 改成单步 4D 感知器，按需查询 3D 轨迹/深度/相机
+
+  - id: d4rt
+    track: geometry_control
+    slug: d4rt
+    title: "Efficiently Reconstructing Dynamic Scenes One D4RT at a Time"
+    venue: arXiv
+    year: 2025
+    arxiv: "2512.08924"
+    status: pending
+    priority: P0
+    deps: []
+    tags: [4d, tracking, query, reconstruction]
+    github: https://github.com/Lijiaxin0111/Open-d4rt
+    code: code/geometry_control/d4rt/
+    project: https://d4rt-paper.github.io/
+    one_liner: 一次编码、按需查询像素的 3D 位置；官方未放代码，用非官方 OpenD4RT
+
+  - id: dvd
+    track: geometry_control
+    slug: dvd
+    title: "DVD: Deterministic Video Depth Estimation with Generative Priors"
+    venue: arXiv
+    year: 2026
+    arxiv: "2603.12250"
+    status: pending
+    priority: P1
+    deps: [wan]
+    tags: [depth, wan, lora, video]
+    github: https://github.com/EnVision-Research/DVD
+    code: code/geometry_control/dvd/
+    project: https://dvd-project.github.io/
+    one_liner: Wan2.1 LoRA 单步回归视频深度；Gen4P 冻住作几何先验
+
+  - id: spatialtracker_v2
+    track: geometry_control
+    slug: spatialtracker_v2
+    title: "SpatialTrackerV2: 3D Point Tracking Made Easy"
+    venue: ICCV
+    year: 2025
+    arxiv: "2507.12462"
+    status: pending
+    priority: P0
+    deps: [spatialtracker]
+    tags: [point_tracking, 3d_tracking, camera, depth]
+    github: https://github.com/henry123-boy/SpaTrackerV2
+    code: code/geometry_control/spatialtracker_v2/
+    project: https://spatialtracker.github.io/
+    one_liner: 端到端同时估相机、几何与像素级 3D 轨迹
+
+  - id: tapip3d
+    track: geometry_control
+    slug: tapip3d
+    title: "TAPIP3D: Tracking Any Point in Persistent 3D Geometry"
+    venue: NeurIPS
+    year: 2025
+    arxiv: "2504.14717"
+    status: pending
+    priority: P1
+    deps: [spatialtracker]
+    tags: [point_tracking, 3d_tracking]
+    github: https://github.com/zbw001/TAPIP3D
+    code: code/geometry_control/tapip3d/
+    project: https://tapip3d.github.io/
+    one_liner: 把特征抬到去相机运动的 3D 空间里做长程点追踪
+
+  - id: st4rtrack
+    track: geometry_control
+    slug: st4rtrack
+    title: "St4RTrack: Simultaneous 4D Reconstruction and Tracking in the World"
+    venue: ICCV
+    year: 2025
+    arxiv: "2504.13152"
+    status: pending
+    priority: P1
+    deps: [monst3r]
+    tags: [4d, tracking, pointmap]
+    github: https://github.com/HavenFeng/St4RTrack
+    code: code/geometry_control/st4rtrack/
+    one_liner: 成对点图同时做世界系 4D 重建与追踪
+
+  - id: monst3r
+    track: geometry_control
+    slug: monst3r
+    title: "MonST3R: A Simple Approach for Estimating Geometry in the Presence of Motion"
+    venue: ICLR
+    year: 2025
+    arxiv: "2410.03825"
+    status: pending
+    priority: P1
+    deps: []
+    tags: [4d, pointmap, dynamic]
+    github: https://github.com/Junyi42/monst3r
+    code: code/geometry_control/monst3r/
+    one_liner: 把 DUSt3R 点图扩到动态场景，估逐帧几何与相机
+
+  - id: vggt
+    track: geometry_control
+    slug: vggt
+    title: "VGGT: Visual Geometry Grounded Transformer"
+    venue: CVPR
+    year: 2025
+    arxiv: "2503.11651"
+    status: pending
+    priority: P1
+    deps: []
+    tags: [gfm, pointmap, camera, tracking]
+    github: https://github.com/facebookresearch/vggt
+    code: code/geometry_control/vggt/
+    one_liner: 前馈 Transformer 一次出相机、深度、点图与 3D 轨迹
+
+  - id: four_rc
+    track: geometry_control
+    slug: four_rc
+    title: "4RC: 4D Reconstruction via Conditional Querying Anytime and Anywhere"
+    venue: ICML
+    year: 2026
+    arxiv: "2602.10094"
+    status: pending
+    priority: P1
+    deps: [vggt]
+    tags: [4d, query, reconstruction]
+    github: https://github.com/Luo-Yihang/4RC
+    code: code/geometry_control/four_rc/
+    project: https://yihangluo.com/projects/4RC/
+    one_liner: 一次编码、任意时刻/任意帧查询稠密几何与运动
+
+  - id: vdpm
+    track: geometry_control
+    slug: vdpm
+    title: "V-DPM: 4D Video Reconstruction with Dynamic Point Maps"
+    venue: arXiv
+    year: 2026
+    arxiv: "2601.09499"
+    status: pending
+    priority: P1
+    deps: [vggt]
+    tags: [4d, pointmap, scene_flow]
+    github: https://github.com/eldar/vdpm
+    code: code/geometry_control/vdpm/
+    one_liner: 在 VGGT 上预测动态点图，恢复逐点 3D 运动
+
+  - id: any4d
+    track: geometry_control
+    slug: any4d
+    title: "Any4D: Unified Feed-Forward Metric 4D Reconstruction"
+    venue: arXiv
+    year: 2025
+    arxiv: "2512.10935"
+    status: pending
+    priority: P1
+    deps: [vggt]
+    tags: [4d, metric, scene_flow]
+    github: https://github.com/Any-4D/Any4D
+    code: code/geometry_control/any4d/
+    project: https://any-4d.github.io/
+    one_liner: 前馈度量尺度稠密 4D；可接 RGB-D / IMU / Radar
+
+  - id: traceanything
+    track: geometry_control
+    slug: traceanything
+    title: "Trace Anything: Representing Any Video in 4D via Trajectory Fields"
+    venue: ICLR
+    year: 2026
+    arxiv: "2510.13802"
+    status: pending
+    priority: P1
+    deps: []
+    tags: [4d, trajectory, parametric]
+    github: https://github.com/ByteDance-Seed/TraceAnything
+    code: code/geometry_control/traceanything/
+    one_liner: 把视频表示成参数化 3D 轨迹场
+
+  - id: trackcraft3r
+    track: geometry_control
+    slug: trackcraft3r
+    title: "TrackCraft3R: Repurposing Video Diffusion Transformers for Dense 3D Tracking"
+    venue: arXiv
+    year: 2026
+    arxiv: "2605.12587"
+    status: pending
+    priority: P1
+    deps: [wan, gen4p]
+    tags: [4d, tracking, wan, dit]
+    github: https://github.com/cvlab-kaist/TrackCraft3r
+    code: code/geometry_control/trackcraft3r/
+    project: https://cvlab-kaist.github.io/TrackCraft3r/
+    one_liner: 同样把 Wan2.1 DiT 改成单步稠密 3D tracker
+
+  - id: jtt
+    track: geometry_control
+    slug: jtt
+    title: "JtT: Rethinking Point Trajectory Diffusion for Diverse and Rigid Motion from an Image"
+    venue: arXiv
+    year: 2026
+    arxiv: "2610.16591"
+    status: pending
+    priority: P1
+    deps: [moge4d]
+    tags: [trajectory, generation, diffusion, rigidity]
+    project: https://jtt.gabrijel-boduljak.com/
+    one_liner: 单图扩散生成多样刚体点轨迹；逐帧速度参数化
+
+  - id: track2view
+    track: geometry_control
+    slug: track2view
+    title: "Track2View: 4D-Consistent Camera-Controlled Video Generation via Paired 3D Point Tracks"
+    venue: arXiv
+    year: 2026
+    arxiv: "2606.15534"
+    status: pending
+    priority: P1
+    deps: [spatialtracker_v2, wan]
+    tags: [camera, 3d_track, recamera, wan]
+    github: https://github.com/mvrl/Track2View
+    code: code/geometry_control/track2view/
+    project: https://qjizhi.github.io/track2view/
+    one_liner: 成对 3D 点轨迹条件做源到目标视角重拍；代码尚未放出
+
+  - id: track4gen
+    track: geometry_control
+    slug: track4gen
+    title: "Track4Gen: Teaching Video Diffusion Models to Track Points Improves Video Generation"
+    venue: CVPR
+    year: 2025
+    arxiv: "2412.06016"
+    status: pending
+    priority: P2
+    deps: []
+    tags: [tracking, video_generation, svd]
+    project: https://hyeonho99.github.io/track4gen/
+    one_liner: 用点追踪损失监督扩散特征，减轻外观漂移；未见官方代码
+
+  - id: track4dgen
+    track: geometry_control
+    slug: track4dgen
+    title: "Tracking-Guided 4D Generation: Foundation-Tracker Motion Priors for 3D Model Animation"
+    venue: CVPR
+    year: 2026
+    arxiv: "2512.06158"
+    status: pending
+    priority: P2
+    deps: [cotracker]
+    tags: [4d, tracking, gaussian, generation]
+    one_liner: tracker 运动先验注入多视角视频扩散与 4D-GS；未见官方代码
+
   # ---------- multi_view ----------
   - id: zero123
     track: multi_view
