@@ -6,7 +6,7 @@
 
 记号（论文 §4.2 Rectified Flow）：$x_1$ 干净视频 latent，$x_0\sim\mathcal{N}(0,I)$ 噪声，$t\in[0,1]$，$X_t=t\,x_1+(1-t)\,x_0$。Wan-VAE 因果压缩：像素 $T=4n+1$（常用 81）→ latent $t_{\mathrm{lat}}=1+(T-1)/4$（21），通道 $c=16$，时序 stride $s=4$。
 
-代码锚点：`wan/image2video.py` 造 $y$；`wan/modules/model.py` 里 `cat(X_t,y)` 与 CLIP∥T5 cross-attn。示意脚本：`code/mycode/wan_i2v_train_step.py`。
+代码锚点：`wan/image2video.py` 造 $y$；`wan/modules/model.py` 里 `cat(X_t,y)` 与 CLIP∥T5 cross-attn。示意脚本：`code/mycode/wan2.1/wan_i2v_train_step.py`；完整阅读路线见 `code/mycode/wan2.1/README.md`。
 
 ---
 

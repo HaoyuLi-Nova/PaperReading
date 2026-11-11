@@ -359,7 +359,7 @@ papers:
     deps: [sd3]
     tags: [video, foundation, dit, open_source]
     notes: notes/base_models/wan2.1/
-    code: code/base_models/wan/
+    code: code/base_models/Wan2.1/
     one_liner: 开源大规模视频 DiT 基座（Wan2.1）
 
   - id: ovi
