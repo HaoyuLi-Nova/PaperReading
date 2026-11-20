@@ -1,0 +1,156 @@
+
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/UI_zoomed.png}
+    \caption{\textbf{Interactive Demo Interface.} This web interface allows generating motion and interacting with \method in real time. The \textit{control panel} at the top right allows dynamically changing the text prompt or input constraints. Input constraints are visualized in red within the \textit{3D scene} as the model generates motion to follow them. The \textit{timeline tracks} on the bottom of the interface intuitively show upcoming text prompts and constraints.} 
+\label{fig:UI}
+\end{figure}
+
+
+
+\section{Interactive Motion Generation Demo}
+\label{sec:results_demo}
+
+To showcase \method's versatility, we developed an interface using Viser~\cite{yi2025viser} to interactively generate motion with our model. The system, shown in \cref{fig:UI}, enables real-time character control through a combination of streaming text prompts and interactive spatial constraints provided via mouse and keyboard inputs. 
+In this section, we first detail \method's test-time operation, then qualitatively demonstrate key results through the interactive demo. 
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[trim={9mm 2mm 7mm 9mm}, clip,width=\linewidth]{figures/replan.pdf}
+    \caption{\textbf{Latency-Aware Replanning.} We utilize a non-blocking strategy where a buffer of $B$ frames is simultaneously played back and fed into the generation thread as history context. This buffer effectively hides the inference latency of slower models, ensuring that the transition to the newly generated sequence remains smooth and continuous. 
+    } 
+\label{fig:replan}
+\end{figure}
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.97\linewidth]{figures/constraints.pdf}
+    \caption{\textbf{Motion Generation with Kinematic Constraints.} 
+    Qualitative results for motion generation conditioned on text prompts and diverse kinematic constraints, including dense root trajectories, sparse root waypoints (visualized as red rings), full-body keyframes (visualized as red skeletons), sparse joint positions (visualized as white skeletons with constrained joints highlighted as red spheres), and joint rotations (visualized as coordinate axes centered at the constrained joint). Motion temporal progression is indicated by a color gradient from gray to blue.
+    } 
+\label{fig:qualitative_results}
+\end{figure*}
+\subsection{Test-Time Operation}
+During inference, \method operates autoregressively to synthesize motion in response to a dynamic stream of user inputs. 
+In the first step of the motion roll-out, \method generates the first window of length $G$ with no history poses as input. In subsequent steps, the previously predicted tokens become the history conditioning as the model predicts the next window of $G$ motion frames. 
+To facilitate autoregressive long motion generation, we employ a truncated sliding window to manage both historical and beyond-generation future contexts. The specific truncation lengths of these context windows are configurable in our interactive demo, up to a maximum of 8 seconds—a limit established by the longest context observed during training. Future constraints that fall beyond the truncation limit (e.g., a target location one minute ahead) are excluded from the input constraint tokens. They are only incorporated into the conditioning once the advancing generation window brings them within the truncated future context horizon.
+During the autoregressive generation, the root component of the previously predicted tokens are translated such that the last frame of the history coincides with the origin, which is what the model expects as input. The translation offset is preserved and subsequently applied to the generated motion to transform it back into global scene coordinates. This loop ensures high-quality motion with smooth temporal transitions.
+
+To enable real-time interactivity, we incorporate a dynamic replanning mechanism that triggers immediately upon detecting new user input, such as updated text prompts or modified future kinematic constraints, or when the current motion buffer will soon be depleted. 
+Our replanning scheme is latency-aware, facilitating the use of more powerful models even when their inference latency exceeds the inter-frame interval. 
+As shown in \cref{fig:replan}, when a replan is triggered we utilize the subsequent $B$ frames, which have already been generated, as a \textit{replan buffer}. These frames are played back to the user while simultaneously serving as history context for the asynchronous generation thread. This replan buffer effectively masks the inference latency of slower models, ensuring smooth and continuous transitions to the new generation. We present this scheme as an optional mechanism to enable increased diffusion steps for enhanced motion quality and control accuracy. In our deployment setup, the 4-step model operates without buffer frames, while the 10-step model employs a single buffer frame.
+
+
+\subsection{Demo Results}
+The interactive motion generation demo uses \method trained on the Bones Rigplay dataset~\cite{BonesStudio2026} described in detail later (see \cref{sec:results_internal}). The demo runs on a workstation equipped with an RTX 4090 GPU. The average generation latency is 33 ms for our efficient 4-step diffusion model and 63 ms for our 10-step diffusion model, with the latter providing slightly improved control accuracy.
+Both models use a generation window of $G = 40$ frames (2 seconds at 20~fps).
+All examples in \cref{fig:teaser} are generated using this interface, demonstrating that the system can process complex descriptions and seamlessly adapt to dynamic changes in user-specified text prompts. It also robustly satisfies diverse kinematic constraints, ranging from sparse long-term goals (e.g., reaching a target location in 10 seconds) to dense short-term constraints (e.g., trajectory following or full-body keyframes). 
+Additional qualitative results for kinematic constraint-conditioned generation are shown in \cref{fig:qualitative_results}.
+
+Our system also supports diverse locomotion interfaces: users can define target root trajectories in real time using mouse-based waypoints or modulate real-time velocity via keyboard commands.
+For mouse-based root path control, we derive the target trajectory by linearly interpolating between mouse-click waypoints and smoothing the resulting path.
+For keyboard-based root velocity control, we compute a target velocity from user input and the current velocity, then linearly interpolate between the two and integrate the resulting per-frame velocities to derive the root trajectory input to the model.
+Extensive video demonstrations of our interactive generation system are provided in the supplementary material, highlighting its responsiveness and high-fidelity motion quality.
+
+\section{Analysis on Large-Scale Mocap Data}
+\label{sec:results_internal}
+Next, we thoroughly analyze key design choices of \method along with the effects of various hyperparameter settings.
+
+\subsection{Experiment Setting}
+\paragraph{Bones Rigplay Mocap Dataset}
+We leverage the large-scale proprietary Bones Rigplay dataset~\cite{BonesStudio2026}, which contains around 700 hours of diverse studio-quality human motion with text descriptions.
+The scale and quality of this data enables a more robust testbed for evaluating design variations compared to smaller public datasets like HumanML3D~\cite{guo2022humanml3d}, which are saturated as indicated by methods scoring higher than ground truth data on metrics like R-precision.
+This dataset contains motions from more than 150 participants and is retargeted to a unified-proportion 27-joint skeleton to facilitate learning. The motions encapsulate thousands of distinct behaviors, each performed by multiple actors for multiple takes, resulting in a diverse distribution of semantics and kinematic variations. It includes common motion categories such as locomotion, everyday activities, gestures, and combat, performed in a variety of styles. Raw motion clips range from 1 to 180 seconds in length, but we clip motions to a maximum of 10 seconds and subsample to 20 fps for training. 
+To improve generalization, we use LLM to generate diverse paraphrases of the original text labels. 
+The dataset is split into training and test sets by first grouping motion clips according to semantic content (\ie, action type, such as ``eating\_apple\_right''), and then assigning disjoint groups to each split with an approximate 90/10 ratio, resulting in about 315k motion clips for training and 35k for testing. As a result, the test set contains motion categories that are entirely unseen during training, providing a stronger evaluation of generalization to novel actions.
+
+
+\paragraph{Constraints Sampling}
+We evaluate text+constraint-conditioned generation across a comprehensive suite of test cases designed to simulate common downstream applications. These scenarios include dense root trajectory following, sparse waypoints navigation, full-body keyframes, and end-effector joints control (incorporating both position and orientation goals). The spatial constraints are sampled directly from the ground-truth test set alongside their corresponding text prompts. Furthermore, to rigorously evaluate the model's robustness against constraint inputs, we introduce slight random perturbations to the global translation and heading of a subset of sampled constraints during the evaluation.
+
+\paragraph{Evaluation Metrics}
+Following established protocols~\cite{guo2022humanml3d}, we employ Fréchet Inception Distance (\textbf{FID}) to quantify the distributional similarity between generated and ground-truth motions, and Top-3 \textbf{R-precision} to assess text-motion alignment. To ensure a rigorous evaluation, we train a robust evaluator model based on TMR~\cite{petrovich23tmr} using the large-scale Bones Rigplay dataset. Notably, we compute R-precision over a test dataset containing about 5k unique samples of diverse action types. This significantly increases the retrieval difficulty compared to the standard practice in benchmarks like HumanML3D~\cite{guo2022humanml3d}, which computes the metric over batches of size 32 only. As a proxy for motion quality, we also report a heuristic \textbf{foot skating} metric that measures mean foot velocity when the foot is considered in-contact based on a height threshold. To assess spatial control accuracy in constraints-conditioned generation, we compute the \textbf{mean error} between the user-specified constraint targets (position and orientation) and the corresponding generated poses.
+
+\input{tables/ablation_study}
+
+\input{tables/ablation_detailed}
+
+\subsection{Ablation Study}
+\label{sec:results_ablation}
+
+\cref{tab:ablation} presents ablation results on three key design choices: the hybrid motion representation, the global-to-local root conversion within the tokenizer decoder, and the two-stage denoiser design.
+
+\paragraph{Hybrid Motion Representation}
+We first compare our proposed hybrid motion representation (derived via the learned tokenizer) against the purely explicit motion representation. To ensure a fair comparison, we train an autoregressive baseline that uses explicit pose features, applying the same patching strategy to align the temporal granularity of the tokens. This explicit baseline uses masked overwriting (\cref{sec:diffusion}) to condition on all kinematic constraint inputs by overwriting both constrained root and body features.
+As demonstrated in \cref{tab:ablation}, our autoregressive model utilizing the hybrid representation significantly outperforms its explicit counterpart in both motion quality and control accuracy. 
+The high-dimensionality of explicit motion representations likely complicates the generative learning process, particularly under our few-step denoising setting. In contrast, the hybrid representation compresses high-dimensional body features into compact latent embeddings that are more amenable to efficient generative modeling.
+
+\paragraph{Global-to-Local Conversion}
+Next, we evaluate the importance of our global-to-local root conversion process within the tokenizer decoder by training a baseline decoder that operates directly on the global root representation. The ablation results reveal that removing the global-to-local root conversion leads to a notable increase in foot skating, confirming that local root representations are essential for preserving motion quality and physical plausibility.
+
+\paragraph{Two-Stage Denoiser Design}
+To validate our two-stage model architecture, we train a one-stage baseline that jointly predicts the root trajectory and latent body motion tokens simultaneously. Experimental results show that the two-stage architecture achieves superior performance, yielding higher-fidelity text-conditioned motion and significantly lower spatial constraint errors. This suggests that decomposing root and body prediction facilitates the simultaneous learning of high-fidelity generation and precise spatial control.
+
+\subsection{Hyperparameter and Tokenizer Type Analysis}
+\label{sec:results_hyperparams}
+
+\cref{tab:ablation_detailed} provides an analysis of the generation horizon length, the number of diffusion steps, and the tokenizer configurations.
+
+\paragraph{Generation Horizon}
+The generation horizon length is a critical hyperparameter impacting the model's performance. We observe that extending the horizon consistently improves motion fidelity (FID) and semantic alignment (R-Precision) metrics. Conversely, extremely narrow horizons (\eg, 4 frames) lead to training instability and degraded performance, ultimately resulting in the generation of drifting motions. The text-only foot-skating metric for the 4-frame horizon is misleadingly low, as the model often fails to respond to text prompts. Regarding spatial control, we find that horizons of 8 and 40 frames effectively minimize the constraint errors.
+Qualitative analysis shows that models with an 8-frame horizon can transition between actions more rapidly in response to updated text prompts compared to those with a 40-frame horizon. Furthermore, our experiments show that the 8-frame model learns constraint adherence faster during training than its 40-frame counterpart.
+
+\paragraph{Diffusion Step}
+We ablate the impact of the number of diffusion steps used by the autoregressive denoiser.
+Using extremely few diffusion steps (\eg, 1 or 2) leads to significantly worse generation quality and constraint adherence.
+Increasing diffusion steps provides slight gains in FID, R-Precision, and constraint accuracy. However, our few-step models still achieve highly competitive performance, demonstrating the robustness of the learned hybrid representation for efficient high-quality motion synthesis.
+
+\paragraph{Tokenizer Patch Size}
+We also evaluate the effect of the tokenizer patch size. Using a minimum patch size of a single frame leads to faster learning in the early stages, but causes training instability later on, resulting in significantly worse overall performance in the end. Conversely, using a larger patch size of 8 slightly improves the FID and R-precision metrics, but at the cost of worse skating performance and constraint accuracy. This trade-off occurs because compressing more frames into a single token causes a greater loss of fine-grained pose details within each patch.
+\paragraph{Tokenizer Latent Space Capacity}
+We evaluate tokenizers with varying latent space capacities. The capacity of a Finite Scalar Quantization (FSQ) latent space is determined jointly by the number of discrete quantization levels and the number of latent dimensions. By default, we use an FSQ configuration with 64 quantization levels and 128 dimensions, denoted as FSQ 64-128. While performance is relatively similar across configurations, there are some notable differences. Using FSQ 16-32 with a smaller latent capacity yields slightly better FID and R-precision metrics under the limited training budget of 1 million iterations, but it degrades performance on end-effector joint constraints and full-body errors. This trade-off arises because a smaller latent space lacks the capacity to represent fine-grained motion details accurately. On the other hand, expanding the number of dimensions to 256 slows model convergence and does not provide performance gains within the same train budget.
+
+\paragraph{Tokenizer Type}
+We experiment with several tokenizer architectures, including Variational Autoencoders (VAE) and Finite Scalar Quantization (FSQ). For the VAE variant, we applied a KL-divergence loss with weight of $1 \times 10^{-6}$ to regularize the latent distribution. Our results indicate that all tokenizer variants perform comparably to a vanilla autoencoder. 
+However, the vanilla autoencoder suffers from severe training instability and diverges when trained with longer horizons, such as 40 frames. In contrast, the FSQ tokenizer demonstrates superior training stability over the vanilla autoencoder baseline, leading us to adopt FSQ as our default choice.
+
+\section{Benchmark Evaluation}
+\label{sec:results_compare}
+
+Lastly, we evaluate \method against both offline and online state-of-the-art baselines for text+constraints-conditioned generation on the standard HumanML3D~\cite{guo2022humanml3d} dataset.
+For these experiments, our model is trained with a 40-frame generation horizon using 10 diffusion steps and a vanilla autoencoder tokenizer.
+
+\subsection{Experiment Setting}
+\paragraph{HumanML3D Dataset}
+This public dataset contains around 30 hours of motion data with corresponding text descriptions. In our experiments, we exclude the HumanAct12~\cite{guo2020action2motion} subset of HumanML3D due to the absence of native joint rotation data and the severe motion artifacts introduced by the original preprocessing.
+During data processing, we preserve the original SMPL~\cite{SMPL:2015} joint rotations in the retargeting step, unlike the original HumanML3D pipeline, which discards native joint rotations. This makes our processed data compatible with real-time animation, since we can directly animate the body model with generated joint rotations instead of going through an expensive inverse kinematics post-process using generated joint positions.
+
+\paragraph{Evaluation Metrics}
+We adopt the evaluation benchmark from prior work~\cite{guo2022humanml3d,pinyoanuntapong2025MaskControl} to assess various aspects of the generated motion. To evaluate text-following, we report the Top-3 \textbf{R-precision}. Motion quality is measured via Fréchet Inception Distance (\textbf{FID}), which indicates similarity to the ground-truth distribution, and the \textbf{foot skating ratio}, which quantifies the frequency of detected foot skating frames. To assess spatial control accuracy, we calculate the \textbf{mean joint error} for the constrained goal joint positions.
+We utilize the original HumanML3D evaluator models, which were trained on the original processed HumanML3D data, to calculate FID and R-precision metrics. As a result, our method is slightly disadvantaged on these metrics.
+Additionally, we report the motion generation \textbf{latency} for each method, measured on a single NVIDIA A100-SXM4-80GB GPU.
+
+\input{tables/offline_compare}
+\subsection{Offline Model Comparison}
+
+We first compare to MaskControl~\cite{pinyoanuntapong2025MaskControl}, a SOTA offline motion generation model that specializes in accurate joint controls. 
+Following the protocol in MaskControl, we evaluate the model's ability to satisfy arbitrary joint position constraints at any given frame.
+We first compare our raw generation results against MaskControl with its test-time optimization module disabled (denoted as MaskControl\textsuperscript{*}). Subsequently, we apply a similar test-time optimization to our predicted hybrid motion to minimize joint errors. We then compare these refined results against the full MaskControl pipeline. As shown in \cref{table:offline_compare}, \method achieves competitive text-following (on par with ground truth R-prec) and motion quality while demonstrating a lower foot skating ratio. Notably, compared to the raw MaskControl output before optimization, our method yields significantly lower spatial control errors, indicating a stronger underlying generative prior.
+
+\subsection{Autoregressive Model Comparison}
+Next, we compare \method to the closely related model DiP~\cite{tevet2025closd}, an autoregressive motion diffusion model. 
+For the autoregressive model comparison, we evaluate constraints satisfaction by sampling goal joints using two distinct schemes. The first scheme, termed \textit{in-horizon goals}, follows the original DiP setting by sampling one goal joint at the final frame of each autoregressive generation window. This scheme necessitates a goal input every 2 seconds, which is often impractical for applications relying on sparser control signals. The second scheme, \textit{out-of-horizon goals}, involves sampling a single final goal joint at the very end of a long sequence which is beyond the initial autoregressive generation window. This configuration creates a challenging scenario requiring long-horizon planning, a task that the DiP system fails to handle effectively. 
+Following the implementation of DiP, we sample the goal joints from the pelvis, wrists, and feet. 
+We set the test sequence length to 9 seconds and provide 1 second of ground truth motion as initial history to adapt to the original DiP implementation.
+
+As presented in \cref{table:autoregressive_compare}, our approach surpasses DiP in both in-horizon and out-of-horizon scenarios. Notably, DiP exhibits a sharp increase in joint error under the out-of-horizon setting, indicating its limitation for long-term planning. In contrast, our method effectively resolves these long-context constraints, maintaining high accuracy even when goals are placed far into the future.
+Furthermore, to ensure our quantitative gains translate to actual human perception, we conduct a side-by-side perceptual study comparing the two methods on motion quality, semantic alignment, and joint goal accuracy for out-of-horizon goals. Participants are instructed to vote for the better result or indicate a tie. Across 240 pairwise human comparisons (\cref{tab:perceptual_study}), our approach \method is strongly and consistently preferred over DiP, confirming that the numerical improvements in \cref{table:autoregressive_compare} reflect genuine qualitative gains.
+
+\input{tables/autoregressive_compare}
+
+
+
+
+
+

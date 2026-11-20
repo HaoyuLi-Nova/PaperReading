@@ -1,0 +1,170 @@
+\section{Large-Scale Motion Capture Dataset}
+\label{sec:dataset}
+For training and evaluation, we leverage Bones Rigplay~\cite{bones_ai_datasets}, a large-scale optical motion capture dataset containing 700 hours of motions from 170 human subjects with a roughly equal number of male and female participants. 
+The dataset contains thousands of unique actions covering a range of locomotion, gestures, everyday activities, common object interactions, videogame combat, dancing, athletics, and more. 
+Many actions are also performed in different styles including tired, angry, happy, sad, scared, drunk, injured, stealthy, old, and childlike.
+Actions are performed by multiple subjects across multiple takes, providing a rich diversity of performers, semantics, and motion variability. 
+As shown in \cref{fig:data_sample}, each clip in the dataset is labeled with an \textit{overview} text description of the entire motion at a high level. Additionally, the clip is broken down into more \textit{fine-grained} atomic action sub-clips, each containing a text description of the contained action.
+
+The dataset contains body-only motions (i.e., no finger motions) that have been retargeted to a uniform-proportion 27-joint skeleton to be standardized across different performers. 
+We use this ``native'' 27-joint skeleton for quantitative experiments presented in \cref{sec:experiments}, however, we also retarget the dataset to other skeletons to train variations of our model, including \bodymodel~\cite{saito2026soma}, the Unitree G1 Robot~\cite{unitree2024g1}, and SMPL-X~\cite{SMPL:2015, SMPL-X:2019}. 
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.9\linewidth]{assets/data_example.pdf}
+    \caption{\textbf{Example Motion Data.} Each mocap sequence in our training dataset includes a high-level overview description, fine-grained descriptions of sub-clips containing atomic actions, and augmented LLM paraphrases.}
+    \label{fig:data_sample}
+\end{figure}
+
+\paragraph{Augmentations}
+For training the denoising model introduced in \cref{sec:method:diffusion_arch}, we apply augmentations to both the text and motions in the dataset. 
+For text, we use an LLM (Qwen3-32B~\cite{qwen3technicalreport}) to paraphrase the motion descriptions into a consistent prompt structure (always starting with ``A [subject]...'') with various levels of detail. 
+To improve handling complex prompts that contain a composition of multiple actions, we also augment the motion in the dataset by stitching together random pairs of motion clips. To ensure natural transitions between the stitched clips, we use our diffusion model trained on the non-augmented dataset to generate short transition motions between the clips. 
+
+During training, we randomly sample from the available data and augmentation variations according to a pre-specified distribution. In particular, we train on a combination of full motion clips, single or combined action sub-clips, augmented stitched motion clips, original text descriptions, and augmented LLM paraphrases. 
+
+\section{Method: \model}
+\label{sec:method}
+
+Our model is designed to provide users with an intuitive and versatile interface for authoring high-quality motions. 
+The core component of our framework is an explicit motion diffusion model~\cite{tevet2023mdm,zhang2024motiondiffuse}, which has been shown to effectively capture the complex distribution of text and motion. 
+It also enables intuitive kinematic controls through simple conditioning mechanisms, such as direct imputation of pose features~\cite{cohan2024condmdi,shafir2024human}.
+
+\paragraph{Background}
+Explicit motion diffusion~\cite{tevet2023mdm,zhang2024motiondiffuse} applies ideas from earlier image diffusion models~\cite{ho2020denoising}, but operates directly on body pose features.
+Given a clean motion $\bx_0$, the forward diffusion process is defined as a Gaussian process that adds noise to the poses until they are approximately $\mathcal{N}(\mathbf{0}, \mathbf{I})$. 
+To generate a motion, the reverse process is used to iteratively denoise a sequence of noisy human poses $\bx_T \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$.
+To enable this reverse process, a denoiser $\mathcal{D}_\theta(\bx_t, C, t)$, which takes a noisy motion $\bx_t$, conditioning signals $C$, and the current denoising step $t \in \{1, \dots, T\}$ as input, is trained to output a prediction of the clean motion $\bxhat_{0}$. The predicted clean motion is then re-noised to obtain an estimate of $\bx_{t-1}$, which serves as input to the next denoising step in the reverse diffusion process. The conditioning signals may include text or other constraints on the motion. 
+
+The key design decisions to enable high-quality motion and control are the motion representation (\cref{sec:method:motion_rep}) and the denoiser architecture (\cref{sec:method:diffusion_arch}). In the following sections, we describe these components of our system, along with the training recipe (\cref{sec:method:training}) and generation process (\cref{sec:method:inference}).
+
+\subsection{Motion Representation}
+\label{sec:method:motion_rep}
+
+
+
+
+A motion sequence is represented as $\bx = [\bx^1, \bx^2, \ldots, \bx^N]$, where N is the number of frames. We assume the motion is standardized such that the root at the first frame is above the origin. For a skeleton with $J$ joints, each pose in the motion is represented by a vector of features $[\br^p, \br^a, \bj^p, \bj^v, \bj^a, \beff]$ consisting of: 
+\begin{itemize}
+    \item $\br^p \in \reals^3$: \textbf{smoothed global root position}. The root motion is computed by taking the pelvis position and heavily smoothing its 2D horizontal components $(x,z)$, while keeping the $y$ height unchanged. 
+    \item $\br^a \in \reals^2$: \textbf{global root heading direction}. This is represented as $[\cos(\psi), \sin(\psi)]$ with the heading angle $\psi$. The heading angle is computed based on the projection of the cross product $\mathbf{e}_y \times \mathbf{v}_\text{hips}$ onto the $xz$ (ground) plane, where $\mathbf{e}_y$ is the unit up vector and $\mathbf{v}_\text{hips}$ is the vector from left to right hip joints.
+    \item $\bj^p \in \reals^{3J}$: \textbf{joint positions}. The 2D horizontal components $(x,z)$ of each joint are represented relative to the smoothed root position, while the $y$ height is global. Note that these joint positions are \textit{not} rotated to be relative to the root heading direction.
+    \item $\bj^v \in \reals^{3J}$: \textbf{global joint velocities}. The joint velocities are computed from the \emph{global} joint positions, rather than the (partially) root-relative positions $\bj^p$.
+    \item $\bj^a \in \reals^{6J}$: \textbf{global joint angles} encoded using the 6D representation~\cite{zhou2019continuity}.
+    \item $\beff \in \{0, 1\}^4$: \textbf{foot contacts} boolean flags for the [left heel, left toe, right heel, right toe].
+\end{itemize}
+
+Considering the decomposed architecture introduced later, it is helpful to think of each pose as containing a global root component $\br^\text{glob}  = [\br^p, \br^a]$ and a body component $\bb = [\bj^p, \bj^v, \bj^a, \beff]$. 
+
+\paragraph{Discussion}
+This motion representation is carefully designed for motion quality and to be amenable for conditioning through direct imputation (\ie, overwriting) of input pose features during denoising (see \cref{sec:method:diffusion_arch}). 
+\begin{wrapfigure}{r}{0.45\textwidth} %
+    \centering
+    \includegraphics[width=\linewidth]{assets/root_compare.pdf}
+    \caption{\textbf{Smoothed Root Representation.} For a simple walking motion, the projected pelvis path captures the sway of the hips, while the smoothed root is nearly a straight line. This smoothed trajectory offers a stable frame of reference for representing joint positions, and emulates paths drawn in practical animation tools.}
+    \vspace{-5mm}
+    \label{fig:smooth_root}
+\end{wrapfigure}
+First, our mostly global representation allows for sparse constraints on the root, joint positions, and joint rotations throughout a pose sequence. This is challenging for other common representations~\cite{guo2022humanml3d} that are purely local/velocity-based, since they require integration to determine global positions/rotations at a specific frame and are therefore better suited for temporally dense constraints~\cite{meng2025absolute}. 
+Second, our joint position representation is not canonicalized with respect to the root heading in each frame. 
+In prior work, joint positions are commonly canonicalized with respect to the root heading, but this design decision can lead to sudden changes in the local joint position representation due to abrupt flips in heading direction, such as during somersaults and cartwheels. These discontinuities can lead to training instabilities and compromise motion quality.
+Third, using a global joint rotation representation enables users to directly specify sparse joint rotation constraints in world space (through imputation), which is rarely supported in prior systems. While this is a common requirement for animation applications, it is difficult to achieve if joint rotations are represented relative to their parent in the kinematic chain (\eg, in the SMPL body model~\cite{SMPL:2015}), since forward kinematics through the entire chain is required to recover a joint's global orientation.   
+Lastly, compared to directly using the pelvis position projected to the ground as the root, our smoothed root position better emulates the smooth curves and straight lines that users are likely to specify as 2D waypoint and path constraints (\cref{fig:smooth_root}). This smoothed root representation enables our model to generate motions that follow smooth target paths, while also providing flexibility for the pelvis joint to move naturally around the smoothed path. 
+
+\subsection{Two-Stage Transformer Denoiser}
+\label{sec:method:diffusion_arch}
+
+Given a noisy motion $\bx_t$ at denoising step $t$, the denoiser predicts the clean motion $\bxhat_{0}$ using a two-stage transformer architecture shown in \cref{fig:arch}. Denoising is optionally conditioned on a text prompt and/or constraints.
+
+\paragraph{Inputs}
+The input noisy motion $\bx_t$ to the transformer is treated as a sequence of pose tokens. 
+Kinematic constraints are specified as partial pose features in the same representation as the input motion. In particular, the target pose features are specified by a (usually sparse) target motion $\bx_{\text{tgt}}$ along with a binary control mask $\bmask$, which indicates which features are constrained. 
+We impute (\ie, overwrite) the noisy motion with the target pose features according to the control mask as $\tilde{\bx}_t = \bmask \odot \bx_{\text{tgt}} + (1 - \bmask) \odot \bx_t$, where $\odot$ is the element-wise product~\cite{cohan2024condmdi}.
+Finally, we concatenate the control mask with the imputed motion along the feature dimension to produce the final input tokens $\bx_{\text{in}} = [\tilde{\bx}_t; \bmask]$. 
+When no constraints are specified, the mask is simply all zeros and $\tilde{\bx}_t = \bx_t$.
+
+The denoiser prediction is $\bxhat_{0} = \mathcal{D}_\theta(\bx_{\text{in}}, C, t)$ where $C = \{ \bc_\text{text}, \bc_\text{dir}, \bc_\text{extra} \}$ is the set of additional conditioning tokens. 
+$\bc_\text{text} \in \reals^{4096}$ is the LLM2Vec embedding of the input text prompt~\cite{llm2vec2024}, which we found to outperform common alternatives like CLIP~\cite{radford2021learning} and T5~\cite{raffel2020t5} in early experiments. 
+$\bc_\text{dir} \in \reals^2$ is the desired heading direction of the first frame. 
+Lastly, $\bc_\text{extra} \in \reals^{P \times 4096}$ contains $P$ extra all-zero tokens. 
+While these extra tokens cannot exactly be considered ``register'' tokens~\cite{darcet2023vision}, since they are not learned, they achieve a similar effect of enhancing the representational capacity of the model as shown in our experiments (\cref{sec:experiments}). In practice, we use $P=49$.
+All pose and conditioning tokens are embedded to the same dimensionality and added to a sinusoidal positional encoding before going into the transformer.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=1.0\linewidth]{assets/arch.pdf}
+    \caption{\textbf{Denoiser Architecture.} (Left) \model predicts clean motion given a noisy motion, pose constraints, and a text embedding. Specified pose constraints directly overwrite the noisy motion before it is given to the denoiser. (Right) The two-stage denoiser decomposes root and body motion prediction. The root denoiser first predicts the global root motion, which is transformed into a local representation as input to the body denoiser. The final output of the denoising step is the concatenation of the outputs from the two stages.}
+    \label{fig:arch}
+\end{figure}
+
+\paragraph{Architecture}
+As shown in \cref{fig:arch}, the denoiser is decomposed into two transformer encoders: one for predicting root motion and the other for body motion.
+The root denoiser first predicts the global root motion $\hat{\br}^\text{glob}_0$. Despite only predicting the root, this denoiser is conditioned on the full noisy motion $\bx_{\text{in}}$, such that the output can be coordinated with the body motion and any relevant constraints.
+After the first stage, the global root prediction is transformed into a local representation $\hat{\br}^\text{local}_0$, concatenated with the body features from $\bx_{\text{in}}$, and inputted to the second transformer to predict the body motion $\hat{\bb}_0$. The final output of the denoiser is the concatenated global root and body predictions $\hat{\bx}_0 = [\hat{\br}^\text{glob}_0; \hat{\bb}_0]$.
+In practice, both transformers use the same architecture with 16 layers, 8 heads, and a latent size of 1024, totaling 282 M learnable parameters in our full model.
+
+While the global root representation is advantageous when modeling root motion, we found that using a \emph{local} root representation is more effective when conditioning the second stage of the model to denoise body motion. 
+Inspired by Guo \etal~\cite{guo2022humanml3d}, we define the local root pose as $\br^\text{local} = [\dot{\br}^a, \dot{\br}^p_{xz}, \br^p_y]$ where $\dot{\br}^a \in \reals$ is the angular velocity of the heading, $\dot{\br}^p_{xz} \in \reals^2$ is the planar translation velocity of the root, and $\br^p_y \in \reals$ is the absolute height.
+Converting from the global to local root representation is straightforward using finite differences to estimate velocities. 
+
+\paragraph{Discussion}
+The two-stage denoiser design is key to maximizing motion quality and control accuracy together. 
+The global root representation used in the first stage enables conditioning on sparse global root constraints through direct imputation, while the second stage benefits from being conditioned on a more invariant local root representation.
+Moreover, we hypothesize that body motion prediction is an easier problem when conditioned on the root motion. 
+This is supported experimentally in \cref{sec:experiments}, where ablations of the two-stage model and the local root representation result in worse performance. 
+Note that unlike prior two-stage approaches, our two-stage model is \emph{interleaved} since the root and body predictions are made at every denoising step. Prior work performs the root denoising process in full before generating the body motion~\cite{karunratanakul2023gmd,hwang2025motion}, while our model enables root and body corrections throughout denoising to attain better alignment in the end. 
+
+The need for the initial heading token $\bc_\text{dir}$ as input stems from our global representation of joint rotations. 
+To generalize more effectively with this global representation, we speculate that it is helpful for the model to see a wide distribution of rotations during training. Therefore, we choose not to canonicalize motions relative to the heading at the first frame, as is common practice, and instead apply a random first-frame heading augmentation to motions during training (see \cref{sec:method:training}). 
+This means the model can generate motion that starts at any arbitrary heading, which we aim to control at test time with $\bc_\text{dir}$. 
+The choice not to canonicalize the motion and use $\bc_\text{dir}$ is also practically convenient at test time. When the model is conditioned on global constraints in the scene or the user wants to generate motion from a sequence of multiple prompts (\eg, from an editing timeline), there is no need to apply a canonicalizing transform before generation and subsequently an inverse transform afterwards, since we can simply specify the desired initial heading with $\bc_\text{dir}$.
+
+
+
+\subsection{Training}
+\label{sec:method:training}
+
+The denoiser is trained according to the DDPM~\cite{ho2020denoising} framework using a modified version of the simplified loss function. At each training iteration, a ground truth motion $\bx_0$ is sampled from the dataset and a diffusion timestep $t \sim \mathcal{U}\{1,\dots,T\}$ and Gaussian noise $\epsilon \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ are used to noise the motion to $\mathbf{x}_t = q(\mathbf{x}_t \mid \mathbf{x}_0, t)$. After obtaining the denoiser prediction $\hat{\bx}_0$, the loss is computed on each component of the motion representation:
+\begin{align}
+    \mathcal{L} &= \gamma_1 || \hat{\br}^p_0 - \br^p_0||_1 + \gamma_2 || \hat{\br}^a_0 - \br^a_0||_1 + \gamma_3 || \hat{\bj}^p_0 - \bj^p_0||_1 + \gamma_4 || \hat{\bj}^v_0 - \bj^v_0||_1 \notag \\
+    &+ \gamma_5 || \hat{\bj}^a_0 - \bj^a_0||_1 + \gamma_6 || \hat{\beff}_0 - \beff_0||_1 + \gamma_7 || \text{FK}(\hat{\bj}^a_0) - \bj^p_0||_1.
+\end{align}
+where $||\cdot||_1$ is a smooth L1 loss that uses an L2 term when the loss is small and an L1 term otherwise~\cite{girshick2015fast}. $\text{FK}(\cdot)$ is the forward kinematics function, which computes joint positions from joint rotations. 
+In practice, the losses are weighted as $\gamma_1 = \gamma_3 = \gamma_5 = 10.0$, $\gamma_2 = 2.0$, $\gamma_4 = 3.0$, $\gamma_6 = 4.0$, and $\gamma_7 = 5.0$. 
+Training uses variable length sequences within each batch, so loss functions are masked accordingly. %
+We use $T=1000$ diffusion steps for training.
+
+
+
+
+
+
+To improve training stability, we use the Adam-atan2 optimizer~\cite{everett2024scaling} with a learning rate of $2e{-}5$. 
+Ground truth motions are cropped to a maximum length of 10 sec and translated such that the root position is above the origin at the first frame. The heading direction at the first frame is randomized to ensure the model is robust to variations in global rotations. 
+Our best model configuration is trained with a batch size of 2048 across 16 NVIDIA A100 (SXM4-80GB) GPUs and generates motions at 30 fps.
+
+\paragraph{Training Curriculum}
+The denoiser is trained in two phases. For the first 500k steps (phase 1), the model is trained purely on the text-to-motion task with no constraints given as input. For the second 500k steps (phase 2), the model is trained on a mix of text and kinematic constraints.
+During phase 2, kinematic constraints are randomly sampled from a set of pre-defined constraint patterns designed to enable specific functionality at test time. These include: full-body joint positions at sparse keyframes, random subsets of hands and feet positions/rotations at sparse keyframes, 2D root position/heading at sparse keyframes, 2D root position/heading on dense paths, and foot contact configuration at sparse keyframes. Two constraint patterns are mixed together $25\%$ of the time, and $10\%$ of the time no constraints are used (leaving only text input).
+During phase 2, the maximum number of keyframes sampled for sparse constraints increases linearly from 1 to 20, and sampling is biased towards fewer keyframes to reflect common real-world use cases. 
+Dropout with a rate of 0.1 is used during phase 1, but is removed for phase 2 to avoid dropping out conditioning constraints that are directly overwritten to the noisy motion input.
+During both phases, the text input is dropped $10\%$ of the time to enable classifier-free guidance at test time~\cite{ho2022classifier}. 
+Exponential Moving Average (EMA) is applied every 10 steps throughout training with a decay of 0.995 to maintain an average of the denoiser parameters, which is then used at test time.
+
+\subsection{Motion Generation}
+\label{sec:method:inference}
+After training, motions are generated using the DDIM~\cite{song2020denoising} inference process with, by default, 100 denoising steps.
+We leverage a classifier-free guidance approach that decomposes text and constraint conditioning to allow control over each one individually. 
+In particular, the model output at each denoising step is computed as $\hat{\bx}_0 = \mathcal{D}_\varnothing + w_\text{text}(\mathcal{D}_\text{text}  - \mathcal{D}_\varnothing) + w_\text{constr}(\mathcal{D}_\text{constr}  - \mathcal{D}_\varnothing)$ where $\mathcal{D}_\varnothing$ is the model output using no text or constraint conditioning, $\mathcal{D}_\text{text}$ uses only text conditioning (no constraints), and $\mathcal{D}_\text{constr}$ uses only constraint conditioning (no text). 
+By default, we use $w_\text{text} = 2$ and $w_\text{constr} = 2$, but a user can adjust each to vary the influence of text and constraint conditioning on the model output. 
+Several prior works make use of gradient-based guidance to further improve constraint following at test-time~\cite{rempeluo2023tracepace,karunratanakul2023gmd}, but we found that since our model is already directly conditioned on the constraints, adding gradient-based guidance gave minimal improvement, substantially increased generation time, and was generally unstable and difficult to tune.
+
+\paragraph{Multi-Prompt Sequencing}
+While \model is trained to take one text prompt as input, it is practically desirable to generate motions for a sequence of prompts (see \cref{sec:key_results:text}). 
+We achieve this by generating the motion for each prompt in sequence and adding constraints to maintain plausible transitions. 
+After generating motion for the first prompt, the subsequent prompt is generated with an overlap to the first prompt where several full-body keyframe constraints are added to encourage consistent joint positions and accelerations with the previously generated motion. To ensure a smooth transition, we blend the constrained frames that are shared by the first and second prompt after generation.
+
+\paragraph{Motion Post-Processing}
+In practice, post-processing can be performed on the model outputs to improve the generated motion. 
+Simple foot locking and IK can clean up any undesirable foot skate using the foot contact classification directly from the model output.
+It is also helpful to perform a short optimization on the output motion to ensure it \emph{exactly} hits the kinematic constraints, which is challenging for the model to achieve. We use these post-processing approaches in our released demo and codebase, but not for the experiments in \cref{sec:experiments} to ensure a fair comparison between methods.

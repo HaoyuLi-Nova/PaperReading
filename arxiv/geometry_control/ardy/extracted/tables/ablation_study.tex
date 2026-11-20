@@ -1,0 +1,20 @@
+\begin{table*}[t]
+\centering
+\caption{\textbf{Quantitative Ablation of Architectural Designs.} We evaluate performance across text-only and various kinematic constraints-conditioned generation scenarios, including end-effector joint rotation and position, full-body keyframe joints, dense root trajectories, and sparse root waypoints. $\uparrow$ denotes higher values are better; $\downarrow$ denotes lower values are better. \textbf{Bold} and \underline{underlined} values indicate the best and second-best results, respectively.}
+\resizebox{\textwidth}{!}{
+    \begin{tabular}{l ccc | cccccc}
+    \toprule
+    & \multicolumn{3}{c}{Text-only Generation} & \multicolumn{6}{c}{Constraints-conditioned Generation} \\
+    Model & Skate (m/s) $\downarrow$ & R-prec. $\uparrow$ & FID $\downarrow$ & Skate (m/s) $\downarrow$ & Joint rot. (deg.) $\downarrow$ & Joint pos. (m) $\downarrow$ & Keyframe body (m)$\downarrow$ & Traj. (m) $\downarrow$ & Waypoint (m) $\downarrow$ \\
+    \midrule
+    Dataset & 0.255 & 76.56 & 0.000 & - & - & - & - & - & - \\
+    \midrule
+    \method (Ours) & \textbf{0.264} & \underline{65.47} & \textbf{0.027} & \underline{0.250} & \underline{2.23} & \textbf{0.025} & \textbf{0.023} & \textbf{0.015} & \textbf{0.024} \\
+    Explicit representation & 0.365 & 53.90 & 0.065 & 0.281 & \textbf{1.67} & 0.130 & 0.136 & 0.033 & 0.203 \\
+    Global root-conditioned decoder & 0.303 & 64.94 & \underline{0.028} & 0.284 & 2.88 & \underline{0.048} & \underline{0.044} & 0.024 & \underline{0.060} \\
+    One-stage architecture & \textbf{0.264} & \textbf{65.84} & 0.029 & \textbf{0.248} & 2.46 & 0.101 & 0.079 & \underline{0.017} & 0.164 \\
+    \bottomrule
+    \end{tabular}
+}
+\label{tab:ablation}
+\end{table*}

@@ -1,0 +1,70 @@
+\begin{table}
+    \centering
+    \caption{\textbf{Ablation study.} We compare models trained \emph{with} and \emph{without} data augmentation on the InterAct dataset~\citep{xu2025interact}. Experiments on unseen objects include in-category and cross-category objects never observed during training. We report R-Precision with batch size 256.}
+    \label{tab:t2i_interact_aug}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{@{}cccccccccccccc@{}}
+        \toprule
+        \multirow{2}{*}{Augmented} &
+        \multirow{2}{*}{Unseen} &
+        \multicolumn{3}{c}{R-Precision$^\uparrow$} &
+        \multirow{2}{*}{FID$^\downarrow$} &
+        \multirow{2}{*}{MM Dist$^\downarrow$} &
+        \multirow{2}{*}{Diversity$^\rightarrow$} &
+        \multirow{2}{*}{FSR$^\downarrow$} &
+        \multirow{2}{*}{Pene$^\downarrow$} &
+        \multirow{2}{*}{Contact$^\rightarrow$} &
+        \multicolumn{3}{c}{Interaction$^\uparrow$} \\
+        \cmidrule(lr){3-5}\cmidrule(lr){12-14}
+        & & \mycolor{Top 1} & \mycolor{Top 2} & \mycolor{Top 3}
+        & & & & & & &
+        $C_{prec}$ & $C_{rec}$ & $C_{F1}$ \\
+        \midrule
+
+        \(\times\) & In-category &
+        0.216$^{\pm0.004}$ & 0.316$^{\pm0.005}$ & 0.396$^{\pm0.001}$ &
+        0.151$^{\pm0.015}$ &
+        \textbf{2.151$^{\pm0.033}$} &
+        6.347$^{\pm0.022}$ &
+        \textbf{0.031$^{\pm0.095}$} &
+        \textbf{0.281$^{\pm0.013}$} &
+        0.193$^{\pm0.001}$ &
+        0.640$^{\pm0.008}$ & 0.503$^{\pm0.011}$ & 0.809$^{\pm0.006}$ \\
+        
+        \(\checkmark\)  & In-category &
+        \textbf{0.279$^{\pm0.012}$} & \textbf{0.386$^{\pm0.004}$} & \textbf{0.466$^{\pm0.007}$} &
+        \textbf{0.133$^{\pm0.025}$} &
+        2.271$^{\pm0.006}$ &
+        \textbf{6.696$^{\pm0.045}$} &
+        0.059$^{\pm0.137}$ &
+        0.305$^{\pm0.016}$ &
+        0.190$^{\pm0.002}$ &
+        \textbf{0.651$^{\pm0.018}$} & \textbf{0.512$^{\pm0.012}$} & \textbf{0.833$^{\pm0.006}$} \\
+        
+        \midrule
+        
+        \(\times\) & Cross-category &
+        \textbf{0.022$^{\pm0.001}$} & \textbf{0.044$^{\pm0.015}$} & 0.064$^{\pm0.016}$ &
+        5.118$^{\pm0.018}$ &
+        5.078$^{\pm0.060}$ &
+        \textbf{5.655$^{\pm0.055}$} &
+        0.226$^{\pm0.259}$ &
+        \textbf{0.098$^{\pm0.005}$} &
+        0.049$^{\pm0.001}$ &
+        0.388$^{\pm0.003}$ & 0.077$^{\pm0.002}$ & 0.351$^{\pm0.005}$ \\
+        
+        \(\checkmark\) & Cross-category &
+        \textbf{0.022$^{\pm0.007}$} & 0.043$^{\pm0.003}$ & \textbf{0.071$^{\pm0.009}$} &
+        \textbf{4.924$^{\pm0.046}$} &
+        \textbf{4.788$^{\pm0.032}$} &
+        5.509$^{\pm0.010}$ &
+        \textbf{0.032$^{\pm0.092}$} &
+        0.203$^{\pm0.025}$ &
+        0.116$^{\pm0.000}$ &
+        \textbf{0.447$^{\pm0.007}$} & \textbf{0.184$^{\pm0.001}$} & \textbf{0.560$^{\pm0.008}$} \\
+        
+        \bottomrule
+    \end{tabular}}
+    \vspace{-0.6em}
+\end{table}
+

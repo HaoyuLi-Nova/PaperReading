@@ -1,0 +1,41 @@
+\begin{table}
+    \centering
+    \caption{\textbf{Quantitative comparisons} on the InterAct dataset~\citep{xu2025interact} between our method and baseline approaches. We report R-Precision with batch sizes 256.}
+    \label{tab:t2i_interact}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{@{}ccccccccccccc@{}}
+       \toprule
+        \multirow{2}{*}{Method} &
+        \multicolumn{3}{c}{R-Precision$^\uparrow$} &
+        \multirow{2}{*}{FID$^\downarrow$} &
+        \multirow{2}{*}{MM Dist$^\downarrow$} &
+        \multirow{2}{*}{Diversity$^\rightarrow$} &
+        \multirow{2}{*}{FSR$^\downarrow$} &
+        \multirow{2}{*}{Pene$^\downarrow$} &
+        \multirow{2}{*}{Contact$^\rightarrow$} &
+        \multicolumn{3}{c}{Interaction$^\uparrow$} \\
+        \cmidrule(lr){2-4}\cmidrule(lr){11-13}
+        & \mycolor{Top 1} & \mycolor{Top 2} & \mycolor{Top 3}
+        & & & & & & &
+        $C_{prec}$ & $C_{rec}$ & $C_{F1}$ \\
+        \midrule
+
+        Ground Truth &
+         0.600$^{\pm0.004}$ & 0.834$^{\pm0.001}$ & 0.909$^{\pm0.001}$ & 0.000$^{\pm0.000}$ & 1.475$^{\pm0.003}$ & 7.781$^{\pm0.140}$ & 0.083$^{\pm0.204}$ & 0.076$^{\pm0.000}$ & 0.208$^{\pm0.000}$ & 1.000$^{\pm0.000}$ & 1.000$^{\pm0.000}$ & 1.000$^{\pm0.000}$ \\
+        \midrule
+        HOI-Diff~\citep{peng2023hoi} &
+        0.413$^{\pm0.010}$ & 0.624$^{\pm0.009}$ & 0.740$^{\pm0.011}$ & 0.689$^{\pm0.031}$ & 3.029$^{\pm0.007}$ & 7.620$^{\pm0.085}$ & 0.072$^{\pm0.160}$ & \textbf{0.103}$^{\pm0.010}$ & 0.084$^{\pm0.006}$ & 0.722$^{\pm0.002}$ & 0.447$^{\pm0.026}$ & 0.501$^{\pm0.022}$ \\
+        CHOIS~\citep{li2023controllable} &
+        0.439$^{\pm0.005}$ & 0.660$^{\pm0.002}$ & 0.766$^{\pm0.003}$ & 0.572$^{\pm0.008}$ & 2.781$^{\pm0.017}$ & \textbf{7.717}$^{\pm0.115}$ & 0.119$^{\pm0.234}$ & 0.131$^{\pm0.013}$ & 0.115$^{\pm0.002}$ & 0.710$^{\pm0.012}$ & 0.520$^{\pm0.004}$ & 0.541$^{\pm0.007}$ \\
+        InterDiff~\citep{xu2023interdiff} &
+        \textbf{0.501}$^{\pm0.009}$ & \textbf{0.722}$^{\pm0.003}$ & \textbf{0.824}$^{\pm0.007}$ & 0.215$^{\pm0.001}$ & \textbf{2.461}$^{\pm0.013}$ & \textbf{7.717}$^{\pm0.117}$ & 0.092$^{\pm0.178}$ & 0.116$^{\pm0.011}$ & 0.124$^{\pm0.003}$ & 0.715$^{\pm0.000}$ & 0.562$^{\pm0.000}$ & 0.584$^{\pm0.003}$ \\
+        Text2HOI~\citep{cha2024text2hoi} &
+        0.428$^{\pm0.003}$ & 0.637$^{\pm0.003}$ & 0.745$^{\pm0.000}$ & 0.331$^{\pm0.003}$ & 2.665$^{\pm0.002}$ & 7.631$^{\pm0.000}$ & \textbf{0.055}$^{\pm0.123}$ & 0.105$^{\pm0.003}$ & 0.102$^{\pm0.001}$ & 0.711$^{\pm0.001}$ & 0.488$^{\pm0.000}$ & 0.532$^{\pm0.002}$ \\
+        \ours{} (\textbf{Ours}) w/o guidance &
+        0.395$^{\pm0.012}$ & 0.599$^{\pm0.009}$ & 0.715$^{\pm0.004}$ & 0.196$^{\pm0.014}$ & 2.885$^{\pm0.004}$ & 7.708$^{\pm0.041}$ & 0.066$^{\pm0.165}$ & 0.121$^{\pm0.003}$ & 0.123$^{\pm0.010}$ & \textbf{0.739}$^{\pm0.008}$ & 0.567$^{\pm0.019}$ & 0.599$^{\pm0.018}$ \\
+        \ours{} (\textbf{Ours}) w/ guidance &
+         0.421$^{\pm0.014}$ & 0.637$^{\pm0.016}$ & 0.754$^{\pm0.016}$ & \textbf{0.148}$^{\pm0.014}$ & 2.756$^{\pm0.018}$ & 7.712$^{\pm0.050}$ & 0.078$^{\pm0.197}$ & 0.132$^{\pm0.001}$ & \textbf{0.132}$^{\pm0.001}$ & 0.731$^{\pm0.002}$ & \textbf{0.615}$^{\pm0.016}$ & \textbf{0.627}$^{\pm0.011}$ \\
+        \bottomrule
+    \end{tabular}}%
+    % \vspace{-1em}
+\end{table}

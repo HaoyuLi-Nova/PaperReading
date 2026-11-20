@@ -1,0 +1,50 @@
+\section{Related Work}
+\label{sec:related_work}
+
+\paragraph{Contextual Interaction Synthesis.}
+% \paragraph{Scene-Aware Human Motion Synthesis. }
+% Based on paired scene and human motion datasets~\cite{}, synthesizing human motions in 3D scenes has been extensively explored~\cite{} in recent years. However, the paired datasets were captured by filming multi-view RGBD videos and conducting optimization to extract human motions, which led to inferior motion quality. To improve the motion quality, prior work explored combining 3D scene datasets~\cite{} and motion capture dataset~\cite{} to synthesize paired data. A novel combination of VR headset and motion capture was explored in prior work~\cite{}. Recent work scaled up the data collection for paired scene and human motion by building physical scenes in the mocap lab to obtain high-quality interaction motion. 
+Recent work on modeling human-object interactions falls into two categories: interactions with static and dynamic objects. Synthesizing human motions in static 3D scenes has been extensively studied~\cite{prox, wang2022humanise, araujo2023circle, jiang2024scaling, hassan_samp_2021, zhang2022couch}. 
+Prior research has explored regression models~\cite{wang2021synthesizing, wang2022towards, hassan_samp_2021, araujo2023circle, mir2023generating} and diffusion models~\cite{huang2023diffusion, jiang2024scaling, yi2024generating, wang2024move} to generate human motions interacting with 3D scenes, such as sitting on a chair or lying down on a sofa. Some studies have also explored reinforcement learning methods to generate physically plausible human motions~\cite{hassan2023synthesizing, zhao2023synthesizing, xiao2024unified}. These works focus on static objects, whereas our work focuses on dynamic interactions.
+
+
+There has been increasing attention on synthesizing human-object interactions with dynamic objects~\cite{diller2023cg, peng2023hoi, wu2024thor,xu2024interdreamer}. OMOMO~\cite{li2023object} collected a dataset for dynamic human-object interactions and proposed a framework to synthesize human motions from object motions. 
+% InterDiff~\cite{xu2023interdiff} predicts future interaction motions based on past object and human motion.
+CHOIS~\cite{li2023controllable} synthesizes interactions in 3D scenes from text and sparse waypoints.
+Despite these advancements, all of these works focus on full-body human motion generation without detailed finger motions. In this work, we aim to generate synchronized object motions, human motions, and finger motions.
+
+\paragraph{Hand-Object Interaction Synthesis. }
+Hand-object interaction synthesis has been extensively explored.
+In the realm of static pose generation, traditional methods often rely on physics-based control or optimization techniques to generate grasp candidates \cite{li2007data, pollard2005physically, rodriguez2012caging}. 
+% Some recent work utilizes differentiable force closure estimators to generate high-quality grasp pose \cite{wang2023dexgraspnet, liu2021synthesizing}.
+Some recent work leverages deep learning to directly estimate hand grasps from extensive interaction datasets \cite{jiang2021hand, brahmbhatt2019contactgrasp, karunratanakul2020grasping, GRAB:2020, fan2023arctic, christen2024diffh2o}. 
+Beyond static grasping, another line of work also explores dynamic object manipulation \cite{zhang2021manipnet, ye2012synthesis, liu2024geneoh}. 
+% ManipNet \cite{zhang2021manipnet} introduces a spatial representation based on the hand-object distance and trains an auto-regressive model to generate finger movement. 
+
+Recent works further explore integrating whole-body motion and hand motion \cite{taheri2023grip, tendulkar2023flex, wu2022saga, taheri2022goal}.
+IMoS \cite{ghosh2023imos} generates hand-object interaction using paired human motion and hand motion, while~\cite{braun2023physically} leverage reinforcement learning to achieve physically plausible motion.
+% However, these methods are typically trained on paired data of whole-body and hand motion, making them challenging to generalize to different scenarios, such as interacting with large objects.
+However, these methods are constrained to manipulate small-sized objects in the GRAB dataset~\cite{GRAB:2020}, unable to generalize to large objects. 
+In this work, we aim to generate realistic full-body and finger motions for manipulating large objects. Since no such paired dataset exists, we leverage DexGraspNet~\cite{wang2023dexgraspnet} to generate realistic grasp poses, train a conditional diffusion model on GRAB~\cite{GRAB:2020} to generate approaching and releasing finger motions, and then integrate these with our full-body motion generation.   
+% FLEX \cite{tendulkar2023flex} proposes a method to separate hand motion and whole-body motion generation. It utilizes distinct datasets to train models for each, which are then combined to generate single-frame full-body grasp poses.
+% \zhen{needs to revise: 
+% In this work, we extend this idea to motion sequence generation. We utilize hand-object interaction datasets such as GRAB \cite{taheri2020grab} and ARCTIC \cite{fan2022articulated} to train a finger motion generator, which is then combined with a whole-body motion generator. Additionally, we introduce a novel grasp-guided finger motion generation method, significantly improving the quality of generated hand motion.}
+
+% \paragraph{Diffusion-Based Motion Synthesis.}
+% Diffusion models have shown strong capabilities in human motion synthesis~\cite{shafir2023human, tevet2022human, zhang2022motiondiffuse, zhang2023tedi, shi2023controllable, karunratanakul2023gmd, chen2023executing}, with several models addressing interactions with objects or scenes~\cite{li2023controllable, li2023object, xu2024interdreamer}. 
+% TeSMo~\cite{yi2024generating} leverages a pre-trained motion diffusion model and finetunes a scene-aware branch to incorporate both text control and scene awareness.
+% \cite{jiang2024autonomous} employs an auto-regressive diffusion model to synthesize the next motion segment in a 3D scene.
+% In this work, we use the diffusion model as a key component of our low-level motion generator. \jiaman{Do we need this paragraph? We already talked about some diffusion-based interaction synthesis in the first paragraph.} \zhen{A siggraph asia reviewer wanted to see that. What do you all think?}
+
+\paragraph{Physics-Based Motion Synthesis.}
+Physics-based methods control a simulated character to perform motion in a simulator, ensuring the physical realism of the generated motion. To make the motion more natural, many approaches leverage motion capture data to produce movements that match the style of the data~\cite{peng2018deepmimic, peng2021amp, peng2023hoi, liu2018learning}. DeepMimic~\cite{peng2018deepmimic} proposes to track motion capture data using RL. Subsequent works~\cite{peng2021amp, xu2021gan} leverage generative adversarial networks (GANs) to learn motion styles. Recent research also explores this approach for human-object interactions, such as playing musical instruments~\cite{xu2024synchronize, wang2024f} or playing soccer~\cite{xie2022learning}.  PhysHOI~\cite{wang2023physhoi} learns basketball-playing skills from human demonstrations. OmniGrasp~\cite{luo2024grasping} enables a character to grasp and move an object along a specified object trajectory.
+In this work, we leverage RL to track generated kinematic motion, successfully producing long-horizon motions that interact with various objects.
+
+\paragraph{LLM-based Planning.}
+LLMs have been widely used in reasoning, planning tasks~\cite{hong20233d, hu2023look, wake2023gpt, zeng2023distilling, ding2023task} for their high-level planning capabilities.
+They have also been adopted in motion synthesis tasks~\cite{yao2024moconvq, zhang2024motiongpt, xiao2024unified, xu2024interdreamer}.
+UniHSI~\cite{xiao2024unified} uses LLMs to extract action plans in a chain-of-contact format, guiding a low-level controller to synthesize corresponding motions. 
+InterDreamer~\cite{xu2024interdreamer} employs LLMs to identify object parts that humans interact with and uses this information to retrieve initial human poses. 
+% CHOIS~\cite{li2023controllable} uses LLMs to extract key information to determine target object position, deriving sparse waypoints as input for a conditional diffusion model to generate interactions grounded in scenes. However, CHOIS requires explicit language descriptions (e.g., "Lift the monitor, move, and put it on the desk.") as input, which cannot support interaction synthesis from more abstract human-level instructions (e.g., "Set up a workspace"). 
+In this work, we leverage LLMs to translate abstract human-level instructions into target scene maps and detailed execution plans, which guide the low-level interaction synthesis.
+

@@ -1,0 +1,23 @@
+% Please add the following required packages to your document preamble:
+% \usepackage{graphicx}
+\begin{table}[t]
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lccc}
+\hline
+\textbf{Ours-7B vs. ScaMo-3B (win/tie/lose)} & Annotator 1 & Annotator 2 & Annotator 3 \\ \hline
+Overall (126)                           & \cellcolor{green!20}45/49/32    & \cellcolor{green!20}32/76/18    & \cellcolor{green!20}47/53/26    \\
+\hline
+Art/Dance (2)                      & \cellcolor{yellow!20}1/0/1       & \cellcolor{yellow!20}0/2/0       & \cellcolor{green!20}1/0/1       \\
+Combat (6)                         & \cellcolor{green!20}3/2/1       & \cellcolor{yellow!20}2/2/2       & \cellcolor{green!20}3/2/1       \\
+Communication (20)                 & \cellcolor{green!20}5/13/2      & \cellcolor{green!20}3/16/1      & \cellcolor{green!20}8/11/1      \\
+Daily life (74)                    & \cellcolor{green!20}24/27/23    & \cellcolor{green!20}21/40/13    & \cellcolor{green!20}25/31/18    \\
+Non-human behavior (2)             & \cellcolor{green!20}2/0/0       & \cellcolor{yellow!20}0/2/0       & 0/1/1       \\
+Sports (16)                        & \cellcolor{green!20}6/6/4       & \cellcolor{green!20}5/9/2       & \cellcolor{green!20}7/6/3       \\
+Work (6)                           & \cellcolor{green!20}4/1/1       & \cellcolor{green!20}1/5/0       & \cellcolor{green!20}3/2/1       \\ \hline
+\end{tabular}%
+}
+% \vspace{-1em}
+\caption{Detailed comparison between ours-7B and ScaMo-3B. The green cells indicate that our model outperforms competing approaches, the yellow cells represent a tie, and the white cells denote that our model underperforms.}
+% \vspace{-2em}
+\label{tab:comp_detail_bench}
+\end{table}

@@ -1,0 +1,212 @@
+\section{Method: \method}
+\label{sec:method}
+Our method \method consists of two main components: (1) a motion tokenizer first learns a compact latent representation of body motion, and then (2) an autoregressive two-stage motion diffusion model learns to denoise hybrid motion tokens containing latent body motion and explicit root motion.
+Our hybrid representation is introduced in \cref{sec:hybrid_rep} followed by the body motion tokenizer in \cref{sec:tokenizer}. The autoregressive generation problem formulation is detailed in \cref{sec:problem_formulation} and then the diffusion model that solves it is described in \cref{sec:diffusion}.
+Finally, \cref{sec:impl_details} covers implementation details.
+
+\subsection{Hybrid Motion Representation}
+\label{sec:hybrid_rep}
+To balance the representational compactness required for efficient generative learning with the need for direct, precise control via explicit feature overwriting,
+we propose a hybrid motion representation that decouples root motion from body motion. Specifically, root trajectories are represented in an explicit, interpretable form, while body motion is encoded in a compact latent space.
+In this section, we give a high-level overview of the hybrid motion representation and its advantages for generation before detailing how the latent component is learned in \cref{sec:tokenizer}.
+
+\paragraph{Explicit Motion Representation}
+Our hybrid representation builds on an explicit motion representation, which we describe first for context. 
+Each frame of a motion that uses this explicit representation $\mathbf{m} = (\mathbf{m}_\text{root}, \mathbf{m}_\text{body}) \in \mathbb{R}^M$ is defined as a tuple of root and body skeleton joint features 
+\begin{equation}
+    \mathbf{m}_\text{root} = (\mathbf{p}, \cos{\psi}, \sin{\psi}) \in \mathbb{R}^5, \quad \mathbf{m}_\text{body} = (\boldsymbol{\theta}, \mathbf{J}, \dot{\mathbf{J}}, \mathbf{c}),
+\label{eqn:explicit_rep}
+\end{equation}
+where $\mathbf{p} \in \mathbb{R}^3$ denotes the global root position, $\psi \in (-\pi, \pi]$ denotes the root heading angle, $\boldsymbol{\theta} \in \mathbb{R}^{6j}$ denotes the 6D representation \cite{zhou2019continuity} of the global joint rotations for all $j$ skeleton joints including the root, $\mathbf{J} \in \mathbb{R}^{3j-3}$ denotes the non-root joint positions subtracted by the planar root position, $\dot{\mathbf{J}} \in \mathbb{R}^{3j}$ denotes the global joint velocities, and $\mathbf{c}  \in \mathbb{R}^{4}$ denotes the binary floor contact label for the feet joints.
+The explicit representation feature size $M$ depends on the number of joints in the skeleton.
+
+\paragraph{Hybrid Motion Representation}
+Our hybrid motion representation is formed by simply replacing the body component of the pose feature with a latent embedding.
+Concretely, a single pose $\mathbf{x}$ of a motion using the hybrid representation is a tuple
+\begin{equation}
+    \mathbf{x} = ( \mathbf{m}_\text{root}, \mathbf{x}_\text{body}  )
+\end{equation}
+where $\mathbf{x}_\text{body} \in \mathbb{R}^L$ is the latent body representation with dimensionality $L$, which has replaced $\mathbf{m}_\text{body}$ from the explicit representation. 
+In practice, $\mathbf{x}_\text{body}$ is the output of a learned tokenizer (\cref{sec:tokenizer}) and each token encodes multiple frames of motion.
+The diffusion model introduced in \cref{sec:diffusion} learns to generate motion using the hybrid representation, which has several advantages.
+Maintaining root position features in global coordinates avoids potential compounding errors inherent to integrating local velocity-based representations.
+The global root also facilitates controllable motion generation conditioned on spatial constraints, which are often sparse and defined within the global scene space, as it enables direct overwriting of root features. 
+Moreover, the latent body representation is more compact than explicit representations, and pre-defined after the tokenizer is trained. This makes it better suited for generative modeling, both computationally and in terms of learning efficiency.
+
+\subsection{Body Motion Tokenizer}
+\label{sec:tokenizer}
+
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/tokenizer_v3.pdf}
+    \caption{\textbf{Motion Tokenizer.} The encoder first embeds the patchified body motion into a latent representation. This latent body motion is concatenated with the patchified global root motion to form our \textit{hybrid representation}, which is decoded back to reconstruct the body motion. } 
+\label{fig:tokenizer}
+\end{figure}
+
+We train a motion tokenization network to compress the high-dimensional explicit body features into a compact latent space, facilitating more efficient generative learning.
+As illustrated in \cref{fig:tokenizer}, the tokenizer employs an asymmetric conditional autoencoder architecture.
+Given an explicit body motion $\mathbf{m}_\text{body}^{1:N}$ containing $N$ frames, we treat each $P$ consecutive frames as a patch by reshaping them into a single vector, resulting in $T=N/P$ input vectors to the encoder.
+The encoder compresses the body motion into latent tokens $\mathbf{x}_\text{body}^{1:T} \in \mathbb{R}^{T \times L}$, which are then concatenated along the feature dimension with the patchified explicit root motion $\mathbf{m}_\text{root}^{1:T} \in \mathbb{R}^{T\times 5P}$ to form the \textit{hybrid motion tokens}:
+\begin{equation}
+    \mathbf{x}^{1:T} = [ \mathbf{m}_\text{root}^{1:T}; \mathbf{x}_\text{body}^{1:T}  ]
+\end{equation}
+resulting in $\mathbf{x}^{1:T} \in \mathbb{R}^{T \times D}$ where $D = L + 5P$. 
+The decoder subsequently reconstructs the body motion from these hybrid tokens.
+Crucially, the decoder first transforms the global root motion from \cref{eqn:explicit_rep} into a local representation, which replaces the global root motion for the conditional input to the decoder network.
+Each root pose in the local representation is a tuple $(\dot{\psi}, \dot{\mathbf{p}}_{x}, \dot{\mathbf{p}}_{z}, \mathbf{p}_y)$ where $\dot{\psi}$ is the 1D angular velocity of the heading, $\dot{\mathbf{p}}_{x}$ and $\dot{\mathbf{p}}_{z}$ are the x and z components of the linear root velocity, and $\mathbf{p}_y$ is the $y$-component (height) of the root.
+Note that while the global root representation is useful for \textit{generating} motion as discussed previously, in the tokenizer decoder we find the local representation is more suitable to significantly mitigate foot skating (discussed in \cref{sec:results_ablation} and \cref{tab:ablation}).
+
+We use transformer encoder layers with causal attention in both the encoder and decoder, which ensures that each frame embedding relies only on preceding frames and preserves temporal causality.
+We experimented with different autoencoder variants for the tokenizer, including variational autoencoder (VAE) \cite{kingma2014auto} and finite scalar quantization (FSQ) \cite{mentzer2023finite} variants, as detailed in \cref{sec:results_hyperparams}. 
+While all variants perform similarly, we find that FSQ demonstrates better stability in training, making it the default tokenizer choice. 
+Training details can be found in \cref{sec:impl_details}. %
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/combined_arch.pdf}
+    \caption{
+    \textbf{Autoregressive Two-Stage Transformer Denoiser.} 
+    (Left) Conditioned on a variable-length history context and optional spatial goal constraints, the autoregressive denoiser predicts a sequence of $C$ clean motion tokens within the current generation window. Spatial goal constraints can be arbitrarily sparse and may be located within or beyond the current motion generation window.
+    (Right) The two-stage denoiser first predicts clean global root motion, which then conditions the second stage to predict clean latent body tokens, together forming the complete hybrid motion prediction.
+} 
+\label{fig:auto_transf}
+\end{figure*}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Controllable Interactive Motion Generation}
+\label{sec:problem_formulation}
+We aim to develop a motion generation model that supports text and spatial conditions from real-time input streams. 
+At runtime, the model should be reactive to any changes in the input streams like a new text prompt or shift in goal location.
+Similar to prior work~\cite{chen2024camdm,zhang2025primal,wu2025uniphys,tevet2025closd}, we formulate this problem as a conditional autoregressive generation task that synthesizes a short window of future motion starting from the current frame, conditioned on past history and optional goal inputs (\ie, kinematic constraints).
+The synthesized future motion is then played back for the user until re-planning occurs and the model predicts future motion in the new window.
+
+Our autoregressive model operates in the hybrid token space. 
+Assuming that the prediction window starts at token index 1, then our goal is to train the generative model $\mathcal{F}$ to generate the next $C$ tokens in the \textit{current} prediction window:
+\begin{equation}
+\mathbf{x}^{1:C} = \mathcal{F}(s, \mathbf{x}^{(-H+1):0}, \mathbf{g}^{1:(C+F)}),
+\label{equ:auto_chunk}
+\end{equation}
+where $s$ is the text prompt describing the motion semantics of the current generation window, $\mathbf{x}^{(-H+1):0}$ is the history motion spanning up to the previous $H$ tokens, and $\mathbf{g}^{1:(C+F)}$ denotes the spatial goals to achieve. Note that the goals for the first $C$ tokens $\mathbf{g}^{1:C}$ are within the current prediction horizon, while $\mathbf{g}^{(C+1):(C+F)}$ are goals beyond the prediction window, up to $F$ additional \textit{future} tokens. 
+
+Notably, $H$ can vary in our formulation, so the model should expect to receive anywhere from 0 to a maximum of $H$ history conditioning tokens. 
+A long history context is crucial to handle text prompts that describe complex non-cyclic motions. For instance, the prompt ``walk forward, then bend over and pick something up before continuing to walk'' has walking before and after the pick-up action. In autoregressive formulations with limited history context~\cite{wu2025uniphys,tevet2025closd,zhao2025DartControl}, a model conditioned only on recent walking frames cannot determine whether a preceding pick-up action has already occurred or still needs to be generated, leading to inaccurate generations with missing or duplicated actions.
+
+While autoregressive generation maintains temporal causality (\ie, there is no dependence on future frames), it can still be conditioned on future goals $\mathbf{g}^{1:(C+F)}$. 
+Spatial goals encompass constraints on the motion that specify joint position and/or rotation values at specific timesteps in the future.
+These can be used to hit 2D waypoints or follow full paths on the ground, full-body pose keyframes, sparse end-effector position constraints, and more.
+Importantly, our formulation is not limited to goals within the current prediction window, but is also conditioned on goals further in the future. 
+Out-of-window goal constraints implicitly determine the motion generation within the current window, even though they do not directly apply to the immediate frames. For example, when a human needs to run to a location in 10 seconds, the destination goal will determine in which direction the human should start moving from the first step. 
+Supporting such long-horizon goals in previous works requires training an additional RL control policy on top of the autoregressive motion model~\cite{shi2024amdm,zhao2025DartControl}, while our model architecture supports this natively.
+
+
+
+
+
+\subsection{Autoregressive Two-Stage Diffusion Model}
+\label{sec:diffusion}
+Based on the hybrid motion representation, we design a transformer-based diffusion denoising model to  learn the goal-conditioned autoregressive motion generation task. To further enable precise controllability without sacrificing motion fidelity, we introduce an interleaved two-stage diffusion framework that decomposes the generation of root motion and body motion.
+
+For an introduction to human motion diffusion, we refer the interested reader to prior work~\cite{tevet2023mdm,zhang2024motiondiffuse}, and focus here on relevant details for our method. 
+At step $k$ in the denoising process, our diffusion model takes $C$ noisy hybrid motion tokens $\mathbf{x}^{1:C}_k \in \mathbb{R}^{C \times D}$ within the current generation window, along with relevant conditioning, and outputs a prediction for the clean denoised hybrid tokens $\hat{\mathbf{x}}^{1:C}_0$.
+Mirroring \cref{equ:auto_chunk}, the denoising process at step $k$ can be written as:
+\begin{equation}
+    \hat{\mathbf{x}}^{1:C}_0 = \mathcal{F}(k, s, \mathbf{x}^{1:C}_k, \mathbf{x}^{(-H+1):0}, \mathbf{g}^{1:(C+F)}).
+\label{eqn:denoiser}
+\end{equation}
+The high-level architecture of the denoising network is illustrated in the left side of~\cref{fig:auto_transf}.
+The diffusion step and text conditioning are each a single token fed in alongside the sequence of history tokens and noisy tokens for the current prediction window. 
+We use sinusoidal positional encodings for motion tokens to embed their temporal position within the motion sequence, while employing separate learned positional embeddings for text and diffusion tokens.
+Linear layers are used to project all token types to the same feature dimensionality before feeding to the denoiser.
+
+\paragraph{Spatial Goal Conditioning}
+We represent spatial goal inputs $\mathbf{g}$ with a masked version of the explicit motion representation from \cref{eqn:explicit_rep}. This allows handling arbitrarily sparse global signals on any pose feature, such as keyframed body or end-effector joints. Only the constrained features and timesteps in $\mathbf{g}$ contain non-zero values while other unconstrained entries are set to zero.
+We additionally define a corresponding binary mask $\mathbf{v}$ of the same shape, which indicates the dimensions that are constrained.
+To align with the temporal granularity of the motion tokens, we assume the goal inputs are patchified, for example the short-term goals are $\mathbf{g}^{1:C} \in \mathbb{R}^{C \times MP}$ with patch size $P$ and pose feature dimensionality $M$.
+
+Before being given to the model, the root part of the noisy tokens $\mathbf{m}^{1:C}_\text{root}$ is \textit{overwritten} with the root component of the constraint as $\tilde{\mathbf{m}}^{1:C}_\text{root} = (1-\mathbf{v}_\text{root}) \odot \mathbf{m}^{1:C}_\text{root} + \mathbf{v}_\text{root} \odot \mathbf{g}^{1:C}_\text{root}$ where $\odot$ is the elementwise product.
+This root constraint overwriting~\cite{cohan2024condmdi, Kimodo2026} facilitates highly accurate control over the root trajectory, which governs the fundamental global movement of the human motion.
+To incorporate constraints on detailed body poses and make the model aware of all constraints, we concatenate the explicit body goal features and the full constraint mask with the input tokens along the feature dimension.
+In other words, the input noisy tokens are extended with masked constraints to form the augmented representation $[\tilde{\mathbf{m}}^{1:C}_\text{root}; \mathbf{x}^{1:C}_\text{body}; \mathbf{g}^{1:C}_\text{body}; \mathbf{v}]$ where $\mathbf{x}^{1:C}_\text{body}$ is the latent body part of the input noisy tokens.
+Since there are no noisy input tokens beyond the prediction horizon $C$, the patchified long-horizon constraints $\mathbf{g}^{(C+1):(C+F)} \in \mathbb{R}^{F \times MP}$ are simply concatenated with their corresponding binary mask and fed in as additional tokens to the transformer. 
+These long-horizon goal tokens can vary in length and sparsity depending on user input, with unconstrained tokens masked out during transformer inference.
+
+
+
+\paragraph{Interleaved Two-Stage Denoiser}
+Our autoregressive transformer denoiser employs an interleaved, two-stage design \cite{Kimodo2026} to sequentially predict clean root and body motions.
+The internals of our transformer-based denoiser are shown on the right side of \cref{fig:auto_transf}.
+At each denoising step, the model first predicts the explicit clean global root motion $\hat{\mathbf{m}}^{1:C}_{\text{root}}$ with the root transformer.
+Next, the global root motion is detached and fed into the body transformer, which predicts the clean latent body tokens $\hat{\mathbf{x}}^{1:C}_{\text{body}}$. 
+The outputs from both branches are concatenated to form the clean hybrid motion prediction $\hat{\mathbf{x}}^{1:C}_0 = [\hat{\mathbf{m}}^{1:C}_{\text{root}}; \hat{\mathbf{x}}^{1:C}_{\text{body}}]$. 
+During inference, this concatenated hybrid prediction is re-noised for the subsequent diffusion step and fed back into the two-stage denoiser. This iterative and interleaved denoising process ensures continuous mutual influence between the root and body transformers throughout generation.
+Finally, the predicted hybrid motion representation is processed by the tokenizer's decoder to recover the explicit body motion and form the full, un-patchified explicit motion as $\hat{\mathbf{m}}_0^{1:G} = [\hat{\mathbf{m}}^{1:G}_{\text{root}}; \hat{\mathbf{m}}^{1:G}_{\text{body}}]$, where the generation window size in frames is $G = C \cdot P$.
+
+Our two-stage architecture is motivated by the hypothesis that predicting body motion conditioned on clean root motion is an easier task than generating both root and body jointly.
+This decomposition is designed to enable precise controllability without compromising the fidelity of the synthesized motion. As demonstrated in our ablation study in \cref{tab:ablation}, the proposed two-stage architecture yields better results compared to a monolithic one-stage baseline that simultaneously predicts root and body motion.
+
+\subsection{Training and Implementation Details}
+\label{sec:impl_details}
+\paragraph{Motion Tokenizer}
+In practice, our motion tokenizer uses a patch size of $P = 4$ frames. Both the encoder and decoder are implemented as 8-layer transformers with a latent dimension of 512, utilizing causal self-attention to preserve temporal consistency.
+The tokenizer is trained on motion clips of varying lengths (1–10 seconds) using a reconstruction loss and additional loss penalizing foot skating:
+\begin{equation}
+    \mathcal{L}_{\text{skate}} = \frac{\sum_{j \in \mathcal{S}_f} \hat{\mathbf{c}}_j \| \hat{\dot{\mathbf{J}}}_{j} \|_2}{\sum_{j \in \mathcal{S}_f}  \hat{\mathbf{c}}_j },
+\end{equation}
+where $\mathcal{S}_f$ represents the set of foot joint indices, $\hat{\mathbf{c}}_j$ denotes the predicted contact label for foot joint $j$, and $\| \hat{\dot{\mathbf{J}}}_{j} \|_2$ denotes the magnitude of predicted foot joint velocity. This foot-skating loss penalizes the velocities of joints predicted to be in contact with the ground, thereby enforcing stationary constraints during the contact phase. We set the weight for this loss term to 0.01.
+The exact implementation of the reconstruction loss depends on the framework being employed for the tokenizer. We test three different approaches including a vanilla continuous autoencoder, VAE, and finite scalar quantization (FSQ)~\cite{mentzer2023finite} and compare them in experiments later (\cref{sec:results_hyperparams}). 
+For the FSQ variant, we apply finite quantization to the encoder output embedding, constraining each feature to one of 64 discrete levels. These quantized vectors serve directly as the latent representation.
+For all tokenizer variations, we train with the AdamAtan2~\cite{everett2024scaling} optimizer for 4 million steps using a learning rate of $2e{-}5$ and batch size of 128. We employ a cosine learning rate scheduler with a 10k-step linear warmup phase. Training is performed on a single NVIDIA A100-SXM4-80GB GPU. 
+
+\paragraph{Two-Stage Denoiser} 
+Both the root and body transformer in our two-stage denoiser employ the same transformer encoder architecture. Each transformer contains 8 layers with 8 heads and a latent size of 1024, totaling around 156 million parameters for our deployed denoiser model in the interactive demo. 
+For text encoding, we use LLM2Vec~\cite{reddy2024llm2vec}, which is an embedding model trained on top of Llama-3-8B-Instruct~\cite{llama3modelcard}.
+
+After training the tokenizer, we train the denoiser using the DDPM framework~\cite{ho2020denoising} with a modified version of the ``simplified'' loss function that contains several components. In the following discussion, we drop the token/frame index superscripts from all terms for simplicity.
+First, given the clean hybrid prediction $\hat{\mathbf{x}}_0 = [\hat{\mathbf{m}}_{\text{root}}; \hat{\mathbf{x}}_{\text{body}}]$ and ground truth $\mathbf{x}_0$, the hybrid loss
+\begin{align}
+    \mathcal{L}_\text{hybrid} = || \hat{\mathbf{x}}_0 - \mathbf{x}_0 ||_1
+\end{align}
+uses a smooth L1 loss \cite{girshickFastRCNN2015} to penalize errors between the predicted and ground truth hybrid motion tokens. 
+For the next loss, we decode the predicted tokens with the tokenizer decoder $\mathcal{D}$ resulting in the predicted explicit body motion $\hat{\mathbf{m}}_\text{body} = \mathcal{D}(\hat{\mathbf{x}}_0)$. Then, the decoded body loss 
+\begin{align}
+    \mathcal{L}_\text{dec} = || \hat{\mathbf{m}}_\text{body} - \mathbf{m}_\text{body} ||_1
+\end{align}
+compares the predicted explicit body motion to the ground truth $\mathbf{m}_\text{body}$. 
+To place greater emphasis on accurately hitting the specified constraints, we add a goal loss
+\begin{align}
+    \mathcal{L}_\text{goal} = || \mathbf{v} \odot (\hat{\mathbf{m}}_0 - \mathbf{g}) ||_1
+\end{align}
+that specifically penalizes components in the full explicit motion prediction $\hat{\mathbf{m}}_0$ that do not hit the constraint goals in $\mathbf{g}$. 
+Finally, we add a regularizer to ensure consistency between the directly predicted joint positions and those resulting from the predicted joint rotations via forward kinmeatics:
+\begin{align}
+    \mathcal{L}_\text{consist} = || \hat{\mathbf{J}}_0 - \text{FK}(\hat{\boldsymbol{\theta}}_0) ||_2
+\end{align}
+where $\hat{\mathbf{J}}_0$ denotes the predicted joint positions, and the forward kinematics function (FK) outputs joint positions given the predicted joint rotations $\hat{\boldsymbol{\theta}}_0$.
+The final loss combines all these objectives as
+\begin{align}
+    \mathcal{L} = \mathcal{L}_\text{hybrid} + \mathcal{L}_\text{dec} + \mathcal{L}_\text{goal} + \mathcal{L}_\text{consist}.
+\end{align}
+
+The two-stage denoiser is trained on sequences with a maximum length of 10 seconds following existing offline motion generation works~\cite{tevet2023mdm, pinyoanuntapong2025MaskControl}. For each training motion sequence, a fixed-size generation window of $G$ frames is sampled randomly. Consequently, the lengths of the available history ($H$) and future ($F$) contexts for each training sample vary dynamically, ranging from 0 to the maximum sequence length minus $G$. 
+Moreover, we augment the motion sequences by applying random rotations around the $y$-axis.
+Spatial constraints for both in-horizon and out-of-horizon are randomly sampled from a set of common use cases including 2D root keyframes, 2D root trajectories, full-body sparse keyframes, full-body keyframe blocks, sparse end-effector keyframes, and foot contact keyframes.
+To enable classifier-free guidance \cite{hoClassifierFreeDiffusionGuidance2022} during inference, we randomly drop the text prompts and spatial constraints with a 10\% probability. 
+
+By default, we use ten diffusion steps during both train and test-time, which strikes a good balance between speed and accuracy. However, performance is still acceptable for most applications when going as low as four steps (see \cref{sec:results_hyperparams}). 
+Denoiser training uses the AdamAtan2 optimizer with a learning rate of $2e{-}5$. 
+Importantly, we do not use dropout in the denoiser as this causes root constraint conditioning inputs to be partially lost.
+Our denoiser models are trained with a batch size of 512 across four NVIDIA A100-SXM4-80GB GPUs for one million optimization steps.
+

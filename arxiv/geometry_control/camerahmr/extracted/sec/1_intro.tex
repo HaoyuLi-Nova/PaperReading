@@ -1,0 +1,54 @@
+\section{Introduction}
+The field of monocular 3D human pose and shape (HPS) estimation has advanced rapidly. 
+Updated architectures, stronger backbones, and more extensive training data have all led to improvements in robustness and accuracy.
+We argue that a key remaining source of error lies in the fact that many HPS methods use a simplified weak-perspective camera model.
+We describe how the wrong camera model introduces error and we propose a solution.
+Specifically, we collect a dataset of images of people with varied field of view (FoV) and train a network to directly predict FoV from pixels.
+We then leverage this predicted FoV in training and show how this leads to state-of-the-art accuracy.
+
+%problem
+Recent HPS methods, such as HMR2.0~\cite{hmr2}, achieve notable 2D alignment by leveraging large-scale real image datasets for training. However, this success in 2D alignment comes at the cost of reduced 3D accuracy as described in \cite{tokenhmr}. 
+The core issue lies in the fact that these large-scale real image datasets frequently lack camera intrinsic parameters. 
+Training involves first creating 3D pseudo ground truth (pGT) data by fitting a parametric 3D body model like SMPL \cite{smpl} to 2D features such as keypoints.
+This fitting process typically uses a weak perspective camera model or default camera intrinsics.
+When the camera model is wrong, fitting 2D keypoints accurately forces the 3D pose to be wrong.
+Consequently, methods trained on these pGT datasets learn to replicate the 3D errors. 
+
+To achieve both accurate 2D alignment and  3D poses, it is crucial to use the correct camera intrinsics in creating the pGT. 
+% problem
+Unfortunately, estimating intrinsics from a single image is challenging.
+While there are many state-of-the-art approaches for camera calibration from monocular images \cite{ctrlc, perspectivefields, wildcamera}, they are trained on datasets such as Google Street View~\cite{gsv} and SUN360~\cite{sun360}.
+Such datasets focus on outdoor or indoor scenes rather than people. 
+Methods trained on datasets containing panoramic images of streets, natural landscapes, urban scenes, indoor settings, etc., do not work well on images of people.  
+%As a result, they perform poorly on images with people and hence are not robust enough to be used by HPS methods. 
+On the other hand methods trained on synthetic data like SPEC-camcalib~\cite{Kocabas_SPEC_2021} do not generalize  well to in-the-wild data. This highlights the need for a robust camera calibration model for images containing people to achieve accurate 3D human pose and shape estimation.
+
+To address this problem, we collect a dataset of about 500K images predominantly comprising  people, to train a field of view (FoV) prediction model. 
+The human body provides useful information for camera estimation. 
+While it would be going too far to call the body a ``calibration object," bodies have highly regular proportions and a limited range of heights.
+When projected into images, this regular structure systematically varies with focal length and perspective projection.
+To exploit this fact, we train a direct FoV regressor, \textbf{\cameramodel}, which generalizes well on benchmarks featuring humans compared to other state-of-the-art (SOTA) camera calibration methods. 
+\cameramodel can be directly incorporated into HPS methods that use a full perspective camera model, enabling accurate 3D reconstruction. 
+Using an accurate camera not only helps HPS regressors infer the 3D location of the people in camera space but it also improves alignment of the inferred body with image features, especially for wide angle images and extreme viewing angles.
+
+While incorporating a more accurate camera model into HPS methods is important, we still need high-quality training data that is as diverse as possible.
+To that end, we use \cameramodel to improve the real-image pGT in the 4DHumans dataset that is used to train HMR2.0~\cite{hmr2}.
+The original dataset uses SMPLify~\cite{smplify} to fit SMPL to 2D keypoints under a weak-perspective assumption.
+Instead, we use a full perspective camera model in SMPLify and exploit \cameramodel to estimate the FoV of the training images. 
+
+Additionally, the original dataset is created by fitting SMPL to only 17 sparse 2D joints; these lack the detail necessary for accurate 3D shape reconstruction. 
+To improve this, we train a keypoint detector (\textbf{DenseKP}) on the BEDLAM~\cite{bedlam} dataset to estimate {\em 138 dense surface keypoints}.
+We modify SMPLify to use these together with the original 17 2D joints.
+This results in significantly more realistic body shapes.
+Qualitatively, the improved camera model and dense keypoints lead to good 2D image alignment and more plausible 3D pGT compared to original dataset (Fig.~\ref{fig:dataset-comp}).
+
+With this, we generate high-quality 3D pGT for a large-scale real image dataset comprising approximately 3.2 million cropped images. 
+Importantly, the dataset includes the camera intrinsics estimated by \cameramodel; these are crucial for HPS methods. We further modify the HMR2.0 architecture to incorporate camera parameters from \cameramodel in training. 
+We iterate training this new \textbf{\hpsmodel} model and refining the pGT with SMPLify initialized with the previously trained model.
+%Incorporating the predicted camera intrinsics from our \cameramodel into the training our new \textbf{\hpsmodel} model 
+This significantly improves performance, with \hpsmodel achieving state-of-the-art accuracy on multiple HPS benchmarks.
+See Fig.~\ref{fig:teaser}.
+
+In summary, we (1) collect a dataset of varied images of humans with known FoV, (2) using this dataset, we train \cameramodel to regress FoV from images of people, (3) update SMPLify with a full perspective model that uses the \cameramodel output,  (4) introduce a dense surface keypoint regressor and incorporate these keypoints into SMPLify,
+(5) improve the 4DHumans training set using the new version of SMPLify, (6) incorporate the FoV estimation in HMR2.0, (7) train a new model, \hpsmodel, with SOTA accuracy.
+Code and pGT dataset is available for research purposes.

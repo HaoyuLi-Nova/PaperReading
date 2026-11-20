@@ -1,0 +1,100 @@
+\section{Data}
+\label{sec:data}
+
+Our data curation process consisted of acquisition, processing, filtering, and captioning, as illustrated in Fig. \ref{fig:data_pipeline}. We first describe our data acquisition, processing, and filtering in \cref{subsec:data_source}. Then we present our motion captioning process in \cref{subsec:captioning} and motion taxonomy in \cref{subsec:stats}.
+
+\input{figures/data/data_pipeline.tex}
+
+
+
+\subsection{Data Acquisition and Filtering}
+\label{subsec:data_source}
+
+
+\paragraph{Data Acquisition.}
+
+
+
+Our dataset was constructed from three complementary data sources: in-the-wild human motion videos, motion capture data, and 3D animation assets.
+Human motion videos provided rich and diverse actions captured across varied real-world scenarios.
+Motion capture data, typically recorded in controlled indoor environments, offered high-quality motion data but were limited in scene diversity.
+3D animation assets, hand-crafted by professional artists for game production, exhibited exceptional motion quality but were relatively expensive and limited in quantity.
+
+
+For video data, we started with a massive collection of 12 million high-quality, in-the-wild video clips from HunyuanVideo~\citep{hunyuanvideo2025}.
+We first processed these clips through a rigorous pre-processing stage, employing shot boundary detection to segment videos into coherent scenes and a human detector to search for clips containing human subjects.
+Subsequently, for the resulting candidate clips, we utilized a state-of-the-art human motion extraction algorithm GVHMR~\citep{shen2024gvhmr}, to reconstruct 3D human tracks of SMPL-X~\citep{smplx} parameters.
+For motion capture data and 3D animation assets, we acquired approximately 500 hours of motion sequences.
+
+
+
+
+
+
+
+
+
+
+
+
+\paragraph{Motion Processing and Filtering}
+
+To facilitate downstream model training, we standardized all motion data onto a unified SMPL-H skeleton. We processed all motions in three steps: retargeting, low-quality motion filtering, and canonicalization.
+We retargeted all motions onto a neutral SMPL-H skeleton~\citep{smplh}.
+For motion data originally in SMPL~\citep{smpl}, SMPL-H~\citep{smplh}, or SMPL-X~\citep{smplx} formats, we employed mesh fitting to convert them into the unified SMPL-H representation.
+For data with other skeletal structures, we applied a retargeting tool to map them to the SMPL-H skeleton.
+For all retargeted data, we established a comprehensive filtering pipeline to remove low-quality motion clips.
+This included removal of duplicates, abnormal poses, outliers of joint velocity, detection of anomalous displacements, pruning of static motions, and detection of artifacts such as foot-sliding.
+After filtering, we applied canonicalization to standardize the data.
+All motions were resampled to 30 fps, and sequences longer than 12 seconds were segmented into multiple clips.
+Each motion was normalized to a canonical coordinate frame: Y-axis up, the starting position centered at the origin, the lowest body point aligned on the ground plane, and initial facing direction along the positive Z-axis.
+Ultimately, we obtained over 3000 hours of motion data, including 400 hours of high-quality 3D motion data.
+
+
+
+
+\subsection{Motion Captioning}
+\label{subsec:captioning}
+
+
+
+
+
+Our captioning pipeline primarily leveraged vision-language models (VLMs) for automatic annotation, followed by manual verification and refinement. Finally, we employed large language models (LLMs) to diversify and enrich the textual descriptions.
+
+For video-sourced data, we directly used the original videos corresponding to each motion sequence.
+For 3D motion data, we textured and rendered the SMPL-H model to generate synthetic videos.
+These videos, along with optimized prompts dedicated to human motion, were fed into a VLM (\eg, Gemini-2.5-Pro) to obtain preliminary captions and action keywords.
+To obtain as accurate a text-motion pair as possible for the high-quality data (i.e., rendered motions),
+we conducted manual verification on the VLM outputs, correcting erroneous descriptions and supplementing missing key motion components.
+
+For all generated captions, we utilized an LLM to standardize the caption structure while preserving the original semantics and to create diverse paraphrases for data augmentation.
+
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Taxonomy}
+\label{subsec:stats}
+
+
+To organize our dataset, we established a three-level hierarchical motion taxonomy based on textual captions and keywords. As illustrated in Figure \ref{fig:data_overview}, the hierarchy began with six coarse-grained, top-level categories: (a) Locomotion, (b) Sports \& Athletics, (c) Fitness \& Outdoor Activities, (d) Daily Activities, (e) Social Interactions \& Leisure, and (f) Game Character Actions. These categories were progressively subdivided, culminating in over 200 fine-grained motion classes at the leaf level.
+
+
+\input{figures/data/data_overview.tex}
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,28 @@
+\begin{algorithm}[!t]
+\caption{Inference with pace-induced guidance}
+\label{alg:diffusion_inference}
+\begin{algorithmic}[1]
+\Require Total number of denoising steps $K$; lagged modality index $m_2$; cleaner modality index $m_1$; $\boldsymbol{x}_U(\boldsymbol K)$ and $\boldsymbol{x}_S(\boldsymbol K)$ initialized with same Gaussian noise; lag offset vector $\boldsymbol{\delta}$
+
+\For{$k = K, K-1, \dots, 1$}
+  \State \text{Assign} $\boldsymbol\lambda$ as an all-$k$ vector
+  \State $ \text{Obtain denoised } \tilde{\boldsymbol{x}}_U \text{ from } \boldsymbol{x}_U(\boldsymbol\lambda) \text{ and } \boldsymbol\lambda \text{ with text CFG} $ \algorithmiccomment{Equation~\ref{eq:textcfg}} 
+  \State $ \text{Add noise back to } \boldsymbol{x}_U(\boldsymbol\lambda-\boldsymbol 1)$ \text{and record} \algorithmiccomment{Equation~\ref{eq:denoising_step}}  
+\EndFor
+
+\For{$k = K, K-1, \dots, 1$}
+  \State \text{Assign} $\boldsymbol\lambda$ as an all-$k$ vector
+  \If{$\boldsymbol\lambda - \boldsymbol\delta \ge \boldsymbol0$ for all elements}
+    \State \text{Obtain} the input of conditional branch $\boldsymbol{x}'_S(\boldsymbol\lambda)$ by merging $\boldsymbol{x}_U(\boldsymbol\lambda - \boldsymbol \delta)$ \algorithmiccomment{Equation~\ref{eq:assign}}
+    \State $ \text{Obtain denoised } \tilde{\boldsymbol{x}}_S \text{ from } \boldsymbol{x}_S(\boldsymbol\lambda) \text{ and } \boldsymbol\lambda\text{ with text CFG} $ \algorithmiccomment{Equation~\ref{equation:textcfg2}} 
+    \State $ \text{Update } \tilde{\boldsymbol{x}}_S \text{ with }\boldsymbol{x}'_S(\boldsymbol\lambda) \text{ by LIGHT} $ \algorithmiccomment{Equation~\ref{equation:guidance_step}, incremental guidance}
+  \Else
+    \State $ \text{Obtain denoised } \tilde{\boldsymbol{x}}_S \text{ from } \boldsymbol{x}_S(\boldsymbol\lambda) \text{ and } \boldsymbol\lambda\text{ with text CFG} $
+  \EndIf
+
+   \State $ \text{Add noise back to } \boldsymbol{x}_S(\boldsymbol\lambda-\boldsymbol 1)$ \algorithmiccomment{ \mycolor{Equation~\ref{equation:guidance_denoise_step}}}  
+\EndFor
+
+\State \Return $\boldsymbol{x}_S(\boldsymbol 0)$
+\end{algorithmic}
+\end{algorithm}

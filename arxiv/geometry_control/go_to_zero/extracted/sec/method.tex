@@ -1,0 +1,55 @@
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\linewidth]{figures/framework.pdf}
+    \caption{Overview of our scalable model architecture, which utilize FSQ as a motion tokenizer and an autoregressive transformer to generate the motion from the given text.}
+    % \vspace{-2em}
+    \label{fig:framework}
+\end{figure}
+
+\section{Architecture}
+\label{sec:architecture}
+Building upon the constructed large-scale annotated motion dataset, we aim to train a foundational motion generation model capable of zero-shot motion generalization, especially the ability to generate complex compositional motions. Inspired by the successful scaling strategies observed in natural language and computer vision\citep{rombach2022high,gpt3,gpt4,sora}, we adopt a discrete autoregressive architecture, as illustrated in Fig.~\ref{fig:framework}.
+The proposed model consists of two key stages: Efficient Motion Tokenization and Scalable Motion Generation.
+1)	Efficient Motion Tokenization: This stage employs a finite scalar quantizer (FSQ) to learn discrete representations of human motion sequences, enabling efficient encoding of continuous motion data into a compact and structured format.
+2) Scalable Motion Generation: Leveraging the LLAMA architecture, the model takes text inputs as prompts and scales from 1B to 7B parameters, facilitating high-capacity motion generation with strong generalization capabilities.
+This design enables the model to generate realistic and contextually coherent human motion sequences while maintaining scalability.
+
+\subsection{Motion Representations}
+We begin by introducing our motion representation. To mitigate errors introduced by the inverse kinematics process in the HumanML3D format while preserving redundant information (e.g., velocity), we reformulate and refine the motion representation \(x^i\) in a manner consistent with previous work on character control~\cite{starke2019neural, starke2022deepphase, shi2024interactive}. Specifically, the \(i\)-th pose \(x^i\) is defined as a tuple comprising: root linear velocities \((\dot{r}^x, \dot{r}^z \in \mathbb{R})\) on the XZ-plane, root angular velocity \(\dot{r}^a \in \mathbb{R}^6\) represented in 6D rotations, local joint positions \(p^i \in \mathbb{R}^{3N}\), local velocities \(v^i \in \mathbb{R}^{3N}\), and local rotations \(r^i \in \mathbb{R}^{6N}\) relative to the root space, where \(N\) denotes the number of joints. Formally, this is expressed as:
+\[
+x^i = \{\dot{r}^x,\dot{r}^z,\dot{r}^a,\,p^i,\,v^i,\,r^i\}.
+\]
+
+A significant advantage of our representation is that it eliminates the need for an inverse kinematics process to obtain SMPL or BVH representations, as required in previous approaches. Moreover, our representation can be losslessly converted to relative rotations akin to those in SMPL. Additionally, because both the rotation and position components are derived from the same skeletal structure, they provide mutual regularization. Notably, the rotation component in the HumanML3D format is erroneous~\cite{humanmlissue}, which heavily hinders the applications of downstream tasks. Rather than discarding this flawed rotation component as done in~\cite{meng2024rethinking}, we undertake engineering corrections to rectify it. We hope our representation could correct previous mistakes and guide future development.
+
+
+\subsection{Efficient Motion Tokenization}
+We leverage Finite Scalar Quantization (FSQ), a codebook-free quantization mechanism that replaces distance-based codebook matching with deterministic discretization, enabling scalable and stable representation learning~\citep{lu2024scamo}.  
+
+The vanilla FSQ architecture operates in three key steps. First, the latent vector z, produced by the motion encoder, is normalized via a sigmoid function to constrain its values within a bounded range \([0, 1]\). Next, each dimension of the normalized latent is discretized into \(L\) uniformly spaced integers using a rounding operation:  
+\vspace{-0.5em}
+\begin{equation}
+\hat{\mathbf{z}} = \mathcal{Q}(\mathbf{z}) = \mathtt{round}\left(f(\mathbf{z}) \cdot (L-1)\right),
+\end{equation},
+% \vspace{-0.5em}
+where \(L\) defines the number of quantization levels per dimension. This produces a discrete code \(\hat{\mathbf{z}} \in \{0, 1, \dots, L-1\}^d\), with \(d\) denoting the latent dimension. Unlike VQ-VAE’s explicit codebook, FSQ implicitly defines a structured grid of \(L^d\) unique codes, eliminating the need to store physical embeddings while ensuring full code utilization.  
+
+The model is optimized solely via reconstruction loss:  
+\begin{equation}
+\mathcal{L} = \|\mathbf{m} - \mathtt{Dec}(\mathbf{z}_q)\|_2^2,
+\end{equation}
+removing auxiliary losses (e.g., codebook commitment terms) required in VQ-VAE.  
+This structured quantization paradigm provides a robust alternative to traditional VQ for representing complex motion data at scale.
+
+Unlike the vanilla FSQ method, as shown in Fig.~\ref{fig:framework}, we first use a wavelet transform before inputting the motion into the motion encoder, and after the motion decoder, we use the inverse wavelet transform to restore the motion. This can largely suppress the jitter problem caused by the information loss of discrete encoding.
+
+\subsection{Scalable Motion Generation}
+To effectively scale our model, we adopt a transformer-decoder-based architecture. The framework first compresses and encodes motion using a finite scalar quantizer (FSQ), while textual information is processed using the T5-XL large language model, which performs word-level encoding. The encoded motions and texts are denoted as $\{m_i\}_{i=1}^{n}$ and $\{T_i\}_{i=1}^{w}$, where $n$ and $w$ represent the number of encoded motion tokens and the word tokens.
+
+Unlike standard causal attention mechanisms used in transformers, our approach employs a mixed attention strategy, where attention among words is bidirectional, whereas attention between motion sequences remains causal. As illustrated in Fig.~\ref{fig:framework}, the encoded text and motion representations are fed into a series of stacked Hybrid Attention Blocks (HABs), with the final output directed to a classification head. Each HAB consists of:
+1) Two RMS-Norm layers, which significantly mitigates the training instability. 2) One mixed attention module, which capture intricate relationships between text and motion features, and 3) one feedforward network(FFN) module, which could fuse the feature from a channel aspect. To optimize the model, we apply cross-entropy loss to the logits produced by the final classification head, formulated as:
+\begin{equation}
+    \mathcal{L} = - \sum_{i=1}^{n} \log p(\hat{m}_i | m_{<i}, T_1,...,T_w)
+\end{equation}
+This approach ensures robust motion-text alignment while maintaining scalability and training stability.

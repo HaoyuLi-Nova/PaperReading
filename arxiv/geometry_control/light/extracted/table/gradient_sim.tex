@@ -1,0 +1,20 @@
+\vspace{-0.5em}
+\begin{wraptable}{r}{0.6\textwidth}
+    \centering
+    \caption{Comparison of the mean gradient similarity with penetration-descending direction, direction towards GT distribution. $\delta=250$ is used and mean gradient similarity is calculated on all the guiding steps. we define $\langle \mathbf{a}, \mathbf{b} \rangle \;=\; 
+\frac{\mathbf{a}}{\|\mathbf{a}\|} \cdot \frac{\mathbf{b}}{\|\mathbf{b}\|} $.}
+    \label{tab:gradient_sim}
+    \resizebox{0.55\textwidth}{!}{%
+    \begin{tabular}{@{}ccccc@{}}
+        \toprule
+        Dataset & \texttt{<$\boldsymbol{g}_{\text{CFG}},\boldsymbol{g}_{\text{GT}}$>} & \texttt{<$\boldsymbol{g}_{\text{LIGHT}},\boldsymbol{g}_{\text{GT}}$>} & \texttt{<$\boldsymbol{g}_{\text{CFG}},\nabla L_{\text{pen}}$>} & \texttt{<$\boldsymbol{g}_{\text{LIGHT}},\nabla L_{\text{pen}}$>} \\
+        \midrule
+        InterAct~\citep{xu2025interact} 
+          & 0.401 & 0.401 + 0.002 & 0.217 &  0.217 \textbf{+ 0.035} \\
+        \midrule
+        OMOMO~\citep{li2023controllable} 
+          & 0.395 & 0.395 + 0.029 & 0.239 & 0.239 \textbf{+ 0.032} \\
+        \bottomrule
+    \end{tabular}
+    \vspace{-1em}}
+\end{wraptable}

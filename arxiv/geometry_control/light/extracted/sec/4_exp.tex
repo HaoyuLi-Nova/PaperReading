@@ -1,0 +1,99 @@
+\section{Experiments} \label{sec:experiments}
+
+\noindent\textbf{Dataset.} We conduct experiments mainly on the InterAct dataset~\citep{xu2025interact}, and ablate on its major subsets, BEHAVE~\citep{bhatnagar22behave} and OMOMO~\citep{li2023controllable}. InterAct includes fine-grained textual annotations accompanying these sequences, and we adopt its official training-testing split for all evaluations. As the data originally annotate human motion using SMPL-H~\citep{MANO} and SMPL-X~\citep{SMPL-X:2019}, we standardize all representations to SMPL-H and utilize SMPL-H joints consistently across our experiments, using official SMPL conversion. We manually filter out implausible motion sequences from the original MoCap data; for instance, we exclude cases from OMOMO in which hand orientations were incorrectly inverted, and cases from IMHD where the human is distorted given their shape and pose. We apply object augmentation to enrich the dataset from $217$ objects to $1121$ objects, with examples in Figure~\ref{fig:aug}.
+
+\begin{figure*}
+    \centering
+    \includegraphics[width=\textwidth]{fig/base.pdf}
+    \caption{\textbf{Qualitative comparison} with baselines.  
+    Our method yields more realistic human-object interactions, fewer contact/penetration artifacts, more accurate finger positioning, and better text-motion alignment.}
+    \label{fig:base}
+    % \vspace{-1em}
+\end{figure*}
+\input{table/t2i}
+
+
+\noindent \textbf{Metrics.}
+Following the standard practice~\citep{guo2022generating}, we measure realism and diversity of the generated HOI sequence, alignment with textual descriptions, and physical plausibility of interactions. To evaluate realism and diversity, we utilize the Fréchet Inception Distance (\textbf{FID}), which quantifies feature distribution similarity between generated sequences and ground-truth samples, and a \textbf{Diversity} metric, measuring variability across generated HOIs. To assess textual alignment, we adopt \textbf{R-Precision}, and Multimodal Distance (\textbf{MM Dist}), quantifying the feature-level distance between generated HOIs and corresponding text embeddings.
+We introduce three metrics tailored explicitly for assessing the plausibility and quality of generated HOI sequences. The Foot Skating Ratio (\textbf{FSR}) measures the proportion of frames exhibiting unrealistic foot sliding. The Penetration Ratio (\textbf{Pene}) calculates the average fraction of object vertices intersecting the human mesh across the sequence. The Contact Ratio (\textbf{Contact}) assesses the frequency with which the human and object maintain consistent contact throughout the motion. More details can be found in Sec.~\ref{sec:metric_supp} of the Appendix. Following~\citet{li2023object}, we also report contact precision ($C_{prec}$), recall ($C_{rec}$), and F1 score ($C_{F1}$) to measure frame-wise contact accuracy, though these may not fully capture plausibility due to the diversity of text-to-HOI generation (see Sec.~\ref{sec:metric_supp} of the Appendix).
+
+Existing methods~\citep{peng2023hoi,diller2023cg,wu2024thor,song2024hoianimator} typically rely on feature extractors trained using relatively small-scale HOI datasets or their evaluator only measure human motion quality, which can negatively impact the robustness and reliability of evaluations. To address this limitation, we retrain our feature extraction models using the larger-scale InterAct dataset, leveraging regressed joint representations in conjunction with object BPS~\citep{prokudin2019efficient} features. Additional details can be found in Sec.~\ref{sec:evaluator_supp} of the Appendix.
+
+\noindent\textbf{Implementation Details.}
+In the main paper, we fix the modiality pairs by setting $m_1 = \{b, h\}, m_2 = \{o\}$. Additional experimensts on all of the component combinations are presented in the Appendix~\ref{sec:exp_supp_guidance}. Unless otherwise specified, we set the guidance weights as $\omega_{1} = 0.5$, $\omega_2 = 3.0$ with a noise-level offset $\delta = 250$ while the total denoising steps $K = 500$. During training, object geometry is represented using a BPS~\citep{prokudin2019efficient} comprising 1024 points. Our models are trained on NVIDIA A100 GPUs, leveraging mixed-precision training with FP16 precision and flash attention. Training converges within approximately 24 hours using a single GPU. For the transformer backbone, we adopt an 8-layer transformer decoder structure with a latent dimension of 512 and a feed-forward dimension of 1024. Additional implementation details are in Sec.~\ref{sec:method_supp}.
+
+\input{table/ablation}
+\begin{figure*}
+    \centering
+    \includegraphics[width=\textwidth]{fig/hand.pdf}
+    \caption{\textbf{Qualitative comparison} between our method using body and hand merged into a single token (\textbf{left}) versus separating body and hand into distinct tokens (\textbf{right}). Unrealistic grasping artifacts produced by the single-token approach are highlighted in red dashed boxes. Our separate-token strategy yields better results.}
+    \label{fig:hand}
+\end{figure*}
+
+\noindent \textbf{Baselines.}
+We compare against four recent HOI generation baselines. HOI-Diff~\citep{peng2023hoi}, a diffusion-based framework for text-driven HOI, employs a transformer backbone~\citep{tevet2022human} with classifier guidance via an affordance predictor~\citep{dhariwal2021diffusion}. CHOIS~\citep{li2023controllable}, originally requiring inputs beyond text, is adapted here for text-only prompts. InterDiff~\citep{xu2023interdiff} is modified by replacing its historical motion encoder with a text encoder. Text2HOI~\citep{cha2024text2hoi} is incorporated for full-body HOI generation, following their protocol to train a static contact-map estimator.
+To assess our guidance strategy, we further evaluate two variants: (\textbf{i}) our method without guidance and (\textbf{ii}) our full model with LIGHT.
+
+\noindent\textbf{Quantitative Evaluation.}
+As shown in Table \ref{tab:t2i_interact}, \ours{} surpasses prior diffusion-based text-to-HOI methods on most key metrics: it attains higher R-precision for tighter text-animation alignment and lower FID and MM Dist scores for better generation quality. Tables \ref{tab:t2i_omomo} and \ref{tab:t2i_behave} demonstrate that our method surpass other baselines, when trained on small-scale datasets, mirroring baseline's setting. Sec.~\ref{sec:exp_supp_guidance} demonstrate that our framework is able to generalize on two new tasks without retraining, with guidance showing improvement over counterpart without guidance, even on these unseen tasks.
+
+\begin{figure*}
+    \centering
+    \includegraphics[width=\textwidth]{fig/guide.pdf}
+    \caption{\textbf{Qualitative comparison.} \textbf{Left}: our \ours{} \textit{without} guidance. \textbf{Right}: our full method \textit{with} guidance, which markedly enhances generation quality.}
+    \label{fig:guide}
+    \vspace{-1em}
+\end{figure*}
+\noindent\textbf{Qualitative Evaluation.}
+In the baseline comparison (Figure~\ref{fig:base}), our method attains higher contact accuracy, whereas the baseline exhibits noticeable penetration and floating artifacts, and their finger articulation is often incorrect. We also conduct a user study to complement the qualitative validation, which is discussed in Sec.~\ref{sec:add_exp_supp}, demonstrating that ours produces animation with higher quality.
+
+\noindent\textbf{Impact of Pace-Induced Guidance.}
+We evaluate the impact of our proposed guidance. Figure~\ref{fig:guide} shows examples comparing HOI sequences generated with and without pace-induced guidance. With guidance enabled, generated animations clearly exhibit more precise contact dynamics and fewer unrealistic motion artifacts. This highlights that our approach effectively enhances the plausibility and overall visual quality of generated results. Table~\ref{tab:t2i_interact} corroborates these observations: combining guidance with our pipeline achieves the strongest performance.
+
+
+\noindent\textbf{Impact of Separating Tokens.} In Figure~\ref{fig:hand}, we show that separate hand token modeling yields noticeably more precise grasping motions and object placements. By comparison, the unified-token baseline often produces unnatural grasps and misaligned objects, underscoring the benefits of our separation strategy. Quantitative results in Table \ref{tab:ablation_interact} reinforce this trend: token separation for three modalities with the our framework achieves superior performance across all metrics. We also conduct ablation on subset evaluation (Tables~\ref{tab:ablation_omomo} and \ref{tab:ablation_behave}), to mirror the setting of existing baselines~\citep{li2023controllable,xu2023interdiff,peng2023hoi} trained on smaller dataset.
+
+\noindent\textbf{Impact of Augmented Data.}
+Table~\ref{tab:augmentation_quality} and Figure~\ref{fig:aug} illustrate that our augmentation framework generates realistic human-object interaction animations well suited for training.
+We evaluate models trained with augmented data under three distinct train-test splits:
+(i) Partitioned by sequence, consistent with the main experimental setup. Here, the test set contains no novel objects -- all objects also appear in training.
+(ii) Partitioned by object category, where the test set consists of in-category objects unseen during training.
+(iii) Partitioned by object category, where the test set consists of cross-category objects entirely unseen during training.
+In all cases, the model is trained on a combination of the original training data and its in-category augmented data, then evaluated on the corresponding test set using our pretrained evaluator without fine-tuning.
+Table~\ref{tab:t2i_interact_aug} shows that augmentation consistently improves performance across metrics on the unseen-object evaluation. This demonstrates that object-level augmentation substantially enhances generalizability, benefiting both in-category and cross-category unseen objects. 
+\input{table/augmentation_t2i}
+
+
+\begin{wrapfigure}{r}{0.48\textwidth}
+    \centering
+    % \vspace{-0.5em}
+    \includegraphics[width=0.46\textwidth]{fig/stats.pdf}
+    % \vspace{-1em}
+    \caption{Ablation study on the schedule-based guidance weight $\omega_2$ 
+    and denoising preceding offset $\delta$. Left: $\delta$ fixed at 200 
+    while varying $\omega_2$. Right: $\omega_2$ fixed at 4 while varying $\delta$.}
+    \label{fig:stats}
+    % \vspace{-1em}
+\end{wrapfigure}
+\noindent\textbf{Impact of Guidance Intensity and Denoising lagging.} Here, we investigate how the key hyperparameters, specifically $\omega_{2}$ and $\delta$, affect the effectiveness of our pace-induced guidance.
+\mycolor{As shown in Figure~\ref{fig:stats}, varying the guidance weight $\omega_{2}$ and the denoising offset $\delta$ reveals a clear optimum. Weak guidance (small $\omega_{2}$) degrades FID; $\omega_{2}=4$ injects just enough prior for the best quality; larger $\omega_{2}$ over-constrains, reducing diversity and motion fluidity. Likewise, small offsets ($\delta<100$) keep the staged and uniform branches too similar for effective correction, $\delta=200$ strikes the best balance, and larger offsets might cause excessive divergence and abrupt fusion.}
+
+
+\input{table/gradient_sim}
+\noindent\textbf{Analysis of Guidance Direction.}
+Motivated by the need to understand why guidance works, we follow~\citep{rajabi2025token} and analyze the directions induced by LIGHT and traditional CFG. Specifically, we measure how each guidance direction correlates with two reference directions: (\textbf{i}) the displacement toward the ground-truth (GT) \(
+\boldsymbol{g}_{\text{GT}} = \hat{\boldsymbol{x}}(\boldsymbol{0}) - \boldsymbol{x}_{S}(\boldsymbol\lambda).
+\) where $\hat{\boldsymbol{x}}(\boldsymbol{0})$ is defined in Sec.~\ref{sec:method_main} as ground truth conterpart, and (\textbf{ii}) the penetration-reducing gradient $\nabla L_{\text{pen}}$. 
+We provides comparisons between two produced guidance directions, where (\textbf{i}) the guidance direction of our LIGHT is defined as
+\(
+\boldsymbol{g}_{\text{LIGHT}}
+= \mathcal{G}_\theta(\boldsymbol{x}'_{S}, \boldsymbol\lambda',\boldsymbol{d})
+-\mathcal{G}_\theta(\boldsymbol{x}_{S}(\boldsymbol\lambda), \boldsymbol\lambda,\boldsymbol{d})
+\), as defined in Equation~\ref{equation:guidance_step}.
+(\textbf{ii}) the text-cfg direction is
+\(
+\boldsymbol{g}_{\text{CFG}}
+= \mathcal{G}_\theta(\boldsymbol{x}_{U}(\boldsymbol\lambda), \boldsymbol\lambda,\boldsymbol{d})
+-\mathcal{G}_\theta(\boldsymbol{x}_{U}(\boldsymbol\lambda), \boldsymbol\lambda,\emptyset)\big).
+\) as defined in Equation~\ref{eq:textcfg}.
+We report the mean cosine similarity between two guidance directions and two reference directions. Empirically, our pace-induced guidance consistently steers motion toward the desired distribution, achieving GT-aligned similarity on par with text-conditioned CFG. To probe effects on low-level contact, we also measure the cosine similarity between two directions with and the penetration-reducing gradient $\nabla L_{\text{pen}}$. As shown in Table~\ref{tab:gradient_sim}, our LIGHT shows more correlation with this gradient compared to pure text CFG. We hypothesize that the hard-dropout form of CFG biases samples toward the marginal data distribution -- enhancing global plausibility but diminishing sensitivity to contact-specific cues. In LIGHT, the ``unconditional'' path retains weak conditioning via noisier, lagged components (\textit{e.g.,} slight human-object surface misalignment). Then, the contrast between clean and noise branch will focus on surface-alignment signals and explicitly promotes depenetration and alignment.

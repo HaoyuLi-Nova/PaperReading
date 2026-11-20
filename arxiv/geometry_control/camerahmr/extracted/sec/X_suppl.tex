@@ -1,0 +1,104 @@
+\clearpage
+\maketitlesupplementary
+\section{Focal length distribution}
+
+We plot the distribution of focal lengths used in training HumanFoV model in Figure~\ref{fig:fl_dist}. The distribution shows notable peaks corresponding to the focal lengths of lenses most frequently used in photography, e.g.~24, 28, 35, 50, 85, 105, 135, 200, 300,  
+\begin{figure}[t]
+\centerline{\includegraphics[width=0.95\columnwidth]{CameraHMR/images/FLbins100.png}}
+\vspace{-0.1in}
+ \caption{Focal Length distribution of images used in training \cameramodel.}
+ \vspace{-0.15in}
+	\label{fig:fl_dist}
+\end{figure}
+\section{CameraHMR}
+\subsection{Losses}
+We use several loss functions to ensure accurate 3D human pose and shape estimation. We minimize the L2 norm distance between the ground truth 3D joint locations $\hat{\mathbf{J}}_{3d} \in \mathbb{R}^{44 \times 3}$ and the predicted 3D joint locations $\mathbf{J}_{3d} \in \mathbb{R}^{44 \times 3}$ centered around pelvis joint using $\mathcal{L}_{J_{3d}}$.
+
+\begin{equation}
+\mathcal{L}_{j3d} = \|\hat{\mathbf{J}}_{3d} - \mathbf{J}_{3d}\|_2^2
+\end{equation}
+
+We also penalize the deviation of the ground truth SMPL shape and pose parameters $\hat{\boldsymbol{\beta}}$ and $\hat{\boldsymbol{\theta}}$ from the predicted  parameters $\boldsymbol{\beta}$ and $\boldsymbol{\theta}$, respectively using $\mathcal{L}_{\text{SMPL}}$. The network predict $\boldsymbol{\theta}$ in a 6D rotation format~\cite{zhou}, which is later converted to a rotation matrix representation to facilitate loss calculation. This avoids the discontinuities and ambiguities associated with angle-based representations, such as Euler angles or quaternions.
+
+\begin{equation}
+\mathcal{L}_{\text{smpl}} = \|\hat{\boldsymbol{\beta}} - \boldsymbol{\beta}\|_2^2 + \|\hat{\boldsymbol{\theta}} - \boldsymbol{\theta}\|_2^2
+\end{equation}
+
+Since we have accurate body shape labels we also minimize the difference between the ground truth 3D body mesh vertices $\hat{\mathbf{V}}_{3d} \in \mathbb{R}^{6890 \times 3}$ and the predicted vertices $\mathbf{V}_{3d} \in \mathbb{R}^{6890 \times 3}$, using $\mathcal{L}_{v3d}$
+
+\begin{equation}
+\mathcal{L}_{v3d}  = \|\hat{\mathbf{V}}_{3d} - \mathbf{V}_{3d}\|_2^2
+\end{equation}
+
+For the 2D keypoint loss, we project ${\mathbf{J}}_{3d}$ and $\hat{\mathbf{J}}_{3d}$ onto the 2D image plane using the camera intrinsic matrix $\mathbf{K}$. For BEDLAM~\cite{bedlam} and AGORA~\cite{agora}, the ground truth intrinsic matrix $\mathbf{K}$ is provided. For 4DHumans dataset, where ground truth camera parameters are unavailable, we estimate $\mathbf{K}$ using our HumanFoV model. The 2D projection ${\mathbf{J}}_{2d}$ of the 3D joints is computed as $\Pi({\mathbf{J}}_{3d}; \mathbf{K})$ where $\Pi(\cdot)$ denotes the projection using the intrinsic matrix $\mathbf{K}$. 
+
+Given that $ J_{2d} $ represents points in the original image coordinates where the horizontal and vertical coordinates $ x $ and $ y $ satisfy $ x \in [0, W] $ and $ y \in [0, H] $ respectively, we need to normalize these coordinates before calculating the loss. Therefore, we first transform the point from the full image coordinates to the cropped coordinates, based on the center and scale of the bounding box. The cropped image coordinates are then resized to a fixed resolution and normalize between -1 to 1.  Finally, the 2D keypoint loss, $\mathcal{L}_{j2d}$, is computed based on the normalized 2D keypoints, $\mathbf{J}_{2d}^{\text{norm}}$.
+
+\begin{equation}
+\mathcal{L}_{j2d} = \|\hat{\mathbf{J}}_{2d}^{\text{norm}} - \mathbf{J}_{2d}^{\text{norm}}\|_2^2
+\end{equation}
+
+\section{CamSMPLify}
+Here we provide more details about the optimization procedure used for generating our pseudo ground truth data for 4DHumans dataset. As describe in Eq.~\ref{main:eq:reg} from the main paper, we minimize the energy term $E(\beta, \theta, t^{\text{full}})$ by optimizing for SMPL shape $\beta$ and pose $\theta$ as well as the camera translation $t^{\text{full}}$ in 2 steps.
+
+
+Initially, we optimize for $n$ iterations focusing solely on the parameters $\beta$ (shape), $\theta_0$ (global orientation), and $t^{\text{full}}$ (translation), while excluding $\theta$ (pose parameters) from the optimization. During this stage, we set the pose prior weight $\lambda_{\text{int}}$ to 0, as we are not yet optimizing the pose. This strategy prevents the model from distorting the body pose excessively to match the keypoints, ensuring that any discrepancies due to incorrect orientation, shape, or translation are addressed first. By refining these parameters initially, we avoid overcompensating for errors related to the pose. After this stage, we update $V_{\text{int}}$ with the output vertices from this optimization stage.
+In the subsequent stage, we optimize all the parameters, including $\theta$, and set $\lambda_{\text{int}}$ to 1.0 to obtain our final pose, shape and camera translation. For more details on the hyperparameter settings, please refer to the code.
+
+
+\section{Shape Evaluation}
+Most HPS evaluation benchmarks primarily represent average body shapes and offer limited shape diversity, which restricts their effectiveness in assessing improvements in shape accuracy. To address this, we utilize the SSP-3D~\cite{ssp} dataset, which includes a broad spectrum of body shapes. SSP-3D contains 311 real-world images of 62 individuals in fitted clothing, along with estimated ground-truth body shape data.
+
+We evaluate shape accuracy using the PVE-T-SC metric on the SSP-3D dataset. PVE-T-SC, or Per-Vertex Error in T-pose after Scale Correction, calculates the per vertex average error by comparing a reconstructed 3D body mesh in a standardized T-pose to the ground truth. Before computing this error, the scale of the predicted model is adjusted to match the ground truth, ensuring that the metric reflects inaccuracies in shape and pose, rather than differences in overall scale.
+
+As demonstrated in Table~\ref{ssp-eval}, CameraHMR outperforms all other benchmarks in terms of shape accuracy, even surpassing methods specifically trained to enhance shape prediction. Additionally, incorporating our improved 4DHumans pGT into the training process, along with BEDLAM, further improves shape accuracy, highlighting the high quality of the shape information in our pseudo ground truth.
+\begin{table}
+\centering
+{\scriptsize
+  \begin{tabular}{l|c|c}
+    \toprule
+     Method & Model & PVE-T-SC $\downarrow$\\
+    \midrule
+    HMR~\cite{Kanazawa2018_hmr} & SMPL & 22.9\\
+    SPIN~\cite{spin} & SMPL & 22.2 \\
+    SHAPY~\cite{shapy} & SMPL-X & 19.2\\
+    STRAPS~\cite{ssp} & SMPL & 15.9\\
+    Sengupta et. al~\cite{sengupta} & SMPL & 13.6\\
+    CLIFF~\cite{li2022cliff} & SMPL & 18.4\\
+    BEDLAM-CLIFF~\cite{bedlam} & SMPL-X & 14.2\\
+    CameraHMR (B) & SMPL & 13.3\\
+    CameraHMR (B+4DH)& SMPL & \textbf{11.6}\\
+    
+    \bottomrule
+  \end{tabular}
+  }
+  \caption{Shape error evaluation on SSP-3D dataset. B means trained on BEDLAM and AGORA and 4DH means trained on 4DHumans.}
+  
+\label{ssp-eval}
+
+\end{table}
+
+\section{More Qualitative Results}
+In Fig.~\ref{fig:qualitative_landscape} and Fig.~\ref{fig:qualitative_portrait}, we present qualitative results of CameraHMR applied to images downloaded from Pexels~\cite{pexel}. The results for multi-person images are obtained by first generating the bounding box for each person using Detectron2~\cite{detectron2} on the full image. These cropped bounding boxes are then fed into CameraHMR. The results demonstrate that CameraHMR effectively estimates both accurate body poses and detailed body shapes, even for complex body poses and camera angles.
+
+In Figure~\ref{fig:qualitative_comp}, we compare the results of CameraHMR with HMR2.0~\cite{hmr2} and ReFit~\cite{refit} on images from Pexels. HMR2.0 employs a weak perspective camera model, while ReFit, like CameraHMR, uses a full perspective camera model during training. Despite achieving good alignment on images with standard focal length, HMR2.0 often results in unrealistic body poses. 2D alignment with the image also gets worse as FoV of the image increases as shown in some of the images in Figure~\ref{fig:qualitative_comp}. ReFit~\cite{refit}, although producing a more accurate 3D pose, suffers from poor 2D alignment due to reliance on default camera parameters during inference. In contrast, CameraHMR leverages robust camera intrinsics predicted by our HumanFoV model, resulting in accurate body poses and shapes as well as improved 2D alignment, even under extreme camera conditions.
+
+\begin{figure*}
+\centerline{\includegraphics[width=1\textwidth]{CameraHMR/images/supp/qualitative.pdf}}
+\caption{CameraHMR results on landscape images downloaded from Pexels~\cite{pexel}.}
+\label{fig:qualitative_landscape}
+
+\end{figure*}
+
+\begin{figure*}
+\centerline{\includegraphics[width=0.9\textwidth]{CameraHMR/images/supp/qualitative2.pdf}}
+\caption{CameraHMR results on portrait images downloaded from Pexels~\cite{pexel}.}
+\label{fig:qualitative_portrait}
+
+\end{figure*}
+
+\begin{figure*}
+\centerline{\includegraphics[width=0.9\textwidth]{CameraHMR/images/supp/compare.pdf}}
+\caption{CameraHMR achieves more accurate 3D pose estimation, shape reconstruction, and 2D alignment with the image even for extreme camera angles, outperforming other methods in these challenging scenarios.}
+\label{fig:qualitative_comp}
+\end{figure*}

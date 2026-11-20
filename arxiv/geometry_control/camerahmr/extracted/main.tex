@@ -1,0 +1,98 @@
+% 3DV 2025 Paper Template; see https://github.com/cvpr-org/author-kit
+
+\documentclass[10pt,twocolumn,letterpaper]{article}
+
+%%%%%%%%% PAPER TYPE  - PLEASE UPDATE FOR FINAL VERSION
+% \usepackage{cvpr}              % To produce the CAMERA-READY version
+% \usepackage[review]{cvpr}      % To produce the REVIEW version
+\usepackage[pagenumbers]{cvpr} % To force page numbers, e.g. for an arXiv version
+\usepackage{orcidlink}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{footnote}
+\usepackage{xr}
+\usepackage{xspace}
+\usepackage{caption}
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{comment}
+
+\usepackage{color, colortbl}
+
+
+% % Import additional packages in the preamble file, before hyperref
+% \input{preamble}
+
+\newcommand{\cameramodel}{HumanFoV\xspace}
+\newcommand{\hpsmodel}{CameraHMR\xspace}
+\newcommand{\camsmplify}{CamSMPLify\xspace}
+
+\newcommand{\mesh}{\mathcal{M}}
+% It is strongly recommended to use hyperref, especially for the review version.
+% hyperref with option pagebackref eases the reviewers' job.
+% Please disable hyperref *only* if you encounter grave issues, 
+% e.g. with the file validation for the camera-ready version.
+%
+% If you comment hyperref and then uncomment it, you should delete *.aux before re-running LaTeX.
+% (Or just hit 'q' on the first LaTeX run, let it finish, and you should be clear).
+\definecolor{cvprblue}{rgb}{0.21,0.49,0.74}
+% \usepackage[pagebackref,breaklinks,colorlinks,citecolor=cvprblue]{hyperref}
+
+% %%%%%%%%% PAPER ID  - PLEASE UPDATE
+% \def\paperID{337} % *** Enter the Paper ID here
+% \def\confName{3DV\xspace}
+% \def\confYear{2025\xspace}
+
+%%%%%%%%% TITLE - PLEASE UPDATE
+\title{CameraHMR: Aligning People with Perspective }
+
+
+\author{
+    \begin{tabular}{c c}
+        Priyanka Patel\textsuperscript{1} & Michael J. Black \\
+        Meshcapade, Germany & Max Planck Institute for Intelligent Systems \\
+        \texttt{priyanka@meshcapade.com} & \texttt{black@tuebingen.mpg.de} \\
+    \end{tabular}
+}
+
+
+\begin{document}
+\twocolumn[
+{
+    \renewcommand\twocolumn[1][]{#1}
+   \maketitle
+   \thispagestyle{empty}
+    \vspace{-0.1in}
+    \centering
+    \begin{minipage}{1.00\textwidth}
+\centerline{\includegraphics[width=1.0\textwidth]{CameraHMR/images/teaser/teaser_3dv.pdf}}
+\vspace{-0.1in}
+\end{minipage}
+    \captionof{figure}{{\bf Putting people in perspective.}
+    In contrast to common methods like HMR2.0, {\bf \hpsmodel} estimates 3D human shape and pose using a \textit{perspective camera} by leveraging a learned regressor, \textbf{\cameramodel}, to estimate the appropriate camera intrinsics. Note how this improves the estimated pose when there is strong \textit{foreshortening}. Our approach exploits new pseudo ground-truth data and a new dense surface keypoint detector that improve body shape estimation; this is particularly visible for the heavier people in the images. \hpsmodel defines the new state-of-the-art for 3D human pose and shape accuracy from a single image.
+    }
+	\label{fig:teaser}
+     \vspace{2ex}
+
+}
+]
+\footnotetext[1]{This work was done when PP was at MPI-IS.}
+\input{sec/0_abstract}    
+\input{sec/1_intro}
+\input{sec/2_relatedwork}
+\input{sec/3_method}
+\input{sec/4_dataset}
+\input{sec/5_experiment}
+\input{sec/6_conclusion}
+
+{
+    \small
+    \bibliographystyle{ieeenat_fullname}
+    \bibliography{main}
+}
+\clearpage
+\input{sec/X_suppl}
+\end{document}

@@ -1,0 +1,128 @@
+\pdfoutput=1
+\documentclass[10pt,logo,copyright]{nvidiatechreport}
+\linespread{1.15}
+
+\input{packages}
+
+\newcommand{\FIGREF}[1]{Fig.~\ref{#1}} %
+\definecolor{darkred}{rgb}{0.7, 0.0, 0.0}
+\newcommand{\checkthis}[1]{\textcolor{darkred}{#1}}
+
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}} %
+\newcommand{\xmark}{\ding{55}} %
+\usepackage{wrapfig}
+
+\usepackage[nameinlink]{cleveref}
+\crefname{equation}{Eq.}{Eqs.}
+\crefname{figure}{Fig.}{Figs.}
+\crefname{section}{Sec.}{Sec.}
+\crefname{appendix}{App.}{App.}
+\crefname{table}{Tab.}{Tabs.}
+\crefname{algorithm}{Algo}{Algo}
+\crefname{thm}{Thm}{Thm}
+\Crefname{thm}{Thm}{Thm}
+\crefname{prop}{Prop}{Prop}
+\usepackage{longtable}
+
+\input{macros}
+
+
+\newcommand{\crefnames}[3]{%
+  \@for\next:=#1\do{%
+    \expandafter\crefname\expandafter{\next}{#2}{#3}%
+  }%
+}
+
+\title{Kimodo: Scaling Controllable Human Motion Generation}
+
+\begin{document}
+
+
+\author{
+    Davis Rempe$^\ast$,
+    Mathis Petrovich$^\ast$,
+    Ye Yuan,
+    Haotian Zhang,
+    Xue Bin Peng,
+    Yifeng Jiang,
+    Tingwu Wang,
+    Umar Iqbal, 
+    David Minor,
+    Michael de Ruyter,
+    Jiefeng Li,
+    Chen Tessler,
+    Edy Lim, 
+    Eugene Jeong, 
+    Sam Wu, 
+    Ehsan Hassani,
+    Michael Huang,
+    Jin-Bey Yu,
+    Chaeyeon Chung,
+    Lina Song, 
+    Olivier Dionne,
+    Jan Kautz,
+    Simon Yuen,
+    Sanja Fidler
+    \\
+	\small NVIDIA \\
+    \small$^\ast$ Co-First Authors \\
+    \small \tt{\href{\link}{\link}}
+}
+
+
+
+
+
+
+\maketitle
+\newcommand{\todo}[1]{\textcolor{red}{ [TODO: \textbf{#1}]}}
+\newcommand{\davis}[1]{\textcolor{green}{ [Davis: \textbf{#1}]}}
+\newcommand{\mathis}[1]{\textcolor{teal}{ [Mathis: \textbf{#1}]}}
+\newcommand{\jason}[1]{\textcolor{blue}{ [Jason: \textbf{#1}]}}
+
+\input{tex/00_abstract}
+\abscontent
+
+\input{tex/01_introduction}
+\input{tex/02_key_results}
+\input{tex/03_method}
+\input{tex/04_relwork}
+\input{tex/05_experiments}
+\input{tex/06_conclusion}
+
+
+
+\clearpage %
+
+
+
+
+
+
+
+\setcitestyle{numbers}
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\appendix
+\newpage
+\clearpage
+
+\section{Acknowledgments}
+We would like to thank John Malaska, Will Telford, Jon Shepard, and Anna Minx for helpful guidance throughout development. Thanks to Or Litany, Zhengyi Luo, Yeongho Seol, Jun Saito, and Michael Buttner for their insightful discussions on human motion. Thanks to Cyrus Hogg, Lindsey Pavao, Jenna Diamond, Rizwan Khan, Samantha Shinagawa, and Akanksha Shukla for their efforts on data acquisition and labeling. Thanks to Kaifeng Zhao and Sunmin Lee for research discussions and testing and feedback of the model and code.
+
+\section{Contributors}
+
+\begin{itemize}
+    \item \textbf{Project Lead}: Davis Rempe
+    \item \textbf{Model}: Mathis Petrovich, Davis Rempe, Ye Yuan, Haotian Zhang, Xue Bin (Jason) Peng, Yifeng Jiang, Tingwu Wang, Umar Iqbal, David Minor, Michael de Ruyter, Jiefeng Li, Chen Tessler
+    \item \textbf{Data}: Edy Lim, Eugene Jeong, Sam Wu, Ehsan Hassani, Michael Huang, Jin-Bey Yu, Chaeyeon Chung, Lina Song, Olivier Dionne
+    \item \textbf{Advising}: Sanja Fidler, Simon Yuen, Jan Kautz 
+\end{itemize}
+
+
+
+\end{document}

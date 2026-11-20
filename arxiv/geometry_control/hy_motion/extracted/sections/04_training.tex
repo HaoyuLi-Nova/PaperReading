@@ -1,0 +1,84 @@
+\section{Model Training}
+\label{sec:training}
+
+The training process for HY-Motion DiT consists of three stages: large-scale pretraining, high-quality fine-tuning, and reinforcement learning. 
+To reconcile the trade-off between generalization (requiring massive scale) and precision (requiring high-quality data), we implement a ``scale-then-refine'' curriculum for the supervised training phases (\cref{subsec:stage1} and \cref{subsec:stage2}).
+We begin with large-scale pretraining on an expansive dataset comprising over $3,000$ hours of motion data, enabling the model to assimilate a broad motion prior and learn a generalized representation of human movement.
+This is followed by a high-quality fine-tuning stage on nearly $400$ hours of meticulously curated and annotated data, which serves to sharpen the model's capabilities and refine the details of the generation.
+While these supervised stages effectively model the underlying data distribution, strictly imitating the training distribution does not necessarily maximize perceptual quality or semantic responsiveness.
+Therefore, we introduce a final reinforcement learning phase (\cref{subsec:stage3}) to bridge the gap between ``statistical likelihood'' and ``human preference''.
+By incorporating feedback from reward models, this stage fine-tunes the model to optimize for perceptual motion quality and maximize adherence to complex user instructions—metrics that are often difficult to capture through supervised loss functions alone.
+
+
+
+\subsection{Large-Scale Pretraining}
+\label{subsec:stage1}
+
+The primary objective of this foundational stage is general motion prior acquisition.
+To maximize the model's exposure to diverse semantic scenarios and kinematic patterns, we train the model on our full motion dataset $\mathcal{D}_{\text{all}}$ consisting of over $3,000$ hours of motion data. 
+This dataset prioritizes coverage over precision, comprising both high-quality captures and noisy, in-the-wild video extractions, accompanied by text descriptions ranging from manual annotations to VLM-generated annotations.
+In this phase, we employ a standard Flow Matching objective (\cref{eq:flow_matching}) with a constant learning rate $\eta_{\text{pre}}$, aiming to rapidly establish a broad support for the motion distribution.
+
+From a distributional perspective, this stage allows the model to effectively ``learn to move''.
+We observe a rapid convergence in training loss, indicating that the model successfully captures the fundamental dynamics of human movement and establishes a robust mapping between diverse textual prompts and plausible poses.
+The model demonstrates strong semantic generalization, capable of responding to a vast vocabulary of actions.
+However, the generated motion quality inevitably mirrors the mixed nature of the input distribution.
+Since a significant portion of $\mathcal{D}_{\text{all}}$ contains noisy data, the model's output distribution remains high-entropy and loosely constrained.
+Consequently, while semantically correct, the generated sequences often exhibit artifacts such as high-frequency jitter, foot sliding, and minor anatomical inconsistencies.
+We treat this result as an expected outcome: the model has successfully learned a generalized but coarse prior, providing a semantic-rich initialization that is ready to be "sharpened" in the subsequent fine-tuning stage.
+
+\subsection{High-Quality Fine-Tuning}
+\label{subsec:stage2}
+
+Following the broad acquisition of motion priors, the second stage focuses on distribution refinement.
+To bridge the gap between ``plausible'' and ``high-quality'', we transition the training source to the meticulously curated subset $\mathcal{D}_{\text{HQ}}$.
+This dataset is characterized by high-quality, rigorously filtered motion data, paired with manually corrected textual descriptions.
+The objective here is to concentrate the model's probability density around the optimal modes of the motion manifold.
+Crucially, to refine fine-grained kinematic details while preventing the forgetting of the broad semantic priors learned in \cref{subsec:stage1}, we decay the learning rate to $\eta_{\text{ft}} = 0.1 \times \eta_{\text{pre}}$. 
+This conservative optimization strategy ensures that the model polishes its output distribution without collapsing its generative diversity.
+
+Empirically, this phase drives a qualitative evolution from ``roughly correct'' to ``precise and smooth''.
+Kinematically, we observe that the model effectively suppresses the noise patterns inherited from the pretraining phase, drastically reducing high-frequency jitter and foot sliding artifacts while enforcing stricter anatomical consistency.
+Semantically, the alignment becomes significantly more rigorous; the model demonstrates enhanced sensitivity to fine-grained anatomical instructions—such as accurately distinguishing between ``waving the left hand'' and ``waving the right hand''—which were often ambiguous in the noisy pretraining data.
+Importantly, this sharpening of quality and control is achieved without a significant degradation in motion diversity, validating the efficacy of our coarse-to-fine curriculum.
+
+
+\subsection{Reinforcement Learning}
+\label{subsec:stage3}
+
+While supervised learning establishes a strong kinematic prior, optimizing for data likelihood does not strictly equate to maximizing perceptual fidelity or instruction adherence.
+Generative models often suffer from a misalignment gap where statistically probable motions may still exhibit physical artifacts or semantic ambiguity.
+To bridge this gap, we propose a synergistic two-phase reinforcement learning, progressing from human preference learning to explicit objective constraint satisfaction.
+
+\paragraph{Human Preference Alignment via DPO.}
+We first aim to internalize the nuanced standards of human perception.
+Since defining a closed-form reward function for complex semantic alignment and motion quality is intractable, we leverage Direct Preference Optimization (DPO)~\citep{Rafailov2023} to steer the policy directly from human feedback.
+We utilize the Stage-2 model to generate candidate pairs for a diverse prompt set.
+From an annotated pool of $40,000$ pairs, we curate a high-information subset of $9,228$ pairs where human judges identified a distinct ``winner''($\bm{x}_w$) and ``loser''($\bm{x}_l$) based on instruction adherence and visual plausibility.
+By maximizing the likelihood margin between these pairs, DPO implicitly models the latent reward function of human perception:
+\begin{equation}
+    \mathcal{L}_{\text{DPO}}(\pi_{\bm{\theta}};\pi_{\text{ref}}) = - \mathbb{E}_{(\bm{c}, \bm{x}_w, \bm{x}_l) \sim \mathcal{D}_{\text{pref}}} \left[ \log \sigma \left( \beta \log \frac{\pi_{\bm{\theta}}(\bm{x}_w|\bm{c})}{\pi_{\text{ref}}(\bm{x}_w|\bm{c})} - \beta \log \frac{\pi_{\bm{\theta}}(\bm{x}_l|\bm{c})}{\pi_{\text{ref}}(\bm{x}_l|\bm{c})} \right) \right],
+\end{equation}
+where $\pi_{\text{ref}}$ represents the frozen reference policy, and $\mathcal{D}_{\text{pref}}=\{(\bm{c}^i, \bm{x}_w^i, \bm{x}_l^i)\}_{i=1}^N$.
+This phase effectively acts as a semantic anchor, drastically improving the model's ``Pass Rate'' by pruning low-quality modes that, while kinetically valid, fail to align with user intent.
+
+\paragraph{Physics \& Semantic Refinement via Flow-GRPO.}
+Building upon the preference-aligned policy, we address the limitations of DPO in enforcing strict physical and semantic boundaries.
+We employ Flow-GRPO~\citep{Liu2025}, a variant of Group Relative Policy Optimization tailored for flow matching models, to optimize explicit objectives.
+Unlike standard PPO which requires a value network, Flow-GRPO stabilizes training by normalizing advantages within a group of sampled outputs for a given prompt.
+We maximize the following objective:
+\begin{equation}
+    \mathcal{L}_{\text{Flow-GRPO}}(\pi_{\bm{\theta}};\pi_{\text{ref}}) = \mathbb{E}_{\bm{c} \sim \mathcal{D}_\text{GRPO}, \{\bm{x}^i\}_{i=1}^G \sim \pi_{\text{ref}}(\cdot| \bm{c})} \left[ f(r,\hat{A},\bm{\theta}, \epsilon,\beta) \right],
+\end{equation}
+where the objective function $f$ is averaged over time steps $T$:
+\begin{equation}
+    \begin{aligned}
+        f(r,\hat{A},\bm{\theta}, \epsilon,\beta) &= \frac{1}{G}\sum_{i=1}^G \frac{1}{T} \sum_{t=1}^T \Big( \min \big( r_t^i(\bm{\theta})\hat{A}^i, \text{clip}(r_t^i(\bm{\theta}), 1-\epsilon, 1+\epsilon)\hat{A}^i \big) \\
+        & \qquad - \beta D_{\text{KL}}(\pi_{\bm{\theta}} \| \pi_{\text{ref}}) \Big), \
+        \text{with}\quad r_t^i(\bm{\theta}) = \frac{p_{\bm{\theta}}(\bm{x}_{t-1}^i|\bm{x}_{t}^i,\bm{c})}{p_{\text{ref}}(\bm{x}_{t-1}^i|\bm{x}_{t}^i,\bm{c})}.
+    \end{aligned}
+\end{equation}
+Here, $\mathcal{D}_\text{GRPO}$ denotes the prompt dataset used for GRPO, $G$ denotes the group size, and $\hat{A}^i$ is the standardized advantage derived from the composite reward $R(\bm{x}^i, \bm{c})$.
+Specifically, the reward function integrates two critical metrics:
+a semantic reward ($R_{\text{sem}}$)  evaluated by a custom-trained Text-Motion Retrieval (TMR) model \cite{petrovich2023tmr}, and a physical reward ($R_{\text{phy}}$) that imposes hard penalties on artifacts such as foot sliding and root drift.
+By explicitly optimizing this objective, the model is fine-tuned to satisfy rigorous kinematic constraints while maximizing semantic precision.

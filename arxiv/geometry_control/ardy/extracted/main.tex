@@ -1,0 +1,136 @@
+\documentclass[acmtog]{acmart}
+\acmSubmissionID{159}
+
+\usepackage{booktabs} %
+
+\citestyle{acmauthoryear}
+
+\input{preamble}
+
+\usepackage[ruled]{algorithm2e} %
+\renewcommand{\algorithmcfname}{ALGORITHM}
+\SetAlFnt{\small}
+\SetAlCapFnt{\small}
+\SetAlCapNameFnt{\small}
+\SetAlCapHSkip{0pt}
+
+\input{siggraph_preamble}
+
+\acmJournal{TOG}
+\acmVolume{45}
+\acmNumber{4}
+\acmArticle{86}
+\acmYear{2026}
+\acmMonth{7}
+
+
+\setcopyright{cc}
+\setcctype{by}
+\acmJournal{TOG}
+\acmYear{2026} \acmVolume{45} \acmNumber{4} \acmArticle{86}
+\acmMonth{7} \acmDOI{10.1145/3811284}
+
+
+
+
+\begin{document}
+\title{ARDY: Autoregressive Diffusion with Hybrid Representation for Interactive Human Motion Generation}
+
+\author{Kaifeng Zhao}
+\orcid{0000-0002-7278-3329}
+\email{kaifeng.zhao@inf.ethz.ch}
+\affiliation{%
+  \institution{NVIDIA}
+  \country{Switzerland}
+}
+\affiliation{%
+  \institution{ETH Zürich}
+  \country{Switzerland}
+}
+
+\author{Mathis Petrovich}
+\orcid{0000-0002-0859-1170}
+\email{mpetrovich@nvidia.com}
+\affiliation{%
+  \institution{NVIDIA}
+  \country{Switzerland}
+}
+
+\author{Haotian Zhang}
+\orcid{0009-0008-0293-337X}
+\email{haotianz@nvidia.com}
+\affiliation{%
+  \institution{NVIDIA}
+  \country{USA}
+}
+
+\author{Tingwu Wang}
+\orcid{0000-0003-2006-0660}
+\email{tingwuw@nvidia.com}
+\affiliation{%
+  \institution{NVIDIA}
+  \country{USA}
+}
+
+\author{Siyu Tang}
+\orcid{0000-0002-1015-4770}
+\email{siyu.tang@inf.ethz.ch}
+\affiliation{%
+  \institution{ETH Zürich}
+  \country{Switzerland}
+}
+
+\author{Davis Rempe}
+\orcid{0000-0003-2256-5507}
+\email{drempe@nvidia.com}
+\affiliation{%
+  \institution{NVIDIA}
+  \country{USA}
+}
+
+\renewcommand\shortauthors{Zhao et al.}
+
+
+\input{sec/0_abstract}
+
+
+
+\begin{CCSXML}
+<ccs2012>
+   <concept>
+       <concept_id>10010147.10010371.10010352.10010380</concept_id>
+       <concept_desc>Computing methodologies~Motion processing</concept_desc>
+       <concept_significance>500</concept_significance>
+       </concept>
+ </ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Computing methodologies~Motion processing}
+
+
+
+
+\begin{teaserfigure}
+    \centering
+    \includegraphics[trim={0pt 0pt 0pt 0pt}, clip,width=\linewidth]{figures/teaser_v2.pdf}
+    \caption{We present \textbf{\method}, an autoregressive diffusion model designed for interactive human motion generation. Our approach natively supports online text prompting alongside a comprehensive suite of flexible kinematic constraints — including root waypoints and trajectories, full-body keyframes, and sparse joint positions and rotations — over long horizons. \method enables controllable and responsive interactive motion synthesis from real-time user inputs such as mouse and keyboard commands, with our efficient 4-step diffusion model achieving an average generation latency of 33~ms.
+    }
+\label{fig:teaser}
+\end{teaserfigure}
+
+\maketitle
+
+
+
+\input{sec/1_intro}
+\input{sec/2_relwork}
+\input{sec/3_method}
+\input{sec/4_experiments}
+\input{sec/5_discussion}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{main}
+
+\input{sec/X_suppl}
+
+\end{document}

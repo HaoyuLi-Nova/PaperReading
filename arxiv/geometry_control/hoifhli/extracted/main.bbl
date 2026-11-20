@@ -1,0 +1,375 @@
+\begin{thebibliography}{74}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Aguina-Kang et~al.(2024)Aguina-Kang, Gumin, Han, Morris, Yoo, Ganeshan, Jones, Wei, Fu, and Ritchie]{aguina2024open}
+Rio Aguina-Kang, Maxim Gumin, Do~Heon Han, Stewart Morris, Seung~Jean Yoo, Aditya Ganeshan, R~Kenny Jones, Qiuhong~Anna Wei, Kailiang Fu, and Daniel Ritchie.
+\newblock Open-universe indoor scene generation using llm program synthesis and uncurated object databases.
+\newblock \emph{arXiv preprint arXiv:2403.09675}, 2024.
+
+\bibitem[Araujo et~al.(2023)Araujo, Li, Vetrivel, Agarwal, Gopinath, Wu, Clegg, and Liu]{araujo2023circle}
+Joao~Pedro Araujo, Jiaman Li, Karthik Vetrivel, Rishi Agarwal, Deepak Gopinath, Jiajun Wu, Alexander Clegg, and C~Karen Liu.
+\newblock Circle: Capture in rich contextual environments.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, 2023.
+
+\bibitem[Brahmbhatt et~al.(2019)Brahmbhatt, Handa, Hays, and Fox]{brahmbhatt2019contactgrasp}
+Samarth Brahmbhatt, Ankur Handa, James Hays, and Dieter Fox.
+\newblock Contactgrasp: Functional multi-finger grasp synthesis from contact.
+\newblock In \emph{2019 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)}, pages 2386--2393. IEEE, 2019.
+
+\bibitem[Braun et~al.(2023)Braun, Christen, Kocabas, Aksan, and Hilliges]{braun2023physically}
+Jona Braun, Sammy Christen, Muhammed Kocabas, Emre Aksan, and Otmar Hilliges.
+\newblock Physically plausible full-body hand-object interaction synthesis.
+\newblock \emph{arXiv preprint arXiv:2309.07907}, 2023.
+
+\bibitem[Christen et~al.(2024)Christen, Hampali, Sener, Remelli, Hodan, Sauser, Ma, and Tekin]{christen2024diffh2o}
+Sammy Christen, Shreyas Hampali, Fadime Sener, Edoardo Remelli, Tomas Hodan, Eric Sauser, Shugao Ma, and Bugra Tekin.
+\newblock Diffh2o: Diffusion-based synthesis of hand-object interactions from textual descriptions.
+\newblock \emph{arXiv preprint arXiv:2403.17827}, 2024.
+
+\bibitem[Diller and Dai(2023)]{diller2023cg}
+Christian Diller and Angela Dai.
+\newblock Cg-hoi: Contact-guided 3d human-object interaction generation.
+\newblock \emph{arXiv preprint arXiv:2311.16097}, 2023.
+
+\bibitem[Ding et~al.(2023)Ding, Zhang, Paxton, and Zhang]{ding2023task}
+Yan Ding, Xiaohan Zhang, Chris Paxton, and Shiqi Zhang.
+\newblock Task and motion planning with large language models for object rearrangement.
+\newblock In \emph{2023 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)}, pages 2086--2092. IEEE, 2023.
+
+\bibitem[Fan et~al.(2023)Fan, Taheri, Tzionas, Kocabas, Kaufmann, Black, and Hilliges]{fan2023arctic}
+Zicong Fan, Omid Taheri, Dimitrios Tzionas, Muhammed Kocabas, Manuel Kaufmann, Michael~J. Black, and Otmar Hilliges.
+\newblock {ARCTIC}: A dataset for dexterous bimanual hand-object manipulation.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, 2023.
+
+\bibitem[Ghosh et~al.(2023{\natexlab{a}})Ghosh, Dabral, Golyanik, Theobalt, and Slusallek]{ghosh2022imos}
+Anindita Ghosh, Rishabh Dabral, Vladislav Golyanik, Christian Theobalt, and Philipp Slusallek.
+\newblock Imos: Intent-driven full-body motion synthesis for human-object interactions.
+\newblock In \emph{Eurographics}, 2023{\natexlab{a}}.
+
+\bibitem[Ghosh et~al.(2023{\natexlab{b}})Ghosh, Dabral, Golyanik, Theobalt, and Slusallek]{ghosh2023imos}
+Anindita Ghosh, Rishabh Dabral, Vladislav Golyanik, Christian Theobalt, and Philipp Slusallek.
+\newblock Imos: Intent-driven full-body motion synthesis for human-object interactions.
+\newblock In \emph{Computer Graphics Forum}, pages 1--12. Wiley Online Library, 2023{\natexlab{b}}.
+
+\bibitem[Grady et~al.(2021)Grady, Tang, Twigg, Vo, Brahmbhatt, and Kemp]{grady2021contactopt}
+Patrick Grady, Chengcheng Tang, Christopher~D Twigg, Minh Vo, Samarth Brahmbhatt, and Charles~C Kemp.
+\newblock Contactopt: Optimizing contact to improve grasps.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, pages 1471--1481, 2021.
+
+\bibitem[Guo et~al.(2022)Guo, Zou, Zuo, Wang, Ji, Li, and Cheng]{guo2022generating}
+Chuan Guo, Shihao Zou, Xinxin Zuo, Sen Wang, Wei Ji, Xingyu Li, and Li Cheng.
+\newblock Generating diverse and natural 3d human motions from text.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, pages 5152--5161, 2022.
+
+\bibitem[Hassan et~al.(2019)Hassan, Choutas, Tzionas, and Black]{prox}
+Mohamed Hassan, Vasileios Choutas, Dimitrios Tzionas, and Michael~J Black.
+\newblock Resolving 3d human pose ambiguities with 3d scene constraints.
+\newblock In \emph{International Conference on Computer Vision (ICCV)}, pages 2282--2292, 2019.
+
+\bibitem[Hassan et~al.(2021)Hassan, Ceylan, Villegas, Saito, Yang, Zhou, and Black]{hassan_samp_2021}
+Mohamed Hassan, Duygu Ceylan, Ruben Villegas, Jun Saito, Jimei Yang, Yi Zhou, and Michael Black.
+\newblock Stochastic scene-aware motion prediction.
+\newblock In \emph{International Conference on Computer Vision (ICCV)}, pages 11354--11364, 2021.
+
+\bibitem[Hassan et~al.(2023)Hassan, Guo, Wang, Black, Fidler, and Peng]{hassan2023synthesizing}
+Mohamed Hassan, Yunrong Guo, Tingwu Wang, Michael Black, Sanja Fidler, and Xue~Bin Peng.
+\newblock Synthesizing physical character-scene interactions.
+\newblock In \emph{SIGGRAPH 2023 Conference Papers}, 2023.
+
+\bibitem[Hong et~al.(2023)Hong, Zhen, Chen, Zheng, Du, Chen, and Gan]{hong20233d}
+Yining Hong, Haoyu Zhen, Peihao Chen, Shuhong Zheng, Yilun Du, Zhenfang Chen, and Chuang Gan.
+\newblock 3d-llm: Injecting the 3d world into large language models.
+\newblock \emph{Advances in Neural Information Processing Systems}, 36:\penalty0 20482--20494, 2023.
+
+\bibitem[Hu et~al.(2023)Hu, Lin, Zhang, Yi, and Gao]{hu2023look}
+Yingdong Hu, Fanqi Lin, Tong Zhang, Li Yi, and Yang Gao.
+\newblock Look before you leap: Unveiling the power of gpt-4v in robotic vision-language planning.
+\newblock \emph{arXiv preprint arXiv:2311.17842}, 2023.
+
+\bibitem[Huang et~al.(2023)Huang, Wang, Li, Jia, Liu, Zhu, Liang, and Zhu]{huang2023diffusion}
+Siyuan Huang, Zan Wang, Puhao Li, Baoxiong Jia, Tengyu Liu, Yixin Zhu, Wei Liang, and Song-Chun Zhu.
+\newblock Diffusion-based generation, optimization, and planning in 3d scenes.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, 2023.
+
+\bibitem[Jiang et~al.(2021)Jiang, Liu, Wang, and Wang]{jiang2021hand}
+Hanwen Jiang, Shaowei Liu, Jiashun Wang, and Xiaolong Wang.
+\newblock Hand-object contact consistency reasoning for human grasps generation.
+\newblock In \emph{Proceedings of the IEEE/CVF international conference on computer vision}, pages 11107--11116, 2021.
+
+\bibitem[Jiang et~al.(2024{\natexlab{a}})Jiang, He, Wang, Li, Chen, Huang, and Zhu]{jiang2024autonomous}
+Nan Jiang, Zimo He, Zi Wang, Hongjie Li, Yixin Chen, Siyuan Huang, and Yixin Zhu.
+\newblock Autonomous character-scene interaction synthesis from text instruction.
+\newblock \emph{arXiv preprint arXiv:2410.03187}, 2024{\natexlab{a}}.
+
+\bibitem[Jiang et~al.(2024{\natexlab{b}})Jiang, Zhang, Li, Ma, Wang, Chen, Liu, Zhu, and Huang]{jiang2024scaling}
+Nan Jiang, Zhiyuan Zhang, Hongjie Li, Xiaoxuan Ma, Zan Wang, Yixin Chen, Tengyu Liu, Yixin Zhu, and Siyuan Huang.
+\newblock Scaling up dynamic human-scene interaction modeling.
+\newblock \emph{arXiv preprint arXiv:2403.08629}, 2024{\natexlab{b}}.
+
+\bibitem[Johnson et~al.(2015)Johnson, Krishna, Stark, Li, Shamma, Bernstein, and Fei-Fei]{johnson2015image}
+Justin Johnson, Ranjay Krishna, Michael Stark, Li-Jia Li, David Shamma, Michael Bernstein, and Li Fei-Fei.
+\newblock Image retrieval using scene graphs.
+\newblock In \emph{Proceedings of the IEEE conference on computer vision and pattern recognition}, pages 3668--3678, 2015.
+
+\bibitem[Karunratanakul et~al.(2020)Karunratanakul, Yang, Zhang, Black, Muandet, and Tang]{karunratanakul2020grasping}
+Korrawe Karunratanakul, Jinlong Yang, Yan Zhang, Michael~J Black, Krikamol Muandet, and Siyu Tang.
+\newblock Grasping field: Learning implicit representations for human grasps.
+\newblock In \emph{2020 International Conference on 3D Vision (3DV)}, pages 333--344. IEEE, 2020.
+
+\bibitem[Kingma and Ba(2015)]{kingma2014adam}
+Diederik~P Kingma and Jimmy Ba.
+\newblock Adam: A method for stochastic optimization.
+\newblock In \emph{International Conference on Learning Representations (ICLR)}, 2015.
+
+\bibitem[Li et~al.(2023{\natexlab{a}})Li, Clegg, Mottaghi, Wu, Puig, and Liu]{li2023controllable}
+Jiaman Li, Alexander Clegg, Roozbeh Mottaghi, Jiajun Wu, Xavier Puig, and C~Karen Liu.
+\newblock Controllable human-object interaction synthesis.
+\newblock \emph{arXiv preprint arXiv:2312.03913}, 2023{\natexlab{a}}.
+
+\bibitem[Li et~al.(2023{\natexlab{b}})Li, Wu, and Liu]{li2023object}
+Jiaman Li, Jiajun Wu, and C~Karen Liu.
+\newblock Object motion guided human motion synthesis.
+\newblock \emph{ACM Trans. Graph.}, 42\penalty0 (6), 2023{\natexlab{b}}.
+
+\bibitem[Li et~al.(2024)Li, Wang, Loy, and Dai]{li2024task}
+Quanzhou Li, Jingbo Wang, Chen~Change Loy, and Bo Dai.
+\newblock Task-oriented human-object interactions generation with implicit neural representations.
+\newblock In \emph{Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision}, pages 3035--3044, 2024.
+
+\bibitem[Li et~al.(2007)Li, Fu, and Pollard]{li2007data}
+Ying Li, Jiaxin~L Fu, and Nancy~S Pollard.
+\newblock Data-driven grasp synthesis using shape matching and task-based pruning.
+\newblock \emph{IEEE Transactions on Visualization and Computer Graphics}, 13\penalty0 (4):\penalty0 732--747, 2007.
+
+\bibitem[Liu et~al.(2024)Liu, Li, Wu, and Lee]{liu2024visual}
+Haotian Liu, Chunyuan Li, Qingyang Wu, and Yong~Jae Lee.
+\newblock Visual instruction tuning.
+\newblock \emph{Advances in neural information processing systems}, 36, 2024.
+
+\bibitem[Liu and Hodgins(2018)]{liu2018learning}
+Libin Liu and Jessica Hodgins.
+\newblock Learning basketball dribbling skills using trajectory optimization and deep reinforcement learning.
+\newblock \emph{ACM Transactions on Graphics (TOG)}, 37\penalty0 (4):\penalty0 1--14, 2018.
+
+\bibitem[Liu and Yi(2024)]{liu2024geneoh}
+Xueyi Liu and Li Yi.
+\newblock Geneoh diffusion: Towards generalizable hand-object interaction denoising via denoising diffusion.
+\newblock \emph{arXiv preprint arXiv:2402.14810}, 2024.
+
+\bibitem[Luo et~al.(2024)Luo, Cao, Christen, Winkler, Kitani, and Xu]{luo2024grasping}
+Zhengyi Luo, Jinkun Cao, Sammy Christen, Alexander Winkler, Kris Kitani, and Weipeng Xu.
+\newblock Grasping diverse objects with simulated humanoids.
+\newblock \emph{arXiv preprint arXiv:2407.11385}, 2024.
+
+\bibitem[Makoviychuk et~al.(2021)Makoviychuk, Wawrzyniak, Guo, Lu, Storey, Macklin, Hoeller, Rudin, Allshire, Handa, and State]{makoviychuk2021isaac}
+Viktor Makoviychuk, Lukasz Wawrzyniak, Yunrong Guo, Michelle Lu, Kier Storey, Miles Macklin, David Hoeller, Nikita Rudin, Arthur Allshire, Ankur Handa, and Gavriel State.
+\newblock Isaac gym: High performance gpu-based physics simulation for robot learning, 2021.
+
+\bibitem[Mir et~al.(2023)Mir, Puig, Kanazawa, and Pons-Moll]{mir2023generating}
+Aymen Mir, Xavier Puig, Angjoo Kanazawa, and Gerard Pons-Moll.
+\newblock Generating continual human motion in diverse 3d scenes.
+\newblock \emph{arXiv preprint arXiv:2304.02061}, 2023.
+
+\bibitem[OpenAI(2024)]{gpt4o}
+OpenAI.
+\newblock Hello gpt-4o, 2024.
+
+\bibitem[OpenAI(2023)]{openai2023gpt}
+R OpenAI.
+\newblock Gpt-4 technical report. arxiv 2303.08774.
+\newblock \emph{View in Article}, 2\penalty0 (5), 2023.
+
+\bibitem[Pavlakos et~al.(2019)Pavlakos, Choutas, Ghorbani, Bolkart, Osman, Tzionas, and Black]{smplx}
+Georgios Pavlakos, Vasileios Choutas, Nima Ghorbani, Timo Bolkart, Ahmed A.~A. Osman, Dimitrios Tzionas, and Michael~J. Black.
+\newblock Expressive body capture: 3d hands, face, and body from a single image.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, pages 10975--10985, 2019.
+
+\bibitem[Peng et~al.(2023)Peng, Xie, Wu, Jampani, Sun, and Jiang]{peng2023hoi}
+Xiaogang Peng, Yiming Xie, Zizhao Wu, Varun Jampani, Deqing Sun, and Huaizu Jiang.
+\newblock Hoi-diff: Text-driven synthesis of 3d human-object interactions using diffusion models.
+\newblock \emph{arXiv preprint arXiv:2312.06553}, 2023.
+
+\bibitem[Peng et~al.(2018)Peng, Abbeel, Levine, and Van~de Panne]{peng2018deepmimic}
+Xue~Bin Peng, Pieter Abbeel, Sergey Levine, and Michiel Van~de Panne.
+\newblock Deepmimic: Example-guided deep reinforcement learning of physics-based character skills.
+\newblock \emph{ACM Transactions On Graphics (TOG)}, 37\penalty0 (4):\penalty0 1--14, 2018.
+
+\bibitem[Peng et~al.(2021)Peng, Ma, Abbeel, Levine, and Kanazawa]{peng2021amp}
+Xue~Bin Peng, Ze Ma, Pieter Abbeel, Sergey Levine, and Angjoo Kanazawa.
+\newblock Amp: Adversarial motion priors for stylized physics-based character control.
+\newblock \emph{ACM Transactions on Graphics (TOG)}, 40\penalty0 (4):\penalty0 1--20, 2021.
+
+\bibitem[Pollard and Zordan(2005)]{pollard2005physically}
+Nancy~S Pollard and Victor~Brian Zordan.
+\newblock Physically based grasping control from example.
+\newblock In \emph{Proceedings of the 2005 ACM SIGGRAPH/Eurographics symposium on Computer animation}, pages 311--318, 2005.
+
+\bibitem[Prokudin et~al.(2019)Prokudin, Lassner, and Romero]{prokudin2019efficient}
+Sergey Prokudin, Christoph Lassner, and Javier Romero.
+\newblock Efficient learning on point clouds with basis point sets.
+\newblock In \emph{International Conference on Computer Vision (ICCV)}, pages 4332--4341, 2019.
+
+\bibitem[Radford et~al.(2021)Radford, Kim, Hallacy, Ramesh, Goh, Agarwal, Sastry, Askell, Mishkin, Clark, et~al.]{radford2021learning}
+Alec Radford, Jong~Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et~al.
+\newblock Learning transferable visual models from natural language supervision.
+\newblock In \emph{International conference on machine learning}, pages 8748--8763. PMLR, 2021.
+
+\bibitem[Rodriguez et~al.(2012)Rodriguez, Mason, and Ferry]{rodriguez2012caging}
+Alberto Rodriguez, Matthew~T Mason, and Steve Ferry.
+\newblock From caging to grasping.
+\newblock \emph{The International Journal of Robotics Research}, 31\penalty0 (7):\penalty0 886--900, 2012.
+
+\bibitem[Schulman et~al.(2017)Schulman, Wolski, Dhariwal, Radford, and Klimov]{schulman2017proximal}
+John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov.
+\newblock Proximal policy optimization algorithms, 2017.
+
+\bibitem[Taheri et~al.(2020)Taheri, Ghorbani, Black, and Tzionas]{GRAB:2020}
+Omid Taheri, Nima Ghorbani, Michael~J. Black, and Dimitrios Tzionas.
+\newblock {GRAB}: A dataset of whole-body human grasping of objects.
+\newblock In \emph{European Conference on Computer Vision (ECCV)}, 2020.
+
+\bibitem[Taheri et~al.(2022)Taheri, Choutas, Black, and Tzionas]{taheri2022goal}
+Omid Taheri, Vasileios Choutas, Michael~J Black, and Dimitrios Tzionas.
+\newblock Goal: Generating 4d whole-body motion for hand-object grasping.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, pages 13263--13273, 2022.
+
+\bibitem[Taheri et~al.(2023)Taheri, Zhou, Tzionas, Zhou, Ceylan, Pirk, and Black]{taheri2023grip}
+Omid Taheri, Yi Zhou, Dimitrios Tzionas, Yang Zhou, Duygu Ceylan, Soren Pirk, and Michael~J Black.
+\newblock Grip: Generating interaction poses using latent consistency and spatial cues.
+\newblock \emph{arXiv preprint arXiv:2308.11617}, 2023.
+
+\bibitem[Tendulkar et~al.(2023)Tendulkar, Sur{\'\i}s, and Vondrick]{tendulkar2023flex}
+Purva Tendulkar, D{\'\i}dac Sur{\'\i}s, and Carl Vondrick.
+\newblock Flex: Full-body grasping without full-body grasps.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, pages 21179--21189, 2023.
+
+\bibitem[Wake et~al.(2023)Wake, Kanehira, Sasabuchi, Takamatsu, and Ikeuchi]{wake2023gpt}
+Naoki Wake, Atsushi Kanehira, Kazuhiro Sasabuchi, Jun Takamatsu, and Katsushi Ikeuchi.
+\newblock Gpt-4v (ision) for robotics: Multimodal task planning from human demonstration.
+\newblock \emph{arXiv preprint arXiv:2311.12015}, 2023.
+
+\bibitem[Wang et~al.(2021)Wang, Xu, Xu, Liu, and Wang]{wang2021synthesizing}
+Jiashun Wang, Huazhe Xu, Jingwei Xu, Sifei Liu, and Xiaolong Wang.
+\newblock Synthesizing long-term 3d human motion and interaction in 3d scenes.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, pages 9401--9411, 2021.
+
+\bibitem[Wang et~al.(2022{\natexlab{a}})Wang, Rong, Liu, Yan, Lin, and Dai]{wang2022towards}
+Jingbo Wang, Yu Rong, Jingyuan Liu, Sijie Yan, Dahua Lin, and Bo Dai.
+\newblock Towards diverse and natural scene-aware 3d human motion synthesis.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, pages 20460--20469, 2022{\natexlab{a}}.
+
+\bibitem[Wang et~al.(2023{\natexlab{a}})Wang, Zhang, Chen, Xu, Li, Liu, and Wang]{wang2023dexgraspnet}
+Ruicheng Wang, Jialiang Zhang, Jiayi Chen, Yinzhen Xu, Puhao Li, Tengyu Liu, and He Wang.
+\newblock Dexgraspnet: A large-scale robotic dexterous grasp dataset for general objects based on simulation.
+\newblock In \emph{2023 IEEE International Conference on Robotics and Automation (ICRA)}, pages 11359--11366. IEEE, 2023{\natexlab{a}}.
+
+\bibitem[Wang et~al.(2024{\natexlab{a}})Wang, Xu, Shi, Schumann, and Liu]{wang2024f}
+Ruocheng Wang, Pei Xu, Haochen Shi, Elizabeth Schumann, and C~Karen Liu.
+\newblock F$\backslash$" urelise: Capturing and physically synthesizing hand motions of piano performance.
+\newblock \emph{arXiv preprint arXiv:2410.05791}, 2024{\natexlab{a}}.
+
+\bibitem[Wang et~al.(2023{\natexlab{b}})Wang, Lin, Zeng, Luo, Zhang, and Zhang]{wang2023physhoi}
+Yinhuai Wang, Jing Lin, Ailing Zeng, Zhengyi Luo, Jian Zhang, and Lei Zhang.
+\newblock Physhoi: Physics-based imitation of dynamic human-object interaction.
+\newblock \emph{arXiv preprint arXiv:2312.04393}, 2023{\natexlab{b}}.
+
+\bibitem[Wang et~al.(2022{\natexlab{b}})Wang, Chen, Liu, Zhu, Liang, and Huang]{wang2022humanise}
+Zan Wang, Yixin Chen, Tengyu Liu, Yixin Zhu, Wei Liang, and Siyuan Huang.
+\newblock Humanise: Language-conditioned human motion generation in 3d scenes.
+\newblock In \emph{Advances in Neural Information Processing Systems (NeurIPS)}, 2022{\natexlab{b}}.
+
+\bibitem[Wang et~al.(2024{\natexlab{b}})Wang, Chen, Jia, Li, Zhang, Zhang, Liu, Zhu, Liang, and Huang]{wang2024move}
+Zan Wang, Yixin Chen, Baoxiong Jia, Puhao Li, Jinlu Zhang, Jingze Zhang, Tengyu Liu, Yixin Zhu, Wei Liang, and Siyuan Huang.
+\newblock Move as you say, interact as you can: Language-guided human motion generation with scene affordance.
+\newblock \emph{arXiv preprint arXiv:2403.18036}, 2024{\natexlab{b}}.
+
+\bibitem[Wu et~al.(2024)Wu, Shi, Huang, Yu, Xu, and Wang]{wu2024thor}
+Qianyang Wu, Ye Shi, Xiaoshui Huang, Jingyi Yu, Lan Xu, and Jingya Wang.
+\newblock Thor: Text to human-object interaction diffusion via relation intervention.
+\newblock \emph{arXiv preprint arXiv:2403.11208}, 2024.
+
+\bibitem[Wu et~al.(2022)Wu, Wang, Zhang, Zhang, Hilliges, Yu, and Tang]{wu2022saga}
+Yan Wu, Jiahao Wang, Yan Zhang, Siwei Zhang, Otmar Hilliges, Fisher Yu, and Siyu Tang.
+\newblock Saga: Stochastic whole-body grasping with contact.
+\newblock In \emph{European Conference on Computer Vision (ECCV)}, pages 257--274, 2022.
+
+\bibitem[Xiao et~al.(2024)Xiao, Wang, Wang, Cao, Zhang, Dai, Lin, and Pang]{xiao2024unified}
+Zeqi Xiao, Tai Wang, Jingbo Wang, Jinkun Cao, Wenwei Zhang, Bo Dai, Dahua Lin, and Jiangmiao Pang.
+\newblock Unified human-scene interaction via prompted chain-of-contacts.
+\newblock In \emph{The Twelfth International Conference on Learning Representations}, 2024.
+
+\bibitem[Xie et~al.(2022)Xie, Starke, Ling, and van~de Panne]{xie2022learning}
+Zhaoming Xie, Sebastian Starke, Hung~Yu Ling, and Michiel van~de Panne.
+\newblock Learning soccer juggling skills with layer-wise mixture-of-experts.
+\newblock In \emph{ACM SIGGRAPH 2022 Conference Proceedings}, pages 1--9, 2022.
+
+\bibitem[Xu and Karamouzas(2021)]{xu2021gan}
+Pei Xu and Ioannis Karamouzas.
+\newblock A gan-like approach for physics-based imitation learning and interactive character control.
+\newblock \emph{Proceedings of the ACM on Computer Graphics and Interactive Techniques}, 4\penalty0 (3):\penalty0 1--22, 2021.
+
+\bibitem[Xu and Wang(2024)]{xu2024synchronize}
+Pei Xu and Ruocheng Wang.
+\newblock Synchronize dual hands for physics-based dexterous guitar playing.
+\newblock \emph{arXiv preprint arXiv:2409.16629}, 2024.
+
+\bibitem[Xu et~al.(2024)Xu, Wang, Wang, and Gui]{xu2024interdreamer}
+Sirui Xu, Ziyin Wang, Yu-Xiong Wang, and Liang-Yan Gui.
+\newblock Interdreamer: Zero-shot text to 3d dynamic human-object interaction.
+\newblock \emph{arXiv preprint arXiv:2403.19652}, 2024.
+
+\bibitem[Yang et~al.(2024)Yang, Sun, Weihs, VanderBilt, Herrasti, Han, Wu, Haber, Krishna, Liu, et~al.]{yang2024holodeck}
+Yue Yang, Fan-Yun Sun, Luca Weihs, Eli VanderBilt, Alvaro Herrasti, Winson Han, Jiajun Wu, Nick Haber, Ranjay Krishna, Lingjie Liu, et~al.
+\newblock Holodeck: Language guided generation of 3d embodied ai environments.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, pages 16227--16237, 2024.
+
+\bibitem[Yao et~al.(2024)Yao, Song, Zhou, Ao, Chen, and Liu]{yao2024moconvq}
+Heyuan Yao, Zhenhua Song, Yuyang Zhou, Tenglong Ao, Baoquan Chen, and Libin Liu.
+\newblock Moconvq: Unified physics-based motion control via scalable discrete representations.
+\newblock \emph{ACM Transactions on Graphics (TOG)}, 43\penalty0 (4):\penalty0 1--21, 2024.
+
+\bibitem[Ye and Liu(2012)]{ye2012synthesis}
+Yuting Ye and C~Karen Liu.
+\newblock Synthesis of detailed hand manipulations using contact sampling.
+\newblock \emph{ACM Transactions on Graphics (ToG)}, 31\penalty0 (4):\penalty0 1--10, 2012.
+
+\bibitem[Yi et~al.(2024)Yi, Thies, Black, Peng, and Rempe]{yi2024generating}
+Hongwei Yi, Justus Thies, Michael~J Black, Xue~Bin Peng, and Davis Rempe.
+\newblock Generating human interaction motions in scenes with text control.
+\newblock \emph{arXiv preprint arXiv:2404.10685}, 2024.
+
+\bibitem[Zeng et~al.(2023)Zeng, Wu, Yang, Zhang, Ding, Cheng, and Dong]{zeng2023distilling}
+Yiming Zeng, Mingdong Wu, Long Yang, Jiyao Zhang, Hao Ding, Hui Cheng, and Hao Dong.
+\newblock Distilling functional rearrangement priors from large models.
+\newblock \emph{arXiv preprint arXiv:2312.01474}, 2023.
+
+\bibitem[Zhang et~al.(2021)Zhang, Ye, Shiratori, and Komura]{zhang2021manipnet}
+He Zhang, Yuting Ye, Takaaki Shiratori, and Taku Komura.
+\newblock Manipnet: neural manipulation synthesis with a hand-object spatial representation.
+\newblock \emph{ACM Transactions on Graphics (ToG)}, 40\penalty0 (4):\penalty0 1--14, 2021.
+
+\bibitem[Zhang et~al.(2022)Zhang, Bhatnagar, Starke, Guzov, and Pons-Moll]{zhang2022couch}
+Xiaohan Zhang, Bharat~Lal Bhatnagar, Sebastian Starke, Vladimir Guzov, and Gerard Pons-Moll.
+\newblock Couch: Towards controllable human-chair interactions.
+\newblock In \emph{European Conference on Computer Vision (ECCV)}, pages 518--535, 2022.
+
+\bibitem[Zhang et~al.(2024)Zhang, Huang, Liu, Tang, Lu, Chen, Bai, Chu, Yu, and Ouyang]{zhang2024motiongpt}
+Yaqi Zhang, Di Huang, Bin Liu, Shixiang Tang, Yan Lu, Lu Chen, Lei Bai, Qi Chu, Nenghai Yu, and Wanli Ouyang.
+\newblock Motiongpt: Finetuned llms are general-purpose motion generators.
+\newblock In \emph{Proceedings of the AAAI Conference on Artificial Intelligence}, pages 7368--7376, 2024.
+
+\bibitem[Zhao et~al.(2023)Zhao, Zhang, Wang, Beeler, and Tang]{zhao2023synthesizing}
+Kaifeng Zhao, Yan Zhang, Shaofei Wang, Thabo Beeler, and Siyu Tang.
+\newblock Synthesizing diverse human motions in 3d indoor scenes.
+\newblock \emph{arXiv preprint arXiv:2305.12411}, 2023.
+
+\bibitem[Zhou et~al.(2019)Zhou, Barnes, Lu, Yang, and Li]{zhou2019continuity}
+Yi Zhou, Connelly Barnes, Jingwan Lu, Jimei Yang, and Hao Li.
+\newblock On the continuity of rotation representations in neural networks.
+\newblock In \emph{Computer Vision and Pattern Recognition (CVPR)}, 2019.
+
+\end{thebibliography}

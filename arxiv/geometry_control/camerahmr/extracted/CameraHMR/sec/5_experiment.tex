@@ -1,0 +1,94 @@
+\section{Experiments}
+
+\subsection{Comparision to SOTA}
+\noindent\textbf{\cameramodel.}
+As shown in Table~\ref{fov},  \cameramodel generalizes well across all benchmarks with diverse fields of view. While WildCamera~\cite{wildcamera} excels on benchmarks with narrow to average field of view, it underperforms on those with wide field of view, such as SPEC. In contrast, our \cameramodel maintains consistent accuracy across all benchmarks.
+
+\noindent\textbf{\hpsmodel.}
+As shown in Table~\ref{hps}, \hpsmodel outperforms the baselines on all three benchmarks by a large margin. For a fair comparison, we categorize the methods based on the major datasets that were used in training. 
+STD refers to standard datasets comprising Human3.6M~\cite{h36m}, COCO~\cite{coco}, MPII~\cite{mpii} and MPI-INF-3DHP~\cite{mpiinf3dhp} while 4DHumans comprises InstaVariety~\cite{insta}, COCO~\cite{coco}, MPII~\cite{mpii}, AI Challenger~\cite{aic} and  AVA~\cite{ava}. 
+Note that \hpsmodel training never uses AVA.
+Even when trained on similar datasets, \hpsmodel consistently outperforms all other baselines, demonstrating notable improvements particularly on the  EMDB and SPEC-SYN benchmarks, which feature a wide variety of cameras. 
+Additionally, our estimated dense keypoints improve the pGT body shape accuracy and this translates into improved accuracy of \hpsmodel on the SSP-3D \cite{ssp} dataset; see Sup.~Mat. 
+%and HBW \cite{shapy} datasets
+
+Table~\ref{pck} also shows that \hpsmodel is either comparable to, or better than, other baselines in terms of 2D alignment on the COCO-val dataset.
+\hpsmodel is nearly identical to HMR2.0b in terms of 2D keypoint alignment, while having significantly better 3D accuracy.
+As shown qualitatively  in Fig.~\ref{fig:baseline-comp}, \hpsmodel achieves not only better 3D reconstruction, but significantly better 2D alignment, especially in cases of foreshortening or for people with non-average body shapes.
+
+
+
+\begin{table}
+\centering
+{\scriptsize
+  \begin{tabular}{lccc}
+    \toprule
+     Camera & EMDB~\cite{emdb}$\downarrow$ & RICH~\cite{rich}$\downarrow$ & SPEC-SYN~\cite{spec}$\downarrow$ \\
+    \midrule
+    fixed   & 89.3 & 64.8 & 138.7 \\
+    default  & 82.7& 64.9 & 115.2 \\
+    predicted   & \textbf{81.7}& \textbf{64.4}& \textbf{72.9} \\
+    % ground truth  & & &  \\
+    \bottomrule
+  \end{tabular}
+  }
+  \caption{Per-vertex error (PVE) in mm for different focal length used during inference of \hpsmodel.}
+\label{abl}
+\end{table}
+
+% FOV EVALUATION
+% HPS EVALUATION
+\begin{table*}
+  \centering 
+  \scriptsize
+  \begin{tabular}{ll|ccc|ccc|ccc}
+    \toprule
+ &\multirow{2}{*}{Method}& \multicolumn{3}{c}{3DPW~\cite{3dpw}} & \multicolumn{3}{c}{EMDB~\cite{emdb}} & \multicolumn{3}{c}{SPEC-SYN~\cite{spec}} \\
+    \cmidrule(lr){3-5}
+    \cmidrule(lr){6-8}
+    \cmidrule(lr){9-11}
+     && PA-MPJPE $\downarrow$ & MPJPE $\downarrow$ & PVE$\downarrow$ & PA-MPJPE$\downarrow$  &MPJPE$\downarrow$ & PVE$\downarrow$  & PA-MPJPE $\downarrow$ & MPJPE$\downarrow$ & PVE$\downarrow$  \\
+    \midrule
+    \multirow{2}{*}{\rotatebox[origin=c]{90}{STD}} 
+    &SPEC~\cite{spec} & 53.2& 96.5& 118.5 &  87.7 & 138.9 & 161.3 & 56.9 & 83.5 & 98.9    \\
+    &CLIFF$^*$~\cite{li2022cliff} & 43.0& 69.0 & 81.2 & 68.3 & 103.5 & 123.7 & 55.8 & 128.5 & 139.0 \\
+    &HMR2.0a$^*$~\cite{hmr2} & 44.4 & 69.8 & 82.2 & 61.5 & 97.8 & 120.0 & 55.8 & 133.3 & 153.0\\
+    \midrule
+    \multirow{5}{*}{\rotatebox[origin=c]{90}{BEDLAM}} 
+    &TokenHMR~\cite{tokenhmr} &43.8 & 70.5 & 86.0 & 49.8 & 88.1 & 104.2 & 51.8 & 110.5 & 127.6\\
+    &WHAM$^{\dagger*}$~\cite{wham} & 35.9 & 57.8 & 68.7 & 50.4 & 79.7 & 94.4 & - & - & - \\
+    &ReFit$^*$~\cite{refit} & 38.2 & 57.6 & 67.6 & 55.5 & 91.7 & 106.2 & 51.3 & 103.6 & 116.3 \\
+    &BEDLAM-CLIFF~\cite{bedlam} & 46.6 &72.0 & 85.0& 61.3 & 97.1 & 113.2& 55.6 & 109.9 & 124.6\\
+    &\hpsmodel(Ours) & 40.0 & 62.3 & 74.8 & 45.4 & 82.7 & 97.0 & \textbf{31.8} & \textbf{58.9} & \textbf{70.0}\\
+    \midrule
+    % SPEC & 96.5& 118.5 &143.0& 166.0  & 410.1 & 81.0 & 95.5 &  1381.3\\
+    % BEV & 78.5 & 92.3 & 106.4 & 123.6& 458.8 &114.7 & 131.0& 3827.7 \\
+    % \hpsmodel (default cam) & \textbf{62.6}& \textbf{74.3} &\textbf{78.1} & \textbf{92.0} &  &94.3 &104.3 & 5207.6\\  
+    \multirow{2}{*}{\rotatebox[origin=c]{90}{4DH}} 
+    &HMR2.0b ~\cite{hmr2} & 54.3 & 81.3 & 93.1 & 79.2 & 118.5 & 140.6 & 67.6 & 150.7 & 172.9\\
+    &\hpsmodel(Ours) & 38.7 & 62.7 & 73.4& 43.9& 73.2 & 85.6&  37.0 & 66.0 & 79.1\\
+    \midrule
+    \multirow{2}{*}{\rotatebox[origin=c]{90}{All}} 
+
+    &\hpsmodel(Ours) & 38.5 & 62.1 & 72.9 & 43.7 & 73.0 & 85.4 &33.0 & 61.8 & 73.1 \\
+    &\hpsmodel$^*$(Ours) & \textbf{35.1} & \textbf{56.0} & \textbf{65.9} & \textbf{43.3}& \textbf{70.3} &\textbf{81.7} & 32.9 & 61.8 & 72.9  \\
+
+   % \hpsmodel (gt cam) & 62.6 & 75.2 & 85.3& 98.4& &  & & \\
+    \bottomrule
+  \end{tabular}
+  \caption{\textbf{Reconstruction error comparison for HPS.} $^*$denotes method is finetuned on 3DPW training data. $^\dagger$denotes video based method. Datasets used in training; STD: standard datasets, 4DH: 4DHumans dataset, All: \text{BEDLAM} + \text{4DHumans dataset}. }
+\label{hps}
+\end{table*}
+\subsection{Ablation}
+To understand the effect of using the predicted camera intrinsics from our \cameramodel, we perform an ablation study in which we vary the focal length used during inference. We use a fixed focal length of 5000 pixels, the predicted focal length from  \cameramodel, and the default focal length that is use by other HPS methods \cite{li2022cliff, beyondwp}, defined as $\sqrt{w^2 + h^2}$
+where \( w \) and \( h \) are the width and height of the full image respectively.
+We evaluate per-vertex error on three different benchmarks: EMDB, RICH, and SPEC-SYN. As shown in Table~\ref{abl}, the impact of using the predicted focal length is modest on  EMDB and RICH. However, there is a significant improvement on the SPEC-SYN benchmark. EMDB and RICH largely contain centered individuals with fixed camera intrinsics, resulting in similar performance whether using predicted or default focal lengths. In contrast, SPEC-SYN includes varied camera intrinsics and off-center subjects,
+resulting in foreshortening and perspective distortion.
+In such cases, the benefits of using predicted focal length over the default focal length is significant.
+
+\begin{figure*}
+\centerline{\includegraphics[width=0.9\textwidth]{CameraHMR/images/baseline_comp.pdf}}
+	\caption{\textbf{Qualitative results of different baselines on LSP~\cite{lsp} and MPII~\cite{mpii} test images}. \hpsmodel achieves better 3D pose and shape reconstruction while also achieving more accurate 2D alignment compared to other SOTA methods trained on comparable datasets. }
+	\label{fig:baseline-comp}
+\end{figure*}
+

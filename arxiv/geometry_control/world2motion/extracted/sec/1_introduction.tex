@@ -1,0 +1,128 @@
+% Previous introduction preserved (2026-09-26).
+% \section{Introduction}
+% \label{sec:intro}
+% The generation of plausible 3D human motion is fundamental to modeling and understanding human behavior. Physically realistic motion sequences can benefit broad downstream applications, such as gaming and humanoid robotics. Conventional Text-to-Motion(T2M) methods~\citep{zhang2024motiondiffuse,tevet2023mdm} rapidly synthesize human motions from textual descriptions. Motivated by the scaling behavior observed in large language models, several approaches~\citep{hymotion2025, Kimodo2026} have trained on large-scale motion datasets to improve generation quality and generalization. T2M methods heavily rely on the text prompts to obtain the human motions. However, pure language struggle to describe detailed scene context, which limiting the ability to perceive and interact with the world. For example, it is difficult for T2M methods to generate a motion that precisely sits on a chair at a specified location. Achieving such interaction often requires manual adjustment of pose keyframes, which is cumbersome. Human-Object Interaction(HOI) methods~\citep{li2024chois, jung2026dechoi} are able to directly generate interaction motions from prompts. Although these methods perceive the environments, they usually rely on explicit 3D object information, such as object meshes ~\citep{kulkarni2024nifty} or object stats~\citep{li2024chois, zhang2026giraf}. Such strict data requirements make large-scale HOI data collection difficult, limiting these methods to leverage the data priors available in large motion data for further applications.
+% 
+% Video generation models have achieved remarkable progress in recent years. These models~\citep{wan2025wan, minimaxh3} produce high-quality human videos with strong visual fidelity and temporal consistency, demonstrating a strong capability to model the physical world and understand the human-environment interactions. With the development of deep learning, existing human mesh recovery(HMR)~\citep{patel2025camerahmr, zhao2026onlinehmr} methods have achieved strong performance in extracting continuous human motions from input images. Therefore, a straightforward method to generate plausible motions can be formulated as a two-stage pipeline: generate high-quality videos from text prompts and then extract the human motions using an HMR method. Although this approach enables scene-aware motion generations, its two-stage computational process is computationally expensive and time-consuming. 
+% 
+% \newsavebox{\introtabbox}
+% \sbox{\introtabbox}{%
+% \begin{tabular}{cccc}
+% \toprule
+%     & Speed & Convenience & scene awareness \\
+% \midrule
+% T2M     & \cmark    & \cmark    & \xmark    \\
+% I2V+HMR & \xmark    & \cmark    & \cmark    \\
+% HOI     & \cmark    & \xmark    & \cmark    \\
+% Ours    & \cmark    & \cmark    & \cmark    \\
+% \bottomrule
+% \end{tabular}}
+% \begin{wraptable}{r}{\wd\introtabbox}
+% \centering
+% \caption{Comparison of Motion Generation Paradigms.}
+% \label{tab:paradigm comparison}
+% \usebox{\introtabbox}
+% \end{wraptable}
+% 
+% Video generation models incorporate rich visual priors about human motions and interactions in the world. Therefore, we try to leverage these priors to generate scene-aware human motions with plausible environmental interactions. To achieve these goal, we introduce World2Motion, which turns video world model to generates realistic videos and scene-aware 3D human motions synchronously. This joint generation paradigm allows the motion generation to benefit from the video generation models. Compared with the two-stage pipeline that first performs Image-to-video(I2V) generation and then recovers human motions using HMR approaches, our method achieves faster inference. Compared with conventional T2M method that rely solely on textual inputs, our framework additionally input an image to provide scene context. This enables the model to obtain more spatially accurate scene-aware 3D motions. Compared with existing HOI methods that require explicit 3D object geometry and object orientations, our method obtains the motions only from a single image. This paradigm makes it easier to input and more general to other scenarios that HOI methods can't covered, such as dancing. Overall, we characterize motion generation paradigms along three dimensions: Inference speed, convenience and scene awareness. As shown in Table~\ref{tab:paradigm comparison}, our paradigm simultaneously satisfies three criteria, providing a more balanced solution than existing motion generation paradigms.
+% 
+% Directly Adding
+% Training our model requires paired data consisting of accurate 3D human motions interacting with objects in 3D scenes and corresponding RGB videos. However, existing motion datasets~\citep{li2023omomo, zhang2025motionx++} rarely provide both. To address this limitation, we develop a data pipeline to construct paired data from existing interaction datasets~\citep{li2023omomo, hassan2021samp, jiang2023chairs}. Directly fine-tune MoT~\citep{agarwal2026cosmos} backbone will lead to severe jitter in the generated motion sequences. To alleviate this phenomenon, we design two strategies to mitigate the jitter. First, we design a motion representation by anchoring root translation to the initial pose. To enable motion generation conditioned on the initial pose, we discard auxiliary features used in other methods~\citep{zhao2026ardy, tevet2023mdm}, such as root velocity and angular velocity. We use 6D joint rotations to encode orientations instead. Second, we introduce a coupled noise schedule that constrains the training trajectories of different modalities to lie on a shared curve. This strategy aligns the noise schedule during training and inference, which improves the motion quality. Extensive ablation studies demonstrate the effectiveness of our design. In summary, our contributions are as follows: 
+% \begin{itemize}[leftmargin=*]
+% \item we propose a unified MoT architecture to generate motions and videos synchronously. This paradigm synthesizes scene-aware motions while maintaining fast inference and convenience.
+% \item We propose a motion representation and a coupled modality schedule to reduce jitter in the generated motions. Extensive ablation studies demonstrate the effectiveness of both designs.
+% \item We develop a data construction pipeline for paired training data and compare other methods with multiple metrics. Experiments demonstrate the effectiveness and robustness of our paradigm.
+% \end{itemize}
+% End previous introduction.
+
+\section{Introduction}
+\label{sec:intro}
+Generating 3D human motion for interactive applications requires motions that follow text descriptions and remain consistent with the surrounding environment. Conventional text-to-motion (T2M) methods~\citep{zhang2024motiondiffuse,tevet2023mdm} synthesize human motion from textual descriptions, and recent approaches~\citep{hymotion2025,Kimodo2026} have improved generation quality by scaling up motion datasets. However, the limited coverage of environments and interactions in available 3D motion datasets constrains their generalization to diverse scenes. Text alone also makes it difficult to specify detailed spatial relationships. For example, generating a person sitting on a chair requires the motion to match the chair's position and orientation. Human--object interaction (HOI) methods~\citep{li2024chois,jung2026dechoi} incorporate such spatial information through explicit 3D inputs, such as object meshes~\citep{kulkarni2024nifty} or object states~\citep{li2024chois,zhang2026giraf}. However, collecting the corresponding motion and scene data at scale remains difficult.
+
+Video world models offer an alternative source of knowledge about human motion and environmental interactions~\citep{wan2025wan,minimaxh3}. Trained on diverse videos, models such as Cosmos 3~\citep{agarwal2026cosmos} provide environmental priors that can complement the limited coverage of 3D motion datasets. However, they are not designed to directly produce the full-body 3D motion required by our task. A straightforward way to use these priors is to first generate a video and then recover motion using a human mesh recovery (HMR) model~\citep{patel2025camerahmr,zhao2026onlinehmr}. This two-stage pipeline enables scene-aware motion generation, but requires a separate motion-recovery pass over the generated video, increasing inference cost.
+
+% Previous Table 1 preserved (2026-09-26).
+% \newsavebox{\introtabbox}
+% \sbox{\introtabbox}{%
+% \begin{tabular}{cccc}
+% \toprule
+%     & Speed & Convenience & scene awareness \\
+% \midrule
+% T2M     & \cmark    & \cmark    & \xmark    \\
+% I2V+HMR & \xmark    & \cmark    & \cmark    \\
+% HOI     & \cmark    & \xmark    & \cmark    \\
+% Ours    & \cmark    & \cmark    & \cmark    \\
+% \bottomrule
+% \end{tabular}}
+% \begin{wraptable}{r}{\wd\introtabbox}
+% \centering
+% \caption{Comparison of Motion Generation Paradigms.}
+% \label{tab:paradigm comparison}
+% \usebox{\introtabbox}
+% \end{wraptable}
+% End previous Table 1.
+
+% Previous full-width Table 1 preserved.
+% \begin{table}[htbp]
+% \centering
+% \normalfont\color{black}
+% \caption{Comparison of motion generation paradigms.}
+% \label{tab:paradigm comparison}
+% \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lccc@{}}
+% \toprule
+% Approach & \shortstack{Direct 3D\\motion output} & \shortstack{No 3D\\object input} & \shortstack{Scene\\conditioning} \\
+% \midrule
+% T2M & \ding{51} & \ding{51} & \\
+% I2V + HMR & & \ding{51} & \ding{51} \\
+% HOI & \ding{51} & & \ding{51} \\
+% World2Motion & \ding{51} & \ding{51} & \ding{51} \\
+% \bottomrule
+% \end{tabular*}
+% \end{table}
+% End previous full-width Table 1.
+
+\begin{wraptable}{r}{0.50\textwidth}
+\centering
+\normalfont\small\color{black}
+\setlength{\tabcolsep}{2pt}
+\caption{Motion generation methods comparison.}
+\label{tab:paradigm comparison}
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lccc@{}}
+\toprule
+Approach & \shortstack{Direct 3D\\motion\\output} & \shortstack{No 3D\\object\\input} & \shortstack{Scene\\conditioning} \\
+\midrule
+T2M & \ding{51} & \ding{51} & \\
+I2V + HMR & & \ding{51} & \ding{51} \\
+HOI & \ding{51} & & \ding{51} \\
+World2Motion & \ding{51} & \ding{51} & \ding{51} \\
+\bottomrule
+\end{tabular*}
+\end{wraptable}
+
+% Before shortening (2026-09-26).
+% To use these video priors directly for motion generation, we introduce World2Motion, which adapts Cosmos 3 into a single-stage framework that generates scene-aware 3D human motion and corresponding video from a single image and a text prompt. We build on its existing Mixture-of-Transformers (MoT) backbone~\citep{agarwal2026cosmos} and extend the generation process to include motion. This allows the model to generate 3D motion alongside video, avoiding a separate motion-recovery stage on the generated sequence. This adaptation presents two challenges: the scarcity of paired video--motion training data and temporal instability in the generated motion.
+% Before restoring the Table 1 discussion (2026-09-26).
+% We introduce World2Motion, which adapts the existing Mixture-of-Transformers (MoT) backbone of Cosmos 3~\citep{agarwal2026cosmos} to jointly generate scene-aware 3D human motion and corresponding video from a single image and a text prompt. This single-stage framework avoids a separate motion-recovery stage on the generated sequence. The adaptation presents two challenges: the scarcity of paired video--motion training data and temporal instability in the generated motion.
+We introduce World2Motion, which adapts the existing Mixture-of-Transformers (MoT) backbone of Cosmos 3~\citep{agarwal2026cosmos} to jointly generate scene-aware 3D human motion and corresponding video from a single image and a text prompt. This single-stage framework avoids a separate motion-recovery stage on the generated sequence. The adaptation presents two challenges: the scarcity of paired video--motion training data and temporal instability in the generated motion. Table~\ref{tab:paradigm comparison} summarizes the input requirements and generation pipelines of these approaches.
+
+% Before shortening (2026-09-26).
+% To address the scarcity of paired supervision, we construct a hybrid training dataset combining synthetic video--motion pairs with real videos paired with estimated 3D motion. For the synthetic component, we use motion sequences from existing interaction datasets~\citep{li2023omomo,hassan2021samp,jiang2023chairs} to construct corresponding videos, providing paired supervision with known 3D motion. For the real component, we estimate 3D motion from real videos~\citep{patel2025camerahmr} to expand the coverage of environments and appearances. These two sources combine motion supervision from existing 3D datasets with the visual diversity of real videos, supporting the adaptation of the video world model to joint video--motion generation.
+% Before restoring the data explanation (2026-09-26).
+% To address the scarcity of paired supervision, we construct a hybrid training dataset combining synthetic video--motion pairs with real videos paired with estimated 3D motion. We construct synthetic videos from existing interaction datasets~\citep{li2023omomo,hassan2021samp,jiang2023chairs}, providing supervision with known 3D motion, and estimate motion from real videos~\citep{patel2025camerahmr} to expand the coverage of environments and appearances.
+To address the scarcity of paired supervision, we construct a hybrid training dataset combining synthetic video--motion pairs with real videos paired with estimated 3D motion. For the synthetic component, we use motion sequences from existing interaction datasets~\citep{li2023omomo,hassan2021samp,jiang2023chairs} to construct corresponding videos, providing paired supervision with known 3D motion. For the real component, we estimate 3D motion from real videos~\citep{patel2025camerahmr} to expand the coverage of environments and appearances. These two sources combine motion supervision from existing 3D datasets with the visual diversity of real videos, supporting the adaptation of the video world model to joint video--motion generation.
+
+% Before shortening (2026-09-26).
+% Directly fine-tuning the backbone for joint video--motion generation produces noticeable motion jitter. To improve temporal stability, we employ a motion representation with root translations relative to the initial root position and 6D joint rotations~\citep{zhao2026ardy}. We further account for the different denoising requirements of video and motion through a shift-decoupled noise schedule. The proposed schedule uses modality-specific shifts to assign different noise levels to video and motion through shared denoising progress. We maintain the same relationship between video and motion noise levels during training and inference. Our ablation studies show that the shift-decoupled noise schedule reduces motion jitter.
+Directly fine-tuning the backbone for joint video--motion generation produces noticeable motion jitter. To improve temporal stability, we employ root translations relative to the initial root position and 6D joint rotations~\citep{zhao2026ardy}. We propose a shift-decoupled noise schedule that assigns different noise levels to video and motion through shared denoising progress, accounting for their different denoising requirements. We maintain the same video--motion noise relationship during training and inference. Our ablation studies show that the shift-decoupled noise schedule reduces motion jitter.
+
+% Before shortening (2026-09-26).
+% We evaluate World2Motion on a diverse test set assembled from multiple data sources. Compared with the evaluated 3D motion generators, World2Motion improves motion--text alignment and scene interaction. It also achieves comparable interaction success to the evaluated two-stage video-generation-and-motion-recovery baseline while providing approximately 3.3$\times$ faster inference. Ablation studies further demonstrate the contributions of the motion representation and shift-decoupled noise schedule to temporal stability.
+% Before agreed claim-scope revision: On a diverse test set assembled from multiple data sources, World2Motion improves motion--text alignment and scene interaction over the evaluated 3D motion generators. It also achieves comparable interaction success to the MiniMax-H3 + CameraHMR baseline with approximately 3.3$\times$ faster inference.
+On a multi-source interaction benchmark, World2Motion improves motion--text alignment and scene interaction over the evaluated 3D motion generators. It also achieves comparable interaction success to the MiniMax-H3 + CameraHMR baseline with approximately 3.3$\times$ faster inference. 
+
+Our contributions are as follows:
+\begin{itemize}[leftmargin=*]
+\item We adapt Cosmos 3 for single-stage joint generation of scene-aware 3D human motion and corresponding video from a single image and a text prompt, avoiding a separate motion-recovery stage on the generated video.
+\item We construct a hybrid training dataset combining synthetic video--motion pairs with real videos paired with estimated 3D motion.
+\item We propose a shift-decoupled noise schedule that uses modality-specific noise shifts with shared denoising progress and maintains the same video--motion noise relationship during training and inference, improving temporal stability.
+\end{itemize}

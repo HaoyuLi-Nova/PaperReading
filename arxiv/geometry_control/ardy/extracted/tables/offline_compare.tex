@@ -1,0 +1,26 @@
+\begin{table}[t]
+\centering
+\caption{\textbf{Offline Text and Constraint Control Comparison.} Evaluation results of text-conditioned motion generation with joint position goals on HumanML3D. $^*$ denotes methods without test-time optimization. $\uparrow$ denotes higher values are better; $\downarrow$ denotes lower values are better.}
+\label{table:offline_compare}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Method} & \textbf{R-Prec. $\uparrow$} & \textbf{FID $\downarrow$} & \textbf{Skate (\%) $\downarrow$} & \textbf{Error (cm) $\downarrow$} & \textbf{Latency (s) $\downarrow$} \\
+\midrule
+Dataset (HumanML3D retarget) & 0.739 & 0.000 & 7.92 & 0.00 & - \\
+Dataset (Our retarget)  & 0.732 & 0.011 & 6.87 & 0.00 & - \\
+\midrule
+\multicolumn{6}{c}{\textit{Without optimization}} \\
+\midrule
+MaskControl$^*$ \cite{pinyoanuntapong2025MaskControl} & \textbf{0.760} & 0.050 & 7.27 & 46.18 & 0.46 \\
+\textbf{\method (Ours)}$^*$ & 0.729 & \textbf{0.044} & \textbf{6.28} & \textbf{4.15} & \textbf{0.15} \\
+\midrule
+\multicolumn{6}{c}{\textit{With optimization}} \\
+\midrule
+MaskControl \cite{pinyoanuntapong2025MaskControl} & \textbf{0.758} & \textbf{0.047} & 7.87 & 0.45 & 68.65 \\
+\textbf{\method (Ours) Opt} & 0.721 & 0.088 & \textbf{5.87} & \textbf{0.30} & \textbf{9.25} \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+

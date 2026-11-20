@@ -1,0 +1,83 @@
+\section{Datasets}
+
+
+\subsection{\cameramodel}
+\label{sec:HumanFoV}
+To train the \cameramodel model we use around 500K images collected from Flickr~\cite{flickr}. To get human-centeric data, we filter Flickr with keywords such as people, man, woman, kid, human, crowd etc. 
+We use the Flickr API to download only the images that have associated EXIF information, which usually contains the focal length in mm. 
+To calculate the vertical field of view $\upsilon$ from the focal length $\mathsf{f}$ in mm, we need to know the sensor height $sh$. Vertical FoV $\upsilon$ can be calculated as
+\begin{equation}
+     \upsilon = 2 \cdot \arctan\left(\frac{sh}{2 \cdot \mathsf{f}}\right).
+\end{equation}
+We use the field \textit{FocalLengthIn35mmFormat} from the EXIF, which contains the focal length corresponding to a 36mm wide and 24mm high sensor. This allows us to use a sensor height of 24mm directly in our calculations. Note that if the aspect ratio of the image is less than 1 (i.e.~portrait mode), we calculate $\upsilon$ using the sensor width instead of sensor height. Please refer to the Sup.~Mat.~to see the distribution of focal lengths in the dataset.
+
+
+Note that the standard aspect ratios for images captured from a phone or camera are in the range of 16:9, 4:3, 3:2, 1:1, 5:4. If the aspect ratio of the image collected from Flickr is outside this range, we assume that the image is cropped. Cropped images, especially those not centered, could introduce inconsistencies with the camera model used and  might confuse the neural network. We filter such images from the training data. Although we do not use cropped images directly in our training data, we extensively apply crop augmentation during training to ensure model's robustness.
+
+To evaluate our \cameramodel model, unlike previous methods, we focus on benchmarks containing images of people. Consequently we use test-set images from SPEC~\cite{spec}, 3DPW~\cite{3dpw} and EMDB~\cite{emdb}, which all provide camera intrinsics. 
+We also create a test set of around 10K images from Flickr that are similar to training set. 
+We also include a scene from the BEDLAM~\cite{bedlam} dataset, BEDLAM-Z, which contains a wide range of focal lengths because the camera is zooming from 28 to 80mm. This provides a more varied distribution over the intrinsics in the test set.
+
+
+\subsection{\hpsmodel}
+
+
+For training \hpsmodel along with the enhanced 4DHumans dataset (minus AVA) we also use the synthetic datasets AGORA~\cite{agora} and BEDLAM~\cite{bedlam}, which contain accurate ground truth camera information. 
+The combination of all these datasets is called ``All" in Table \ref{hps}.
+For evaluation we use the 3DPW~\cite{3dpw} EMDB~\cite{emdb} and RICH~\cite{rich} datasets. Additionally, we evaluate accuracy on the  SPEC test set~\cite{spec}, which features multiple off-center individuals and more varied camera perspectives. To evaluate 3D shape accuracy, we utilize the SSP-3D~\cite{ssp} dataset. We also evaluate 2D alignment accuracy on the COCO validation set and perform qualitative evaluation using images from the LSP~\cite{lsp} and MPII~\cite{mpii} test sets in 
+Fig.~\ref{fig:baseline-comp}.
+
+
+\subsection{Evaluation Metrics}
+We follow previous work \cite{spec, hmr2} and evaluate  3D reconstruction accuracy using MPJPE (Mean Per Joint Position Error), PA-MPJPE (Procrustes Analysis Mean Per Joint Position Error), and PVE (Per Vertex Error), which measures the Euclidean distance (in mm) between predicted and actual 3D vertices and joints after aligning the pelvis. 
+PVE is useful for evaluating body shape accuracy.
+We also evaluate the 2D alignment using PCK (Percentage of Correct Keypoints) on COCO-val~\cite{coco}. PCK measures the accuracy of 2D keypoint detection by calculating the percentage of predicted keypoints within a specified distance threshold from the ground truth.
+We use thresholds of \(0.05\) and \(0.1\), which correspond to \(5\%\) and \(10\%\) of the crop size, respectively. 
+
+
+\begin{table}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{lccccc}
+\toprule
+& Flickr-test & SPEC & 3DPW & EMDB & BEDLAM-Z \\ 
+\midrule
+Perspective Fields~\cite{perspectivefields} & 15.3 & {\it 8.0} & 14.0 & 12.8 & 18.0 \\
+Ctrl-C~\cite{ctrlc} & 26.5 & 10.4 & {\it 5.6} & {\it 5.4} & 31.3\\
+WildCamera~\cite{wildcamera} & {\it 10.9} & 17.8 & 8.2 & {\bf 2.3} & {\bf 4.8}\\
+SPEC-camcalib~\cite{spec} & 14.0 & 14.3 & 8.8 & 5.9 & 14.2              \\
+\cameramodel (Ours) & {\bf 7.3}  & {\bf 7.9} &  {\bf 5.0}  &5.7 & {\it 5.4}               \\
+\bottomrule
+\end{tabular}
+}
+\caption{Vertical field of view error in degrees. BEDLAM-Z stands for the ``zoom" sequence from BEDLAM used for testing (see text). Bold and italics correspond to best and second best respectively.}
+\label{fov}
+\end{table}
+
+
+\begin{table}
+\centering
+{\scriptsize
+\begin{tabular}{lccc}
+    \toprule
+     Method & PCK 0.05 $\uparrow$ & PCK 0.1 $\uparrow$\\
+    \midrule
+    CLIFF~\cite{li2022cliff}  & 0.66 & 0.84\\
+    BEDLAM-CLIFF~\cite{bedlam} & 0.62 & 0.80\\
+    HMR2.0a~\cite{hmr2} & 0.79 & 0.94\\
+    HMR2.0b~\cite{hmr2} & \textbf{0.86} & \textbf{0.96}\\
+    TokenHMR~\cite{tokenhmr} & 0.80 & \textit{0.95} \\
+    ReFit~\cite{refit} & 0.74 &  0.84 \\
+    CameraHMR (Ours) & \textit{0.84} & 0.94 \\
+    
+    \bottomrule
+  \end{tabular}
+  }
+  \caption{PCK on COCO-val dataset measures 2D alignment accuracy. 
+  Bold: most accurate. Italics: second most.}
+  
+\label{pck}
+
+\end{table}
+
+
+

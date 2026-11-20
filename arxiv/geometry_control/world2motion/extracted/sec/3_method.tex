@@ -1,0 +1,131 @@
+% Previous method preserved (2026-09-26).
+% \section{Method}
+% The understanding branch encodes the text into multi-level semantic representations, while the generation branch leverages the semantic features to generate the videos and human motions
+% 
+% Given an image $I_0 \in \mathbb{R}^{H \times W \times 3}$ containing a person in the scene, the corresponding human pose $P_0 \in \mathbb{R}^{J \times 3}$ and a text prompt of intended human actions, World2Motion jointly generates a video sequence $I_{1:N} \in \mathbb{R}^{N \times H \times W \times 3}$ and a human pose sequence $P_{1:N} \in \mathbb{R}^{N \times J \times 3}$ synchronously. Here, $H$ and $W$ denote the image height and width, $J$ denotes the number of SMPL~\citep{SMPL:2015} joints, and $N$ denotes the number of the generated sequence. Our framework adopts a Mixture-of-Transformers(MoT) architecture consisting of a understanding branch and a generation branch, as shown in Figure\ref{fig:Method}. 
+% 
+% % The text prompt is encoded into the understanding branch, while the video and the motion are processed by their respective encoders and fed into the generation branch. A shared attention layer is used to fuse information across multiple modalities. Finally, the video and motion outputs are decoded by respective decoders.
+% 
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[width=\linewidth]{Fig/pdf/Method_v3.pdf}
+%     \caption{The architecture of our method.}
+%     \label{fig:Method}
+% \end{figure}
+% 
+% \subsection{Modality Tokenization}
+% We first process the language, visual and motion inputs with modality-specific encoders to obtain the representations in a shared latent space. For text inputs, we adopt a text tokenizer to encode the prompts into the text embeddings. The text embeddings are provided as conditional context to make the generative branch better capture the semantic information of the prompt. To distinguish the text conditions from the generated modalities, we apply a 1D positional encoding to the text embeddings. The $i$-th text token $\mathbf{h}_{i}^{text}$ can be represented as:
+% \begin{equation}
+% \mathbf{h}_i^{\text{text}} = \mathbf{E}[w_i] \otimes \mathrm{RoPE}\big(\mathbf{p}_i^{\text{text}}\big),
+% \qquad \mathbf{p}_i^{\text{text}} = (i,i,i)
+% \label{eq:text-token}
+% \end{equation}
+% where $\mathbf{E}$ denotes the text embedding table, $w_i$ denotes the indices of the text embeddings, $\mathbf{p}_{i}^{text}$ denotes the coordinate of the $i$-th text token. We use a video VAE to compress the input videos into video latents. The video VAE applies $4\times$ temporal downsampling and $16\times$ spatial downsampling, followed by patchification with a $2\times2$ kernel. The video latent $x_{l,r,c}$ is projected by a vae2llm $W_v$ to align the dimension with the Transformer hidden space. A video-specified timestep emebedding $\boldsymbol{\phi}(\sigma_v)$ is then added to indicate the video noise level, followed by the video positional embedding $\mathrm{RoPE} \big(\mathbf{p}_{l,r,c}^{\text{video}}\big)$ to obtain the final video token $\mathbf{h}_{l,r,c}^{\text{video}}$:
+% \begin{equation}
+% \mathbf{h}_{l,r,c}^{\text{video}} = \Big( W_v x_{l,r,c} + \boldsymbol{\phi}(\sigma_v) \Big) \otimes \mathrm{RoPE} \big(\mathbf{p}_{l,r,c}^{\text{video}}\big), \qquad \mathbf{p}_{l,r,c}^{\text{video}}= (t_0+l, r, c)
+% \label{eq:video-token}
+% \end{equation}
+% where $t_0, l, r, c$ indicate the origin of the temporal coordinate, video latent index, patch row index and patch column index respectively. $\sigma_v$ indicates the noise level of the video latent, and $\boldsymbol{\phi}(\cdot)$ represents the timestep embedding. 
+% 
+% \textbf{Motion Representation.} The input human motion $m_k$ of $k$-th frame contains root global orientation $r_0^k \in \mathbb{R}^3$, root global translation $\delta^k \in \mathbb{R}^3$ and joints orientations $r_{j_1, j_2,..j_n}^k \in \mathbb{R}^{n \times 3}$, $n$ represents the number of human joints. Then we convert the 3D axis-angle representation $r^k=[r_0^k, r_{j_1}^k,\ldots,r_{j_n}^k]$ into a 6D rotation representation $\tau^k=[\tau_0^k, \tau_{j_1}^k,\ldots,\tau_{j_n}^k]$ for more stable learning. Conventional Text-to-Motion (T2M) methods~\citep{guo2022humanml3d,zhang2023t2mgpt} generate an entire motion sequence directly from text. Their motion representations rely on root angular velocity and yaw increments to describe global motion and orientation. For our task, motion generation is conditioned on a initial pose without additional velocity. Therefore, we only use the 6D rotations and root translation to represent the pose. Directly feeding $\tau_k$ and $\delta_k$ into the network leads to temporal jitter in the generated motion. Inspired from ARDy~\citep{zhao2026ardy}, the root translation $\hat \delta_k$ is represented relative to the first frame translation $\delta_0$ as:
+% \begin{equation}
+% \hat \delta_k = \delta_k - \delta_0
+% \label{eq:relative-translation}
+% \end{equation}
+% Then we apply the normalization and input the motion latent $x_k = [ \hat \delta_k, \tau_k ]$ into the encoder $W_a$ for dimensional alignment. We add a learnable embedding vector $e_{motion}$ to distinguish different modalities and use an action-specified timestep embedding $\boldsymbol{\phi}(\sigma_m)$ to indicate the motion noise level. Since the video latent is temporally $4 \times $ downsampled, we adjust the motion positional coordinate $\mathbf{p}_k^{\text{motion}}$ to align the video latent. Finally, the motion token $\mathbf{h}_k^{\text{motion}}$ can be described as:
+% \begin{equation}
+% \mathbf{h}_{k}^{\text{motion}} = \Big( W_a x_{k} + \mathbf{e}_{\text{motion}} + \boldsymbol{\phi}(\sigma_m) \Big) \otimes \mathrm{RoPE}\big(\mathbf{p}_k^{\text{motion}} \big), \qquad \mathbf{p}_k^{\text{motion}} = (t_0{+}\tfrac{k}{4}, 0, 0)
+% \label{eq:motion-token}
+% \end{equation}
+% where $k$ denotes the index of the frame, $\sigma_m$ indicates the noise level of motion latent. $\mathrm{RoPE}(\cdot)$ denotes the rotary transform applied to the query and key projections of the token at every attention layer.
+% 
+% \subsection{Mixture of Transformer(MoT)}
+% 
+% Our backbone follows the MoT architecture design of Cosmos3~\citep{agarwal2026cosmos}, as illustrated in Figure\ref{fig:Method}(a). The MoT consists of an understanding branch and a generation branch. Each branch is a standard Transformer layer with its own parameters, including layer normalization modules, attention projection matrices, and feed-forward networks. The understanding branch implements a causal attention mask to achieve autoregressive design. During training, the understanding branch remains frozen and provides multi-level semantic guidance to the generation branch. The generation branch adopts a diffusion-based design, where the video and motion tokens are jointly fed into the Transformer for denoising. The understanding branch and generation branch interact through a shared multimodal attention layer. The Understanding branch attends causally within text tokens, while the generation branch attends bidirectionally to both AR and diffusion tokens through concatenated key and value representtaion.
+% 
+% \subsection{Coupled Noise Schedule}
+% \textbf{Training.} A single noise level for both modalities is suboptimal: the video stream carries $\sim$25K tokens per sample while the motion stream carries around one hundred tokens. Different from EgoTwin~\citep{xiu2026egotwin}, we assign the two modalities different noise level through a shared variant $u$. This coupled scheme constrains all training noise pairs to lie on a single curve, ensuring better alignment with the inference trajectory. At each training step, we randomly sample a variant $u = g(\tau)$ with $\tau \sim \mathcal{U}(0,1)$ and warp it with per-modality shifts:
+% 
+% \begin{equation}
+% \sigma_v = \frac{s_vu}{1+(s_v-1)u}, \qquad \sigma_m = \frac{s_mu}{1+(s_m-1)u}
+% \label{eq:coupled-noise-schedule}
+% \end{equation}
+% 
+% where $s_m$ and $s_v$ represent the shift of motion and video, respectively. We set $s_v$ higher than $s_m$ so that the video latent remains longer in the high-noise regime, which helps improve video generation quality. Both modality output are trained with rectified flow. Given a clean modality latent $z$, we construct noisy latent $z_\sigma = (1 - \sigma) z + \sigma\epsilon$. Each modality token receives its own timestep embedding, $\phi(\sigma_v)$ on video tokens and $\phi(\sigma_m)$ on motion tokens. Intuitively, the motion tokens is resolved earlier during denoising to provide the coarse structural guidance, while the video tokens refines high dimensional visual details. Finally, our training objective is formulated as:
+% \begin{equation}
+% \mathcal{L} = \mathcal{L}_{\text{video}} + \lambda\mathcal{L}_{\text{motion}}
+% \label{eq:training-objective}
+% \end{equation}
+% where $\lambda$ is a coefficient for the motion loss, which compensates for the imbalance in token counts between the video and motion modalities.
+% 
+% \textbf{Inference.} Sampling runs two schedulers that share a single grid of progress values $u_{k}$ and differ only in their shifts $s_v, s_m$ at step $k$. At each inference step, the video and motion streams are assigned noise levels $\big(\sigma_v(u_k), \sigma_m(u_k)\big)$ along the same coupled trajectory used during training, ensuring that both modality latents denoise completely at the final step. After synchronous generation, we inverse-normalize the motion output and recover the global translation by adding the predicted relative translation to the positions of first frame. Finally, we apply a zero-phase Savitzky-Golay filter~\citep{savitzky1964smoothing} to the generated motion to improve the motion quality.
+% 
+% \begin{figure}[!h]
+%     \centering
+%     \includegraphics[width=\linewidth]{Fig/pdf/Denoising.pdf}
+%     \caption{Qualitative comparison of motion generation methods.}
+%     \label{fig:Comparison}
+% \end{figure}
+% 
+% \label{sec:method}
+% 
+% End previous method.
+
+\section{Method}
+\label{sec:method}
+
+Given a single image containing a person and a text prompt describing the intended action, World2Motion jointly generates a video sequence and corresponding 3D human motion. We estimate the initial human pose from the input image using CameraHMR~\citep{patel2025camerahmr}. To use the priors learned during video world model pretraining, we adapt the existing Cosmos 3 backbone for full-body motion generation. Figure~\ref{fig:Method} provides an overview of the framework.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=\linewidth]{Fig/pdf/Method_v6.pdf}
+%     \caption{Overview of World2Motion. We adapt the Cosmos 3 backbone to jointly generate video and 3D human motion from an input image and a text prompt. Motion input and output projections connect the full-body motion representation to the pretrained backbone. A shift-decoupled noise schedule assigns modality-specific noise levels through shared denoising progress.}
+%     \caption{Overview of World2Motion. Given an image and a text prompt, World2Motion jointly generates 3D human motion and video. CameraHMR estimates the initial pose from the image. A motion encoder and decoder adapt the Cosmos 3 backbone for full-body motion generation. The shift-decoupled noise schedule assigns modality-specific noise levels through shared denoising progress.}
+    \caption{Overview of World2Motion. From an image and a text prompt, the adapted Cosmos 3 backbone jointly generates 3D human motion and video. CameraHMR estimates the initial pose from the image. The shift-decoupled schedule uses modality-specific noise shifts with shared denoising progress.}
+    \label{fig:Method}
+\end{figure}
+
+\subsection{Review of Cosmos 3}
+Cosmos 3~\citep{agarwal2026cosmos} uses a Mixture-of-Transformers (MoT) backbone with an understanding branch and a generation branch. We retain its text and video encoding components, shared attention mechanism, positional encoding, and train both generated modalities with rectified-flow objectives.
+
+\subsection{Hybrid Video--Motion Training Data}
+\label{sec:training-data}
+% Before naming the dataset and specifying the real-video source: To address the scarcity of paired supervision, we construct a hybrid training dataset combining synthetic video--motion pairs with real videos paired with estimated 3D motion. For the synthetic component, we render motion sequences from existing interaction datasets, including OMOMO~\citep{li2023omomo}, CHAIRs~\citep{jiang2023chairs}, and SAMP~\citep{hassan2021samp}, and use the rendered animations to guide MiniMax-H3~\citep{minimaxh3} in generating corresponding RGB videos. The original motion sequences provide known 3D supervision. For the real component, we estimate 3D motion from internet videos using CameraHMR. We use Gemini 2.5~\citep{comanici2025gemini} to generate text descriptions for both components. These sources combine motion supervision from existing 3D datasets with the diversity of environments and appearances in real videos.
+To address the scarcity of paired supervision, we construct HOI-mix, a hybrid dataset combining synthetic video--motion pairs with real videos paired with estimated 3D motion. For the synthetic component, we render motion sequences from existing interaction datasets, including OMOMO~\citep{li2023omomo}, CHAIRs~\citep{jiang2023chairs}, and SAMP~\citep{hassan2021samp}, and use the rendered animations to guide MiniMax-H3~\citep{minimaxh3} in generating corresponding RGB videos. The original motion sequences provide known 3D supervision. For the real component, we estimate 3D motion from curated Bilibili videos using CameraHMR. We use Gemini 2.5~\citep{comanici2025gemini} to generate text descriptions for both components. These sources combine motion supervision from existing 3D datasets with the diversity of environments and appearances in real videos.
+
+\subsection{Full-Body Motion Adaptation}
+% We represent each SMPL~\citep{SMPL:2015} motion frame using root translation and 6D joint rotations, including the root orientation. This representation allows generation to be conditioned on an initial pose without requiring velocity estimates. Following ARDY~\citep{zhao2026ardy}, we express root translation relative to its initial position:
+% \begin{equation}
+% \hat{\delta}_k = \delta_k - \delta_0,
+% \label{eq:relative-translation}
+% \end{equation}
+% where $\delta_k$ is the global root translation at frame $k$ and $\delta_0$ is its initial position. We convert the axis-angle joint rotations to 6D rotations $\tau_k$, normalize the motion features $x_k=[\hat{\delta}_k,\tau_k]$, and project them into the Transformer hidden dimension using a motion encoder. A learnable modality embedding distinguishes motion tokens from video tokens. Motion time coordinates are scaled to match the video VAE's fourfold temporal compression, aligning the two modalities in time.
+We represent each SMPL~\citep{SMPL:2015} motion frame using root translation and 6D joint rotations, including the root orientation. This representation allows generation to be conditioned on an initial pose without requiring velocity estimates. Following ARDY~\citep{zhao2026ardy}, we subtract the initial root position from the root translation at each frame. We convert the axis-angle joint rotations to 6D rotations, normalize the combined translation and rotation features, and project them into the Transformer hidden dimension using a motion encoder. A learnable modality embedding distinguishes motion tokens from video tokens. Motion time coordinates are scaled to match the video VAE's fourfold temporal compression, aligning the two modalities in time.
+
+We train the motion encoder and decoder from scratch and initialize the remaining model weights from Cosmos 3. The understanding branch remains frozen during training. Our ablation study compares relative and absolute root translations and shows lower jerk and foot sliding with the relative representation (Table~\ref{tab:ablation_norm}).
+
+\begin{figure}[!tb]
+    \centering
+    \includegraphics[width=\linewidth]{Fig/pdf/Denoising_v2.pdf}
+%     \caption{Shift-decoupled video--motion denoising. (a) Video and motion noise levels over inference steps. (b) Shared denoising progress defines a coupled curve of video and motion noise levels. (c) Intermediate video frames and motion states at selected denoising steps. Rows show denoising steps, and column groups show different video times. The chair mesh is reference geometry for visualization.}
+    \caption{Shift-decoupled video--motion denoising. (a) Video and motion noise levels during inference with $s_v=10$ and $s_m=1$. (b) The corresponding training noise pairs follow a shared curve, with lower motion noise than video noise at intermediate steps. (c) Intermediate video frames and motion states. Rows show denoising steps, and column groups show video times. The chair mesh is reference geometry for visualization.}
+    \label{fig:denoising}
+\end{figure}
+
+\subsection{Shift-Decoupled Noise Schedule}
+% Video and motion have different denoising requirements. We propose a shift-decoupled noise schedule that assigns modality-specific noise levels through a shared progress variable $u\in[0,1]$. At each training step, we sample one value of $u$ and compute the video and motion noise levels as
+To improve temporal stability in joint video--motion generation, we propose a shift-decoupled noise schedule. It uses separate noise shifts for video and motion while retaining shared denoising progress $u\in[0,1]$. At each training step, we sample one value of $u$ and compute the video and motion noise levels as
+\begin{equation}
+\sigma_v(u) = \frac{s_vu}{1+(s_v-1)u}, \qquad
+\sigma_m(u) = \frac{s_mu}{1+(s_m-1)u},
+\label{eq:coupled-noise-schedule}
+\end{equation}
+% where $s_v$ and $s_m$ are positive shifts for video and motion, respectively. The shifts control how shared progress maps to each modality's noise level. When $s_v>s_m$, video has a higher noise level than motion for $0<u<1$. Each modality receives a timestep embedding corresponding to its own noise level. The shared progress constrains the training noise pairs to a single curve in the video--motion noise space, as illustrated in Figure~\ref{fig:denoising}(b).
+where $s_v$ and $s_m$ are positive shifts for video and motion, respectively. The shifts control how shared progress maps to each modality's noise level. Setting $s_v>s_m$ keeps video at a higher noise level than motion during intermediate denoising steps, as illustrated in Figure~\ref{fig:denoising}(a). Each modality receives a timestep embedding corresponding to its own noise level. The shared progress constrains the training noise pairs to a single curve in the video--motion noise space, as illustrated in Figure~\ref{fig:denoising}(b).
+
+% During inference, both modalities follow a common progress grid from $u=1$ to $u=0$ using the same shifts and mappings as in training. At each step, the video and motion streams use their respective noise levels along this shared curve. Both noise schedules reach zero at the final step. Our ablation studies show lower motion jitter with $s_v=10$ and $s_m=1$ than with equal shifts, and lower jitter when training and inference shifts match than when they differ (Table~\ref{tab:ablation_schedule}).
+During inference, both modalities follow a common progress grid from $u=1$ to $u=0$, using the same shifts and mappings as in training. Both noise schedules reach zero at the final step. Among the tested configurations, $s_v=10$ and $s_m=1$ achieve the lowest jerk and foot sliding rate. Matching the inference shifts to the training shifts also improves both metrics compared with mismatched settings (Table~\ref{tab:ablation_schedule}).
+
+After joint generation, we inverse-normalize the motion output and recover global root translation by adding the initial root position to the predicted relative translation. We then apply a Savitzky--Golay filter~\citep{savitzky1964smoothing} as post-processing. We disable this filter in all ablation experiments to evaluate the effects of the motion representation and noise schedule directly.
+
+

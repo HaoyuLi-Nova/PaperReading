@@ -1,0 +1,68 @@
+% require xspace, array
+
+\newcommand{\stderr}[1]{\scriptsize $\pm #1$}
+
+%% layout
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+\newcommand{\xpar}[1]{\noindent\textbf{#1}\ \ }
+\newcommand{\vpar}[1]{\vspace{3mm}\noindent\textbf{#1}\ \ }
+
+%% notations
+\newcommand{\sect}[1]{Section~\ref{#1}}
+\newcommand{\sectapp}[1]{Appendix~\ref{#1}}
+\newcommand{\ssect}[1]{\S~\ref{#1}}
+\newcommand{\eqn}[1]{Equation~\ref{#1}}
+\newcommand{\fig}[1]{Figure~\ref{#1}}
+\newcommand{\tbl}[1]{Table~\ref{#1}}
+\newcommand{\alg}[1]{Algorithm.~\ref{#1}}
+
+\newcommand{\degree}{\ensuremath{^\circ}\xspace}
+\newcommand{\ignore}[1]{}
+\newcommand{\norm}[1]{\lVert#1\rVert}
+\newcommand{\fcseven}{$\mbox{fc}_7$}
+% \DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+% \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+
+%\DeclareMathOperator*{\argmin}{arg\,min}
+%\DeclareMathOperator*{\argmax}{arg\,max}
+
+\def\naive{na\"{\i}ve\xspace}
+\def\Naive{Na\"{\i}ve\xspace}
+
+\makeatletter
+\DeclareRobustCommand\onedot{\futurelet\@let@token\@onedot}
+\def\@onedot{\ifx\@let@token.\else.\null\fi\xspace}
+
+\def\eg{e.g\onedot} \def\Eg{E.g\onedot}
+\def\ie{i.e\onedot} \def\Ie{I.e\onedot}
+\def\cf{\emph{c.f}\onedot} \def\Cf{\emph{C.f}\onedot}
+\def\etc{etc\onedot}
+\def\vs{\emph{vs}\onedot}
+\def\wrt{w.r.t\onedot}
+\def\dof{d.o.f\onedot}
+\def\etal{et al\onedot}
+\def\aka{a.k.a\onedot}
+\makeatother
+
+%% comments
+\definecolor{MyDarkBlue}{rgb}{0,0.08,1}
+\definecolor{MyDarkGreen}{rgb}{0.02,0.6,0.02}
+\definecolor{MyDarkRed}{rgb}{0.8,0.02,0.02}
+\definecolor{MyDarkOrange}{rgb}{0.40,0.2,0.02}
+\definecolor{MyPurple}{RGB}{111,0,255}
+\definecolor{MyRed}{rgb}{1.0,0.0,0.0}
+\definecolor{MyGold}{rgb}{0.75,0.6,0.12}
+\definecolor{MyDarkgray}{rgb}{0.66, 0.66, 0.66}
+
+\definecolor{turquoise}{cmyk}{0.65,0,0.1,0.3}
+
+\newcommand{\karen}[1]{\textcolor{red}{[Karen: {#1}]}}
+\newcommand{\jiaman}[1]{\textcolor{orange}{[Jiaman: {#1}]}}
+\newcommand{\zhen}[1]{\textcolor{blue}{[Zhen: {#1}]}}
+
+\renewcommand{\algorithmcfname}{ALGORITHM}

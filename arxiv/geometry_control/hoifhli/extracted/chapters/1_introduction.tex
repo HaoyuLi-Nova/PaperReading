@@ -1,0 +1,38 @@
+\section{Introduction}
+\label{sec:introduction}
+
+% (1 Background) 
+Synthesizing physically plausible, long-horizon, human-object interactions in contextual environments is crucial for applications in computer graphics, embodied AI, and robotics. When given human-level language instructions, intelligent agents should be able to comprehend these high-level commands and map them to executable action sequences. For instance, when instructed to set up a workspace, an agent must understand the abstract concept of ``workspace'', identify the relevant furniture and objects in the room, and translate this concept into a series of concrete actions, such as moving and orienting a desk, placing a chair nearby, and positioning a monitor on the desk. In addition to understanding the instructions, the agent must execute actions that lead to realistic and functional human movements, including navigating cluttered spaces, manipulating various objects for the task, and appropriately releasing them after use.
+% (2 What prior work do and cannot achieve) 
+
+Prior research has made significant progress in synthesizing human-scene interactions using large language model (LLM) planners~\cite{xiao2024unified}. However, most of these interactions have been limited to static objects without hand manipulation. Some studies~\cite{li2023controllable} have demonstrated the manipulation of dynamic objects, but the resulting interactions still lack realistic finger movements. Recently, physics-based RL policies has demonstrated promising results in human-object interactions~\cite{luo2024grasping, wang2023physhoi}. However, generating long-horizon motions that interact with various objects in a scene-aware manner remains an ongoing challenge. Build upon these prior work, we introduce the first complete system capable of synthesizing physically accurate, long-horizon human-object interactions with synchronous full-body and intricate finger movements, from human-level language instructions. 
+
+
+
+Synthesizing coordinated full-body and finger movements from human-level instructions presents two main challenges. First, human-level instructions typically provide only a high-level task outline, requiring common sense and world knowledge to translate them into precise object arrangements and detailed execution plans. Second, existing datasets with paired full-body and finger motion data are limited to interactions with small objects and lack locomotion during object manipulation~\cite{GRAB:2020, fan2023arctic}.
+Although a recent dataset~\cite{li2023object} includes locomotion and manipulation for large objects, it lacks detailed finger movements due to the difficulty of capturing both modalities simultaneously. 
+
+To tackle the challenge of comprehending human-level instructions, we utilize the latest advancements in LLMs, which are highly effective in interpreting high-level commands\cite{openai2023gpt, liu2024visual}.
+However, LLMs are not well-suited for directly predicting precise scene layouts, such as the exact positions and orientations of objects~\cite{aguina2024open, hong20233d}.
+Instead of prompting LLMs to directly specify object placements, we use object spatial relationships as intermediate representations and ask LLMs to derive these relationships. We then propose an algorithm to calculate the precise object poses based on these relationships.
+
+For the low-level motion synthesis, we take the approach of modeling human motion from real-world human data. To address the lack of large-scale object manipulation datasets with synchronized full-body and finger motions, one could use two separate datasets to train a full-body manipulation model and another detailed finger manipulation model. 
+% However, a causality dilemma emerges when putting the motions together---should we first generate the full-body manipulation and then enforce the finger-object contacts to agree with the wrist poses determined by the full-body motion, or should we proceed with the other way around? In either approach, simply fusing the two motions together will cause glaring artifacts due to the disagreement in two separately trained models.
+However, simply fusing the two motions together will cause glaring artifacts due to the disagreement in two separately trained models.
+%The former would result in glaring physical artifacts at finger-object contacts while the latter requires both datasets to share the same object motion. 
+% Our solution to break the dilemma is to employ \emph{both} approaches in three steps. 
+Our solution is to break this process into three steps.
+We first generate full-body and object motions without detailed fingers. The object motion and rough wrist poses provide guidance for generating contact-consistent finger motion in the second step. Finally, we generate full-body and object motions again conditioned on precise finger motions. This approach enables our framework to successfully produce synchronized object motion, full-body motion, and finger motions without requiring a dataset that includes all data modalities.
+
+% However, existing datasets only consist of kinematic pose trajectories, resulting in generative models that do not produce physically accurate motions. 
+The generated motion, however, is not guaranteed to be physically accurate.
+To ensure physical plausibility, we further use reinforcement learning (RL) to track the generated motion in a physics simulator. 
+Our method adopts an importance sampling technique to improve the training efficiency of long sequence tracking and supports tracking diverse interactions with multiple distinct objects within a single sequence.
+
+We evaluate our method through extensive quantitative and qualitative comparisons, as well as human studies, demonstrating that our approach outperforms all others. This underscores the effectiveness of our method and its potential for real-world applications.
+
+% (5 Summary of Contributions) 
+%To summarize, our work makes the following contributions: (i) We leverage LLMs to translate human-level instructions into precise spatial task planning grounded in executable actions. 
+%(ii) We propose an effective motion generator that synthesizes human-object interactions with detailed finger movements. (iii) We apply RL to ensure the physical plausibility of the generated motions. (iv) By integrating these components, we develop the first complete system capable of synthesizing physically accurate, long-horizon human-object interactions with intricate finger movements, from human-level language instructions. \karen{We can just talk about evaluation in this paragraph.}
+
+% \vspace{10pt}

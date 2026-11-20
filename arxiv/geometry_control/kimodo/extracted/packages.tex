@@ -1,0 +1,53 @@
+\usepackage[square,numbers]{natbib}
+
+\usepackage[utf8]{inputenc} %
+\usepackage[T1]{fontenc}    %
+
+\usepackage{parskip}        %
+\usepackage{url}            %
+\usepackage{hyperref}       %
+\usepackage{booktabs}       %
+\usepackage{amsfonts}       %
+\usepackage{nicefrac}       %
+\usepackage{microtype}      %
+\usepackage{xcolor}         %
+\usepackage[dvipsnames]{xcolor} %
+\usepackage{graphicx}
+\usepackage{animate}        %
+\usepackage{subcaption}
+\usepackage{tabularx}
+\usepackage{makecell}
+\usepackage{adjustbox}
+\usepackage{setspace}
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{positioning,shapes,arrows}
+\usepackage{amsmath,amsfonts,bm, bbm,leftindex}
+\usepackage{multirow}
+\usepackage{comment}
+\usepackage{gensymb}
+\usepackage{lipsum}
+\usetikzlibrary{arrows.meta, positioning, fit}
+\usepackage[para]{threeparttable}
+\usepackage{tikz}
+\usetikzlibrary{tikzmark}
+
+\newenvironment{multicoltextblock}{%
+    \hspace{16pt} %
+    \begin{minipage}[t]{\dimexpr\textwidth-16pt\relax} %
+}{%
+    \end{minipage}%
+    \unskip\ignorespacesafterend %
+}
+
+\newenvironment{multicoltextblockhalf}{%
+    \hspace{4pt} %
+    \begin{minipage}[t]{\dimexpr\textwidth/2-16pt\relax} %
+}{%
+    \end{minipage}%
+    \unskip\ignorespacesafterend %
+}
+
+\newcommand{\prompttext}[1]{\textbf{#1}}
+\newcommand{\prompt}[1]{\textsf{#1}}

@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+outputs/
+checkpoints/*.safetensors
+checkpoints/*.pth
+checkpoints/*.pt
+checkpoints/*.bin
+checkpoints/tokenizer/
+*.log
+.DS_Store

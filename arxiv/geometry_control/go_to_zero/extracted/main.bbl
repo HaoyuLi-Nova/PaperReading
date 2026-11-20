@@ -1,0 +1,555 @@
+\begin{thebibliography}{108}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Achiam et~al.(2023)Achiam, Adler, Agarwal, Ahmad, Akkaya, Aleman, Almeida, Altenschmidt, Altman, Anadkat, Avila, Babuschkin, Balaji, Balcom, Baltescu, ing Bao, Bavarian, Belgum, Bello, Berdine, Bernadett-Shapiro, Berner, Bogdonoff, Boiko, Boyd, Brakman, Brockman, Brooks, Brundage, Button, Cai, Campbell, Cann, Carey, Carlson, Carmichael, Chan, Chang, Chantzis, Chen, Chen, Chen, Chen, Chen, Chess, Cho, Chu, Chung, Cummings, Currier, Dai, Decareaux, Degry, Deutsch, Deville, Dhar, Dohan, Dowling, Dunning, Ecoffet, Eleti, Eloundou, Farhi, Fedus, Felix, Fishman, Forte, abella Fulford, Gao, Georges, Gibson, Goel, Gogineni, Goh, Gontijo-Lopes, Gordon, Grafstein, Gray, Greene, Gross, Gu, Guo, Hallacy, Han, Harris, He, Heaton, Heidecke, Hesse, Hickey, Hickey, Hoeschele, Houghton, Hsu, Hu, Hu, Huizinga, Jain, Jain, Jang, Jiang, Jiang, Jin, Jin, Jomoto, Jonn, Jun, Kaftan, Kaiser, Kamali, Kanitscheider, Keskar, Khan, Kilpatrick, Kim, Kim, Kim, Kirchner, Kiros, Knight, Kokotajlo, Kondraciuk, Kondrich,
+  Konstantinidis, Kosic, Krueger, Kuo, Lampe, Lan, Lee, Leike, Leung, Levy, Li, Lim, Lin, Lin, teusz Litwin, Lopez, Lowe, Lue, Makanju, Malfacini, Manning, Markov, Markovski, Martin, Mayer, Mayne, McGrew, McKinney, McLeavey, McMillan, McNeil, Medina, Mehta, Menick, Metz, Mishchenko, Mishkin, Monaco, Morikawa, Mossing, Mu, Murati, Murk, M'ely, Nair, Nakano, Nayak, Neelakantan, Ngo, Noh, Long, O'Keefe, Pachocki, Paino, Palermo, Pantuliano, Parascandolo, Parish, Parparita, Passos, Pavlov, Peng, Perelman, de~Avila Belbute~Peres, Petrov, de~Oliveira~Pinto, Pokorny, Pokrass, Pong, Powell, Power, Power, Proehl, Puri, Radford, Rae, Ramesh, Raymond, Real, Rimbach, Ross, Rotsted, Roussez, Ryder, Saltarelli, Sanders, Santurkar, Sastry, Schmidt, Schnurr, Schulman, Selsam, Sheppard, Sherbakov, Shieh, Shoker, Shyam, Sidor, Sigler, Simens, Sitkin, Slama, Sohl, Sokolowsky, Song, Staudacher, Such, Summers, Sutskever, Tang, Tezak, Thompson, Tillet, Tootoonchian, Tseng, Tuggle, Turley, Tworek, Uribe, Vallone, Vijayvergiya,
+  Voss, Wainwright, Wang, Wang, Wang, Ward, Wei, Weinmann, Welihinda, Welinder, Weng, Weng, Wiethoff, Willner, Winter, Wolrich, Wong, Workman, Wu, Wu, Wu, Xiao, Xu, Yoo, Yu, ing Yuan, Zaremba, Zellers, Zhang, Zhang, Zhao, Zheng, Zhuang, Zhuk, and Zoph]{gpt4}
+OpenAI~Josh Achiam, Steven Adler, Sandhini Agarwal, Lama Ahmad, Ilge Akkaya, Florencia~Leoni Aleman, Diogo Almeida, Janko Altenschmidt, Sam Altman, Shyamal Anadkat, Red Avila, Igor Babuschkin, Suchir Balaji, Valerie Balcom, Paul Baltescu, Haim ing Bao, Mo Bavarian, Jeff Belgum, Irwan Bello, Jake Berdine, Gabriel Bernadett-Shapiro, Christopher Berner, Lenny Bogdonoff, Oleg Boiko, Madelaine Boyd, Anna-Luisa Brakman, Greg Brockman, Tim Brooks, Miles Brundage, Kevin Button, Trevor Cai, Rosie Campbell, Andrew Cann, Brittany Carey, Chelsea Carlson, Rory Carmichael, Brooke Chan, Che Chang, Fotis Chantzis, Derek Chen, Sully Chen, Ruby Chen, Jason Chen, Mark Chen, Benjamin Chess, Chester Cho, Casey Chu, Hyung~Won Chung, Dave Cummings, Jeremiah Currier, Yunxing Dai, Cory Decareaux, Thomas Degry, Noah Deutsch, Damien Deville, Arka Dhar, David Dohan, Steve Dowling, Sheila Dunning, Adrien Ecoffet, Atty Eleti, Tyna Eloundou, David Farhi, Liam Fedus, Niko Felix, Sim'on~Posada Fishman, Juston Forte, Is abella Fulford, Leo
+  Gao, Elie Georges, Christian Gibson, Vik Goel, Tarun Gogineni, Gabriel Goh, Raphael Gontijo-Lopes, Jonathan Gordon, Morgan Grafstein, Scott Gray, Ryan Greene, Joshua Gross, Shixiang~Shane Gu, Yufei Guo, Chris Hallacy, Jesse Han, Jeff Harris, Yuchen He, Mike Heaton, Johannes Heidecke, Chris Hesse, Alan Hickey, Wade Hickey, Peter Hoeschele, Brandon Houghton, Kenny Hsu, Shengli Hu, Xin Hu, Joost Huizinga, Shantanu Jain, Shawn Jain, Joanne Jang, Angela Jiang, Roger Jiang, Haozhun Jin, Denny Jin, Shino Jomoto, Billie Jonn, Heewoo Jun, Tomer Kaftan, Lukasz Kaiser, Ali Kamali, Ingmar Kanitscheider, Nitish~Shirish Keskar, Tabarak Khan, Logan Kilpatrick, Jong~Wook Kim, Christina Kim, Yongjik Kim, Hendrik Kirchner, Jamie~Ryan Kiros, Matthew Knight, Daniel Kokotajlo, Lukasz Kondraciuk, Andrew Kondrich, Aris Konstantinidis, Kyle Kosic, Gretchen Krueger, Vishal Kuo, Michael Lampe, Ikai Lan, Teddy Lee, Jan Leike, Jade Leung, Daniel Levy, Chak~Ming Li, Rachel Lim, Molly Lin, Stephanie Lin, Ma teusz Litwin, Theresa Lopez,
+  Ryan Lowe, Patricia Lue, Anna Makanju, Kim Malfacini, Sam Manning, Todor Markov, Yaniv Markovski, Bianca Martin, Katie Mayer, Andrew Mayne, Bob McGrew, Scott~Mayer McKinney, Christine McLeavey, Paul McMillan, Jake McNeil, David Medina, Aalok Mehta, Jacob Menick, Luke Metz, Andrey Mishchenko, Pamela Mishkin, Vinnie Monaco, Evan Morikawa, Daniel~P. Mossing, Tong Mu, Mira Murati, Oleg Murk, David M'ely, Ashvin Nair, Reiichiro Nakano, Rajeev Nayak, Arvind Neelakantan, Richard Ngo, Hyeonwoo Noh, Ouyang Long, Cullen O'Keefe, Jakub~W. Pachocki, Alex Paino, Joe Palermo, Ashley Pantuliano, Giambattista Parascandolo, Joel Parish, Emy Parparita, Alexandre Passos, Mikhail Pavlov, Andrew Peng, Adam Perelman, Filipe de Avila Belbute~Peres, Michael Petrov, Henrique~Pond{\'e} de Oliveira~Pinto, Michael Pokorny, Michelle Pokrass, Vitchyr~H. Pong, Tolly Powell, Alethea Power, Boris Power, Elizabeth Proehl, Raul Puri, Alec Radford, Jack~W. Rae, Aditya Ramesh, Cameron Raymond, Francis Real, Kendra Rimbach, Carl Ross, Bob
+  Rotsted, Henri Roussez, Nick Ryder, Mario~D. Saltarelli, Ted Sanders, Shibani Santurkar, Girish Sastry, Heather Schmidt, David Schnurr, John Schulman, Daniel Selsam, Kyla Sheppard, Toki Sherbakov, Jessica Shieh, Sarah Shoker, Pranav Shyam, Szymon Sidor, Eric Sigler, Maddie Simens, Jordan Sitkin, Katarina Slama, Ian Sohl, Benjamin~D. Sokolowsky, Yang Song, Natalie Staudacher, Felipe~Petroski Such, Natalie Summers, Ilya Sutskever, Jie Tang, Nikolas~A. Tezak, Madeleine Thompson, Phil Tillet, Amin Tootoonchian, Elizabeth Tseng, Preston Tuggle, Nick Turley, Jerry Tworek, Juan Felipe~Cer'on Uribe, Andrea Vallone, Arun Vijayvergiya, Chelsea Voss, Carroll~L. Wainwright, Justin~Jay Wang, Alvin Wang, Ben Wang, Jonathan Ward, Jason Wei, CJ Weinmann, Akila Welihinda, Peter Welinder, Jiayi Weng, Lilian Weng, Matt Wiethoff, Dave Willner, Clemens Winter, Samuel Wolrich, Hannah Wong, Lauren Workman, Sherwin Wu, Jeff Wu, Michael Wu, Kai Xiao, Tao Xu, Sarah Yoo, Kevin Yu, Qim ing Yuan, Wojciech Zaremba, Rowan Zellers, Chong
+  Zhang, Marvin Zhang, Shengjia Zhao, Tianhao Zheng, Juntang Zhuang, William Zhuk, and Barret Zoph.
+\newblock Gpt-4 technical report.
+\newblock 2023.
+
+\bibitem[Ahn et~al.(2018)Ahn, Ha, Choi, Yoo, and Oh]{text2action}
+Hyemin Ahn, Timothy Ha, Yunho Choi, Hwiyeon Yoo, and Songhwai Oh.
+\newblock Text2action: Generative adversarial synthesis from language to action.
+\newblock In \emph{ICRA}, pages 5915--5920, 2018.
+
+\bibitem[Ahuja and Morency(2019)]{jl2p}
+Chaitanya Ahuja and Louis-Philippe Morency.
+\newblock Language2pose: Natural language grounded pose forecasting.
+\newblock In \emph{3DV}, pages 719--728, 2019.
+
+\bibitem[Athanasiou et~al.(2022)Athanasiou, Petrovich, Black, and Varol]{teach}
+Nikos Athanasiou, Mathis Petrovich, Michael~J Black, and G{\"u}l Varol.
+\newblock Teach: Temporal action composition for 3d humans.
+\newblock In \emph{3DV}, pages 414--423, 2022.
+
+\bibitem[Barquero et~al.(2024{\natexlab{a}})Barquero, Escalera, and Palmero]{barquero2024seamless}
+German Barquero, Sergio Escalera, and Cristina Palmero.
+\newblock Seamless human motion composition with blended positional encodings.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, pages 457--469, 2024{\natexlab{a}}.
+
+\bibitem[Barquero et~al.(2024{\natexlab{b}})Barquero, Escalera, and Palmero]{flowmdm}
+German Barquero, Sergio Escalera, and Cristina Palmero.
+\newblock Seamless human motion composition with blended positional encodings.
+\newblock In \emph{CVPR}, pages 457--469, 2024{\natexlab{b}}.
+
+\bibitem[Bhattacharya et~al.(2021)Bhattacharya, Rewkowski, Banerjee, Guhan, Bera, and Manocha]{t2g}
+Uttaran Bhattacharya, Nicholas Rewkowski, Abhishek Banerjee, Pooja Guhan, Aniket Bera, and Dinesh Manocha.
+\newblock Text2gestures: A transformer-based network for generating emotive body gestures for virtual agents.
+\newblock In \emph{VR}, pages 1--10, 2021.
+
+\bibitem[Brooks et~al.(2024)Brooks, Peebles, Holmes, DePue, Guo, Jing, Schnurr, Taylor, Luhman, Luhman, Ng, Wang, and Ramesh]{sora}
+Tim Brooks, Bill Peebles, Connor Holmes, Will DePue, Yufei Guo, Li Jing, David Schnurr, Joe Taylor, Troy Luhman, Eric Luhman, Clarence Ng, Ricky Wang, and Aditya Ramesh.
+\newblock Video generation models as world simulators.
+\newblock 2024.
+
+\bibitem[Brown et~al.(2020)Brown, Mann, Ryder, Subbiah, Kaplan, Dhariwal, Neelakantan, Shyam, Sastry, Askell, Agarwal, Herbert-Voss, Krueger, Henighan, Child, Ramesh, Ziegler, Wu, Winter, Hesse, Chen, Sigler, teusz Litwin, Gray, Chess, Clark, Berner, McCandlish, Radford, Sutskever, and Amodei]{gpt3}
+Tom~B. Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel~M. Ziegler, Jeff Wu, Clemens Winter, Christopher Hesse, Mark Chen, Eric Sigler, Ma teusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei.
+\newblock Language models are few-shot learners.
+\newblock \emph{ArXiv}, abs/2005.14165, 2020.
+
+\bibitem[Chen et~al.(2025)Chen, Chen, Xu, Li, Dong, Sun, Jiang, Li, Yang, Zhao, et~al.]{chen2025dancetogether}
+Junhao Chen, Mingjin Chen, Jianjin Xu, Xiang Li, Junting Dong, Mingze Sun, Puhua Jiang, Hongxiang Li, Yuhang Yang, Hao Zhao, et~al.
+\newblock Dancetogether! identity-preserving multi-person interactive video generation.
+\newblock \emph{arXiv preprint arXiv:2505.18078}, 2025.
+
+\bibitem[Chen et~al.(2024{\natexlab{a}})Chen, Dai, Ju, Lu, and Zhang]{motionclr}
+Ling-Hao Chen, Wenxun Dai, Xuan Ju, Shunlin Lu, and Lei Zhang.
+\newblock Motionclr: Motion generation and training-free editing via understanding attention mechanisms.
+\newblock \emph{arXiv preprint arXiv:2410.18977}, 2024{\natexlab{a}}.
+
+\bibitem[Chen et~al.(2024{\natexlab{b}})Chen, Lu, Dai, Dou, Ju, Wang, Komura, and Zhang]{chen2024pay}
+Ling-Hao Chen, Shunlin Lu, Wenxun Dai, Zhiyang Dou, Xuan Ju, Jingbo Wang, Taku Komura, and Lei Zhang.
+\newblock Pay attention and move better: Harnessing attention for interactive motion generation and training-free editing.
+\newblock \emph{arXiv preprint arXiv:2410.18977}, 2024{\natexlab{b}}.
+
+\bibitem[Chen et~al.(2023)Chen, Jiang, Liu, Huang, Fu, Chen, and Yu]{mld}
+Xin Chen, Biao Jiang, Wen Liu, Zilong Huang, Bin Fu, Tao Chen, and Gang Yu.
+\newblock Executing your commands via motion diffusion in latent space.
+\newblock In \emph{CVPR}, pages 18000--18010, 2023.
+
+\bibitem[Cheng and Shan(2024)]{cheng2024learning}
+Weihao Cheng and Ying Shan.
+\newblock Learning layout generation for virtual worlds.
+\newblock \emph{Computational Visual Media}, 10\penalty0 (3):\penalty0 577--592, 2024.
+
+\bibitem[Cong et~al.(2024)Cong, Wang, Dou, Ren, Yin, Cheng, Sun, Long, Zhu, and Ma]{cong2024laserhuman}
+Peishan Cong, Ziyi Wang, Zhiyang Dou, Yiming Ren, Wei Yin, Kai Cheng, Yujing Sun, Xiaoxiao Long, Xinge Zhu, and Yuexin Ma.
+\newblock Laserhuman: Language-guided scene-aware human motion generation in free environment.
+\newblock \emph{arXiv preprint arXiv:2403.13307}, 2024.
+
+\bibitem[Dabral et~al.(2023)Dabral, Mughal, Golyanik, and Theobalt]{mofusion}
+Rishabh Dabral, Muhammad~Hamza Mughal, Vladislav Golyanik, and Christian Theobalt.
+\newblock Mofusion: A framework for denoising-diffusion-based motion synthesis.
+\newblock In \emph{CVPR}, pages 9760--9770, 2023.
+
+\bibitem[Dai et~al.(2025)Dai, Wang, Fan, Ji, Zhao, Dong, and Dai]{dai2025towards}
+Minyue Dai, Jingbo Wang, Ke Fan, Bin Ji, Haoyu Zhao, Junting Dong, and Bo Dai.
+\newblock Towards synthesized and editable motion in-betweening through part-wise phase representation.
+\newblock \emph{arXiv preprint arXiv:2503.08180}, 2025.
+
+\bibitem[Dai et~al.(2024{\natexlab{a}})Dai, Chen, Wang, Liu, Dai, and Tang]{dai2024motionlcm}
+Wenxun Dai, Ling-Hao Chen, Jingbo Wang, Jinpeng Liu, Bo Dai, and Yansong Tang.
+\newblock Motionlcm: Real-time controllable motion generation via latent consistency model.
+\newblock In \emph{European Conference on Computer Vision}, pages 390--408. Springer, 2024{\natexlab{a}}.
+
+\bibitem[Dai et~al.(2024{\natexlab{b}})Dai, Chen, Wang, Liu, Dai, and Tang]{motionlcm}
+Wenxun Dai, Ling-Hao Chen, Jingbo Wang, Jinpeng Liu, Bo Dai, and Yansong Tang.
+\newblock Motionlcm: Real-time controllable motion generation via latent consistency model.
+\newblock \emph{ECCV}, 2024{\natexlab{b}}.
+
+\bibitem[discussion(2023)]{humanmlissue}
+GitHub discussion.
+\newblock rotation discussion.
+\newblock \url{https://github.com/EricGuo5513/HumanML3D/issues/26}, 2023.
+\newblock 2023-03-04.
+
+\bibitem[Dou et~al.(2023)Dou, Chen, Fan, Komura, and Wang]{dou2023c}
+Zhiyang Dou, Xuelin Chen, Qingnan Fan, Taku Komura, and Wenping Wang.
+\newblock C{\textperiodcentered}ase: Learning conditional adversarial skill embeddings for physics-based characters.
+\newblock In \emph{SIGGRAPH Asia 2023}, pages 1--11. 2023.
+
+\bibitem[Fan et~al.(2024)Fan, Tang, Cao, Yi, Li, Gong, Zhang, Wang, Wang, and Ma]{fan2024freemotion}
+Ke Fan, Junshu Tang, Weijian Cao, Ran Yi, Moran Li, Jingyu Gong, Jiangning Zhang, Yabiao Wang, Chengjie Wang, and Lizhuang Ma.
+\newblock Freemotion: A unified framework for number-free text-to-motion synthesis.
+\newblock In \emph{European Conference on Computer Vision}, pages 93--109. Springer, 2024.
+
+\bibitem[Feng* et~al.(2024)Feng*, Dou*\#, Chen, Liu, Li, Wang, Cao, Wang, Komura, and Liu]{feng2024motionwavelet}
+Yuming Feng*, Zhiyang Dou*\#, Ling-Hao Chen, Yuan Liu, Tianyu Li, Jingbo Wang, Zeyu Cao, Wenping Wang, Taku Komura, and Lingjie Liu.
+\newblock Motionwavelet: Human motion prediction via wavelet manifold learning.
+\newblock \emph{arXiv preprint arXiv:2411.16964}, 2024.
+
+\bibitem[Fieraru et~al.(2021)Fieraru, Zanfir, Oneata, Popa, Olaru, and Sminchisescu]{fieraru2021learning}
+Mihai Fieraru, Mihai Zanfir, Elisabeta Oneata, Alin-Ionut Popa, Vlad Olaru, and Cristian Sminchisescu.
+\newblock Learning complex 3d human self-contact.
+\newblock In \emph{Proceedings of the AAAI Conference on Artificial Intelligence}, pages 1343--1351, 2021.
+
+\bibitem[Guo et~al.(2022{\natexlab{a}})Guo, Zou, Zuo, Wang, Ji, Li, and Cheng]{humanml3d}
+Chuan Guo, Shihao Zou, Xinxin Zuo, Sen Wang, Wei Ji, Xingyu Li, and Li Cheng.
+\newblock Generating diverse and natural 3d human motions from text.
+\newblock In \emph{CVPR}, pages 5152--5161, 2022{\natexlab{a}}.
+
+\bibitem[Guo et~al.(2022{\natexlab{b}})Guo, Zuo, Wang, and Cheng]{tm2t}
+Chuan Guo, Xinxin Zuo, Sen Wang, and Li Cheng.
+\newblock Tm2t: Stochastic and tokenized modeling for the reciprocal generation of 3d human motions and texts.
+\newblock In \emph{ECCV}, pages 580--597, 2022{\natexlab{b}}.
+
+\bibitem[Guo et~al.(2024)Guo, Mu, Javed, Wang, and Cheng]{momask}
+Chuan Guo, Yuxuan Mu, Muhammad~Gohar Javed, Sen Wang, and Li Cheng.
+\newblock Momask: Generative masked modeling of 3d human motions.
+\newblock In \emph{CVPR}, pages 1900--1910, 2024.
+
+\bibitem[Han et~al.(2024)Han, Peng, Dong, Ren, Shen, and Xu]{amd}
+Bo Han, Hao Peng, Minjing Dong, Yi Ren, Yixuan Shen, and Chang Xu.
+\newblock Amd: Autoregressive motion diffusion.
+\newblock In \emph{AAAI}, pages 2022--2030, 2024.
+
+\bibitem[Ho et~al.(2020)Ho, Jain, and Abbeel]{ddpm1}
+Jonathan Ho, Ajay Jain, and Pieter Abbeel.
+\newblock Denoising diffusion probabilistic models.
+\newblock \emph{NeurIPS}, pages 6840--6851, 2020.
+
+\bibitem[Hong et~al.(2022)Hong, Zhang, Pan, Cai, Yang, and Liu]{avatarclip}
+Fangzhou Hong, Mingyuan Zhang, Liang Pan, Zhongang Cai, Lei Yang, and Ziwei Liu.
+\newblock Avatarclip: Zero-shot text-driven generation and animation of 3d avatars.
+\newblock \emph{ACM SIGGRAPH}, 2022.
+
+\bibitem[Huang et~al.(2024)Huang, Yang, Luo, Wang, Xu, Zhang, Zhang, and Peng]{stablemofusion}
+Yiheng Huang, Hui Yang, Chuanchen Luo, Yuxi Wang, Shibiao Xu, Zhaoxiang Zhang, Man Zhang, and Junran Peng.
+\newblock Stablemofusion: Towards robust and efficient diffusion-based motion generation framework.
+\newblock \emph{ACM MM}, 2024.
+
+\bibitem[Huang et~al.(2025)Huang, Dou, and Liu]{huang2025modskill}
+Yiming Huang, Zhiyang Dou, and Lingjie Liu.
+\newblock Modskill: Physical character skill modularization.
+\newblock \emph{ICCV 2025}, 2025.
+
+\bibitem[Ji et~al.(2023)Ji, Pan, Yan, Chen, and Yang]{ji2023stylevr}
+Bin Ji, Ye Pan, Yichao Yan, Ruizhao Chen, and Xiaokang Yang.
+\newblock Stylevr: Stylizing character animations with normalizing flows.
+\newblock \emph{IEEE Transactions on Visualization and Computer Graphics}, 2023.
+
+\bibitem[Ji et~al.(2025{\natexlab{a}})Ji, Pan, Liu, Tan, Jin, and Yang]{Ji_2025_CVPR}
+Bin Ji, Ye Pan, Zhimeng Liu, Shuai Tan, Xiaogang Jin, and Xiaokang Yang.
+\newblock Pomp: Physics-constrainable motion generative model through phase manifolds.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)}, pages 22690--22701, 2025{\natexlab{a}}.
+
+\bibitem[Ji et~al.(2025{\natexlab{b}})Ji, Pan, Liu, Tan, and Yang]{ji2025sport}
+Bin Ji, Ye Pan, Zhimeng Liu, Shuai Tan, and Xiaokang Yang.
+\newblock Sport: From zero-shot prompts to real-time motion generation.
+\newblock \emph{IEEE Transactions on Visualization and Computer Graphics}, 2025{\natexlab{b}}.
+
+\bibitem[Jiang et~al.(2024{\natexlab{a}})Jiang, Chen, Liu, Yu, Yu, and Chen]{motiongpt}
+Biao Jiang, Xin Chen, Wen Liu, Jingyi Yu, Gang Yu, and Tao Chen.
+\newblock Motiongpt: Human motion as a foreign language.
+\newblock \emph{NeurIPS}, 2024{\natexlab{a}}.
+
+\bibitem[Jiang et~al.(2024{\natexlab{b}})Jiang, Zhang, Li, Ma, Wang, Chen, Liu, Zhu, and Huang]{jiang2024scaling}
+Nan Jiang, Zhiyuan Zhang, Hongjie Li, Xiaoxuan Ma, Zan Wang, Yixin Chen, Tengyu Liu, Yixin Zhu, and Siyuan Huang.
+\newblock Scaling up dynamic human-scene interaction modeling.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, pages 1737--1747, 2024{\natexlab{b}}.
+
+\bibitem[Karunratanakul et~al.(2023)Karunratanakul, Preechakul, Suwajanakorn, and Tang]{gmd}
+Korrawe Karunratanakul, Konpat Preechakul, Supasorn Suwajanakorn, and Siyu Tang.
+\newblock Guided motion diffusion for controllable human motion synthesis.
+\newblock In \emph{CVPR}, pages 2151--2162, 2023.
+
+\bibitem[Le et~al.(2023)Le, Pham, Do, Tjiputra, Tran, and Nguyen]{le2023music}
+Nhat Le, Thang Pham, Tuong Do, Erman Tjiputra, Quang~D Tran, and Anh Nguyen.
+\newblock Music-driven group choreography.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, pages 8673--8682, 2023.
+
+\bibitem[Li et~al.(2022)Li, Zhao, Zhelun, and Sheng]{danceformer}
+Buyu Li, Yongchi Zhao, Shi Zhelun, and Lu Sheng.
+\newblock Danceformer: Music conditioned 3d dance generation with parametric motion transformer.
+\newblock In \emph{AAAI}, pages 1272--1279, 2022.
+
+\bibitem[Li et~al.(2024)Li, Li, Yang, Cao, Zhu, Cheng, and Chen]{li2024dispose}
+Hongxiang Li, Yaowei Li, Yuhang Yang, Junjie Cao, Zhihong Zhu, Xuxin Cheng, and Long Chen.
+\newblock Dispose: Disentangling pose guidance for controllable human image animation.
+\newblock \emph{arXiv preprint arXiv:2412.09349}, 2024.
+
+\bibitem[Li et~al.(2023)Li, Zhao, Zhang, Su, Ren, Zhang, Tang, and Li]{finedance}
+Ronghui Li, Junfan Zhao, Yachao Zhang, Mingyang Su, Zeping Ren, Han Zhang, Yansong Tang, and Xiu Li.
+\newblock Finedance: A fine-grained choreography dataset for 3d full body dance generation.
+\newblock In \emph{ICCV}, pages 10234--10243, 2023.
+
+\bibitem[Liang et~al.(2024{\natexlab{a}})Liang, Bao, Zhang, Ren, Xu, Yang, Chen, Yu, and Xu]{omg}
+Han Liang, Jiacheng Bao, Ruichi Zhang, Sihan Ren, Yuecheng Xu, Sibei Yang, Xin Chen, Jingyi Yu, and Lan Xu.
+\newblock Omg: Towards open-vocabulary motion generation via mixture of controllers.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, pages 482--493, 2024{\natexlab{a}}.
+
+\bibitem[Liang et~al.(2024{\natexlab{b}})Liang, Zhang, Li, Yu, and Xu]{liang2024intergen}
+Han Liang, Wenqian Zhang, Wenxuan Li, Jingyi Yu, and Lan Xu.
+\newblock Intergen: Diffusion-based multi-human motion generation under complex interactions.
+\newblock \emph{IJCV}, pages 1--21, 2024{\natexlab{b}}.
+
+\bibitem[Lin et~al.(2024)Lin, Zeng, Lu, Cai, Zhang, Wang, and Zhang]{motionx}
+Jing Lin, Ailing Zeng, Shunlin Lu, Yuanhao Cai, Ruimao Zhang, Haoqian Wang, and Lei Zhang.
+\newblock Motion-x: A large-scale 3d expressive whole-body human motion dataset.
+\newblock \emph{NeurIPS}, 2024.
+
+\bibitem[Lin and Amer(2018)]{dvgans}
+Xiao Lin and Mohamed~R Amer.
+\newblock Human motion modeling using dvgans.
+\newblock \emph{arXiv preprint arXiv:1804.10652}, 2018.
+
+\bibitem[Liu et~al.(2008)Liu, Ting, and Zhou]{liu2008isolation}
+Fei~Tony Liu, Kai~Ming Ting, and Zhi-Hua Zhou.
+\newblock Isolation forest.
+\newblock In \emph{2008 eighth ieee international conference on data mining}, pages 413--422. IEEE, 2008.
+
+\bibitem[Liu et~al.(2024)Liu, Dai, Wang, Cheng, Tang, and Tong]{promotion}
+Jinpeng Liu, Wenxun Dai, Chunyu Wang, Yiji Cheng, Yansong Tang, and Xin Tong.
+\newblock Plan, posture and go: Towards open-world text-to-motion generation.
+\newblock \emph{ECCV}, 2024.
+
+\bibitem[Liu et~al.(2023)Liu, Zeng, Ren, Li, Zhang, Yang, Li, Yang, Su, Zhu, et~al.]{liu2023grounding}
+Shilong Liu, Zhaoyang Zeng, Tianhe Ren, Feng Li, Hao Zhang, Jie Yang, Chunyuan Li, Jianwei Yang, Hang Su, Jun Zhu, et~al.
+\newblock Grounding dino: Marrying dino with grounded pre-training for open-set object detection.
+\newblock \emph{arXiv preprint arXiv:2303.05499}, 2023.
+
+\bibitem[Loper et~al.(2023)Loper, Mahmood, Romero, Pons-Moll, and Black]{loper2023smpl}
+Matthew Loper, Naureen Mahmood, Javier Romero, Gerard Pons-Moll, and Michael~J Black.
+\newblock Smpl: A skinned multi-person linear model.
+\newblock In \emph{Seminal Graphics Papers: Pushing the Boundaries, Volume 2}, pages 851--866. 2023.
+
+\bibitem[Lu et~al.(2024{\natexlab{a}})Lu, Chen, Zeng, Lin, Zhang, Zhang, and Shum]{humantomato}
+Shunlin Lu, Ling-Hao Chen, Ailing Zeng, Jing Lin, Ruimao Zhang, Lei Zhang, and Heung-Yeung Shum.
+\newblock Humantomato: Text-aligned whole-body motion generation.
+\newblock \emph{ICML}, 2024{\natexlab{a}}.
+
+\bibitem[Lu et~al.(2024{\natexlab{b}})Lu, Wang, Lu, Chen, Dai, Dong, Dou, Dai, and Zhang]{lu2024scamo}
+Shunlin Lu, Jingbo Wang, Zeyu Lu, Ling-Hao Chen, Wenxun Dai, Junting Dong, Zhiyang Dou, Bo Dai, and Ruimao Zhang.
+\newblock Scamo: Exploring the scaling law in autoregressive motion generation model.
+\newblock \emph{arXiv preprint arXiv:2412.14559}, 2024{\natexlab{b}}.
+
+\bibitem[Meng et~al.(2024)Meng, Xie, Peng, Han, and Jiang]{meng2024rethinking}
+Zichong Meng, Yiming Xie, Xiaogang Peng, Zeyu Han, and Huaizu Jiang.
+\newblock Rethinking diffusion for text-driven human motion generation.
+\newblock \emph{arXiv preprint arXiv:2411.16575}, 2024.
+
+\bibitem[Pan et~al.(2024)Pan, Wang, Huang, Zhang, Wang, Tang, and Wang]{pan2024synthesizing}
+Liang Pan, Jingbo Wang, Buzhen Huang, Junyu Zhang, Haofan Wang, Xu Tang, and Yangang Wang.
+\newblock Synthesizing physically plausible human motions in 3d scenes.
+\newblock In \emph{2024 International Conference on 3D Vision (3DV)}, pages 1498--1507. IEEE, 2024.
+
+\bibitem[Pan et~al.(2025)Pan, Yang, Dou, Wang, Huang, Dai, Komura, and Wang]{pan2025tokenhsi}
+Liang Pan, Zeshi Yang, Zhiyang Dou, Wenjia Wang, Buzhen Huang, Bo Dai, Taku Komura, and Jingbo Wang.
+\newblock Tokenhsi: Unified synthesis of physical human-scene interactions through task tokenization.
+\newblock \emph{CVPR 2025}, 2025.
+
+\bibitem[Petrovich et~al.(2022)Petrovich, Black, and Varol]{temos}
+Mathis Petrovich, Michael~J Black, and G{\"u}l Varol.
+\newblock Temos: Generating diverse human motions from textual descriptions.
+\newblock In \emph{ECCV}, pages 480--497, 2022.
+
+\bibitem[Petrovich et~al.(2024)Petrovich, Litany, Iqbal, Black, Varol, Bin~Peng, and Rempe]{stmc}
+Mathis Petrovich, Or Litany, Umar Iqbal, Michael~J Black, Gul Varol, Xue Bin~Peng, and Davis Rempe.
+\newblock Multi-track timeline control for text-driven 3d human motion generation.
+\newblock In \emph{CVPRW}, pages 1911--1921, 2024.
+
+\bibitem[Plappert et~al.(2016)Plappert, Mandery, and Asfour]{kit}
+Matthias Plappert, Christian Mandery, and Tamim Asfour.
+\newblock The kit motion-language dataset.
+\newblock \emph{Big data}, 4\penalty0 (4):\penalty0 236--252, 2016.
+
+\bibitem[Plappert et~al.(2018)Plappert, Mandery, and Asfour]{plappert2018learning}
+Matthias Plappert, Christian Mandery, and Tamim Asfour.
+\newblock Learning a bidirectional mapping between human whole-body motion and natural language using deep recurrent neural networks.
+\newblock \emph{RAS}, 109:\penalty0 13--26, 2018.
+
+\bibitem[Punnakkal et~al.(2021)Punnakkal, Chandrasekaran, Athanasiou, Quiros-Ramirez, and Black]{babel}
+Abhinanda~R Punnakkal, Arjun Chandrasekaran, Nikos Athanasiou, Alejandra Quiros-Ramirez, and Michael~J Black.
+\newblock Babel: Bodies, action and behavior with english labels.
+\newblock In \emph{CVPR}, pages 722--731, 2021.
+
+\bibitem[Radford et~al.(2021)Radford, Kim, Hallacy, Ramesh, Goh, Agarwal, Sastry, Askell, Mishkin, Clark, et~al.]{clip}
+Alec Radford, Jong~Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et~al.
+\newblock Learning transferable visual models from natural language supervision.
+\newblock In \emph{International conference on machine learning}, pages 8748--8763. PMLR, 2021.
+
+\bibitem[Ravi et~al.(2024)Ravi, Gabeur, Hu, Hu, Ryali, Ma, Khedr, R{\"a}dle, Rolland, Gustafson, Mintun, Pan, Alwala, Carion, Wu, Girshick, Doll{\'a}r, and Feichtenhofer]{ravi2024sam2}
+Nikhila Ravi, Valentin Gabeur, Yuan-Ting Hu, Ronghang Hu, Chaitanya Ryali, Tengyu Ma, Haitham Khedr, Roman R{\"a}dle, Chloe Rolland, Laura Gustafson, Eric Mintun, Junting Pan, Kalyan~Vasudev Alwala, Nicolas Carion, Chao-Yuan Wu, Ross Girshick, Piotr Doll{\'a}r, and Christoph Feichtenhofer.
+\newblock Sam 2: Segment anything in images and videos.
+\newblock \emph{arXiv preprint arXiv:2408.00714}, 2024.
+
+\bibitem[Rombach et~al.(2022)Rombach, Blattmann, Lorenz, Esser, and Ommer]{rombach2022high}
+Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Bj{\"o}rn Ommer.
+\newblock High-resolution image synthesis with latent diffusion models.
+\newblock In \emph{Proceedings of the IEEE/CVF conference on computer vision and pattern recognition}, pages 10684--10695, 2022.
+
+\bibitem[Shafir et~al.(2024)Shafir, Tevet, Kapon, and Bermano]{diffprior}
+Yonatan Shafir, Guy Tevet, Roy Kapon, and Amit~H Bermano.
+\newblock Human motion diffusion as a generative prior.
+\newblock In \emph{ICLR}, 2024.
+
+\bibitem[Shen et~al.(2024)Shen, Pi, Xia, Cen, Peng, Hu, Bao, Hu, and Zhou]{shen2024world}
+Zehong Shen, Huaijin Pi, Yan Xia, Zhi Cen, Sida Peng, Zechen Hu, Hujun Bao, Ruizhen Hu, and Xiaowei Zhou.
+\newblock World-grounded human motion recovery via gravity-view coordinates.
+\newblock In \emph{SIGGRAPH Asia 2024 Conference Papers}, pages 1--11, 2024.
+
+\bibitem[Shi et~al.(2024)Shi, Wang, Jiang, Lin, Dai, and Peng]{shi2024interactive}
+Yi Shi, Jingbo Wang, Xuekun Jiang, Bingkun Lin, Bo Dai, and Xue~Bin Peng.
+\newblock Interactive character control with auto-regressive motion diffusion models.
+\newblock \emph{ACM Transactions on Graphics (TOG)}, 43\penalty0 (4):\penalty0 1--14, 2024.
+
+\bibitem[Sohl-Dickstein et~al.(2015)Sohl-Dickstein, Weiss, Maheswaranathan, and Ganguli]{ddpm2}
+Jascha Sohl-Dickstein, Eric Weiss, Niru Maheswaranathan, and Surya Ganguli.
+\newblock Deep unsupervised learning using nonequilibrium thermodynamics.
+\newblock In \emph{ICML}, pages 2256--2265, 2015.
+
+\bibitem[Song et~al.(2021)Song, Meng, and Ermon]{ddim}
+Jiaming Song, Chenlin Meng, and Stefano Ermon.
+\newblock Denoising diffusion implicit models.
+\newblock In \emph{ICLR}, 2021.
+
+\bibitem[Starke et~al.(2019)Starke, Zhang, Komura, and Saito]{starke2019neural}
+Sebastian Starke, He Zhang, Taku Komura, and Jun Saito.
+\newblock Neural state machine for character-scene interactions.
+\newblock \emph{ACM Transactions on Graphics}, 38\penalty0 (6):\penalty0 178, 2019.
+
+\bibitem[Starke et~al.(2022)Starke, Mason, and Komura]{starke2022deepphase}
+Sebastian Starke, Ian Mason, and Taku Komura.
+\newblock Deepphase: Periodic autoencoders for learning motion phase manifolds.
+\newblock \emph{ACM Transactions on Graphics (ToG)}, 41\penalty0 (4):\penalty0 1--13, 2022.
+
+\bibitem[Tevet et~al.(2022{\natexlab{a}})Tevet, Gordon, Hertz, Bermano, and Cohen-Or]{motionclip}
+Guy Tevet, Brian Gordon, Amir Hertz, Amit~H Bermano, and Daniel Cohen-Or.
+\newblock Motionclip: Exposing human motion generation to clip space.
+\newblock In \emph{ECCV}, pages 358--374, 2022{\natexlab{a}}.
+
+\bibitem[Tevet et~al.(2022{\natexlab{b}})Tevet, Raab, Gordon, Shafir, Cohen-Or, and Bermano]{mdm}
+Guy Tevet, Sigal Raab, Brian Gordon, Yonatan Shafir, Daniel Cohen-Or, and Amit~H Bermano.
+\newblock Human motion diffusion model.
+\newblock In \emph{ICLR}, 2022{\natexlab{b}}.
+
+\bibitem[Touvron et~al.(2023)Touvron, Lavril, Izacard, Martinet, Lachaux, Lacroix, Rozi{\`e}re, Goyal, Hambro, Azhar, et~al.]{llama}
+Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timoth{\'e}e Lacroix, Baptiste Rozi{\`e}re, Naman Goyal, Eric Hambro, Faisal Azhar, et~al.
+\newblock Llama: Open and efficient foundation language models.
+\newblock \emph{arXiv preprint arXiv:2302.13971}, 2023.
+
+\bibitem[Vaswani et~al.(2017)Vaswani, Shazeer, Parmar, Uszkoreit, Jones, Gomez, Kaiser, and Polosukhin]{attention}
+Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan~N Gomez, {\L}ukasz Kaiser, and Illia Polosukhin.
+\newblock Attention is all you need.
+\newblock \emph{NeurIPS}, 2017.
+
+\bibitem[Wan et~al.(2024{\natexlab{a}})Wan, Dou, Komura, Wang, Jayaraman, and Liu]{tlcontrol}
+Weilin Wan, Zhiyang Dou, Taku Komura, Wenping Wang, Dinesh Jayaraman, and Lingjie Liu.
+\newblock Tlcontrol: Trajectory and language control for human motion synthesis.
+\newblock \emph{ECCV}, 2024{\natexlab{a}}.
+
+\bibitem[Wan et~al.(2024{\natexlab{b}})Wan, Dou, Komura, Wang, Jayaraman, and Liu]{wan2024tlcontrol}
+Weilin Wan, Zhiyang Dou, Taku Komura, Wenping Wang, Dinesh Jayaraman, and Lingjie Liu.
+\newblock Tlcontrol: Trajectory and language control for human motion synthesis.
+\newblock In \emph{ECCV 2024}, pages 37--54. Springer Nature Switzerland, 2024{\natexlab{b}}.
+
+\bibitem[Wang et~al.(2025{\natexlab{a}})Wang, Pan, Dou, Liao, Lou, Yang, Wang, and Komura]{wang2025sims}
+Wenjia Wang, Liang Pan, Zhiyang Dou, Zhouyingcheng Liao, Yuke Lou, Lei Yang, Jingbo Wang, and Taku Komura.
+\newblock Sims: Simulating human-scene interactions with real world script planning.
+\newblock \emph{ICCV 2025}, 2025{\natexlab{a}}.
+
+\bibitem[Wang et~al.(2024{\natexlab{a}})Wang, Zheng, Cao, Wei, Jin, and Lu]{wang2024quo}
+Ye Wang, Sipeng Zheng, Bin Cao, Qianshan Wei, Qin Jin, and Zongqing Lu.
+\newblock Quo vadis, motion generation? from large language models to large motion models.
+\newblock \emph{arXiv preprint arXiv:2410.03311}, 2024{\natexlab{a}}.
+
+\bibitem[Wang et~al.(2025{\natexlab{b}})Wang, Zhao, Yu, Tsui, Zeng, Lin, Luo, Yu, Li, Chen, et~al.]{wang2025skillmimic}
+Yinhuai Wang, Qihan Zhao, Runyi Yu, Hok~Wai Tsui, Ailing Zeng, Jing Lin, Zhengyi Luo, Jiwen Yu, Xiu Li, Qifeng Chen, et~al.
+\newblock Skillmimic: Learning basketball interaction skills from demonstrations.
+\newblock In \emph{Proceedings of the Computer Vision and Pattern Recognition Conference}, pages 17540--17549, 2025{\natexlab{b}}.
+
+\bibitem[Wang et~al.(2022)Wang, Chen, Liu, Zhu, Liang, and Huang]{humanise}
+Zan Wang, Yixin Chen, Tengyu Liu, Yixin Zhu, Wei Liang, and Siyuan Huang.
+\newblock Humanise: Language-conditioned human motion generation in 3d scenes.
+\newblock \emph{NeurIPS}, pages 14959--14971, 2022.
+
+\bibitem[Wang et~al.(2024{\natexlab{b}})Wang, Chen, Jia, Li, Zhang, Zhang, Liu, Zhu, Liang, and Huang]{move}
+Zan Wang, Yixin Chen, Baoxiong Jia, Puhao Li, Jinlu Zhang, Jingze Zhang, Tengyu Liu, Yixin Zhu, Wei Liang, and Siyuan Huang.
+\newblock Move as you say interact as you can: Language-guided human motion generation with scene affordance.
+\newblock In \emph{CVPR}, pages 433--444, 2024{\natexlab{b}}.
+
+\bibitem[Wu et~al.(2024)Wu, Zhao, Wang, Tai, and Tang]{wu2024motionllm}
+Qi Wu, Yubo Zhao, Yifan Wang, Yu-Wing Tai, and Chi-Keung Tang.
+\newblock Motionllm: Multimodal motion-language learning with large language models.
+\newblock \emph{arXiv preprint arXiv:2405.17013}, 2024.
+
+\bibitem[Xiao et~al.(2025)Xiao, Lu, Pi, Fan, Pan, Zhou, Feng, Zhou, Peng, and Wang]{xiao2025motionstreamer}
+Lixing Xiao, Shunlin Lu, Huaijin Pi, Ke Fan, Liang Pan, Yueer Zhou, Ziyong Feng, Xiaowei Zhou, Sida Peng, and Jingbo Wang.
+\newblock Motionstreamer: Streaming motion generation via diffusion-based autoregressive model in causal latent space.
+\newblock \emph{arXiv preprint arXiv:2503.15451}, 2025.
+
+\bibitem[Xiao et~al.(2024)Xiao, Wang, Wang, Cao, Zhang, Dai, Lin, and Pang]{unihsi}
+Zeqi Xiao, Tai Wang, Jingbo Wang, Jinkun Cao, Wenwei Zhang, Bo Dai, Dahua Lin, and Jiangmiao Pang.
+\newblock Unified human-scene interaction via prompted chain-of-contacts.
+\newblock In \emph{ICLR}, 2024.
+
+\bibitem[Xie et~al.(2024{\natexlab{a}})Xie, Jampani, Zhong, Sun, and Jiang]{omnicontrol}
+Yiming Xie, Varun Jampani, Lei Zhong, Deqing Sun, and Huaizu Jiang.
+\newblock Omnicontrol: Control any joint at any time for human motion generation.
+\newblock In \emph{ICLR}, 2024{\natexlab{a}}.
+
+\bibitem[Xie et~al.(2024{\natexlab{b}})Xie, Wu, Gao, Sun, Yang, and Liang]{b2ahdm}
+Zhenyu Xie, Yang Wu, Xuehao Gao, Zhongqian Sun, Wei Yang, and Xiaodan Liang.
+\newblock Towards detailed text-to-motion synthesis via basic-to-advanced hierarchical diffusion model.
+\newblock In \emph{AAAI}, pages 6252--6260, 2024{\natexlab{b}}.
+
+\bibitem[Xu et~al.(2023{\natexlab{a}})Xu, Song, Wang, Su, Fang, Ding, Gan, Yan, Jin, Yang, et~al.]{actformer}
+Liang Xu, Ziyang Song, Dongliang Wang, Jing Su, Zhicheng Fang, Chenjing Ding, Weihao Gan, Yichao Yan, Xin Jin, Xiaokang Yang, et~al.
+\newblock Actformer: A gan-based transformer towards general action-conditioned 3d human motion generation.
+\newblock In \emph{ICCV}, pages 2228--2238, 2023{\natexlab{a}}.
+
+\bibitem[Xu et~al.(2023{\natexlab{b}})Xu, Song, Wang, Su, Fang, Ding, Gan, Yan, Jin, Yang, et~al.]{xu2023actformer}
+Liang Xu, Ziyang Song, Dongliang Wang, Jing Su, Zhicheng Fang, Chenjing Ding, Weihao Gan, Yichao Yan, Xin Jin, Xiaokang Yang, et~al.
+\newblock Actformer: A gan-based transformer towards general action-conditioned 3d human motion generation.
+\newblock In \emph{ICCV}, pages 2228--2238, 2023{\natexlab{b}}.
+
+\bibitem[Xu et~al.(2024{\natexlab{a}})Xu, Hua, Lin, Liu, Ma, Yan, Jin, Yang, and Zeng]{xu2024motionbank}
+Liang Xu, Shaoyang Hua, Zili Lin, Yifan Liu, Feipeng Ma, Yichao Yan, Xin Jin, Xiaokang Yang, and Wenjun Zeng.
+\newblock Motionbank: A large-scale video motion benchmark with disentangled rule-based annotations.
+\newblock \emph{arXiv preprint arXiv:2410.13790}, 2024{\natexlab{a}}.
+
+\bibitem[Xu et~al.(2024{\natexlab{b}})Xu, Lv, Yan, Jin, Wu, Xu, Liu, Zhou, Rao, Sheng, et~al.]{interx}
+Liang Xu, Xintao Lv, Yichao Yan, Xin Jin, Shuwen Wu, Congsheng Xu, Yifan Liu, Yizhou Zhou, Fengyun Rao, Xingdong Sheng, et~al.
+\newblock Inter-x: Towards versatile human-human interaction analysis.
+\newblock In \emph{CVPR}, pages 22260--22271, 2024{\natexlab{b}}.
+
+\bibitem[Xu et~al.(2024{\natexlab{c}})Xu, Zhou, Yan, Jin, Zhu, Rao, Yang, and Zeng]{xu2024regennet}
+Liang Xu, Yizhou Zhou, Yichao Yan, Xin Jin, Wenhan Zhu, Fengyun Rao, Xiaokang Yang, and Wenjun Zeng.
+\newblock Regennet: Towards human action-reaction synthesis.
+\newblock In \emph{CVPR}, pages 1759--1769, 2024{\natexlab{c}}.
+
+\bibitem[Xu et~al.(2023{\natexlab{c}})Xu, Mu, and Yang]{xu2023survey}
+Qun-Ce Xu, Tai-Jiang Mu, and Yong-Liang Yang.
+\newblock A survey of deep learning-based 3d shape generation.
+\newblock \emph{Computational Visual Media}, 9\penalty0 (3):\penalty0 407--442, 2023{\natexlab{c}}.
+
+\bibitem[Yang et~al.(2024)Yang, Zhai, Wang, Yu, Cao, and Zha]{yang2024egochoir}
+Yuhang Yang, Wei Zhai, Chengfeng Wang, Chengjun Yu, Yang Cao, and Zheng-Jun Zha.
+\newblock Egochoir: Capturing 3d human-object interaction regions from egocentric views.
+\newblock \emph{arXiv preprint arXiv:2405.13659}, 2024.
+
+\bibitem[Yang et~al.(2025)Yang, Liu, Lu, Zhao, Wu, Zhai, Yi, Cao, Ma, Zha, et~al.]{yang2025sigman}
+Yuhang Yang, Fengqi Liu, Yixing Lu, Qin Zhao, Pingyu Wu, Wei Zhai, Ran Yi, Yang Cao, Lizhuang Ma, Zheng-Jun Zha, et~al.
+\newblock Sigman: Scaling 3d human gaussian generation with millions of assets.
+\newblock \emph{arXiv preprint arXiv:2504.06982}, 2025.
+
+\bibitem[Yin et~al.(2023)Yin, Guo, Kaufmann, Zarate, Song, and Hilliges]{yin2023hi4d}
+Yifei Yin, Chen Guo, Manuel Kaufmann, Juan~Jose Zarate, Jie Song, and Otmar Hilliges.
+\newblock Hi4d: 4d instance segmentation of close human interaction.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, pages 17016--17027, 2023.
+
+\bibitem[Yu et~al.(2025{\natexlab{a}})Yu, Zhai, Yang, Cao, and Zha]{yu2025hero}
+Chengjun Yu, Wei Zhai, Yuhang Yang, Yang Cao, and Zheng-Jun Zha.
+\newblock Hero: Human reaction generation from videos.
+\newblock \emph{arXiv preprint arXiv:2503.08270}, 2025{\natexlab{a}}.
+
+\bibitem[Yu et~al.(2025{\natexlab{b}})Yu, Wang, Zhao, Tsui, Wang, Tan, and Chen]{yu2025skillmimic}
+Runyi Yu, Yinhuai Wang, Qihan Zhao, Hok~Wai Tsui, Jingbo Wang, Ping Tan, and Qifeng Chen.
+\newblock Skillmimic-v2: Learning robust and generalizable interaction skills from sparse and noisy demonstrations.
+\newblock \emph{arXiv preprint arXiv:2505.02094}, 2025{\natexlab{b}}.
+
+\bibitem[Yuan et~al.(2023)Yuan, Song, Iqbal, Vahdat, and Kautz]{physdiff}
+Ye Yuan, Jiaming Song, Umar Iqbal, Arash Vahdat, and Jan Kautz.
+\newblock Physdiff: Physics-guided human motion diffusion model.
+\newblock In \emph{ICCV}, pages 16010--16021, 2023.
+
+\bibitem[Zhang et~al.(2023{\natexlab{a}})Zhang, Zhang, Cun, Zhang, Zhao, Lu, Shen, and Shan]{t2mgpt}
+Jianrong Zhang, Yangsong Zhang, Xiaodong Cun, Yong Zhang, Hongwei Zhao, Hongtao Lu, Xi Shen, and Ying Shan.
+\newblock Generating human motion from textual descriptions with discrete representations.
+\newblock In \emph{CVPR}, pages 14730--14740, 2023{\natexlab{a}}.
+
+\bibitem[Zhang et~al.(2024{\natexlab{a}})Zhang, Chen, Yu, and Tu]{zhang2024generative}
+Jiaxu Zhang, Xin Chen, Gang Yu, and Zhigang Tu.
+\newblock Generative motion stylization of cross-structure characters within canonical motion space.
+\newblock In \emph{ACM MM}, 2024{\natexlab{a}}.
+
+\bibitem[Zhang et~al.(2023{\natexlab{b}})Zhang, Guo, Pan, Cai, Hong, Li, Yang, and Liu]{remodiffuse}
+Mingyuan Zhang, Xinying Guo, Liang Pan, Zhongang Cai, Fangzhou Hong, Huirong Li, Lei Yang, and Ziwei Liu.
+\newblock Remodiffuse: Retrieval-augmented motion diffusion model.
+\newblock In \emph{ICCV}, 2023{\natexlab{b}}.
+
+\bibitem[Zhang et~al.(2024{\natexlab{b}})Zhang, Cai, Pan, Hong, Guo, Yang, and Liu]{motiondiffuse}
+Mingyuan Zhang, Zhongang Cai, Liang Pan, Fangzhou Hong, Xinying Guo, Lei Yang, and Ziwei Liu.
+\newblock Motiondiffuse: Text-driven human motion generation with diffusion model.
+\newblock \emph{IEEE TPAMI}, 2024{\natexlab{b}}.
+
+\bibitem[Zhang et~al.(2024{\natexlab{c}})Zhang, Jin, Gu, Hong, Cai, Huang, Zhang, Guo, Yang, He, et~al.]{zhang2024large}
+Mingyuan Zhang, Daisheng Jin, Chenyang Gu, Fangzhou Hong, Zhongang Cai, Jingfang Huang, Chongzhi Zhang, Xinying Guo, Lei Yang, Ying He, et~al.
+\newblock Large motion model for unified multi-modal motion generation.
+\newblock \emph{arXiv preprint arXiv:2404.01284}, 2024{\natexlab{c}}.
+
+\bibitem[Zhang et~al.(2024{\natexlab{d}})Zhang, Huang, Liu, Tang, Lu, Chen, Bai, Chu, Yu, and Ouyang]{motiongptv2}
+Yaqi Zhang, Di Huang, Bin Liu, Shixiang Tang, Yan Lu, Lu Chen, Lei Bai, Qi Chu, Nenghai Yu, and Wanli Ouyang.
+\newblock Motiongpt: Finetuned llms are general-purpose motion generators.
+\newblock In \emph{AAAI}, pages 7368--7376, 2024{\natexlab{d}}.
+
+\bibitem[Zhou et~al.(2023)Zhou, Li, Zeng, Aristidou, Zhang, Chen, and Tu]{zhou2023let}
+Qiu Zhou, Manyi Li, Qiong Zeng, Andreas Aristidou, Xiaojing Zhang, Lin Chen, and Changhe Tu.
+\newblock Let’s all dance: Enhancing amateur dance motions.
+\newblock \emph{Computational Visual Media}, 9\penalty0 (3):\penalty0 531--550, 2023.
+
+\bibitem[Zhou et~al.(2024{\natexlab{a}})Zhou, Dou, Cao, Liao, Wang, Wang, Liu, Komura, Wang, and Liu]{emdm}
+Wenyang Zhou, Zhiyang Dou, Zeyu Cao, Zhouyingcheng Liao, Jingbo Wang, Wenjia Wang, Yuan Liu, Taku Komura, Wenping Wang, and Lingjie Liu.
+\newblock Emdm: Efficient motion diffusion model for fast, high-quality motion generation.
+\newblock \emph{ECCV}, 2024{\natexlab{a}}.
+
+\bibitem[Zhou et~al.(2024{\natexlab{b}})Zhou, Dou\#, Cao, Liao, Wang, Wang, Liu, Komura, Wang, and Liu]{zhou2024emdm}
+Wenyang Zhou, Zhiyang Dou\#, Zeyu Cao, Zhouyingcheng Liao, Jingbo Wang, Wenjia Wang, Yuan Liu, Taku Komura, Wenping Wang, and Lingjie Liu.
+\newblock Emdm: Efficient motion diffusion model for fast and high-quality motion generation.
+\newblock In \emph{ECCV 2024}, pages 18--38. Springer Nature Switzerland, 2024{\natexlab{b}}.
+
+\bibitem[Zhou et~al.(2024{\natexlab{c}})Zhou, Wan, and Wang]{avatargpt}
+Zixiang Zhou, Yu Wan, and Baoyuan Wang.
+\newblock Avatargpt: All-in-one framework for motion understanding planning generation and beyond.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, pages 1357--1366, 2024{\natexlab{c}}.
+
+\end{thebibliography}

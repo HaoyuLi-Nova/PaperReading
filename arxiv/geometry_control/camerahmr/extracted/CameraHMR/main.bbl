@@ -1,0 +1,271 @@
+\begin{thebibliography}{53}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[fli(2024)]{flickr}
+{Flickr}.
+\newblock \url{https://www.flickr.com}, 2024.
+
+\bibitem[pex(2024)]{pexel}
+{Pexels}.
+\newblock \url{https://www.pexels.com/}, 2024.
+
+\bibitem[Ahmadyan et~al.(2021)Ahmadyan, Zhang, Ablavatski, Wei, and Grundmann]{objectron}
+Adel Ahmadyan, Liangkai Zhang, Artsiom Ablavatski, Jianing Wei, and Matthias Grundmann.
+\newblock Objectron: {A} large scale dataset of object-centric videos in the wild with pose annotations.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, pages 7822--7831, 2021.
+
+\bibitem[Andriluka et~al.(2014)Andriluka, Pishchulin, Gehler, and Schiele]{mpii}
+Mykhaylo Andriluka, Leonid Pishchulin, Peter Gehler, and Bernt Schiele.
+\newblock 2{D} human pose estimation: New benchmark and state of the art analysis.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, 2014.
+
+\bibitem[Anguelov et~al.(2010)Anguelov, Dulong, Filip, Frueh, Lafon, Lyon, Ogale, Vincent, and Weaver]{gsv}
+Dragomir Anguelov, Carole Dulong, Daniel Filip, Christian Frueh, St{\'e}phane Lafon, Richard Lyon, Abhijit Ogale, Luc Vincent, and Josh Weaver.
+\newblock Google street view: Capturing the world at street level.
+\newblock pages 32--38, 2010.
+
+\bibitem[Black et~al.(2023)Black, Patel, Tesch, and Yang]{bedlam}
+Michael~J. Black, Priyanka Patel, Joachim Tesch, and Jinlong Yang.
+\newblock {BEDLAM}: A synthetic dataset of bodies exhibiting detailed lifelike animated motion.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, pages 8726--8737, 2023.
+
+\bibitem[Bogo et~al.(2016)Bogo, Kanazawa, Lassner, Gehler, Romero, and Black]{smplify}
+Federica Bogo, Angjoo Kanazawa, Christoph Lassner, Peter Gehler, Javier Romero, and Michael~J. Black.
+\newblock Keep it {SMPL}: Automatic estimation of {3D} human pose and shape from a single image.
+\newblock In \emph{European Conference on Computer Vision (ECCV)}, 2016.
+
+\bibitem[Choutas et~al.(2020)Choutas, Pavlakos, Bolkart, Tzionas, and Black]{expose}
+Vasileios Choutas, Georgios Pavlakos, Timo Bolkart, Dimitrios Tzionas, and Michael~J. Black.
+\newblock Monocular expressive body regression through body-driven attention.
+\newblock In \emph{European Conference on Computer Vision (ECCV)}, pages 20--40, 2020.
+
+\bibitem[Choutas et~al.(2022)Choutas, M{\"u}ller, Huang, Tang, Tzionas, and Black]{shapy}
+Vasileios Choutas, Lea M{\"u}ller, Chun-Hao~P. Huang, Siyu Tang, Dimitrios Tzionas, and Michael~J. Black.
+\newblock Accurate {3D} body shape regression using metric and semantic attributes.
+\newblock In \emph{IEEE/CVF Conf.~on Computer Vision and Pattern Recognition (CVPR)}, pages 2718--2728, 2022.
+
+\bibitem[Deng et~al.(2009)Deng, Dong, Socher, Li, Li, and Fei-Fei]{imagenet}
+Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Li Fei-Fei.
+\newblock {ImageNet}: A large-scale hierarchical image database.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, 2009.
+
+\bibitem[Dosovitskiy et~al.(2021)Dosovitskiy, Beyer, Kolesnikov, Weissenborn, Zhai, Unterthiner, Dehghani, Minderer, Heigold, Gelly, Uszkoreit, and Houlsby]{vit}
+Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, Jakob Uszkoreit, and Neil Houlsby.
+\newblock An image is worth 16x16 words: Transformers for image recognition at scale.
+\newblock In \emph{International Conference on Learning Representations (ICLR)}, 2021.
+
+\bibitem[Dwivedi et~al.(2024)Dwivedi, Sun, Patel, Feng, and Black]{tokenhmr}
+Sai~Kumar Dwivedi, Yu Sun, Priyanka Patel, Yao Feng, and Michael~J. Black.
+\newblock {TokenHMR}: Advancing human mesh recovery with a tokenized pose representation.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, 2024.
+
+\bibitem[Feng et~al.(2021)Feng, Choutas, Bolkart, Tzionas, and Black]{pixie}
+Yao Feng, Vasileios Choutas, Timo Bolkart, Dimitrios Tzionas, and Michael~J. Black.
+\newblock Collaborative regression of expressive bodies using moderation.
+\newblock In \emph{International Conference on 3D Vision (3DV)}, 2021.
+
+\bibitem[Geiger et~al.(2013)Geiger, Lenz, Stiller, and Urtasun]{kitti}
+Andreas Geiger, Philip Lenz, Christoph Stiller, and Raquel Urtasun.
+\newblock Vision meets robotics: The {KITTI} dataset.
+\newblock \emph{International Journal of Robotics Research}, pages 1231 -- 1237, 2013.
+
+\bibitem[Goel et~al.(2023)Goel, Pavlakos, Rajasegaran, Kanazawa*, and Malik*]{hmr2}
+Shubham Goel, Georgios Pavlakos, Jathushan Rajasegaran, Angjoo Kanazawa*, and Jitendra Malik*.
+\newblock Humans in 4{D}: Reconstructing and tracking humans with transformers.
+\newblock In \emph{International Conference on Computer Vision (ICCV)}, 2023.
+
+\bibitem[Gu et~al.(2018)Gu, Sun, Ross, Vondrick, Pantofaru, Li, Vijayanarasimhan, Toderici, Ricco, Sukthankar, et~al.]{ava}
+Chunhui Gu, Chen Sun, David~A Ross, Carl Vondrick, Caroline Pantofaru, Yeqing Li, Sudheendra Vijayanarasimhan, George Toderici, Susanna Ricco, Rahul Sukthankar, et~al.
+\newblock Ava: A video dataset of spatio-temporally localized atomic visual actions.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, pages 6047--6056, 2018.
+
+\bibitem[He et~al.(2016)He, Zhang, Ren, and Sun]{resnet}
+Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun.
+\newblock Deep residual learning for image recognition.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, pages 770--778, 2016.
+
+\bibitem[Huang et~al.(2022)Huang, Yi, Höschle, Safroshkin, Alexiadis, Polikovsky, Scharstein, and Black]{rich}
+Chun-Hao~P. Huang, Hongwei Yi, Markus Höschle, Matvey Safroshkin, Tsvetelina Alexiadis, Senya Polikovsky, Daniel Scharstein, and Michael~J. Black.
+\newblock Capturing and inferring dense full-body human-scene contact.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, 2022.
+
+\bibitem[Ionescu et~al.(2014)Ionescu, Papava, Olaru, and Sminchisescu]{h36m}
+Catalin Ionescu, Dragos Papava, Vlad Olaru, and Cristian Sminchisescu.
+\newblock {Human3.6M}: Large scale datasets and predictive methods for {3D} human sensing in natural environments.
+\newblock \emph{Transactions on Pattern Analysis and Machine Intelligence (TPAMI)}, 36\penalty0 (7):\penalty0 1325--1339, 2014.
+
+\bibitem[Jin et~al.(2023)Jin, Zhang, Hold{-}Geoffroy, Wang, Blackburn{-}Matzen, Sticha, and Fouhey]{perspectivefields}
+Linyi Jin, Jianming Zhang, Yannick Hold{-}Geoffroy, Oliver Wang, Kevin Blackburn{-}Matzen, Matthew Sticha, and David~F. Fouhey.
+\newblock Perspective fields for single image camera calibration.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, 2023.
+
+\bibitem[Johnson and Everingham(2011)]{lsp}
+Sam Johnson and Mark Everingham.
+\newblock Learning effective human pose estimation from inaccurate annotation.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, 2011.
+
+\bibitem[Joo et~al.(2020)Joo, Neverova, and Vedaldi]{eft}
+Hanbyul Joo, Natalia Neverova, and Andrea Vedaldi.
+\newblock Exemplar fine-tuning for 3d human pose fitting towards in-the-wild 3d human pose estimation.
+\newblock In \emph{International Conference on 3D Vision (3DV)}, 2020.
+
+\bibitem[Kanazawa et~al.(2018)Kanazawa, Black, Jacobs, and Malik]{Kanazawa2018_hmr}
+Angjoo Kanazawa, Michael~J. Black, David~W. Jacobs, and Jitendra Malik.
+\newblock End-to-end recovery of human shape and pose.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, pages 7122--7131, 2018.
+
+\bibitem[Kanazawa et~al.(2019)Kanazawa, Zhang, Felsen, and Malik]{insta}
+Angjoo Kanazawa, Jason~Y Zhang, Panna Felsen, and Jitendra Malik.
+\newblock Learning 3d human dynamics from video.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, pages 5614--5623, 2019.
+
+\bibitem[Kaufmann et~al.(2023)Kaufmann, Song, Guo, Shen, Jiang, Tang, Z{\'a}rate, and Hilliges]{emdb}
+Manuel Kaufmann, Jie Song, Chen Guo, Kaiyue Shen, Tianjian Jiang, Chengcheng Tang, Juan~Jos{\'e} Z{\'a}rate, and Otmar Hilliges.
+\newblock {EMDB}: The {E}lectromagnetic {D}atabase of {G}lobal 3{D} {H}uman {P}ose and {S}hape in the {W}ild.
+\newblock In \emph{International Conference on Computer Vision (ICCV)}, 2023.
+
+\bibitem[Kingma and Ba(2015)]{adam}
+Diederik~P Kingma and Jimmy Ba.
+\newblock Adam: A method for stochastic optimization.
+\newblock In \emph{International Conference on Learning Representations (ICLR)}, 2015.
+
+\bibitem[Kissos et~al.(2020)Kissos, Fritz, Goldman, Meir, Oks, and Kliger]{beyondwp}
+Imry Kissos, Lior Fritz, Matan Goldman, Omer Meir, Eduard Oks, and Mark Kliger.
+\newblock Beyond weak perspective for monocular 3d human pose estimation.
+\newblock In \emph{European Conference on Computer Vision Workshops (ECCV-W)}, 2020.
+
+\bibitem[Kocabas et~al.(2021{\natexlab{a}})Kocabas, Huang, Tesch, M{\"u}ller, Hilliges, and Black]{Kocabas_SPEC_2021}
+Muhammed Kocabas, Chun-Hao~P. Huang, Joachim Tesch, Lea M{\"u}ller, Otmar Hilliges, and Michael~J. Black.
+\newblock {SPEC}: Seeing people in the wild with an estimated camera.
+\newblock In \emph{Proceedings International Conference on Computer Vision (ICCV)}, 2021{\natexlab{a}}.
+
+\bibitem[Kocabas et~al.(2021{\natexlab{b}})Kocabas, Huang, Tesch, M{\"u}ller, Hilliges, and Black]{spec}
+Muhammed Kocabas, Chun-Hao~P. Huang, Joachim Tesch, Lea M{\"u}ller, Otmar Hilliges, and Michael~J. Black.
+\newblock {SPEC}: Seeing people in the wild with an estimated camera.
+\newblock In \emph{International Conference on Computer Vision (ICCV)}. IEEE, 2021{\natexlab{b}}.
+
+\bibitem[Kolotouros et~al.(2019)Kolotouros, Pavlakos, Black, and Daniilidis]{spin}
+Nikos Kolotouros, Georgios Pavlakos, Michael~J Black, and Kostas Daniilidis.
+\newblock Learning to reconstruct {3D} human pose and shape via model-fitting in the loop.
+\newblock In \emph{International Conference on Computer Vision (ICCV)}, pages 2252--2261, 2019.
+
+\bibitem[Lee et~al.(2021)Lee, Go, Lee, Cho, Sung, and Kim]{ctrlc}
+Jinwoo Lee, Hyunsung Go, Hyunjoon Lee, Sunghyun Cho, Min{-}Hyuk Sung, and Junho Kim.
+\newblock {CTRL-C:} camera calibration transformer with line-classification.
+\newblock In \emph{International Conference on Computer Vision (ICCV)}, 2021.
+
+\bibitem[Li et~al.(2021)Li, Xu, Chen, Bian, Yang, and Lu]{hybrik}
+Jiefeng Li, Chao Xu, Zhicun Chen, Siyuan Bian, Lixin Yang, and Cewu Lu.
+\newblock Hybrik: A hybrid analytical-neural inverse kinematics solution for 3d human pose and shape estimation.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, pages 3383--3393, 2021.
+
+\bibitem[Li et~al.(2022)Li, Liu, Zhang, Xu, and Yan]{li2022cliff}
+Zhihao Li, Jianzhuang Liu, Zhensong Zhang, Songcen Xu, and Youliang Yan.
+\newblock {CLIFF}: Carrying location information in full frames into human pose and shape estimation.
+\newblock In \emph{European Conference on Computer Vision}, 2022.
+
+\bibitem[Lin et~al.(2014)Lin, Maire, Belongie, Hays, Perona, Ramanan, Doll{\'a}r, and Zitnick]{coco}
+Tsung-Yi Lin, Michael Maire, Serge Belongie, James Hays, Pietro Perona, Deva Ramanan, Piotr Doll{\'a}r, and C~Lawrence Zitnick.
+\newblock Microsoft {COCO:} common objects in context.
+\newblock In \emph{European Conference on Computer Vision (ECCV)}, pages 740--755, 2014.
+
+\bibitem[Loper et~al.(2015)Loper, Mahmood, Romero, Pons-Moll, and Black]{smpl}
+Matthew Loper, Naureen Mahmood, Javier Romero, Gerard Pons-Moll, and Michael~J. Black.
+\newblock {SMPL}: A skinned multi-person linear model.
+\newblock \emph{Transactions on Graphics (TOG)}, 34\penalty0 (6):\penalty0 248:1--248:16, 2015.
+
+\bibitem[Mehta et~al.(2017)Mehta, Rhodin, Casas, Fua, Sotnychenko, Xu, and Theobalt]{mpiinf3dhp}
+Dushyant Mehta, Helge Rhodin, Dan Casas, Pascal Fua, Oleksandr Sotnychenko, Weipeng Xu, and Christian Theobalt.
+\newblock Monocular {3D} human pose estimation in the wild using improved {CNN} supervision.
+\newblock 2017.
+
+\bibitem[Patel et~al.(2021)Patel, Huang, Tesch, Hoffmann, Tripathi, and Black]{agora}
+Priyanka Patel, Chun-Hao~Paul Huang, Joachim Tesch, David Hoffmann, Shashank Tripathi, and Michael~J. Black.
+\newblock {AGORA}: Avatars in geography optimized for regression analysis.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, pages 13468--13478, 2021.
+
+\bibitem[Ranjan et~al.(2018)Ranjan, Bolkart, Sanyal, and Black]{coma}
+Anurag Ranjan, Timo Bolkart, Soubhik Sanyal, and Michael~J Black.
+\newblock Generating 3d faces using convolutional mesh autoencoders.
+\newblock In \emph{Proceedings of the European conference on computer vision (ECCV)}, pages 704--720, 2018.
+
+\bibitem[Sengupta et~al.(2020)Sengupta, Budvytis, and Cipolla]{ssp}
+Akash Sengupta, Ignas Budvytis, and Roberto Cipolla.
+\newblock Synthetic training for accurate {3D} human pose and shape estimation in the wild.
+\newblock In \emph{British Machine Vision Conference (BMVC)}, 2020.
+
+\bibitem[Sengupta et~al.(2021)Sengupta, Budvytis, and Cipolla]{sengupta}
+Akash Sengupta, Ignas Budvytis, and Roberto Cipolla.
+\newblock Hierarchical kinematic probability distributions for {3D} human shape and pose estimation from images in the wild.
+\newblock In \emph{International Conference on Computer Vision (ICCV)}, pages 11219--11229, 2021.
+
+\bibitem[Shin et~al.(2024)Shin, Kim, Halilaj, and Black]{wham}
+Soyong Shin, Juyong Kim, Eni Halilaj, and Michael~J. Black.
+\newblock Wham: Reconstructing world-grounded humans with accurate 3d motion.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, 2024.
+
+\bibitem[Silberman et~al.(2012)Silberman, Hoiem, Kohli, and Fergus]{nyuv2}
+Nathan Silberman, Derek Hoiem, Pushmeet Kohli, and Rob Fergus.
+\newblock Indoor segmentation and support inference from rgbd images.
+\newblock In \emph{European Conference on Computer Vision (ECCV)}, pages 746--760, 2012.
+
+\bibitem[Sun et~al.(2019)Sun, Xiao, Liu, and Wang]{hrnet}
+Ke Sun, Bin Xiao, Dong Liu, and Jingdong Wang.
+\newblock Deep high-resolution representation learning for human pose estimation.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, 2019.
+
+\bibitem[von Marcard et~al.(2018)von Marcard, Henschel, Black, Rosenhahn, and Pons-Moll]{3dpw}
+Timo von Marcard, Roberto Henschel, Michael Black, Bodo Rosenhahn, and Gerard Pons-Moll.
+\newblock Recovering accurate {3D} human pose in the wild using {IMUs} and a moving camera.
+\newblock In \emph{European Conference on Computer Vision (ECCV)}, pages 614--631, 2018.
+
+\bibitem[Wang and Daniilidis(2023)]{refit}
+Yufu Wang and Kostas Daniilidis.
+\newblock Refit: Recurrent fitting network for 3d human recovery.
+\newblock In \emph{International Conference on Computer Vision (ICCV)}, 2023.
+
+\bibitem[Wu et~al.(2017)Wu, Zheng, Zhao, Li, Yan, Liang, Wang, Zhou, Lin, Fu, et~al.]{aic}
+Jiahong Wu, He Zheng, Bo Zhao, Yixin Li, Baoming Yan, Rui Liang, Wenjia Wang, Shipei Zhou, Guosen Lin, Yanwei Fu, et~al.
+\newblock Ai challenger: A large-scale dataset for going deeper in image understanding.
+\newblock \emph{arXiv preprint arXiv:1711.06475}, 2017.
+
+\bibitem[Wu et~al.(2019)Wu, Kirillov, Massa, Lo, and Girshick]{detectron2}
+Yuxin Wu, Alexander Kirillov, Francisco Massa, Wan-Yen Lo, and Ross Girshick.
+\newblock Detectron2.
+\newblock \url{https://github.com/facebookresearch/detectron2}, 2019.
+
+\bibitem[Xiao et~al.(2012)Xiao, Ehinger, Oliva, and Torralba]{sun360}
+Jianxiong Xiao, Krista~A. Ehinger, Aude Oliva, and Antonio Torralba.
+\newblock Recognizing scene viewpoint using panoramic place representation.
+\newblock In \emph{2012 {IEEE} Conference on Computer Vision and Pattern Recognition}, 2012.
+
+\bibitem[Xiao et~al.(2013)Xiao, Owens, and Torralba]{sun3d}
+Jianxiong Xiao, Andrew Owens, and Antonio Torralba.
+\newblock {SUN3D:} {A} database of big spaces reconstructed using sfm and object labels.
+\newblock In \emph{International Conference on Computer Vision (ICCV)}, pages 1625--1632, 2013.
+
+\bibitem[Xu et~al.(2022)Xu, Zhang, Zhang, and Tao]{vitpose}
+Yufei Xu, Jing Zhang, Qiming Zhang, and Dacheng Tao.
+\newblock Vi{TP}ose: Simple vision transformer baselines for human pose estimation.
+\newblock In \emph{Advances in Neural Information Processing Systems}, 2022.
+
+\bibitem[Zhang et~al.(2021)Zhang, Tian, Zhou, Ouyang, Liu, Wang, and Sun]{pymaf}
+Hongwen Zhang, Yating Tian, Xinchi Zhou, Wanli Ouyang, Yebin Liu, Limin Wang, and Zhenan Sun.
+\newblock Pymaf: 3d human pose and shape regression with pyramidal mesh alignment feedback loop.
+\newblock In \emph{Conference on Computer Vision and Pattern Recognition (CVPR)}, 2021.
+
+\bibitem[Zhou et~al.(2019)Zhou, Barnes, Lu, Yang, and Li]{zhou}
+Yi Zhou, Connelly Barnes, Jingwan Lu, Jimei Yang, and Hao Li.
+\newblock On the continuity of rotation representations in neural networks.
+\newblock In \emph{Proceedings of the IEEE/CVF conference on computer vision and pattern recognition}, pages 5745--5753, 2019.
+
+\bibitem[Zhu et~al.(2024)Zhu, Kumar, Hu, and Liu]{wildcamera}
+Shengjie Zhu, Abhinav Kumar, Masa Hu, and Xiaoming Liu.
+\newblock Tame a wild camera: In-the-wild monocular camera calibration.
+\newblock \emph{Advances in Neural Information Processing Systems}, 36, 2024.
+
+\end{thebibliography}

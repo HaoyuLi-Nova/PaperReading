@@ -1,0 +1,15 @@
+\section{Conclusion}\label{sec:conclusion}
+We introduced LIGHT, a framework for human-object interaction animation that jointly models dynamic human motion and diverse object geometries without relying on hand-crafted priors or kinematic constraints. By decoupling modality-specific components with individualized noise schedules, the model enables cleaner elements to guide noisier ones, yielding inherently contact-aware generation. Generalization is further enhanced through synthetic object augmentation, which serves as a data prior to promote invariance of contact semantics across geometric variations. Collectively, these contributions establish a new form of guidance for HOI animation, providing both a scalable path toward more generalizable modeling and a natural extension of guidance within the diffusion forcing paradigm.
+
+\section*{Acknowledgments} 
+
+This work was supported in part by Snap Inc., NSF under Grants 2106825 and 2519216, the DARPA Young Faculty Award, the ONR Grant N00014-26-1-2099, and the NIFA Award 2020-67021-32799. This work used computational resources, including the NCSA Delta and DeltaAI and the PTI Jetstream2 supercomputers through allocations CIS230012, CIS230013, CIS240311, and CIS240428 from the Advanced Cyberinfrastructure Coordination Ecosystem: Services \& Support (ACCESS) program, as well as the TACC Frontera supercomputer, Amazon Web Services (AWS), and OpenAI API through the National Artificial Intelligence Research Resource (NAIRR) Pilot.
+
+\section*{Ethics Statement}
+The realism and flexibility of animations produced by our approach could facilitate misuse, such as generating convincing yet fictitious scenarios involving human interactions with objects, which might lead to misinformation. To proactively mitigate these risks, we explicitly adopt abstract human-body representations, specifically, the SMPL model, which inherently lacks identifiable facial or biometric features. Thus, our approach substantially decreases the likelihood of synthesized content being exploited for identity misrepresentation or other privacy-invasive applications, thereby ensuring responsible and ethical usage.
+
+
+\section*{Reproducibility Statement}
+We provide a detailed description of the model architecture in Sec.~\ref{sec:method_main}. Details of adapted baselines are introduced in Sec.~\ref{sec:experiments}. For augmentation, we include all the details in Sec.~\ref{sec:augmentation}. Comprehensive implementation details, including hyperparameters, evaluation metrics, and the training procedure of the evaluator, are reported in Sec.~\ref{sec:method_main} and further expanded in Sec.~\ref{sec:method_supp}, to facilitate reproducibility.
+
+

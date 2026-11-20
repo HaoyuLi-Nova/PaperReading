@@ -1,0 +1,10 @@
+\section{Conclusion}
+
+We have introduced \model, a kinematic motion diffusion model trained on a large-scale motion capture dataset that generates high-quality human motions and can be controlled through text and a variety of kinematic constraints. 
+Our model enables easy authoring of motions using intuitive interfaces as shown in \cref{sec:key_results}, and can be applied directly to generating robot motion after retargeting the training dataset. 
+After training entirely on optical mocap data, our model gives a strong foundation for further scaling up of human motion generation. 
+
+\paragraph{Future Challenges}
+Looking forward, a promising direction is to further scale up the model with motions reconstructed from internet videos or generated videos. An important challenge here will be how to combine clean and noisy data sources without compromising output motion quality from the model. 
+While \model is designed specifically for ``offline'' motion authoring and can take several seconds to generate a motion, applications such as robotics and digital twin simulation require a runtime model that dynamically controls humanoids and reacts to changing environments. To this end, an interesting avenue is moving diffusion to a learned latent space and reformulating motion generation to be an autoregressive problem. 
+Finally, scene and object interactions are crucial to making motion generation models truly practical for most applications. Gathering data for this problem becomes even more challenging, and will require creative solutions.

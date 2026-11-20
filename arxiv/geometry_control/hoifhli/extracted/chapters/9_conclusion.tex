@@ -1,0 +1,19 @@
+\section{Conclusions}
+In this work, we introduced a system that simulates realistic human-object manipulation in a contextual environment based on human-level language instructions.
+The framework consists of a high-level LLM planner that infers a target scene layout and execution plan from the given instructions, a low-level motion generator that generates synchronized, full-body, fingers, and object motion, and a physics tracker that imitates the generated kinematic motions and produces physically plausible interaction motions.
+Our system effectively handles a variety of tasks, showcasing its potential for various real-world applications.
+
+\paragraph{Future Work.}
+% Despite its strengths, the system has several limitations. 
+% While our approach successfully leverages LLMs to interpret human-level instructions, there is room to improve plan generation for more complex environments.
+Our system currently uses text or image inputs to represent the contextual environment, and could potentially be enhanced with more structured representations like voxel grids as used in \cite{jiang2024autonomous}. 
+% For grasp pose generation, we build upon~\cite{wang2023dexgraspnet}, though alternative approaches could be explored to further improve grasp success rates.
+% \zhen{Include failure cases in the video.}
+% \paragraph{Future Work.}
+Building on this idea, a promising direction is to create an agent with egocentric vision perception as input to LLM/VLMs for high-level motion planning. 
+This could enable the agent to exhibit more natural behaviors, such as purposeful head orientation for observation and better body positioning to avoid collisions.
+
+% A promising future direction is to create an agent with egocentric vision perception and use it as an input to the LLM/VLMs for high-level motion planning. We expect that more humanlike behaviors will emerge as a result of realistic modeling of human perception. For example, the agent will orient its head more purposefully to observe the world and will position its whole body more effectively to avoid collisions. 
+
+% \paragraph{Future Work.}
+% First, we aim to improve the quality and variation of generated motions for more realistic interactions. We also plan to enhance the system's ability to handle more complex environments and diverse interactions, such as sitting on a chair or lying on a sofa \jiaman{This is contradictory to what we said in the introduction. sitting on a chair is not complex, it's solved.}.\zhen{But our current system can't do such tasks, I want to say that we can build a unified system that can handle both static and dynamic objects,}

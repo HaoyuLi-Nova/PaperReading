@@ -1,0 +1,24 @@
+\section{Related Work}
+\label{sec:relwork}
+
+Our approach is closely related to previous works in generative human motion modeling, while improving upon them in key ways.
+Besides explicit motion diffusion~\cite{tevet2023mdm,zhang2024motiondiffuse}, several alternative approaches have proven successful at text-conditioned human motion generation. 
+Latent motion diffusion~\cite{chen2023executing} denoises motion in a learned latent space rather than the explicit pose space, thereby improving efficiency. In a similar spirit, MMM~\cite{pinyoanuntapong2024mmm} and MoMask~\cite{guo2024momask} learn a discretized latent space via a VQ-VAE~\cite{van2017neural}, then train a model to generate a sequence of latents through a progressive masked prediction procedure. A different class of methods treat discretized latents as tokens and autoregressively predict them in sequence, similar to large language models~\cite{zhang2023generating,jiang2024motiongpt}. 
+Such latent approaches focus primarily on text control. Those that do handle kinematic constraints require latent test-time optimization to achieve high accuracy~\cite{wan2024tlcontrol,pinyoanuntapong2025MaskControl}.
+
+Our choice of explicit motion diffusion is motivated by the ease of controllability on the pose features.
+OmniControl~\cite{xie2024omnicontrol} demonstrated dense and sparse positional control with a ControlNet~\cite{zhang2023adding} fine-tuned on top of a base motion diffusion model.
+GMD~\cite{karunratanakul2023gmd} uses a combination of imputation and test-time guidance to handle potentially sparse positional constraints. Learning an RL policy on top of a diffusion model has also been explored for kinematic controls~\cite{shi2024amdm,zhao2025DartControl}.
+Our method is most related to methods that use imputation to condition generation by directly overwriting constraints in the input motion~\cite{shafir2024human,hwang2025motion}.
+CondMDI uses the same imputation approach that we do with a concatenated mask as input to the denoiser~\cite{cohan2024condmdi}.
+
+Our method, \model, supports a suite of kinematic controls that is more extensive than prior works. Through direct imputation during training, our denoiser can handle both sparse and dense constraints on positions and joint rotations. This is achieved without additional ControlNet fine-tuning, test-time guidance/optimization, or RL. Moreover, our smoothed root representation lends itself to root constraints commonly found in motion editing applications.
+While prior work has leveraged a global joint position representation to handle sparse constraints~\cite{karunratanakul2023gmd,cohan2024condmdi,hwang2025motion,meng2025absolute}, we also adopt the global representation for joint rotations, enabling sparse rotation control.
+Additionally, previous approaches that use a two-stage model~\cite{karunratanakul2023gmd,hwang2025motion} train each stage independently, while our interleaved two-stage denoiser trains end-to-end.
+
+A major challenge in learning effective motion generation models is the relative lack of large-scale datasets, with the most common benchmark HumanML3D~\cite{guo2022humanml3d} containing only 30 hours of motion.
+Several works try to address this through increasingly larger datasets.
+Motion-X was an early work to collect a dataset with a majority of motions recovered from online video sources, totaling 144 hours of motion~\cite{lin2023motion}. Datasets have continued to grow through a combination of mocap and videos from several sources~\cite{lu2025scamo,lin2025quest,wang2025scaling,zhang2024large,hymotion2025}, with the recent MotionMillion dataset containing 2000 hours of motions~\cite{fan2025gotozero}. 
+While such diverse data is exciting to study the scaling properties of motion generation, these datasets rely heavily on motions reconstructed from monocular videos and/or mocap from a variety of sources with different framerates and skeletons. Additionally, text descriptions are often labeled through automatic LLM-driven approaches.
+As a result, the average motion and text quality is considerably lower than the 700 hours of optical mocap data and human-labeled text annotations that \model is trained on. An exciting future direction is how to leverage large-scale video data without compromising the motion quality that can be learned from mocap.
+

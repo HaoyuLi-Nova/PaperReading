@@ -1,0 +1,52 @@
+
+\hypersetup{colorlinks,urlcolor=black,citecolor=cyan}
+
+\newcommand\blfootnote[1]{%
+  \begingroup
+  \renewcommand\thefootnote{}\footnote{#1}%
+  \addtocounter{footnote}{-1}%
+  \endgroup
+}
+\makeatletter
+\DeclareRobustCommand\onedot{\futurelet\@let@token\@onedot}
+\def\@onedot{\ifx\@let@token.\else.\null\fi\xspace}
+
+\def\eg{\emph{e.g}\onedot} \def\Eg{\emph{E.g}\onedot}
+\def\ie{\emph{i.e}\onedot} \def\Ie{\emph{I.e}\onedot}
+\def\cf{\emph{c.f}\onedot} \def\Cf{\emph{C.f}\onedot}
+\def\etc{\emph{etc}\onedot} \def\vs{\emph{vs}\onedot}
+\def\wrt{w.r.t\onedot} \def\dof{d.o.f\onedot}
+\def\etal{\emph{et al}\onedot}
+\makeatother
+
+\definecolor{citecolor}{rgb}{0.21,0.49,0.74}
+\definecolor{linkcolor}{HTML}{ED1C24}
+\definecolor{graycolor}{rgb}{0.95,0.95,0.95}
+
+\usepackage[capitalize]{cleveref}
+\crefname{section}{Sec.}{Secs.}
+\Crefname{section}{Section}{Sections}
+\Crefname{table}{Table}{Tables}
+\crefname{table}{Tab.}{Tabs.}
+\crefname{figure}{Fig.}{Figs.}
+
+\newcommand{\figref}[1]{Fig.~\ref{#1}}
+\newcommand{\tabref}[1]{Tab.~\ref{#1}}
+\newcommand{\xmark}{\ding{55}}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\R}{\mathbb{R}}
+
+\newcommand{\modelname}{HY-Motion 1.0}
+\newcommand{\departmentname}{Tencent Hunyuan}
+\newcommand{\teamname}{Tencent Hunyuan 3D Digital Human Team}
+
+\def\huggingface{\raisebox{-1.5pt}{\includegraphics[height=1.05em]{logo/hf-logo.pdf}}}
+\def\hunyuan{\raisebox{-1.5pt}{\includegraphics[height=1.05em]{logo/hunyuan-logo.png}}}
+\def\github{\raisebox{-1.5pt}{\includegraphics[height=1.05em]{logo/github-logo.pdf}}}
+
+\newcommand{\hflink}{https://huggingface.co/tencent/HY-Motion-1.0}
+\newcommand{\ghlink}{https://github.com/Tencent-Hunyuan/HY-Motion-1.0}
+
+\newcommand{\todo}[1]{\colorbox{yellow!30}{TODO: #1}}
+
+\newcommand{\qing}[1]{\colorbox{red!30}{@chingshuai: #1}}

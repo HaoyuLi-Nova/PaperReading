@@ -1,0 +1,25 @@
+\section{System Overview}
+\label{sec:system_overview}
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=\textwidth]{figures/1_system_overview_v7_compressed.pdf}
+    \vspace{-6mm}
+    \caption{
+    Our system takes the scene description and human-level instruction as input and uses a high-level planner to obtain the scene map and a detailed execution plan. The low-level motion generator then generates synchronized object motion, full-body human motion, and finger motion. Finally, the physics tracker uses RL to track the generated motion, producing physically plausible motion.}
+    % \Description{}
+    \vspace{-4mm}
+    \label{fig:system_overview}
+\end{figure*}
+Given a human-level instruction and a scene description, we develop a system that generates synchronized human motion and object motion to accomplish the task. 
+%Our system differs from prior work in human-scene and human-object interaction by not only modeling the full-body dynamics of human motion but also focusing on the intricate details of finger movements. This enhancement contributes significantly to the realism of the motions generated.
+An overview of our system is depicted in \cref{fig:system_overview}. The system consists of a high-level planner, a low-level motion generator, and a physics tracker. The high-level planner leverages LLMs to reason about instructions and the scene description, generating a \emph{scene map} along with a detailed \emph{execution plan}. The scene map specifies the desired positions and orientations of the objects, while the execution plan outlines the steps to interact with these objects. The low-level motion generator unites conditional diffusion models trained on separate datasets for full body motion and dexterous hand motion, producing synchronous object and human movements.
+%It includes an interaction module and a navigation module. The interaction module, introduced in \cref{sec:low_level_interaction}, employs a multi-stage framework to produce human-object interaction motions. The navigation module, described in \cref{sec:low_level_navigation}, generates walking motions between interactions.
+The physics tracker then uses RL to track the generated motion in a physics simulator, ensuring physical plausibility.
+% Together, these modules operate sequentially to ensure smooth and realistic human-object interactions.
+
+
+
+
+
+

@@ -1,0 +1,56 @@
+\input{tabs/reconstruction_comparison}
+\input{tabs/compare_wavelet}
+\input{tabs/compare_on_motionmillion}
+
+\section{Experiments}
+\label{sec:experiments}
+
+
+
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=1\textwidth]{figures/motion_generation_result.pdf}
+    \vspace{-2em}
+    \caption{Our model demonstrates robust performance in generating coherent motions from complex compositional textual descriptions.}
+    \vspace{-1em}
+    \label{fig:generation_result}
+\end{figure*}
+
+\subsection{FSQ Reconstruction Comparison}
+
+\fk{\textbf{Reconstruction Comparison with Different Datasets.}}
+We first compare the reconstruction performance of different datasets after conducting FSQ training with the same number of parameters on both our dataset and the MotionUnion dataset. As shown in Tab.~\ref{tab:recons_comp}, our FSQ model is trained on the training set of MotionMillion, while the FSQ model from Scamo is trained on the MotionUnion dataset. We observe that the FSQ model trained on the MotionMillion training set, using the same number of parameters, achieves the best performance across HumanML3D, MotionX, and MotionMillion.
+% 
+
+\fk{\noindent \textbf{Ablation Study Wavelet Transformation.}}
+\fk{As shown in the Tab.~\ref{ablation:wavelet}, we exhibit the reconstruction results via MPJPE metrics and jitter by calculating the acceleration of the reconstructed motion. 
+
+We find that training vanilla FSQ (a.k.a. w/o wavelet) leads to a large deviation between the acceleration of the motion reconstructed by the model and that of the ground truth (GT), which means there is a significant data jitter. We analyze that this may be because the discretized compression inevitably causes information loss, resulting in a deviation in the modeling of high-frequency information, thus leading to severe jitter. Therefore, we use the wavelet transform to transform the input motion, and after using the wavelet transform, the deviation between the acceleration of the motion reconstructed by the model and that of the GT is significantly reduced. At the same time, the MPJPE of the model also gains a little better improvement.}
+
+\subsection{Quantitative Comparison on Different Models}
+
+\fk{We followed the previous method~\cite{humantomato}, and trained an evaluator on our dataset to assess the impact of different model scales on the generation ability.}
+\fk{As shown in Tab.~\ref{tab:comp_on_motionmillion}, we can find that our model significantly surpasses the ScaMo performance. Besides, with the increase of the model size, FID and R-precision are gradually improved. However, we found that when the model size improved from 3B to 7B, it was difficult to effectively reflect the difference between the two models from the metrics. This is also in line with the current dilemma of generative models, that is, metrics often can not fully reflect the capabilities of the model. Therefore, in the following sections, we further propose the MotionMillion-Eval benchmark to evaluate zero-shot generation capabilities of different models.}
+
+
+
+\subsection{Zero-shot Potential Verification}
+\textbf{Benchmark and Metric.}
+We introduce MotionMillion-Eval, a novel benchmark designed to assess the quality of text-to-motion generation models through human verification. This benchmark comprises 126 prompts derived from real-world industrial standards, covering various motion categories, including daily life, work, arts, communication, combat, sports, dance, and nonhuman behavior.
+We evaluate different text-to-motion models with three human evaluation dimensions on MotionMillion-Eval:
+1) Text Alignment, 2) Motion Smoothness, and 3) Physical Plausibility. The scoring details for the three dimensions are provided in the supplementary materials.
+
+\input{tabs/compare_on_three_dimenson_bench}
+\input{tabs/compare_detail_bench}
+
+\noindent\textbf{Comparisons Between Different Models.} As shown in Tab.~\ref{tab:comp_metrics},
+We evaluate multiple models on MotionMillion-Eval. Compared with the ScaMo-3B model, our 3B model significantly outperforms ScaMo in terms of Text Alignment, Physical Plausibility, and Motion Smoothness. This indicates that compared to the MotionUnion dataset used for training ScaMo, the model trained with our dataset has stronger generalization performance. In addition, as the model scale increases (ranging from 1B to 7B), the effect in the dimension of Text Alignment is significantly improved. This shows that the scale and diversity of our data can effectively support the expansion of the model scale, thus better paving the way for realizing zero-shot applications. 
+
+Besides, we find that for the two metrics of physical feasibility and motion smoothness, expanding the model size does not bring a significant increase. We analyze that the reason for this is that these two metrics do not need to measure the alignment degree between motion and text, but only need to focus on the quality of motion itself. Therefore, we believe that these two metrics are highly correlated with the motion quality of the dataset itself. Further, when we compare the MDM, T2M-GPT, and ScaMo-3B models, we find that our model can be comparable to the former two in terms of Physical Plausibility and Motion Smoothness, and is significantly better than the ScaMo-3B model. Therefore, this further shows that the quality of MotionMillion we constructed can significantly reach almost the same level as HumanML3D and is significantly better than MotionX.
+
+\noindent\textbf{Detailed Comparisons Between Ours-7B and ScaMo-3B Models.}
+We compared the generative capabilities of both models on diverse instruction categories, with three professional annotators voting on the better outputs for identical text prompts. As shown in Table~\ref{tab:comp_detail_bench}, our model matches ScaMo-3B in the Art/Dance and Non-human behavior subsets but surpasses it in all other areas, demonstrating the enhanced diversity of motions achievable by our dataset.
+
+\subsection{Qualitive Results}
+We further present visualization results, as shown in Fig.~\ref{fig:generation_result}. Our model demonstrates: 1) the ability to comprehend abstract concepts, effectively recognizing and generating the characteristic walking posture of a zombie; and 2) strong instruction-following capabilities, accurately interpreting long text descriptions and producing corresponding combined motions. These results indicate that MotionMillion, the largest-scale dataset we propose, has the potential to advance text-to-motion generation into the zero-shot era.
+% \vspace{-1em}

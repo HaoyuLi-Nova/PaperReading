@@ -1,0 +1,91 @@
+\section{Quantitative Evaluation}
+\label{sec:experiments}
+
+In this section, we perform a detailed experimental analysis of key design decisions of our approach (\cref{sec:experiments:ablations}) and scaling behavior in terms of data size, model size, and batch size (\cref{sec:experiments:scaling}). 
+
+Most prior works evaluate on the public HumanML3D benchmark~\cite{guo2022humanml3d}, which is relatively small scale and is becoming increasingly saturated, as indicated by better-than-ground-truth metrics reported for recent methods. 
+For our experiments, we choose to exclusively use the large-scale, high-quality Bones Rigplay~\cite{bones_ai_datasets} mocap dataset described in \cref{sec:dataset}, as it provides a robust benchmark for highlighting differences between ablations and variations of our method.
+
+\subsection{Experiment Setting}
+\label{sec:experiments_setup}
+
+\paragraph{Dataset}
+We hold out 10\% of the motions in Rigplay from training for evaluation. 
+Splits are determined based on unique behaviors (\ie, action types) in the dataset, such that the test set contains only novel behaviors that were not seen during training. 
+For results reported here, we evaluate on a subset containing about 5k motions that cover all distinct behaviors in the test set. 
+For these experiments, models are trained on the native 27-joint skeleton version of the dataset.
+
+\paragraph{Test Cases}
+Models are evaluated in three different settings. 
+(1) To evaluate the text-to-motion task with no kinematic constraints, we prompt the model with the high-level \textit{Overview Prompt} for each motion (see \cref{sec:dataset}). 
+(2) We also evaluate unconstrained text-to-motion with a \textit{Fine-Grained Prompt} that tends to describe a shorter motion containing an atomic action. 
+(3) To evaluate combined text+constraint conditioning, we aggregate results from a test suite containing diverse variations of kinematic constraints sampled from the ground truth motion. Constraints in this suite reflect real-world use cases including sparse full-body joint position keyframes, in-betweening with blocks of keyframes at the start and/or end of a motion, sparse keyframes on position/rotation of end-effectors (hands and feet), sparse 2D waypoint keyframes for the root, dense 2D root paths, and mixing multiple constraints together. Constrained generation is evaluated at motion lengths from 3 to 9 sec, both with and without text-conditioning. For a subset of test cases, we apply random perturbations on the global translation and heading of constraints to evaluate generalization.
+
+\paragraph{Evaluation Metrics}
+We adapt common metrics from prior work~\cite{guo2022humanml3d}. 
+To evaluate text-following, we report \textit{Top-3 R-precision (R@3)} using a TMR embedding model~\cite{petrovich23tmr} trained on the full Rigplay dataset, including both train and test split.  
+Notably, retrieval with TMR is performed over the entire test set rather than within small batches of 32 as is common in prior work, significantly increasing the challenge.
+For motion quality, we measure \textit{FID} using the same TMR model. We also report a \textit{Foot Skate} metric that computes the mean velocity of feet joints in the output motion for frames where the model predicts the joint should be in static contact with the ground. This foot skate metric depends on the \textit{Foot Contact Classification Accuracy}, which is generally very good across all methods, but is also reported for completeness. 
+
+For constraint-conditioned generation, the \textit{average distance error} between the input constraint and the generated motion at constrained frames is reported. Errors are split into full-body positions, end-effector position/rotation, and 2D root position and averaged over all test cases.
+Because our model uses a smoothed root representation, the model can generate motion where the smoothed root matches the constraint, but the projected pelvis of the character still deviates from the smooth path/waypoint constraint. As discussed in \cref{sec:method:motion_rep}, this flexibility is useful for maintaining natural motion when following root constraints, however, significant deviation of the pelvis from the constraint is undesirable as the character can appear to drift from the constraint path. 
+To evaluate the extent of this deviation, we report the \textit{95th percentile of the 2D position error} between the smoothed root constraint and projected pelvis. This value indicates the maximum that the pelvis will stray from smoothed root constraints for the vast majority of generated motions; closest to ground truth is optimal.
+
+\paragraph{Model Setting}
+Unless otherwise noted, the models presented in these experiments are trained at 20 fps using 8 GPUs (resulting in a batch size of 1024 motions) and on data with all the augmentations described in \cref{sec:dataset}. 
+This differs slightly from our best models demonstrated in \cref{sec:key_results}, which are 30 fps and trained with 16 GPUs, but the trends are still informative.
+
+\input{tables/ablations}
+
+\subsection{Ablation Study}
+\label{sec:experiments:ablations}
+
+In \cref{table:ablation_study}, we compare the full model architecture and training curriculum to several strong baselines to justify key design decisions. Metrics computed on the ground truth data are shown for reference.
+
+\paragraph{Two-Stage Denoiser}
+We first compare our decomposed two-stage denoiser design to a \textit{One-Stage} baseline that uses a single transformer to simultaneously denoise root and body motion. To ensure a fair comparison, we increase the number of layers and latent size of the baseline such that the number of learnable parameters is similar to the two-stage model. 
+While the text-following capabilities of this baseline are about the same as the full model, we note a substantial increase in foot skating, indicating that generating body motion conditioned on root motion is indeed easier than generating both simultaneously. The one-stage baseline also causes a substantial increase in constraint errors.
+
+The \textit{Second Stage Global} baseline uses the global root representation in the second (body) stage of the denoiser instead of converting the input root motion to a local representation. This tends to cause an increase in foot skating, likely due to the lack of invariance of the global root representation.
+
+\paragraph{Smoothed Root Representation}
+The next baseline directly uses the pelvis joint projected to the ground as the root instead of the smoothed representation used in the full model, which causes notably increased foot skate.
+Without the smoothed root, body joint positions are represented with respect to the pelvis, which may be more difficult to learn due to the high-frequency motions of the pelvis.
+Despite this foot skate, constraint accuracy in on par with the smoothed root representation.
+As expected, the 95th percentile of pelvis error is lower than the full model, since the baseline is directly trained to match the pelvis to the root constraint. 
+However, in practice this can cause qualitatively unnatural motions when constraining motions with straight lines or smoothed curves as is common in animation applications. For example, asking the baseline to generate a walking motion along a straight line results in a motion with a stealthy/sneaking style or old person style, since these minimize lateral pelvis movements and therefore deviate less from the straight line constraint.
+
+\paragraph{Extra ``Register" Tokens}
+The \textit{No Extra Tokens} baseline removes the extra register tokens, leaving only the text embedding and heading token as additional conditioning for the model. This tends to reduce performance particularly for text-following and motion quality, indicating that the added tokens increase the representational capacity of the model.
+
+\paragraph{Dual-Phase Training Curriculum}
+The \textit{No Train Curriculum} baseline directly trains the model for text+constraint conditioning from scratch, rather than training in two phases, as described in \cref{sec:method:training}. For a fair comparison, the baseline is trained for 1 million steps, the same as the total steps of phased training. During training, the baseline receives text-only or text+constraint inputs with equal probability and does not use dropout. 
+This baseline reaches comparable text-following accuracy and motion quality as using phased training, but sees an increase in constraint errors. 
+In two-phase training, phase 1 is dedicated to pre-training on text-to-motion so that phase 2 can be dedicated to constraint-following, but non-phased training must balance text and constraint learning for the entire duration of training. While it is possible there is a perfect balance between text-only and text+constraint input sampling that will result in competitive performance across the board, we find the phased training works well without additional hyperparameter tuning.
+
+\input{tables/scaling}
+
+\subsection{Scaling Analysis}
+\label{sec:experiments:scaling}
+
+\cref{table:scaling} evaluates how scaling affects model performance across three different axes.
+
+\paragraph{Data Size} 
+The top part of the table compares using the full training dataset to training on a subset of 50\% and 10\% of training motions. 
+Subsets are strategically sampled to include all unique behaviors (action types) from the full dataset, but with the number of performances for each behavior reduced to the desired fraction. As a result, this experiment primarily evaluates how much repeated performances of the same behavior across many actors influences motion generation ability. 
+For this experiment only, we do not use the augmented stitched motions described in \cref{sec:dataset}.
+
+Comparing the three dataset sizes, we see that foot skate and constraint accuracy monotonically improve with more available training data, with significantly decreased performance when using 10\% of the data (\ie, the same order of magnitude as popular AMASS~\cite{mahmood2019amass} and HumanML3D datasets). 
+Curiously, R-precision and FID are not significantly affected by dataset size, which we believe is an artifact of how we subsample the training data. Since the baselines are trained on the same unique behaviors as the full training set, they should still generate reasonable results for test prompts. Therefore, retrieval with TMR is still successful and R-precision is not greatly affected. 
+Similarly, the generated motion distributions for the test set will be similar even if using only 10\% of the data, especially after embedding with TMR and being fit with a unimodal Gaussian, as is done in the FID metric. 
+What R-precision and FID do not capture are the fine-grained differences in motion distribution and subtle but important variations in motion, which manifests as reduced constraint following accuracy due to training on less diverse data.
+
+\paragraph{Model Size}
+The middle part of \cref{table:scaling} compares large (L), medium (M), and small (S) variants of our model in terms of learnable parameters. Our full best model uses the large size. The medium variant uses 8 layers in the transformer encoders instead of 16, while the small variant additionally decreases the latent size to 512 from 1024. We see that increasing model size improves performance across all metrics. While continuing to increase model size to the order of 500M or 1B parameters could potentially further improve performance, we found training stability becomes a bigger challenge and we speculate that without more data there will be diminishing returns.
+
+
+\paragraph{Batch Size}
+The bottom part of the table evaluates how increasing batch size affects performance. In practice, a larger batch size means using more GPUs so we compare small (S), medium (M), and large (L) batch sizes using 4, 8, and 16 GPUs, respectively. This corresponds to 512, 1024, and 2048 batch sizes.
+As shown in the table, using more GPUs generally improves performance across the board as the gradient estimate during optimization becomes more accurate. 
+We use the large batch size with 16 GPUs to train our best model.
+

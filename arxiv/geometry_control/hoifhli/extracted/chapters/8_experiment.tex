@@ -1,0 +1,202 @@
+\section{Experiment}
+\label{sec:experiment}
+We conduct extensive evaluation to assess the overall performance of our system, as well as each individual component. We use quantitative metrics and user perception studies to evaluate our results compared to the baselines. We also conduct ablation studies to analyze the effects of each system module. 
+We present the key results in this section and highly recommend readers refer to the supplementary video and documents for more detailed results and descriptions of the studies.
+% We present the key results in this section. More results and detailed descriptions of the studies can be found in the supplementary video and documents.
+% We evaluate each system module by comparing our proposed approach with baseline methods and conducting ablation studies. 
+% We highly recommend that readers refer to the supplementary video for additional qualitative results.
+
+\subsection{Evaluation of High-Level Planner}
+\label{subsec:planner_eval}
+
+% \karen{Geometric accuracy: Describe metrics. Describe samples. Refer to a table or figure. Conclusion.}
+
+% \karen{Perception study: Describe metrics. Describe samples. Refer to a table or figure. Conclusion.}
+
+The core component of the high-level planner is the scene map calculation. To assess its effectiveness, we quantitatively measure the geometric accuracy of the resulting plans and conduct a human perception study.
+For evaluation, we compare our method to a baseline that uses LLMs to directly predict object positions and orientations. We design 25 human-level instructions covering common everyday tasks for assessment, using OpenAI's GPT-4o \cite{gpt4o} for both our method and the baseline.
+
+\begin{figure}[t]
+\begin{center}
+    \includegraphics[width=\columnwidth]{figures/4_llm_results_compressed.pdf}
+    \vspace{-5mm}
+    \caption{Comparison between (a) the baseline and (b) our high-level planner. The baseline generates an incorrect monitor position and orientation, and places the chair in a position that intersects with the table. The human perception study results (bottom) show that the majority of participants preferred our results.
+    %\karen{Should show the input text commands too. Also need caption on the perception study.}\zhen{Added.}
+    }
+    \label{fig:llm_result}
+   \vspace{-8mm}
+\end{center}
+\end{figure}
+
+
+
+\begin{table*}[ht]
+\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lcccccccccccccccccc}
+\toprule
+\multirow{2}{*}{Method} & \multicolumn{1}{c}{Condition} & \multicolumn{2}{c}{Human Motion} & \multicolumn{5}{c}{Interaction} & \multicolumn{3}{c}{GT Difference} \\
+\cmidrule(r){2-2} \cmidrule(r){3-4} \cmidrule(r){5-9} \cmidrule(r){10-12}
+& $T_{xy} \downarrow$ & $H_{\text{feet}} \downarrow$ & FS $\downarrow$ & $\text{C}_{\text{prec}} \uparrow$ & $\text{C}_{\text{rec}} \uparrow$ & $\text{C}_{\text{F1}} \uparrow$ & CC $\uparrow$ & IV $\downarrow$ & $\text{MPJPE} \downarrow$ & $T_{\text{obj}} \downarrow$ & $O_{\text{obj}} \downarrow$ \\
+\midrule
+% IMoS \cite{ghosh2023imos} 
+% & 112.32  & -90.32 & 1.46 & 0.26 & 0.07 & 0.09 & 1.25\% & 18.25 & 32.86 & 130.10 & 2.36 \\
+CNet+GRIP \cite{taheri2023grip} 
+& 3.58 & \textbf{2.50} & 0.45 & 0.90 & 0.64 & 0.70 & 3.99\% & 49.00 & 14.33 & 11.55 & 0.93 \\
+\midrule
+CNet 
+& 3.26 & 2.68 & 0.43 & 0.91 & 0.81 & 0.84 & 3.54\% & 48.56 & \textbf{14.32} & \textbf{10.56} & 1.06 \\
+C+RNet 
+& \textbf{2.81} & 2.89 & \textbf{0.33} & \textbf{0.91} & \textbf{0.95} & \textbf{0.92} & 3.84\% & 24.78 & 15.96 & 12.57 & \textbf{0.73} \\
+C+R+FNet (ours)
+& \textbf{2.81} & 2.89 & \textbf{0.33} & \textbf{0.91} & \textbf{0.95} & \textbf{0.92} & \textbf{5.53\%} & \textbf{19.06} & 15.96 & 12.57 & \textbf{0.73}\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Interation synthesis on the FullBodyManipulation dataset \cite{li2023object}. Our full model achieves superior interaction quality compared to all others. }
+\label{tab:interaction}
+\end{table*}
+
+
+\begin{figure*}[t]
+    \centering
+     % \captionsetup{aboveskip=0pt, belowskip=0pt}
+\vspace{-2mm}
+\includegraphics[width=\textwidth]{figures/5_qualitative_results_v4_compressed.pdf}
+\vspace{-8mm}
+    \caption{Qualitative comparisons of each method. All baselines and ablations fail to produce precise hand and finger motions, while our method generates natural hand-object interactions.} 
+    \label{fig:interaction_qualitative}
+\vspace{-4mm}
+\end{figure*}
+
+\begin{figure}[t]
+    \centering
+\includegraphics[width=0.48\textwidth]{figures/6_interaction_human_study_v2.pdf}
+\vspace{-5mm}
+    \caption{Comparison of our full model and baseline models through human perception studies.}
+    \label{fig:interaction_human_study}
+\vspace{-6mm}
+\end{figure}
+
+
+
+
+\setlength{\columnsep}{10pt}
+\begin{wraptable}{r}{0.45\columnwidth}
+\centering
+% \begin{table}[]
+% \centering
+\vspace{-10pt}
+\caption{Comparison of geometric accuracy between our method and the baseline.}
+\begin{adjustbox}{max width=0.45\columnwidth}
+\begin{tabular}{lcc}
+\toprule
+& PE$_\text{p} \downarrow$ & PE$_\text{o} \downarrow$ \\
+\midrule
+Baseline & 21.9\% & 12.5\% \\
+Ours & \textbf{3.1\%} & \textbf{1.6\%} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\label{tab:llm_geometry}
+\vspace{-10pt}
+
+\end{wraptable}
+% \end{table}
+For geometric accuracy, we measure the proportion of objects with positional (PE$_\text{p}$) or orientation errors (PE$_\text{o}$) in the scene. 
+Positional errors include objects placed at incorrect heights or with penetration into other objects, while orientation errors refer to objects being directed in the wrong direction.
+The results, shown in \cref{tab:llm_geometry}, demonstrate that our method outperforms the baseline by a large margin. A qualitative comparison is presented in the upper part of \cref{fig:llm_result}, where the baseline generates incorrect object positions and orientations, while our method produces more reasonable layouts.
+
+
+
+% \paragraph{Results.} 
+We also conducted a human perception study, with results presented in the lower part of \cref{fig:llm_result}. Each pair was reviewed by 20 Amazon Mechanical Turk (AMT) workers. They were asked to choose the scene that was more reasonable and consistent with the given instruction. The majority of participants preferred our method.
+
+\subsection{Evaluation of Low-Level Motion Generator}
+\label{subsec:low_level_eval}
+% \karen{The low-level motion generator is evaluated by 11 metrics, including two newly introduced metrics for finger-object interaction and other frequently used metrics in the area of human motion synthesis. Additionally, we conduct a perception study to validate the quality of synthesized motion that might be difficult to quantify by numerical metrics. We report the results in comparison with the baseline and ablations to analyze the overall impact of our system, as well as the contributions of each individual component.}
+
+
+\paragraph{Datasets.}
+CoarseNet and RefineNet are trained on the FullBodyManipulation dataset~\cite{li2023object}, which includes 10 hours of human-object interaction with 15 objects but lacks finger motion.
+FingerNet uses the GRAB dataset~\cite{GRAB:2020}, containing full-body and finger motion for 10 subjects with 51 objects.
+The navigation module is trained on HumanML3D~\cite{guo2022generating}, featuring 28 hours of diverse motions with language descriptions.
+For all datasets, we follow standard data partitioning from prior work~\cite{li2023object, GRAB:2020, guo2022generating}.
+
+\vspace{-4mm}
+\paragraph{Evaluation Metrics.}
+Following prior work~\cite{li2023controllable}, we evaluate our approach from various aspects.
+All distance errors are measured in centimeters. 
+For condition matching, we report the waypoint following errors ($T_{xy}$).
+For human motion quality, we report the foot sliding score (FS) and foot height ($H_{\text{feet}}$).
+% We also report FID, which calculates the discrepancy between the generated and ground truth motions. Additionally, R-precision (R\textsubscript{prec}) measures how well the generated motion matches the input text by checking if the correct motion is ranked among the top-3 results for a given text description.
+For interaction quality, we use contact precision (C\textsubscript{prec}), recall (C\textsubscript{rec}), and F1 score (C\textsubscript{F1}).
+To better assess finger-object interaction, we also report contact coverage (CC) -- the percentage of hand points within -2mm to +2mm of the object surface -- and intersection volume (IV), the overlap volume of hand and object meshes in $\text{cm}^3$, following~\cite{grady2021contactopt}.
+For ground truth difference, we report the mean per-joint position error (MPJPE), object position error ($T_{\text{obj}}$), and the object orientation error ($O_{\text{obj}}$).
+We also conduct a human perception study to measure the motion quality.
+
+\vspace{-4mm}
+\paragraph{Baselines.}
+For generating full-body human motion, finger motion, and object motion from text, prior work~\cite{ghosh2022imos,li2024task} trained models on GRAB~\cite{GRAB:2020} to predict motions for small-object manipulation. However, GRAB contains only small-object manipulation data without locomotion, so models trained on it cannot generalize to scenarios involving large objects that require full-body coordination and locomotion. Moreover, the approach from~\cite{ghosh2022imos,li2024task} is not applicable to the FullBodyManipulation dataset~\cite{li2023object} used in our work, as this dataset lacks finger motions, making it infeasible to learn a model via direct supervision. 
+Due to these differences, a directly comparable baseline does not exist.
+Thus, we establish our baseline by combining two complementary methods: CHOIS~\cite{li2023controllable} (referred to as CoarseNet in our framework), which generates object motion and full-body motion from text, and GRIP~\cite{taheri2023grip}, which refines arm movements and generates finger motions based on CHOIS's output.
+
+In addition, to evaluate the impact of each component, we compare our full system against two ablations: (1) CoarseNet alone (CNet) and (2) CoarseNet + RefineNet (C+RNet), which represents the full system without finger motion. 
+The full system is denoted as C+R+FNet.
+% Our full system, which can be seen as (C+RNet) combined with FingerNet, is denoted as C+R+FNet.
+This evaluation focuses on the motion synthesis quality before physics tracking. We present the evaluation for the physics tracker in \cref{subsec:phys_eval}.
+%We evaluate all methods on the FullBodyManipulation dataset~\cite{li2023object}. 
+
+
+\vspace{-4mm}
+\paragraph{Results.}
+The qualitative comparison in \cref{fig:interaction_qualitative} clearly demonstrates the superiority of our method. Both ablated variants show a lack of finger detail, and GRIP~\cite{taheri2023grip} fails to generate accurate hand motion, resulting in significant artifacts. In contrast, our method produces precise finger-object interactions.
+We also observe the impact of RefineNet: compared to CNet, C+RNet maintains more consistent and reasonable relative poses between the hand and object during the interaction, showing RefineNet’s role in improving pose consistency and reducing artifacts.
+
+The quantitative results are presented in \cref{tab:interaction}.
+Since our method focuses on finger-object interaction, the five metrics under the \textit{Interaction} column are particularly important, and we achieve the best performance across all of them.
+
+We further conduct a human perception study to complement our evaluation. We generate 15 sequences using each method and compose 60 pairs, with each pair consisting of our results and the results of a baseline. Each pair was reviewed by 20 Amazon Mechanical Turk (AMT) workers. As shown in \cref{fig:interaction_human_study}, our method is consistently preferred over the baselines by a large margin. Notably, our method achieves even higher preference rates when compared to the real-world data from the FullBodyManipulation~\cite{li2023object} dataset, as we generate detailed finger motions that are absent in the original dataset.
+
+\subsection{Evaluation of Physics Tracker}
+\label{subsec:phys_eval}
+
+The physics tracker can accurately track kinematic motion while ensuring the physical plausibility of the motion. Through physics simulation, artifacts such as foot floating, foot sliding, and human-object penetration are eliminated, as shown in \cref{fig:physics_qualitative_results}. 
+
+\setlength{\columnsep}{10pt}
+\begin{wraptable}{r}{0.4\columnwidth}
+\centering
+% \begin{table}[]
+% \centering
+\vspace{-1pt}
+\caption{Tracking error between the kinematic motion and physics-based motion.}
+\begin{adjustbox}{max width=0.35\columnwidth}
+\begin{tabular}{lcc}
+\toprule
+& $E_h$ & $E_o$ \\
+\midrule
+Ours & 5.45 & 4.67 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\label{tab:physics}
+\vspace{-6pt}
+\end{wraptable}
+% \end{table}
+Additionally, we evaluate the tracking error of human joints ($E_h$) and objects ($E_o$), as shown in \cref{tab:physics}. The tracking error is defined as the positional error (cm) between the kinematic motion and the tracked motion. 
+The results were evaluated across 20 interaction sequences, each with an average duration of 30 seconds and 2 objects of varying shapes and types.
+All sequences were successfully tracked, with relatively small errors, demonstrating high tracking accuracy.
+
+
+
+\begin{figure}[t]
+    \centering
+     % \captionsetup{aboveskip=0pt, belowskip=0pt}
+\includegraphics[width=0.48\textwidth]{figures/7_physics_qualitative_results_v3_compressed.pdf}
+\vspace{-7mm}
+    \caption{Qualitative comparison of kinematic motion and physics-based motion. The physics tracker corrects artifacts such as foot floating and penetration.} 
+    \label{fig:physics_qualitative_results}
+    % \vspace{-8mm}
+\end{figure}
+

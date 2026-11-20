@@ -1,0 +1,145 @@
+\documentclass{article}
+
+\usepackage{iclr2026_conference,times}
+\iclrfinalcopy
+
+\input{math_commands.tex}
+
+\usepackage{url}
+
+\usepackage[utf8]{inputenc} 
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}   
+
+
+%  ---------------------------
+
+\usepackage[accsupp]{axessibility} 
+% \usepackage{times}
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+% \usepackage{xcolor}
+\usepackage{bm}
+\usepackage{booktabs}
+\usepackage[accsupp]{axessibility}
+\usepackage{epsfig}
+\usepackage{epigraph}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage[font={small}]{caption}
+% \usepackage[table]{xcolor}
+\usepackage{threeparttable}
+\usepackage{tabularx}
+\usepackage{tabularray}
+\usepackage{wrapfig}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{overpic}
+\usepackage{appendix}
+\usepackage{float}
+\usepackage{booktabs} % For formal tables
+\usepackage{diagbox}
+\usepackage{makecell}
+\usepackage{bbm}
+\usepackage{threeparttable}
+\usepackage{dsfont}
+\usepackage{subfigure} 
+\usepackage{arydshln}
+\usepackage{overpic}
+\usepackage[misc]{ifsym}
+\usepackage{wrapfig}
+\usepackage{xspace}
+\usepackage{varwidth}
+\usepackage{svg}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+% \usepackage{algorithmic}
+\usepackage{amsmath}
+
+\setlength{\textfloatsep}{6pt}
+\setlength{\intextsep}{6pt}
+\setlength{\abovecaptionskip}{2pt}
+\setlength{\belowcaptionskip}{0pt}
+
+\usepackage[pagebackref,breaklinks,colorlinks=true, citecolor=teal, linkcolor=purple, urlcolor=purple]{hyperref}
+
+
+
+
+\title{Unleashing Guidance Without Classifiers for Human-Object Interaction Animation} 
+
+% -----------------------------
+\def\ours{LIGHT}
+\colorlet{myglobalcolor}{black}
+\colorlet{myglobalcolor2}{blue}
+
+
+\newcommand{\mycolor}[1]{\textcolor{myglobalcolor}{#1}}
+\newcommand{\newcolor}[1]{\textcolor{myglobalcolor2}{#1}}
+
+% -----------------------------
+
+
+
+
+
+\def\@onedot{\ifx\@let@token.\else.\null\fi\xspace}
+\def\eg{\emph{e.g}\onedot} 
+\def\Eg{\emph{E.g}\onedot}
+\def\ie{\emph{i.e}\onedot} 
+\def\Ie{\emph{I.e}\onedot}
+\def\cf{\emph{cf}\onedot} 
+\def\Cf{\emph{Cf}\onedot}
+\def\etc{\emph{etc}\onedot} 
+\def\vs{\emph{vs}\onedot}
+\def\wrt{w.r.t\onedot} 
+\def\dof{d.o.f\onedot}
+\def\iid{i.i.d\onedot} 
+\def\wolog{w.l.o.g\onedot}
+\def\etal{\emph{et al}\onedot}
+
+
+
+\author{Ziyin Wang$^{1}$ \quad Sirui Xu$^{1}$ \quad Chuan Guo$^{2}$ \quad Bing Zhou$^{2}$ \quad Jiangshan Gong$^{1}$ \\[1.5pt]
+ \textbf{Jian Wang$^{2}$ \quad Yu-Xiong Wang$^{1}$ \quad Liang-Yan Gui$^{1}$} \\[3pt]
+$^{1}$University of Illinois Urbana-Champaign \quad $^{2}$Snap Inc.\\[3pt]
+{\url{http://ziyinwang1.github.io/LIGHT}}
+}
+
+
+\begin{document}
+
+
+\maketitle
+
+\vspace{-0.7cm}
+\begin{center}
+      \centering
+      
+      \includegraphics[width=\textwidth]{fig/teaser2.pdf} 
+      % \vspace{-0.2cm} 
+      \captionof{figure}{Given a textual prompt, our LIGHT generates realistic, vivid human-object interaction (HOI) motions via a novel classifier-free guidance scheme.}
+      
+      \label{fig:teaser}
+      \vspace{2em}
+\end{center}
+
+\input{sec/0_abstract}
+\input{sec/1_intro}
+\input{sec/2_related}
+\input{sec/3_method}
+\input{sec/4_exp}
+\input{sec/5_con}
+
+
+\bibliography{main}
+\bibliographystyle{iclr2026_conference}
+\clearpage
+\input{supp.tex}
+\end{document}

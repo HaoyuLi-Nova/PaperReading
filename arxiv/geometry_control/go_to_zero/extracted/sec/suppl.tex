@@ -1,0 +1,80 @@
+\clearpage
+\setcounter{page}{1}
+\maketitlesupplementary
+
+
+
+\section{Overview}
+In the following, we provide additional implementation details, including the data distribution and prompts in Sec.~\ref{supp:ddp}, finegrained scoring criteria in MotionMillion-Eval in Sec.~\ref{supp:eval_detail}, and 126 prompts used by MotionMillion-Eval in Sec.~\ref{supp:prompts}.
+Various generations of out-domain and complex compositional long motions are shown in our demo video.
+
+\section{Data Distribution and Prompts}
+\label{supp:ddp}
+We further demonstrate the data distribution of motion length, motion velocity, and motion diversity in Fig.~\ref{fig:supp_datadis}. We also provide the prompt used during captioning the motions in the web-scale human videos and text rewrite in the inference stage in Fig.~\ref{fig:supp_prompt}.
+
+\section{Scoring Criteria Details of MotionMillion-Eval}
+\label{supp:eval_detail}
+The scoring criteria details for each dimension (Text Alignment, Motion Smoothness, and  Physical Plausibility) are defined as follows:
+
+\textbf{Text Alignment (TA).}Score = 4: The generated motion is fully aligned with the textual prompt, accurately depicting all specified elements and details.
+Score = 3: The motion generally corresponds to the prompt, though minor discrepancies may be present in certain details.
+Score = 2: The motion exhibits clear misalignment with the prompt, with significant omissions or deviations from the described content.
+Score = 1: The generated motion is entirely inconsistent with the prompt, displaying substantial inaccuracies in key scenes or actions.
+
+\textbf{Motion Smoothness (MS).} Score = 4: The motion is highly fluid and natural, with smooth and seamless transitions between movements. Score = 3: The motion is generally smooth, though minor unnatural artifacts may occasionally appear in specific segments. Score = 2: The motion lacks fluidity, exhibiting noticeable discontinuities or stuttering. Score = 1: The motion appears highly unnatural, with frequent stuttering and abrupt transitions that disrupt coherence and comprehensibility.
+
+\textbf{Physical Plausibility (PP).} Score = 4: The generated motion adheres to real-world physical laws, accurately simulating object interactions, lighting, shadows, and collision effects.
+Score = 3: Multiple instances of physically implausible motion, lighting inconsistencies, or unrealistic interactions are observed, though the primary actions maintain a degree of coherence.
+Score = 2: The generated motion exhibits substantial violations of physical laws, with unrealistic object interactions or lighting effects that diminish realism.
+Score = 1: The motion is entirely implausible, featuring severe distortions in object dynamics, lighting, or interactions, making the scene difficult to interpret.
+
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/supp/data_distribution.pdf}
+    % \vspace{-1em}
+    \caption{Data Distributions of MotionMillion.}
+    % \vspace{-2em}
+    \label{fig:supp_datadis}
+\end{figure}
+
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/supp/prompt.pdf}
+    % \vspace{-1em}
+    \caption{Prompt used during captioning the motions in the web-scale human videos and text rewrite in inference stage.}
+    \vspace{-2em}
+    \label{fig:supp_prompt}
+\end{figure}
+
+\begin{figure*}
+    \centering
+    \includegraphics[width=0.8\linewidth]{tabs/supp1-1.pdf}
+    % \caption{xxxxxxxxxxxxxx}
+    % \label{fig:}
+\end{figure*}
+
+\begin{figure*}
+    \centering
+    \includegraphics[width=0.8\linewidth]{tabs/supp1-2.pdf}
+    % \caption{xxxxxxxxxxxxxx}
+    % \label{fig:}
+\end{figure*}
+
+\begin{figure*}
+    \centering
+    \includegraphics[width=0.8\linewidth]{tabs/supp1-3.pdf}
+    % \caption{xxxxxxxxxxxxxx}
+    % \label{fig:}
+\end{figure*}
+
+\begin{figure*}
+    \centering
+    \includegraphics[width=0.8\linewidth]{tabs/supp1-4.pdf}
+    % \caption{xxxxxxxxxxxxxx}
+    % \label{fig:}
+\end{figure*}
+\section{Prompts in MotionMillion-Eval}.
+\label{supp:prompts}
+We show all the prompts in the figures below.

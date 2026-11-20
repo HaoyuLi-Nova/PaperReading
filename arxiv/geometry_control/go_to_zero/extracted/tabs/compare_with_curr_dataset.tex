@@ -1,0 +1,27 @@
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+% \usepackage{graphicx}
+\begin{table}[t]
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lllllllll}
+\hline
+\multirow{2}{*}{Dataset} &
+  \multirow{2}{*}{Clip Number} &
+  \multirow{2}{*}{Hour} &
+  \multirow{2}{*}{Text Diversity} &
+  \multicolumn{1}{c}{\multirow{2}{*}{Static Motion}} &
+  \multicolumn{1}{c}{\multirow{2}{*}{Person}} &
+  \multicolumn{3}{c}{Scene} \\ \cline{7-9} 
+                     &       &       &                  & \multicolumn{1}{c}{} & \multicolumn{1}{c}{} & Indoor & Ourdoor & RGB \\ \hline
+KIT-ML               & 3911  & 11.2  & 1-3              & no                   & single               & yes    & no      & no  \\
+BABEL                & 13220 & 43.5  & 1                & no                   & single               & yes    & no      & no  \\
+HumanML3D            & 14616 & 28.6  & 1-3              & no                   & single               & yes    & no      & no  \\
+Motion-X             & 81084 & 144.2 & 1                & no                   & single               & yes    & no      & no  \\
+MotionBase           & 1M    & -     & -                & yes                  & multi                & yes    & yes     & yes \\ \hline
+MotionMillion (ours) & 2M    & \textgreater{}2000     & \textgreater{}20 & no                   & multi                & yes    & yes     & yes \\ \hline
+\end{tabular}%
+}
+\caption{Statistics comparison between our MotionMillion and other motion datasets.}
+% \vspace{-2em}
+\label{tab:comp_curr_dataset}
+\end{table}

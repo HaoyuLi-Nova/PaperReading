@@ -1,0 +1,20 @@
+{
+  "joint_attn_implementation": "two_way",
+  "max_action_dim": 160,
+  "video_temporal_causal": false,
+  "diffusion_expert_config": {
+    "base_fps": 24,
+    "enable_fps_modulation": true,
+    "max_vae_latent_side_after_patchify": 40,
+    "patch_spatial": 2,
+    "sound_base_temporal_compression_factor": null,
+    "timestep_range": 1.0,
+    "unified_3d_mrope_reset_spatial_ids": true,
+    "unified_3d_mrope_temporal_modality_margin": 15000,
+    "vision_temporal_position_mode": "latent_index"
+  },
+  "resolution": "720",
+  "vlm_config": {
+    "use_system_prompt": false
+  }
+}

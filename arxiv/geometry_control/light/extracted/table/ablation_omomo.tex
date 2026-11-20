@@ -1,0 +1,40 @@
+\begin{table}[!htbp]
+    \centering
+    \caption{\textbf{Ablation study} of token-separation strategies on the OMOMO dataset~\citep{li2023controllable}. We report R-Precision with batch size 256.}
+    \label{tab:ablation_omomo}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{@{}cccccccccccccc@{}}
+        \toprule
+        \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}hand--body\\ separation\end{tabular}} &
+        \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}human--object\\ separation\end{tabular}} &
+        \multicolumn{3}{c}{R-Precision$^\uparrow$} &
+        \multirow{2}{*}{FID$^\downarrow$} &
+        \multirow{2}{*}{MM Dist$^\downarrow$} &
+        \multirow{2}{*}{Diversity$^\rightarrow$} &
+        \multirow{2}{*}{FSR$^\downarrow$} &
+        \multirow{2}{*}{Pene$^\downarrow$} &
+        \multirow{2}{*}{Contact$^\rightarrow$} &
+        \multicolumn{3}{c}{Interaction$^\uparrow$} \\
+        \cmidrule(lr){3-5}\cmidrule(lr){12-14}
+        & &
+        \mycolor{Top 1} & \mycolor{Top 2} & \mycolor{Top 3} &
+        & & & & & &
+        $C_{prec}$ & $C_{rec}$ & $C_{F1}$ \\
+        \midrule
+
+        $\checkmark$ & $\checkmark$ &
+        0.302$^{\pm0.004}$ & 0.538$^{\pm0.015}$ & 0.707$^{\pm0.011}$ & 0.099$^{\pm0.018}$ & 1.657$^{\pm0.010}$ & 7.443$^{\pm0.043}$ & \textbf{0.013}$^{\pm0.045}$ & 0.100$^{\pm0.001}$ & 0.194$^{\pm0.000}$ & \textbf{0.940}$^{\pm0.000}$ & \textbf{0.851}$^{\pm0.008}$ & \textbf{0.881}$^{\pm0.005}$ \\
+        \midrule
+        -- & $\checkmark$ &
+        \mycolor{0.320$^{\pm0.000}$} & \mycolor{0.551$^{\pm0.005}$} & \mycolor{0.711$^{\pm0.005}$} &
+        \textbf{0.093}$^{\pm0.008}$ & \textbf{1.483$^{\pm0.006}$} & \textbf{7.366$^{\pm0.071}$} &
+        0.017$^{\pm0.004}$ & \textbf{0.062}$^{\pm0.006}$ & 0.223$^{\pm0.005}$ &
+        0.840$^{\pm0.003}$ & 0.775$^{\pm0.005}$ & 0.798$^{\pm0.005}$ \\
+        $\checkmark$ & -- &
+        \mycolor{\textbf{0.322$^{\pm0.003}$}} & \mycolor{\textbf{0.553$^{\pm0.003}$}} & \mycolor{\textbf{0.715$^{\pm0.000}$}} &
+        0.106$^{\pm0.003}$ & 1.499$^{\pm0.013}$ & 7.378$^{\pm0.193}$ &
+        0.031$^{\pm0.004}$ & 0.079$^{\pm0.002}$ & 0.236$^{\pm0.003}$ &
+        0.835$^{\pm0.003}$ & \textbf{0.790$^{\pm0.000}$} & \textbf{0.804$^{\pm0.003}$} \\
+        \bottomrule
+    \end{tabular}}%
+\end{table}

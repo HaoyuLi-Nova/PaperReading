@@ -1,0 +1,7 @@
+\section{Physics Tracker}
+After obtaining a sequence of kinematic motions, we train a tracking policy using reinforcement learning to control a physically simulated character that imitates these motions. This approach helps eliminate artifacts (e.g., hand-object penetration and foot sliding) in the kinematic motions and ensures the physical plausibility of the generated results.
+
+We use PPO~\cite{schulman2017proximal} as the backbone reinforcement learning algorithm,
+and adopt an importance sampling strategy to facilitate the tracking of long motion sequences involving interactions with multiple objects.
+Policies trained by our approach can accurately track the kinematics motions, enabling the character to grasp and move distinct objects along the generated trajectories.
+Implementation and training details for the physics tracker are provided in the supplementary materials.

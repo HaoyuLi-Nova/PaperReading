@@ -1,0 +1,76 @@
+\documentclass[10pt,twocolumn,letterpaper]{article}
+\usepackage[pagenumbers]{iccv}
+\usepackage{mmstyle}
+
+\input{preamble}
+\usepackage{hyperref}
+% \definecolor{iccvblue}{rgb}{0.21,0.49,0.74}
+% \usepackage[pagebackref,breaklinks,colorlinks,allcolors=iccvblue]{hyperref}
+
+\def\paperID{1838}
+\def\confName{ICCV}
+\def\confYear{2025}
+
+\title{Go to Zero: Towards Zero-shot Motion Generation with Million-scale Data}
+
+\author{Ke Fan\\
+Shanghai Jiao Tong University\\
+\and
+Shunlin Lu\\
+CUHK, Shenzhen\\
+\and
+Minyue Dai\\
+Fudan University\\
+\and
+Runyi Yu\\
+HKUST\\
+\and
+Lixing Xiao\\
+Zhejiang University\\
+\and
+Zhiyang Dou\\
+HKU\\
+\and
+Junting Dong\\
+Shanghai AI Laboratory\\
+\and
+Lizhuang Ma\textsuperscript{$\dagger$} \\
+Shanghai Jiao Tong University, East China Normal University\\
+\and
+Jingbo Wang\\
+Shanghai AI Laboratory\\
+}
+
+
+\begin{document}
+\twocolumn[{%
+\renewcommand\twocolumn[1][]{#1}%
+\maketitle
+\vspace{-3em}
+\begin{center}
+    \centering
+    \captionsetup{type=figure}
+    \includegraphics[width=\textwidth]{figures/teaser.pdf}
+    \captionof{figure}{We present Go to Zero, where we can deal with out-domain and complex compositional motions.}
+    \label{fig:teaser}
+\end{center}
+}]
+\let\thefootnote\relax\footnotetext{$^\dagger$ Corresponding author}
+
+\input{sec/abstract}    
+\input{sec/introduction}
+\input{sec/related_work}
+\input{sec/data_construction}
+\input{sec/method}
+\input{sec/experiments}
+\input{sec/conclusion}
+
+{
+    \small
+    \bibliographystyle{ieeenat_fullname}
+    \bibliography{main}
+}
+
+\input{sec/suppl}
+
+\end{document}

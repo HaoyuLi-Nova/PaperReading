@@ -1,0 +1,510 @@
+% CVPR 2025 Paper Template; see https://github.com/cvpr-org/author-kit
+
+% \documentclass[10pt,twocolumn,letterpaper]{article}
+
+% %%%%%%%%% PAPER TYPE  - PLEASE UPDATE FOR FINAL VERSION
+% \usepackage{iccv}              % To produce the CAMERA-READY version
+% \usepackage[review]{iccv}      % To produce the REVIEW version
+% \usepackage[pagenumbers]{cvpr} % To force page numbers, e.g. for an arXiv version
+
+% Import additional packages in the preamble file, before hyperref
+% \input{preamble}
+
+
+% Include other packages here, before hyperref.
+
+% It is strongly recommended to use hyperref, especially for the review version.
+% hyperref with option pagebackref eases the reviewers' job.
+% Please disable hyperref *only* if you encounter grave issues, e.g. with the
+% file validation for the camera-ready version.
+%
+% If you comment hyperref and then uncomment it, you should delete
+% ReviewTempalte.aux before re-running LaTeX.
+% (Or just hit 'q' on the first LaTeX run, let it finish, and you
+%  should be clear).
+% \definecolor{cvprblue}{rgb}{0.21,0.49,0.74}
+% \usepackage[pagebackref,breaklinks,colorlinks,allcolors=cvprblue]{hyperref}
+% \AtBeginDocument{
+%   \addtocontents{toc}{\protect\hypersetup{linkcolor=black}}
+% }
+% \AtEndDocument{
+%   \addtocontents{toc}{\protect\hypersetup{linkcolor=cvprblue}}
+% }
+% \usepackage{verbatim}
+% \usepackage{comment}
+% \usepackage{wrapfig}
+
+% \usepackage{graphicx}
+% \usepackage{amsmath}
+% \usepackage{amssymb}
+% \usepackage{booktabs}
+% % \usepackage{caption}
+% \usepackage{bm}
+% \usepackage{adjustbox}
+% \usepackage{multirow}
+
+% \usepackage{url}            % simple URL typesetting
+% \usepackage{amsfonts}       % blackboard math symbols
+% \usepackage{nicefrac}       % compact symbols for 1/2, etc.
+% \usepackage{microtype}      % microtypography
+% \usepackage{xcolor}         % colors
+
+% \usepackage{array}
+% \usepackage{xspace}
+
+% \usepackage{float}
+% Support for easy cross-referencing
+% \usepackage[capitalize]{cleveref}
+% \crefname{section}{Sec.}{Secs.}
+% \Crefname{section}{Section}{Sections}
+% \Crefname{table}{Table}{Tables}
+% \crefname{table}{Tab.}{Tabs.}
+
+
+% \usepackage[ruled]{algorithm2e} % For algorithms
+
+
+
+% \input{macros.tex}
+
+% %%%%%%%%% PAPER ID  - PLEASE UPDATE
+% \def\paperID{6622} % *** Enter the CVPR Paper ID here
+% \def\confName{ICCV}
+% \def\confYear{2025}
+
+
+% % Document starts
+
+% % Title portion
+% \title{Human-Object Interaction from Human-Level Instructions}
+
+% \author{First Author\\
+% Institution1\\
+% Institution1 address\\
+% {\tt\small firstauthor@i1.org}
+% % For a paper whose authors are all at the same institution,
+% % omit the following lines up until the closing ``}''.
+% % Additional authors and addresses can be added with ``\and'',
+% % just like the second author.
+% % To save space, use either the email address or home page, not both
+% \and
+% Second Author\\
+% Institution2\\
+% First line of institution2 address\\
+% {\tt\small secondauthor@i2.org}
+% }
+
+% \begin{document}
+
+% \twocolumn[{%
+% \renewcommand\twocolumn[1][]{#1}%
+% \maketitle
+% \begin{center}
+%     \centering
+% \includegraphics[width=\linewidth]{figures/0_teaser.pdf}
+% % \vspace{-2em}
+% \captionof{figure}{\zhen{need revision}}
+% \label{fig:teaser}
+% \end{center}
+% }]
+
+% \begin{document}
+
+
+% WARNING: do not forget to delete the supplementary pages from your submission 
+
+
+% \clearpage
+\renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\thetable}{S\arabic{table}}
+\def\theequation{S\arabic{equation}}
+\setcounter{page}{1}
+\setcounter{section}{0}
+\setcounter{equation}{0}
+\setcounter{table}{0}
+\setcounter{figure}{0}
+\maketitlesupplementary
+
+\renewcommand{\thesection}{\Alph{section}}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+% \clearpage
+% \newpage
+\setcounter{tocdepth}{2}
+% \tableofcontents
+
+
+
+\section{Details of High-Level Planner}
+
+
+
+\subsection{Pseudo-code for Object Positions Calculation}
+
+In \cref{alg:compute_position}, we provide the pseudo-code for the algorithm that calculates object positions in the scene graph, as described in~\cref{subsec:spatial_relationship}.
+
+\begin{algorithm}
+\SetAlgoLined
+\DontPrintSemicolon
+\SetKwInOut{Input}{Input}
+\SetKwInOut{Output}{Output}
+
+\Input{Scene graph $G(V, E)$ with vertices $V$ and edges $E$, initial positions $L$, static nodes ($V_{S}$), the nodes to be moved ($V_{M}$).}
+\Output{Updated positions $L$ for all nodes.}
+
+\SetKwFunction{FSub}{ComputePositions}
+\SetKwFunction{FUpdate}{Update}
+\SetKwFunction{FOffset}{ComputeOffset}
+
+\SetKwProg{Fn}{Procedure}{:}{\KwRet}
+\Fn{\FSub{$G$, $L$}}{
+    % Let $E_{0}$ be the set of edges in $G_0$\;
+    Let the set of processed nodes $V_{P} \gets V_{S}$\;
+    
+    \While{$V_{M}$ is not empty}{
+        Let \( V' \subseteq V_M \) be the nodes whose predecessors' positions are known\;
+        \ForEach{$v \in V'$}{
+            % $L_{\text{P}}(u) \gets \{L(u) \mid (u, v) \in E\}$\;
+            $L(v) \gets$ \FUpdate{$v$, $G$, $L$}\;
+            $V_{P} \gets V_{P} \cup \{v\}$\;
+            $V_M \gets V_M \setminus \{v\}$
+            % Remove $v$ and all edges $(u, v)$from $G$\;
+        }
+    }
+    \KwRet $L$\;
+}
+
+\Fn{\FUpdate{$v$, $G$, $L$}}{
+    Initialize an empty list of positions $P$\;
+    \ForEach{predecessor $u$ of $v$ in $G$}{
+        $O \gets$ \FOffset{$(u, v)$, $L(u)$}\;
+        Append $L(u) + O$ to $P$\;
+    }
+    \KwRet $\text{Average}(P)$\;
+}
+
+\Fn{\FOffset{$(u, v)$, $L(u)$}}{
+    \If{edge $(u, v)$ indicates ``on''}{
+        Set $O_{\text{height}}$ to align with the top surface of $u$\;
+        Sample $O_{\text{horizontal}}$ within the horizontal bounds of $u$\;
+        \KwRet $[O_{\text{horizontal}}, O_{\text{height}}]$\;
+    }
+    \ElseIf{edge $(u, v)$ indicates ``adjacent''}{
+        Use the direction and distance provided by the LLMs to compute $O$\;
+        \KwRet $O$\;
+    }
+}
+% $L \gets$ \FSub{$G$, $L$, $V_{S}$, $V_{M}$}\;
+
+\caption{Object Positions Calculation}
+\label{alg:compute_position}
+\end{algorithm}
+
+\subsection{Prompts for High-Level Planner}
+We provide the prompts used for generating the scene map and execution plan in~\cref{fig:llm_spatial_text}. 
+An example of the input and the corresponding output of the LLM planner is shown in~\cref{fig:llm_our_example}.
+We also present the prompt used by the baseline (as described in~\cref{subsec:planner_eval})
+% \cref{subsec:planner_eval}
+in~\cref{fig:llm_baseline}.
+
+
+\begin{figure*}[h]
+    \centering
+     % \captionsetup{aboveskip=0pt, belowskip=0pt}
+\includegraphics[width=\textwidth]{figures/supp_our_prompt.pdf}
+    \caption{Prompts used by the LLM planner to generate the scene map and execution plan.} 
+    \label{fig:llm_spatial_text}
+    \vspace{-2mm}
+\end{figure*}
+
+
+\begin{figure*}[h]
+    \centering
+     % \captionsetup{aboveskip=0pt, belowskip=0pt}
+\includegraphics[width=\textwidth]{figures/supp_input_output.pdf}
+    \caption{Example of the input and output for the LLM planner.} 
+    \label{fig:llm_our_example}
+    \vspace{-2mm}
+\end{figure*}
+
+
+\begin{figure*}[h]
+    \centering
+     % \captionsetup{aboveskip=0pt, belowskip=0pt}
+\includegraphics[width=\textwidth]{figures/supp_baseline_prompt.pdf}
+    \caption{Prompts used by the baseline, as described in~\cref{subsec:planner_eval}.} 
+    \vspace{-2mm}
+    \label{fig:llm_baseline}
+\end{figure*}
+
+
+\section{Details of Low-Level Motion Generator}
+\subsection{Diffusion Model Architecture}
+\label{supp:diff_arch}
+
+Our system includes four diffusion models: CoarseNet, RefineNet, FingerNet, and the navigation module, all of which adopt a similar transformer-based architecture. Here, we illustrate the architecture of RefineNet in \cref{fig:supp_diffusion}. The model is provided with a motion sequence $\bm{x}_n$, the condition $\bm{c}_r$, and the noise step $n$, and predicts the clean motion $\hat{\bm{x}}_{0}$.
+For the other networks, we simply substitute the condition with the corresponding one.
+
+\begin{figure}[!t]
+    \centering
+     % \captionsetup{aboveskip=0pt, belowskip=0pt}
+\includegraphics[width=0.48\textwidth]{figures/supp_diffusion.pdf}
+    \caption{Architecture of RefineNet. The model is conditioned on $\bm{c}_{r} = \left\{\bm{W}, \bm{S}_{r}, \bm{G}, \bm{T}\right\}$, where $\bm{W}$ represents the wrist-object relative pose, $\bm{S}_{r}$ is the masked motion representation containing the static pose and waypoints, $\bm{G}$ denotes the object geometry, and $\bm{T}$ is the textual input.}
+    \label{fig:supp_diffusion}
+    
+\end{figure}
+
+
+\subsection{Implementation Details of Grasp Pose Generation}
+As introduced in~\cref{subsubsec:grasp_pose}, we use a state-of-the-art grasp pose generation
+method ~\cite{wang2023dexgraspnet} to generate the grasp pose.
+Although originally designed for robotic hand grasping, this method relies solely on kinematic chain information, making it fully compatible with the SMPL-X~\cite{smplx} hand model. Starting with an object mesh and an initial hand pose, the grasp generation process is formulated as an optimization problem that minimizes a differentiable force closure energy term along with several additional terms that encourage the fingers to conform closely to the object surface while maintaining a natural hand shape. For motions involving both hands, such as carrying a box, we omit the force closure term.
+
+\subsection{Post-processing in RefineNet}
+\label{subsec:post_process}
+As introduced in~\cref{sec:refine_net}, we apply post-processing to RefineNet's output to better align it with the input condition.
+First, we replace the object poses in the pre-contact and post-contact phases with the corresponding static poses. To address the abrupt transitions at the phase boundaries, we identify the difference between the predicted object pose and the static object pose at the boundary frame denoted as $\Delta \bm{d} \in \mathbb{R}^6$ (suppose this is the boundary between pre-contact phase and contact phase), which encapsulates both the positional and rotational differences in axis-angle format. To smooth these transitions, we employ an interpolation strategy to the object motion in the contact phase. The interpolation function is defined by $\hat{\bm{O}}_{t} = \bm{O}_{t} + \alpha_t \Delta \bm{d}$, where $\alpha_t$ is a time-dependent scaling factor that decreases from 1 to 0 across the transition period, $\bm{O}_t$ denotes the predicted object pose. 
+
+Next, we use the rectified object motion and the optimized wrist pose $\hat{\bm{w}}=(\bm{\hat{R}}, \bm{\hat{T}})$ to compute the wrist trajectories during the contact phase. 
+The rotation is computed as $\bm{R}_o\bm{\hat{R}}$, and the position is computed as $\bm{R}_o \bm{\hat{T}} + \bm{T}_o$, where $\bm{R}_o$ and $\bm{T}_o$ represent the object's rotation and position, respectively.
+The computed wrist trajectories may slightly deviate from the predicted wrist trajectories in the contact phase, leading to unsmooth transitions near the phase boundaries. We apply the same interpolation strategy to the wrist poses in the pre-contact and post-contact phases to produce smooth wrist motions. Finally, we employ an Inverse Kinematics (IK) algorithm to solve for the updated human pose constrained by the wrist poses. 
+
+
+\subsection{Implementation Details of FingerNet}
+FingerNet generates finger motions for the pre-contact and post-contact phases to create natural transitions between rest and grasp poses. It is trained on the GRAB dataset~\cite{GRAB:2020}. Since FingerNet focuses solely on the hand approaching and releasing motions, we only use the corresponding portions of the dataset. Specifically, we extract one second of motion before the grasp begins and after it ends as training data, discarding the rest.
+
+
+We adopt a mirroring strategy similar to~\cite{zhang2021manipnet} to handle both hands simultaneously. During training, left-hand data are mirrored and combined with the right-hand data so that the model only needs to predict motions for the right hand. At inference time, we mirror the left-hand input, predict the corresponding motions using the model, and then mirror the output back to obtain the left-hand motions.
+
+\subsection{Smooth Transition between Navigation and Interaction}
+The navigation and interaction modules alternate to generate a long-horizon interaction sequence. Specifically, when the human is far from the object, the navigation module is activated to guide the human towards it. Once the human is within a threshold distance (set at 1 meter), the system switches to the interaction module to begin object manipulation. After the interaction is completed and the object is put down, control reverts to the navigation module to move towards the next object.
+
+Since both modules use the initial human pose as an input condition, we ensure a smooth transition by feeding the last pose from the previous module into the next.
+We apply the same smoothing technique described in \cref{subsec:post_process} at the switching boundary to further enhance continuity.
+
+
+\section{Implementation Details of Physics Tracker}
+We use IsaacGym~\cite{makoviychuk2021isaac} as the physics engine to perform simulation.
+The simulated character is skeleton-driven where each joint is modeled as a motor controlled through a PD controller.
+The control policy works at 30Hz, which is the same with generated kinematics motions, while the simulation runs at 120Hz.
+Our character has $62$ body links and $49$ controllable joints.
+This results in a state space $\mathbf{s}_t \in \mathbb{R}^{(62+|\mathcal{O}|)\times 13}$ including the position, orientation and linear and angular velocities of the character's body links and the manipulating objects $\mathcal{O}$ depending on the given tracking motions.
+To track the target motion,
+additional observation $\mathbf{o}_t \in \mathbb{R}^{(62+|\mathcal{O}|)\times7}$ including the target position and orientation of each body link and object is also introduced as the input to the control policy.
+The action space is $\mathbf{a}_t \in \mathbb{R}^{49\times3}$ given each controllable joint has 3 degrees of freedom.
+All our control policies are optimized using PPO~\cite{schulman2017proximal} as the backbone reinforcement learning algorithm with network parameters updated by Adam optimizers~\cite{kingma2014adam}.
+The hyperparameters used for policy training are listed in Tab.~\ref{tab:rl_hyper}.
+
+\subsection{Reward Design}
+Since fingers take $30$ out of $49$ controllable joints and have a higher requirement in control precision for accurate object manipulation, we define a reward function containing three terms to evaluate the full-body pose and finger pose separately:
+\begin{equation}
+    r = 0.8 r_\text{body} + 0.2 r_\text{hand} + 0.05 r_\text{energy},
+\end{equation}
+where $r_\text{body}$ evaluates the full-body poses excluding fingers, $r_\text{hand}$ evaluates the hand poses related to the target manipulating object,
+and $r_\text{energy}$ is an additional energy-related term penalizing end effectors' abrupt movement.
+Note that in our implementation, at any time step,
+at most one object is activated as the manipulation target, while multiple objects may exist in the scene and would be manipulated one by one.
+
+\begin{table}[t]
+    \centering
+    \begin{tabular}{rl}
+    \toprule
+       \textbf{Body Part}  &  \quad\textbf{Value} \\
+       \midrule
+       root (pelvis) & $w_q = 1, w_p = 1$\\
+       lower abdomen & $w_q = 0.2$\\
+       upper abdomen & $w_q = 0.2$\\
+       chest & $w_q = 0.2$\\
+       neck & $w_q = 0.2$\\
+       head & $w_q = 0.2$\\
+       clavicles & $w_q = 0.1$\\
+       upper arms & $w_q = 0.2$ \\
+       lower arms & $w_q = 0.2$\\
+       wrists & $w_q = 0.3, w_p = 0.3$\\
+       thighs & $w_q = 0.5$\\
+       calfs & $w_q = 0.3$\\
+       feet & $w_q = 0.2, w_p = 0.1$\\
+       target object & $w_q = 1, w_p = 1$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{Unnormalized weights of each body link of the character and the target object when computing the reward regarding body pose errors (cf. $r_\text{body}$ in Equation~\ref{eq:r_body}). All weights unlisted are zero.
+    The weights are normalized such that $\sum_b w_{p,b}=1$ and $\sum_b w_{q,b}=1$ before computing $r_\text{body}$.}
+    \label{tab:rl_weights}
+\end{table}
+
+\begin{table}[t]
+    \centering
+\begin{tabular}{lc}
+    \toprule
+    \textbf{Parameter} & \textbf{Value}\\
+    \midrule
+    policy network learning rate & $5 \times 10^{-6}$\\
+    critic network learning rate & $1 \times 10^{-4}$\\
+    reward discount factor ($\gamma$) & $0.95$ \\
+    GAE discount factor ($\lambda$) & $0.95$ \\
+    surrogate clip range ($\epsilon$) & $0.2$ \\
+    number of PPO workers & \\
+    \quad (simulation environment instances) & $2048$ \\
+    PPO replay buffer size & $2048\times8$ \\
+    PPO batch size & $256$ \\
+    PPO optimization epochs & $5$ \\
+  \bottomrule
+  \end{tabular}
+    \caption{Hyperparameters of policy training for physics tracker.}
+    \label{tab:rl_hyper}
+    
+\end{table}
+
+
+For full-body pose evaluation,
+we consider the orientation and position accuracy of the character's body links and the target object:
+\begin{equation}\label{eq:r_body}\begin{split}
+    r_\text{body} = & 0.5\exp\left(-15 \sum_{b\in\mathcal{B}} w_{q,b} ||\mathbf{e}_{q,b}||^2\right) \\
+    & \quad + 0.5\exp\left(-15 \sum_{b\in\mathcal{B}} w_{p,b} ||\mathbf{e}_{p,b}||^2\right),
+\end{split}
+\end{equation}
+where $\mathcal{B}$ is the set of all body links of the character and the activated target object at the current time step, $\mathbf{e}_{q,b}$ is the orientation error between each body link $b$ of the simulated character and that in the tracking motion, $\mathbf{e}_{p,b}$ is the position error, and $w_{q,b}$ and $w_{p,b}$ are the associated weights.
+We measure $\mathbf{e}_{q,b}$ using the radian of the angle needed to rotate the link $b$ to the target orientation,
+while $\mathbf{e}_{p,b}$ is measured by the Euclidean distance from the current position of link $b$ to the target position.
+All weight values are listed in Tab.~\ref{tab:rl_weights}. For position tracking, we focus only on the position of the root link and end effectors to ensure that the trajectory of end effectors (foot and hand excluding fingers) matches the tracking target,
+while relying on orientation tracking to ensure the naturalness of full-body poses.
+
+For hand pose evaluation,
+to ensure that the object would be manipulated by hands correctly,
+we consider the fingers' relative position to the target manipulating object when the hand is close to the object, or their relative position to the wrist when the hand is far away from the target object:
+\begin{equation}
+    r_\text{hand} = \exp\left(- \frac{5}{|\mathcal{F}|}\sum_{f\in\mathcal{F}} \alpha ||\mathbf{e}_{f,o}|| + (1-\alpha)  ||\mathbf{e}_{f,w}||\right),
+\end{equation}
+where $\mathcal{F}$ is the set of fingers, $\mathbf{e}_{f,o}$ is the position error between each finger $f$ of the simulated character and the tracking target position in the object's local system, $\mathbf{e}_{f,w}$ is the position error in the wrist's local system, and $\alpha$ is an interpolation coefficient depending on the distance between the hand and object in the generated tracking motions. We define $\alpha=1$ when the hand is equal to or less than 0.25m from the target object and $\alpha=0$ if the hand is at least 1m far away from the object in the tracking motion.
+
+
+$r_\text{energy}$ takes into account the character's end effectors to prevent jittering or abrupt movement with larger acceleration:
+\begin{equation}
+    r_\text{energy} = \exp\left(-\frac{1}{900}\sum_{e\in\mathcal{E}} ||\mathbf{a}_e||^2\right),
+\end{equation}
+where $\mathcal{E}$ is the set of the character's key end effectors (feet and hands excluding fingers), and $\mathbf{a}_e$ is the linear acceleration of the end effector $e$.
+
+In contrast to recent works~\cite{brahmbhatt2019contactgrasp,wang2023physhoi,luo2024grasping} on object manipulation, our reward function does not rely on the contact states between the hands (or fingers) and objects. This is because the contact data derived from the kinematic motions generated by diffusion models can be unreliable due to artifacts (cf.~\cref{fig:physics_qualitative_results}). Moreover, this approach aligns with the common scenario in which detailed contact information is typically absent in motions obtained from motion capture and video demonstrations~\cite{pollard2005physically}.
+
+
+\subsection{Importance Sampling Strategy}
+
+Given that the generated kinematic motions can span several minutes and involve interactions with multiple objects, it would be highly inefficient to perform motion tracking from the very beginning of the sequence. Since locomotion without object manipulation and the phase following object grasping are relatively easier to learn, we adopt an importance sampling strategy that focuses on pre-grasp states to facilitate policy training.
+Specifically, we partition the parallel simulated physics environments into $|\mathcal{O}|$ batches, with each batch assigned to a specific manipulating object. In each batch, simulated characters are initialized in a random pre-grasp pose while interacting with the assigned object. This approach increases the likelihood that the policy learns the transition from the pre-grasp to the grasping phase, and subsequently, the locomotion that follows a successful grasp.
+Moreover, this strategy ensures that the policy consistently learns to interact with multiple objects simultaneously, thereby avoiding potential local minima during policy exploration.
+
+
+
+
+\section{Inference Speed}
+Achieving real-time performance remains an open challenge for both diffusion-based and optimization-based methods. In our low-level motion generator, producing a 4-second motion sequence takes about four seconds for each diffusion model in stages 1, 3, and 4, while the optimization process in stage 2 requires roughly three minutes. Additionally, training the physics tracker on a 4-second interaction segment takes approximately 2 hours.
+All experiments were run on a single NVIDIA RTX 4000 GPU.
+
+\begin{figure}[t]
+    \centering
+     % \captionsetup{aboveskip=0pt, belowskip=0pt}
+\includegraphics[width=0.48\textwidth]{figures/8_physhoi.pdf}
+% \vspace{-7mm}
+    \caption{PhysHOI~\cite{wang2023physhoi} fails to track kinematic motion, while our policy successfully drives the character to interact with diverse objects.}
+    \label{fig:physhoi}
+    % \vspace{-5mm}
+\end{figure}
+
+\section{Additional Experiemental Analysis}
+
+
+\subsection{Implementation Details of Baseline}
+Since no prior work addresses the task of generating full-body motion, finger motion, and object motion from language instructions, we adapt prior works CHOIS~\cite{li2023controllable} and GRIP~\cite{taheri2023grip} as fair baselines to compare against our system. CHOIS generates full-body motion and object motion from text and initial states, which also serves as our Stage 1. The output of CHOIS will serve as input to GRIP. GRIP consists of an arm denoising model and a two-stage finger motion generation model. It takes full-body motion (without finger motion) and object motion as input to denoise arm motion. It then proposes a hand sensor to extract hand-object spatial features and predict initial finger poses. In the second stage of finger motion generation, GRIP leverages these predicted finger poses to compute proximity features, which serve as input to refine the finger motion.
+
+\subsection{Results of Navigation Module}
+We report the evaluation scores for the navigation module in \cref{tab:navigation}, using the metrics introduced in~\cref{subsec:low_level_eval}. The module is evaluated on the test split of the HumanML3D dataset \cite{guo2022generating}. It demonstrates that the module closely adheres to the input waypoints, with a relatively small joint position error when compared to the ground truth data, while maintaining reasonable foot sliding and foot height.
+
+\begin{table}[t]
+\centering
+% \small
+\begin{adjustbox}{max width=0.5\textwidth}
+\begin{tabular}{lcccccccccccccccccc}
+\toprule
+& $T_{xy}$ & $H_{\text{feet}}$ & $FS$ & $\text{MPJPE}$  \\
+\midrule
+
+Ours
+& 4.00 & 1.48 & 0.58 & 10.87 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\caption{Navigation synthesis on the HumanML3D dataset \cite{guo2022generating}. The joint error is relatively small, demonstrating that the model aligns well with the input waypoints.}
+\label{tab:navigation}
+\end{table}
+
+
+
+\subsection{Results of Physics Tracker}
+We compare our physics tracker against PhysHOI~\cite{wang2023physhoi}, which trains reinforcement learning policies to control a humanoid character playing basketball. 
+For our task, we have PhysHOI track the kinematic motion generated by our low-level motion generator. As shown in \cref{fig:physhoi}, PhysHOI fails to grasp objects, whereas our method successfully completes the task.
+
+\subsection{Human Perception Study Details}
+We show the interface of the human perceptual study for the high-level planner in Figure~\ref{fig:llm_human_study} and the low-level motion generator in Figure~\ref{fig:motion_human_study}. 
+
+
+
+% \section{Evaluation of High-Level Planner}
+
+ 
+% % We show an example for processing a task using our LLM planner in Figure~\ref{fig:llm_our_example}.
+
+% \begin{figure}[!ht]
+% \begin{center}
+%     \includegraphics[width=0.9\columnwidth]{figures/tasks15_llm_eval.pdf}
+%     % \vspace{-3mm}
+%     \caption{Tasks for evaluating target layout generation.}
+%     \label{fig:llm_all_tasks}
+%     \vspace{-5mm}
+% \end{center}
+% \end{figure}
+
+% \begin{figure*}[!ht]
+%     \centering
+%      % \captionsetup{aboveskip=0pt, belowskip=0pt}
+%      \vspace{-4mm}
+% \includegraphics[width=0.9\textwidth]{figures/baseline_prompt_new.pdf}
+% \vspace{-4mm}
+%     \caption{Prompts for the baseline of target layout generation evaluation.} 
+%     \label{fig:llm_baseline}
+% \end{figure*}
+
+
+
+
+% We show the prompt for the baseline in Figure~\ref{fig:llm_baseline}.
+% We provide descriptions of 15 tasks used for evaluating target layout generation in Figure~\ref{fig:llm_all_tasks}. 
+
+
+\begin{figure*}[h]
+    \centering
+     % \captionsetup{aboveskip=0pt, belowskip=0pt}
+\includegraphics[width=\textwidth]{figures/llm_human_study.pdf}
+    \caption{Interface of human perceptual study for the high-level planner.} 
+    \label{fig:llm_human_study}
+    \vspace{-2mm}
+\end{figure*}
+
+\begin{figure*}[h]
+    \centering
+     % \captionsetup{aboveskip=0pt, belowskip=0pt}
+\includegraphics[width=\textwidth]{figures/motion_human_study.pdf}
+    \caption{Interface of human perceptual study for the low-level motion generator.} 
+    \label{fig:motion_human_study}
+    \vspace{-2mm}
+\end{figure*}
+
+% Bibliography
+% \clearpage
+% {
+%     \small
+%     \bibliographystyle{ieeenat_fullname}
+%     \bibliography{sample-bibliography}
+% }
+
+
+% \end{document}

@@ -1,0 +1,38 @@
+\section{Introduction}
+While human motion data has always been central to games and other media, recent advances in robotics and physical AI have increased the demand for such data.
+In robotics, human demonstrations allow humanoids to move realistically and complete complex tasks~\cite{tessler2024maskedmimic,tessler2025maskedmanipulator,luo2025sonic}. 
+Digital twins and industrial simulations need dynamic humans to populate and interact with environments. 
+And in established domains such as game development, the growing scope of interactive experiences necessitates plausible digital humans at scale.
+
+
+Obtaining high-quality 3D human motion data is challenging, though. 
+Traditional hand animation is often tedious and requires substantial domain expertise, while studio motion capture (mocap) is expensive and requires heavy instrumentation of both the actors and environments. 
+Teleoperation has become a popular method to collect demonstrations directly with robots~\cite{ze2025twist}, but this process is slow and results in awkward, unnatural behaviors. 
+While videos offer a rich source of human motions~\cite{li2025genmo}, recovering high-quality 3D motions from monocular videos remains a challenging research problem.
+
+In this work, we contend that generative models offer an alternative motion data acquisition paradigm, which can easily synthesize high-quality human motion data with precise control.
+For such a model to be useful in practice, it should maintain the advantages of traditional motion acquisition approaches while increasing accessibility for novice animators (\eg, roboticists). In particular, an ideal model should: (1) produce high-quality motions on par with optical mocap, (2) provide a versatile and directable interface akin to hand animation, but with more intuitive controls, and (3) be able to generate a diverse corpus of motions to support a large variety of applications.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=1.0\linewidth]{assets/constraint_results.pdf}
+    \caption{\textbf{Controllable Motion Generation.} Kimodo supports flexible and intuitive control for motion generation through text prompting combined with an extensive suite of kinematic constraints. By training on 700 hours of optical mocap data, the model achieves precise control accuracy for a large variety of behaviors. In each example, constrained joints are indicated with a red color, and generated poses at constrained frames are highlighted in yellow. Time progression is indicated by lighter to darker blue coloring.}
+    \label{fig:constraint_results}
+\end{figure}
+
+Recently, rapid progress has been made in human motion generation. 
+Modern generative models such as diffusion~\cite{tevet2023mdm,zhang2024motiondiffuse}, masked models~\cite{guo2024momask}, and tokenized transformers~\cite{zhang2023generating} have enabled intuitive motion generation by conditioning on text prompts.
+Some approaches also support \emph{control} over generation through various kinematic constraints such as keyframe poses, 2D waypoints, and joint trajectories~\cite{guo2024momask, karunratanakul2023gmd, xie2024omnicontrol, cohan2024condmdi}.
+These works show promising results and have inspired a wave of new research, but their motion quality, control accuracy, and generalization ability are limited by relatively small publicly available datasets~\cite{guo2022humanml3d,Plappert2016}. Furthermore, saturated benchmarks on these datasets make it difficult to differentiate which design decisions are critical to achieve effective modeling.
+Several works attempt to scale up human motion generation models and improve generalization by training on large volumes of motion data recovered from videos~\cite{hymotion2025,wang2025scaling,lu2025scamo,lin2023motion}, but these approaches tend to compromise motion quality due to the inherent inaccuracies in video reconstruction.
+
+In this report, we introduce \textbf{\model}, a \textbf{ki}nematic \textbf{mo}tion \textbf{d}iffusi\textbf{o}n model that 
+trains at scale to enable intuitive authoring of high-quality motions through text prompting and an extensive set of kinematic constraints. 
+Our model uses a carefully designed motion representation and two-stage diffusion architecture that decomposes root and body motion to accurately follow user specifications while minimizing common artifacts, such as floating and foot skating.
+In addition to text inputs, the model natively supports a suite of constraints on generated poses, including full-body keyframes, sparse joint positions/rotations, 2D waypoints, 2D path following, and foot contact patterns.  
+A key component to effectively train \model is the Bones Rigplay~\cite{bones_ai_datasets} dataset, a large studio mocap dataset containing 700 hours of production-quality human motion with corresponding text descriptions. This large dataset also enables a comprehensive evaluation of various design decisions on a wide range of behaviors and scenarios.
+
+To facilitate motion generation for robotics, simulation, games, and other applications, we have released model checkpoints for \model trained on the SOMA body model~\cite{saito2026soma} and the Unitree G1 robot~\cite{unitree2024g1}. Along with these models, we have included generation code and an interactive interface for motion authoring (see \cref{fig:authoring_demo}) to demonstrate the model's full capabilities. 
+In the remainder of this report, \cref{sec:key_results} shows the key capabilities of our model, which enable practical authoring of human motions. 
+Next, \cref{sec:dataset} describes the Bones Rigplay dataset and \cref{sec:method} details the core design of our two-stage transformer denoiser along with the training recipe. 
+\cref{sec:relwork} positions our work in the context of prior systems, and lastly, \cref{sec:experiments} provides a comprehensive evaluation of key design decisions in our model and explores how scaling dataset size, model size, and batch size (GPUs) impacts model performance.

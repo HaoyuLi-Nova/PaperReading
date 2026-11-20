@@ -1,0 +1,16 @@
+% Please add the following required packages to your document preamble:
+% \usepackage{graphicx}
+\begin{table}[t]
+\centering
+\resizebox{0.85\columnwidth}{!}{%
+\begin{tabular}{cccc}
+\hline
+\textbf{}    & MPJPE$\downarrow$ & Mean Acc$\downarrow$   & Max Acc$\downarrow$     \\ \hline
+GT           & -     & 2.0          & 9.0           \\
+w/o wavelet & 46.8    & 6.0          & 15.0          \\
+w/ wavalet   & \textbf{45.5}    & \textbf{4.0} & \textbf{12.0} \\ \hline
+\end{tabular}%
+}
+\caption{Ablation on whether to use wavelet transformation during training the FSQ model, where Acc represents the acceleration.}
+\label{ablation:wavelet}
+\end{table}

@@ -1,0 +1,22 @@
+% Please add the following required packages to your document preamble:
+% \usepackage{graphicx}
+\begin{table}[t]
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lccc}
+\hline
+Model & \multicolumn{1}{l}{Text Alignment} & \multicolumn{1}{l}{Physical Plausibility} & \multicolumn{1}{l}{Motion Smoothness} \\ \hline
+MDM~\citep{mdm}      & 195.5        & 478.5        & 416.5        \\
+MotionGPT~\citep{motiongpt}     & 170          & 497          & 501.5        \\
+T2M-GPT~\citep{t2mgpt} & 207          & 495.5        & 500          \\
+ScaMo-3B~\citep{lu2024scamo}    & 226.6        & 477.5        & 494          \\ \hline
+Ours-1B       & 170.3        & \textbf{497} & \textbf{501} \\
+Ours-3B       & 238.6        & 496          & 499.5        \\
+% Ours-5B       & 243.3        & 494.5        & 500          \\
+Ours-7B       & \textbf{261} & 495.5        & \textbf{501} \\ \hline
+\end{tabular}%
+}
+% \vspace{-1em}
+\caption{Average human evaluation results under the aspect of Text Alignment, Physical Plausibility, and Motion Smoothness on MotionMillion-Eval between Different Models.}
+% \vspace{-1em}
+\label{tab:comp_metrics}
+\end{table}

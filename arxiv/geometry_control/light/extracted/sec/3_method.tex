@@ -1,0 +1,108 @@
+\section{Methodology}
+\label{sec:method_main}
+\noindent \textbf{Overview.} We formalize the HOI animation task as the synthesis of a 3D motion sequence in which a human interacts with an object over a time horizon of $T$ frames. The input is a text description $\boldsymbol{d}$, a canonical geometry of the object represented as a point cloud $\boldsymbol{P}$, and a body shape parameter $\beta$ from SMPL-H~\citep{loper2015smpl,MANO}, and the output of LIGHT is a sequence comprising both human motion and object motion trajectories. The human state is represented by joint positions $\boldsymbol{j}^{p} \in \mathbb{R}^{T\times52\times3}$, where 30 of total 52 joints are for both hands, and hand scalar rotation angles $\boldsymbol{j}^{r_{h}} \in \mathbb{R}^{T\times30}$.  Object trajectories are in translations $\boldsymbol{o}^{t} \in \mathbb{R}^{T\times3}$ and rotations in a 6D representation~\citep{zhou2019continuity} $\boldsymbol{o}^{r} \in \mathbb{R}^{T\times6}$. Thus, each frame $\boldsymbol{x}_t$ is fully characterized by the tuple $\boldsymbol{x}_t = (\boldsymbol{j}^p_t, \boldsymbol{j}_{t}^{r_{h}}, \boldsymbol{o}^t_t, \boldsymbol{o}^r_t)$. We omit the time step $t$ in the following for simplicity.
+
+\begin{figure*}
+    \centering
+    \includegraphics[width=\textwidth]{fig/method_light.pdf}
+    \caption{\textbf{Overview of \ours.}
+    \textit{Left: Training.} We form different modalities, \textit{e.g.,} body, hand, and object, each diffused with its own noise level. After adding modal-wise and frame-wise rotary positional encodings, the tokens are processed by a shared Transformer decoder and an MLP head to predict clean motion.
+    \textit{Right: Inference.} We compare a \emph{uniform} schedule that denoises all modalities synchronously with a \emph{staged} schedule that keeps one modality cleaner from the uniform run.}
+    \label{fig:method}
+    % \vspace{-1.5em}
+\end{figure*}
+
+\noindent \textbf{Preliminaries.} Diffusion forcing~\citep{chen2024diffusion} is a recent advancement in diffusion modeling that generalizes the conventional diffusion process by allowing independent noise schedules for each token within a sequence. Unlike standard diffusion models, which uniformly apply a single noise schedule across all tokens at each diffusion step, diffusion forcing treats each token independently, enabling flexible and staged denoising processes tailored to sequential generation tasks. Formally, consider a sequence of tokens ${\boldsymbol{x}}(\boldsymbol 0)$, representing the unperturbed data. Diffusion forcing introduces token-specific noise levels $\boldsymbol\lambda$ with each element drawn independently from $\{0, 1, 2, \dots, K\}$, where $K$ is the total number of denoising steps. Each token of ${\boldsymbol{x}}(\boldsymbol 0)$ is then corrupted individually,
+$
+    \boldsymbol{x}(\boldsymbol\lambda) = \langle\sqrt{\bar{\alpha}(\boldsymbol\lambda)},\boldsymbol{x}(0)\rangle + \langle\sqrt{1 - \bar{\alpha}(\boldsymbol\lambda)},\boldsymbol{\epsilon}\rangle,$
+where $\boldsymbol{\epsilon} \sim \mathcal{N}(\boldsymbol{0}, \boldsymbol{I})$ denotes Gaussian noise, and $\bar{\alpha}(\boldsymbol\lambda)$ defines the cumulative noise schedule for handling tokens corrupted by varying degrees of noise. We use dot product $\langle,\rangle$ because the noise level for different tokens can be varied.
+
+We slightly adjust the original diffusion forcing framework to directly predict the clean data $\tilde{\boldsymbol{x}}(\boldsymbol0) = \mathcal{G}_\theta(\boldsymbol{x}(\boldsymbol{\lambda}), \boldsymbol\lambda, \boldsymbol d)$ from its noised counterpart $\boldsymbol{x}(\boldsymbol\lambda)$, a typical solution for the motion generation task~\citep{tevet2023human}, rather than predicting the noise. The training objective is formulated as minimizing the reconstruction error,
+\begin{align}
+\mathcal{L}_{\text{DF}} = \mathbb{E}_{\boldsymbol{x}(0),\boldsymbol{\lambda}} \| \hat{\boldsymbol{x}}(\boldsymbol 0) - \mathcal{G}_\theta(\boldsymbol{x}(\boldsymbol{\lambda}), \boldsymbol\lambda, \boldsymbol d) \|^2,
+\end{align}
+where $\hat{\boldsymbol{x}}(\boldsymbol 0)$ denotes the ground truth data. $\mathcal{G}_\theta(\boldsymbol{x}(\boldsymbol{\lambda}), \boldsymbol\lambda, \boldsymbol d)$ denotes the model prediction of clean data from the generative model $\mathcal{G}$, parameterized by $\theta$, conditioned on the partially noised sequence $\boldsymbol{x}(\boldsymbol{\lambda})$, the noise level $\boldsymbol\lambda$ for each token, and the textual description $\boldsymbol{d}$. For notational simplicity, we omit other inputs including human shape parameter $\boldsymbol{\beta}$ and object geometry $\boldsymbol{P}$ here; we describe how these additional conditioning variables are incorporated into our generative model below.
+
+\noindent \textbf{Token Separation.}
+Following~\citet{cha2024text2hoi}, we explicitly decompose the representation $\boldsymbol{x}$ into distinct modalities for the human body, hands, and objects, denoted as $\boldsymbol{x}^b$, $\boldsymbol{x}^h$, and $\boldsymbol{x}^o$, respectively, which formulates these three components as separate token groups, yielding a total of $3 \times T$ tokens and noise levels $
+\boldsymbol{\lambda} = \{\boldsymbol\lambda^b, \boldsymbol\lambda^h, \boldsymbol\lambda^o\} \in \mathbb{R}^{T\times 3}
+$. As common practice for whole-body motion generation~\citep{humantomato}, this separation is beneficial for differentiating body and hand representations due to their distinct characteristics: the body encompasses 22 joints and typically exhibits larger-scale spatial movements, while the hands contain 30 joints with fine-grained and intricate finger motions. Empirically, we observe that separating the hand component improves motion generation quality in tasks with frequent hand interactions such as on the GRAB dataset~\citep{taheri2020grab} (Figure~\ref{fig:hand}).
+
+\noindent \textbf{Overall Inference Procedure.}
+As shown in Figure~\ref{fig:method}, at test time, we perform two coupled denoising passes that share the same denoiser $\mathcal{G}_\theta$, as outlined in Algorithm~\ref{alg:diffusion_inference}.
+First, a \emph{uniform} schedule denoises all modalities in sync under a same schedule, enhanced with text classifier-free guidance.
+Second, a \emph{staged} schedule applies modality-specific schedules.
+The staged schedule incorporates the cleaner generation from the prior uniform schedule and introduces pace-induced guidance, combined with text CFG, as incremental guidance.
+The final sample is obtained from the staged schedule.
+Design choices and hyperparameters are provided in Sec.~\ref{sec:experiments}.
+
+\noindent \textbf{Inference with Uniform Schedule.} 
+The reverse process of diffusion forcing gradually denoises a noisy latent sequence $\boldsymbol{x}_U(\boldsymbol{\lambda})$ into a clean sequence $\boldsymbol{x}_U (\boldsymbol0)$, defined as:
+\begin{align}
+\tilde{\boldsymbol{x}}_U &= \mathcal{G}_\theta(\boldsymbol{x}_U(\boldsymbol{\lambda}), \boldsymbol\lambda, \boldsymbol{d}) \nonumber \\ & + \omega_{1}\big(\mathcal{G}_\theta(\boldsymbol{x}_{U}(\boldsymbol\lambda), \boldsymbol\lambda,\boldsymbol{d})
+-\mathcal{G}_\theta(\boldsymbol{x}_{U}(\boldsymbol\lambda), \boldsymbol\lambda,\emptyset)\big), \label{eq:textcfg}\\
+\boldsymbol{x}_U(\boldsymbol{\lambda} - \boldsymbol{1}) &= \langle\sqrt{\bar{\alpha}(\boldsymbol\lambda - \boldsymbol{1})},\tilde{\boldsymbol{x}}_{U}\rangle + \langle\sqrt{ \boldsymbol{1} - \bar{\alpha}(\boldsymbol\lambda - \boldsymbol{1})},\boldsymbol{\epsilon}\rangle,
+\label{eq:denoising_step}
+\end{align}
+where our generative model predicts the denoised sequence $\tilde{\boldsymbol{x}}_U$ given the partially noised input sequence $\boldsymbol{x}_U(\boldsymbol{\lambda})$, with classifier-free guidance (CFG) with text $\boldsymbol{d}$ dropout. $\omega_{1}$ is a hyperparameter to control the text CFG. With $\tilde{\boldsymbol{x}}_U$ further noised back to $\boldsymbol{x}_U(\boldsymbol{\lambda} - \boldsymbol{1})$, this iterative denoising step yields clearer HOI sequences until the inference advances to step $\boldsymbol{0}$. 
+In this scenario, all frames and modalities are denoised simultaneously as plain diffusion models, with $\boldsymbol{\lambda}$ set to be the same and start at $K$. The resulting trajectory ${\boldsymbol{x}}_U(\cdot)$ are incorporated into the staged schedule to formulate LIGHT.
+
+\noindent \textbf{Inference with Staged Schedule.}
+Our \emph{staged inference} strategy assigns asynchronized denoising schedules, enabling distinct denoising paces across modalities. Specifically, for specified modalities $m_1,m_2$ satisfying $m_1 \cap m_2 = \varnothing, m_1 \cup m_2 = \{b,h,o\}.$ \textit{i.e.,} together $m_1$ and $m_2$ cover all modalities without overlap (\textit{e.g.,} $m_1 = \{h\}, m_2 = \{b,o\}$). This partitioning is flexible. In Table~\ref{tab:uncond_guide}, we verify that all possible combinations yield improvements to varying degrees. 
+Then, we set
+\mycolor{\begin{align}
+    \boldsymbol{x}_S' &= \big(\boldsymbol{x}_U^{m_1}(\boldsymbol \lambda^{m_1} - \boldsymbol \delta);\, \boldsymbol{x}_S^{m_2}(\boldsymbol \lambda^{m_2})\big), \quad \boldsymbol\lambda' = \big((\boldsymbol \lambda^{m_1} - \boldsymbol \delta);\, \boldsymbol \lambda^{m_2}\big),
+    \label{eq:assign}
+\end{align}}where the vectors $\boldsymbol{\lambda}^{m_1}$ and $\boldsymbol{\lambda}^{m_2}$ are all-$k$ vectors at denoising step $k$, \mycolor{and $(\cdot\,;\, \cdot)$ denotes the concatenation operation.} The offset vector $\boldsymbol{\delta}$ determines how much earlier $m_1$ is denoised compared to $m_2$, thereby creating a pacing discrepancy across modalities. This discrepancy allows $m_1$ to reach a cleaner state from the previous generation ${\boldsymbol{x}}_U^{m_1}$, and when it is combined with the current output of ${\boldsymbol{x}}_S^{m_2}$ to formulate ${\boldsymbol{x}}_S'$ , it can lead to what we refer to as pace-induced guidance. Formally, the guided update is given by
+\begin{align}
+\tilde{\boldsymbol{x}}_{S}
+&= \mathcal{G}_\theta(\boldsymbol{x}_{S}(\boldsymbol\lambda), \boldsymbol\lambda,\boldsymbol{d}) \notag \\
+&\quad + \omega_{1}\!\left(\mathcal{G}_\theta(\boldsymbol{x}_{S}(\boldsymbol\lambda), \boldsymbol\lambda,\boldsymbol{d})
+    - \mathcal{G}_\theta(\boldsymbol{x}_{S}(\boldsymbol\lambda), \boldsymbol\lambda,\varnothing)\right) \label{equation:textcfg2} \\
+&\quad + \omega_{2}\!\left(\mathcal{G}_\theta(\boldsymbol{x}'_{S}, \boldsymbol\lambda',\boldsymbol{d})
+    - \mathcal{G}_\theta(\boldsymbol{x}_{S}(\boldsymbol\lambda), \boldsymbol\lambda,\boldsymbol{d})\right) \label{equation:guidance_step}, \\
+\mycolor{\boldsymbol{x}_S(\boldsymbol{\lambda} - \boldsymbol{1})}
+&\mycolor{=} 
+\mycolor{\langle \sqrt{\bar{\alpha}(\boldsymbol\lambda - \boldsymbol{1})}, \tilde{\boldsymbol{x}}_{S} \rangle 
++ \langle \sqrt{ \boldsymbol{1} - \bar{\alpha}(\boldsymbol\lambda - \boldsymbol{1})}, \boldsymbol{\epsilon} \rangle, \label{equation:guidance_denoise_step}}
+\end{align}
+
+where $\omega_1,\omega_2$ are the scalar weights controlling the strength of the conditional influence. The resulting guided prediction for the $m_2$ component is then re-noised according to the schedule and propagated to the next denoising step, while $m_1$ continues to follow the trajectory of ${\boldsymbol{x}}_U(\boldsymbol k), k \in \{0,1,2,\ldots,K\}$.  
+\input{sec/alg}
+
+
+
+\noindent\textbf{Architecture.} The left figure in Figure \ref{fig:method} illustrates the full architecture $\mathcal{G}_\theta$.
+(i) \emph{Motion tokens.} At each frame we form three motion tokens, body $\boldsymbol{x}_{t}^{b}$, hand $\boldsymbol{x}_{t}^{h}$ and object $\boldsymbol{x}_{t}^{o}$, and attach a \emph{modal-wise positional encoding} that distinguishes these modalities. A small linear projection is applied to each modality so that the three streams share a common hidden dimensionality before fusion.
+(ii) \emph{Noise-level and temporal encodings.}  Each motion token receives an additive noise-level embedding  together that encodes the diffusion step with a \emph{frame-wise timestep embedding}.
+(iii) \emph{Object-geometry token.}  Object shape is encoded once per sequence. From the point cloud $\boldsymbol{P}$, we concatenate an un-normalised Basis Point Set (BPS)~\citep{prokudin2019efficient} descriptor with a normalized BPS~\citep{zhang2024bimart} whose maximal point-to-centroid distance is normalized to $0.95$; the original object scale (largest radius) is appended as an extra scalar. This geometry vector is processed by an MLP and then concatenated to text tokens.
+(iv) \emph{Text token.}  The input prompt $\boldsymbol{d}$ is encoded by a frozen DistilBert~\citep{sanh2019distilbert} text encoder, producing a sequence of language tokens.  These tokens are injected into
+each of the transformer decoder’s layers through their cross-attention blocks.
+(v) \emph{Transformer decoder and prediction head.}  The concatenated sequence, including body, hand and object tokens with all positional, temporal embeddings, is passed through a Transformer decoder, with text and object-geometry tokens injected by cross-attention. A lightweight MLP head maps the denoised motion latents to final output, which are trained to match the clean ground-truth targets.
+
+
+\noindent \textbf{Training Schedule.}
+Following~\citet{kim2024versatile,xiu2025egotwin,zhang2024tedi,chen2024diffusion}, we assign independent noise levels across modalities, formally defined as $ \boldsymbol\lambda^b, \boldsymbol\lambda^h, \boldsymbol\lambda^o\sim U\{\boldsymbol 0, \boldsymbol 1, \boldsymbol 2, \dots, \boldsymbol K\} \text{ independently}$. Training with independent noise levels encourages the model to capture a broad range of asynchronized conditional distributions, enabling diverse conditionalities at inference. Unlike diffusion forcing~\citep{chen2024diffusion}, we do not vary noise levels across frames; instead, all frames within the same modality share the same noise level. 
+
+\noindent\textbf{Training Loss.}
+The model is trained with a composite loss consisting of a diffusion supervised term $L_{\text{DF}}$ and a regularization term $L_{\text{reg}}$. The total loss is defined as
+$
+    \mathcal{L}
+    \;=\;
+    \mathcal{L}_{\text{DF}}
+    \;+\;
+    \,\mathcal{L}_{\text{reg}}.
+$
+ The regularization term $L_{\text{reg}}$ promotes plausible human-object interactions and comprises three components: (i) a \emph{bone-length loss} that penalizes deviations in limb lengths from ground truth, (ii) a \emph{contact loss} that aligns designated human joints with expected contact regions on the object, and (iii) a \emph{velocity loss} that matches predicted object and human motion velocity with ground truth. Full details of these components are
+provided in Sec.~\ref{sec:training_loss} of the Appendix.
+
+
+\noindent \textbf{Contact-Aware Shape-Spectrum Augmentation.}
+We employ an optimization-based augmentation strategy to enhance our dataset by transferring original HOI sequences onto novel objects from the same category. Specifically, we first train a correspondence network following~\citet{xie2024intertrack} that maps points from the source object's surface to corresponding points on new object surface selected from ShapeNet~\citep{chang2015shapenet} and Objaverse~\citep{deitke2023objaverse} within the same object category. With the learned correspondence, we replace the original object with the novel object, optimizing the placement so that the original human-object contact points are preserved -- the new object's corresponding points remain consistently matched to the same human contacts. The optimization objectives are detailed in Sec.~\ref{sec:augmentation} of the Appendix.
+
+
+
+
+\textbf{}
+
+

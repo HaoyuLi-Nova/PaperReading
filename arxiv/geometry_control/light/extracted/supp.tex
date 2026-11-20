@@ -1,0 +1,240 @@
+
+% -----------------------------
+\def\ours{LIGHT~}
+
+% -----------------------------
+
+
+
+
+
+\def\@onedot{\ifx\@let@token.\else.\null\fi\xspace}
+\def\eg{\emph{e.g}\onedot} 
+\def\Eg{\emph{E.g}\onedot}
+\def\ie{\emph{i.e}\onedot} 
+\def\Ie{\emph{I.e}\onedot}
+\def\cf{\emph{cf}\onedot} 
+\def\Cf{\emph{Cf}\onedot}
+\def\etc{\emph{etc}\onedot} 
+\def\vs{\emph{vs}\onedot}
+\def\wrt{w.r.t\onedot} 
+\def\dof{d.o.f\onedot}
+\def\iid{i.i.d\onedot} 
+\def\wolog{w.l.o.g\onedot}
+\def\etal{\emph{et al}\onedot}
+
+
+\section*{Appendix}
+
+\setcounter{table}{0}
+\renewcommand{\thetable}{\Alph{table}}
+\renewcommand*{\theHtable}{\thetable}
+\setcounter{figure}{0}
+\renewcommand{\thefigure}{\Alph{figure}}
+\renewcommand*{\theHfigure}{\thefigure}
+\setcounter{section}{0}
+\renewcommand{\thesection}{\Alph{section}}
+\renewcommand*{\theHsection}{\thesection}
+\maketitle
+
+\noindent In the Appendix, we provide additional methodological details and experimental results: (i) an expanded explanation of our loss formulation and object-augmentation procedure in Sec.~\ref{sec:method_supp}; (iii) definitions of the proposed metrics in Sec.~\ref{sec:metric_supp}; and (iv) extra experimental results, omitted from the main paper for space, in Sec.~\ref{sec:add_exp_supp}.
+
+\noindent\textbf{LLM Usage.} We employ large language models (LLMs), such as ChatGPT, to assist in polishing our paper. Specifically, LLMs are used to correct grammatical errors, refine word choice, and improve overall fluency. We do not use LLM in formulating our methodology or running experiments
+
+\section{Additional Details of Methodology}\label{sec:method_supp}
+
+\subsection{Training Loss}\label{sec:training_loss}
+
+In training, we regularize our \ours with three loss terms, foot-skating loss ($L_{\text{fs}}$), velocity loss ($L_v$), and contact loss ($L_{\text{cont}}$).  
+The total regularization objective is
+\begin{equation}
+  L_{\text{reg}}
+  = \lambda_{\text{fs}}\,L_{\text{fs}}
+  + \lambda_{\text{v}}\,L_{\text{v}}
+  + \lambda_{\text{cont}}\,L_{\text{cont}},
+\end{equation}
+where we set $\lambda_{\text{fs}}=1, \lambda_{\text{v}}=0.02, \lambda_{\text{cont}}=0.1.$
+
+\paragraph{Foot-skating loss.}
+To constrain foot sliding during ground contact, we penalize the deviation between predicted and ground-truth foot velocities:
+\begin{equation}
+  L_{\text{fs}}
+  = \sum_{t=1}^{T}\sum_{f=1}^{4}
+      {c}^{f}_{t}\,
+      \Bigl\|
+        \bigl(\boldsymbol{j}^{p}_{t,f}-\boldsymbol{j}^{p}_{t-1,f}\bigr)
+        -
+        \bigl(\hat{\boldsymbol{j}}^{p}_{t,f}-\hat{\boldsymbol{j}}^{p}_{t-1,f}\bigr)
+      \Bigr\|_2^{2},
+\end{equation}
+where ${c}^{f}_{t}\!\in\!\{0,1\}$ is the ground-truth foot-contact label for joint $f$ at time $t$, and $\hat{\boldsymbol{j}}^{p}_{t,f}$ (\emph{resp.}\ $\hat{\boldsymbol{j}}^{p}_{t,f}$) denotes the predicted (\emph{resp.}\ ground-truth) 3-D position of that joint. We follow \citep{guo2022generating} for the foot-joint definitions and contact annotation.
+
+\paragraph{Velocity loss.}
+To encourage smooth temporal evolution of both human and object trajectories, we match first-order differences between predictions and ground truth:
+\begin{align}
+  L_{\text{v}} \;=&~
+    \lambda_{\text{pv}}
+    \sum_{t=1}^{T}\sum_{j=1}^{J}
+      \Bigl\|
+        \bigl(\boldsymbol{j}^{p}_{t,j}-\boldsymbol{j}^{p}_{t-1,j}\bigr)
+        -
+        \bigl(\hat{\boldsymbol{j}}^{p}_{t,j}-\hat{\boldsymbol{j}}^{p}_{t-1,j}\bigr)
+      \Bigr\|_2^{2}
+      \nonumber\\
+  &+
+    \lambda_{\text{otv}}
+    \sum_{t=1}^{T}
+      \Bigl\|
+        \bigl(\boldsymbol{o}^{t}_{t}-\boldsymbol{o}^{t}_{t-1}\bigr)
+        -
+        \bigl(\hat{\boldsymbol{o}}^{t}_{t}-\hat{\boldsymbol{o}}^{t}_{t-1}\bigr)
+      \Bigr\|_2^{2}
+      \nonumber\\
+  &+
+    \lambda_{\text{orv}}
+    \sum_{t=1}^{T}
+      \Bigl\|
+        \bigl(\boldsymbol{o}^{r}_{t}-\boldsymbol{o}^{r}_{t-1}\bigr)
+        -
+        \bigl(\hat{\boldsymbol{o}}^{r}_{t}-\hat{\boldsymbol{o}}^{r}_{t-1}\bigr)
+      \Bigr\|_2^{2},
+\end{align}
+where $\boldsymbol{j}^{p}_{t,j}$ is the position of human joint $j$, while $\boldsymbol{o}^{t}_{t}$ and $\boldsymbol{o}^{r}_{t}$ are the object translation and rotation at time~$t$.  
+We set $\lambda_{\text{pv}} = 1, \lambda_{\text{otv}} =1, \lambda_{\text{orv}} =1.$
+
+\paragraph{Contact loss.}
+To promote accurate human–object interactions, we minimize joint-to-surface distances whenever contact is expected:
+\begin{equation}
+  L_{\text{cont}}
+  = \sum_{t=1}^{T}\sum_{j=1}^{J}
+      \bigl(
+        d\!\bigl(\boldsymbol{j}^{p}_{t,j},\,\hat{\boldsymbol{V}}^{o}_{t}\bigr)\,
+        \hat{c}^{j}_{t}
+      \bigr)^{2},
+\end{equation}
+where $d(\cdot,\cdot)$ returns the minimum Euclidean distance between joint $\hat{\boldsymbol{j}}^{p}_{t,j}$ and the set of ground truth object vertices ${\boldsymbol{V}}^{o}_{t}$, and ${c}^{j}_{t}$ is the ground-truth binary contact label for joint $j$ at time~$t$, where we extract this information from ground truth data whether any joint to mesh distance is less than 0.03 m.
+
+
+\subsection{Additional Details on Object Augmentation} \label{sec:augmentation}
+
+
+We employ an optimization-based strategy to enhance our dataset by transferring each original human-object interaction (HOI) sequence onto a novel object instance of the same category. Specifically, given an original HOI sequence with human motion and an object trajectory, we first train a dense correspondence network following~\citet{xie2024intertrack,zhou2022adjoint}. Specifically, first, we extract the AABB (Axis-Aligned Bounding Box) of the object, and normalize to make the diagram of AABB to be 1, and the center of AABB to be at the origin. Then we train the corresponding network following~\citet{zhou2022adjoint}. The model architecture consists of a PointNet~\citep{qi2017pointnet} and multilayer perceptron (MLP), which maps an unordered point cloud to the orientation. We follow~\citet{zhou2022adjoint} to supervise the model with a chamfer distance loss. This network learns to map points on the source object’s surface to corresponding points on a new object instance selected from a 3D shape repository in the same category, \textit{e.g.}, ShapeNet~\citep{chang2015shapenet} or Objaverse~\citep{deitke2023objaverse}. Using the learned correspondence, we replace the original object in the HOI sequence with the novel object, obtaining an initial transformed trajectory for the new object. 
+
+The goal is to position and move the new object such that the human’s contact interactions remain consistent with the original sequence. In other words, for each contact constraint observed in the original sequence, \textit{i.e.,} a specific human joint maintaining contact at frame with the original object, the corresponding surface point on the new object, identified via the correspondence network, should likewise remain in contact with that same human joint. We achieve this by optimizing the new object’s pose parameters and the original human parameters over time to preserve the spatial alignment of these contact points while maintaining the physical plausibility of the interaction. To refine the new object’s trajectory, we formulate an objective function that is a weighted sum of multiple alignment terms:
+\begin{equation}
+\mathcal{L}= \lambda_{\text{con}}L_{\text{con}} + \lambda_{\text{normal}}L_{\text{normal}} + \lambda_{\text{colli}}L_{\text{colli}} + \lambda_{\text{init}}L_{\text{init}} + \lambda_{\text{acc}}L_{\text{acc}},
+\end{equation}
+where $\lambda_{\text{con}}$, $\lambda_{\text{normal}}$, $\lambda_{\text{colli}}$, $\lambda_{\text{init}}$, and $\lambda_{\text{acc}}$ are weighting coefficients. Each loss term $L_{\ast}$ is designed to enforce a particular aspect of alignment between the human and the new object:
+\begin{itemize}\setlength\itemsep{0em}
+\item $L_{\text{con}}$: penalizes any deviation in the distance between the human’s contact points and the new object’s corresponding surface points.
+\item $L_{\text{normal}}$: encourages the surface normals of the new object at contact regions to align with those of the source object, ensuring that the orientation of the object relative to the human’s contacting limb (\textit{e.g.}, a hand grasp) remains consistent with the original interaction.
+\item $L_{\text{colli}}$: penalizes interpenetration or unintended collisions between the human body and the new object, enforcing that the object remains outside the human geometry except at the intended contact regions.
+\item $L_{\text{init}}$: regularizes the solution towards the original motion.
+\item $L_{\text{acc}}$: promotes smooth motion by penalizing abrupt changes in velocity and acceleration.
+\end{itemize}
+By minimizing $\mathcal{L}$, we refine the human and novel object’s trajectory so that the human’s interaction with the object remains natural and consistent with the original sequence. Thus, the new object is placed and moved in such a way that its correspondence-defined contact points remain matched to the human’s grasp or touch points throughout the sequence.
+
+\begin{figure*}
+    \centering
+    \includegraphics[width=\textwidth]{fig/augmentation.pdf}
+    \caption{We visualize our augmentation results, where original MoCap sequences (\textbf{left}) are enriched by introducing novel objects (\textbf{right}) sourced from ShapeNet~\citep{chang2015shapenet} and Objaverse~\citep{deitke2023objaverse}. Through optimization, human and object motions are aligned at corresponding contact points.
+    }
+    \label{fig:aug}
+    \vspace{-1em}
+\end{figure*}
+
+\input{table/augmentation_quality}
+
+
+
+\section{Additional Details of Experimental Setup}
+
+\subsection{Evaluator representation and evaluator training} \label{sec:evaluator_supp}
+
+Our evaluator takes as input the global human joint locations, object rotation, object translation, and object dynamic BPS. The dynamic BPS is computed using a static basis point set, following~\citet{li2023object,xu2025interact}. Consequently, the evaluator assesses the quality of the entire HOI sequence rather than evaluating human or object motion in isolation. Following~\citet{humantomato,petrovich2023tmr}, we jointly train the text and HOI motion encoders of our evaluator. Departing from traditional training on classification tasks~\citep{guo2022generating}, we utilize a sequence-level contrastive learning objective based on the InfoNCE loss~\citep{oord2018representation}, following recent implementations~\citep{humantomato,petrovich2023tmr}. Our text encoding module incorporates Sentence-BERT~\citep{reimers2019sentence}.
+
+\subsection{Evaluation Metrics}\label{sec:metric_supp}
+We outline our metric definitions below. Standard text-to-motion metrics are not restated; we simply extend them with the object and contact representations introduced in the main paper. For their original formulations, see~\citet{guo2022generating}.
+
+
+\paragraph{Contact Percentage.}  
+This metric measures how consistently the human's body joints stay in contact with the object, indicating the quality of physical interaction.  
+Extending \citet{li2023object} from hand contact to whole-body contact, we define
+\begin{equation}
+\text{Contact} \;=\; 
+\frac{1}{T\,J}\sum_{t=1}^{T}\sum_{j=1}^{J}
+  \mathbf{1}\!\Bigl(d\bigl(\boldsymbol{j}^{p}_{t,j},\,\boldsymbol{V}^{o}_{t}\bigr)<\gamma\Bigr),
+\label{eq:contact}
+\end{equation}
+where $\boldsymbol{j}^{p}_{t,j}\!\in\!\mathbb{R}^{3}$ is the 3-D position of the $j$-th joint at time $t$, $\boldsymbol{V}^{o}_{t}$ is the set of object vertices at time~$t$, and
+$d(\boldsymbol{j}^{p}_{t,j},\boldsymbol{V}^{o}_{t})$ is the minimum distance from the joint to the object surface.  
+We use the contact threshold $\gamma = 0.05$ following \citet{li2023controllable}.  
+The more alignment of values of Equation ~\eqref{eq:contact} with the ground truth indicates better quality.
+
+\paragraph{Frame-Wise Contact Matching.}
+Following~\citet{li2023object}, we report frame-wise contact matching, where $C_{F1}$, $C_{prec}$, and $C_{rec}$ denote the F1 score, precision, and recall of detected contacts between hands and objects. We use a contact threshold of $\gamma = 0.05$, consistent with~\citet{li2023controllable}. However, this metric is not entirely suitable for the text-to-HOI task, since frame-level alignment is not strictly enforced. In generative tasks conditioned only on text, it is standard practice to evaluate outputs with distributional metrics (\textit{e.g.,} FID in text-to-motion or text-to-image), rather than element- or frame-wise measures such as MPJPE or MSE. Nevertheless, we include frame-wise contact scores as they provide a partial indication of contact quality.
+
+\paragraph{Penetration.}  
+Penetration quantifies geometric violations between the human mesh and the object.  
+After reconstructing the full human mesh via forward kinematics, we compute
+\begin{equation}
+\text{Penetration} \;=\;
+\frac{1}{T}\sum_{t=1}^{T}\,\sum_{i=1}^{N}
+  \Bigl|\min\!\bigl(\operatorname{sdf}^{h_t}(\boldsymbol{v}_{o_i}),\,0\bigr)\Bigr|,
+\label{eq:penetration}
+\end{equation}
+where $\operatorname{sdf}^{h_t}(\boldsymbol{v}_{o_i})$ is the signed distance from object vertex $\boldsymbol{v}_{o_i}$ to the human mesh at time~$t$.  
+Negative SDF values indicate penetration depth; clamping positive values to zero ensures that only interpenetrations are accumulated.  
+Lower scores in Eq.~\eqref{eq:penetration} correspond to fewer or shallower penetrations.
+\input{table/uncond_guide}
+\begin{figure*}
+    \centering
+    \includegraphics[width=0.9\textwidth]{fig/user_study.pdf}
+    \caption{\textbf{User study results.} 15 participants evaluates our method comparing baselines, and our guidance mechanism. Percentages indicate participant preference.}
+    \label{fig:user_study}
+\end{figure*}
+\paragraph{Foot-Skating Ratio (FSR).}  
+FSR gauges how well the character’s feet remain stationary during ground-contact phases, a key indicator of motion realism.  
+Following \citet{karunratanakul2023gmd}, we compute
+\begin{equation}
+\text{FSR} \;=\;
+\frac{1}{T}\sum_{t=1}^{T}
+  {c}^{F}_{t}\,
+  \mathbf{1}\!\Bigl(
+    \bigl\|(\boldsymbol{j}^{p}_{t,f} - \boldsymbol{j}^{p}_{t-1,f})\cdot\text{fps}\bigr\| < \epsilon
+  \Bigr),
+\label{eq:fsr}
+\end{equation}
+where ${c}^{F}_{t}\!\in\!\{0,1\}$ is the ground-contact indicator for a foot joint at time~$t$, $\boldsymbol{j}^{p}_{t,f}$ is that foot’s position, and \text{fps} converts frame-to-frame displacement to velocity.  
+We adopt $\epsilon = 0.025$ and a ground-contact height threshold of 0.05 as in \citet{karunratanakul2023gmd}.  
+FSR ranges from 0 to~1; higher values signify less foot sliding and more realistic foot-ground interaction.
+
+\section{Additional Analysis of Guidance}\label{sec:exp_supp_guidance}
+\noindent\textbf{Quantitative Evaluation of Our Guidance Across Tasks.}
+In addition to the Text-to-HOI task presented in the main paper, we evaluate our guidance under different task settings. Specifically, we consider (i) \emph{unconditional HOI generation}, where the model takes as input an object mesh and a human shape to synthesize a complete HOI sequence without extra conditioning, and (ii) \emph{controllable HOI generation}, where the model is conditioned on a richer set of inputs—including the full object motion sequence, object mesh, human shape, and a textual description—to generate the corresponding HOI sequence. For both settings, we reuse the model from the main paper without retraining. This is made possible by our independent noise scheduling, which allows the model to noised out unused conditioning signals or overlap one denoising modality with input condition. Table~\ref{tab:uncond_guide} demonstrates that our guidance remains effective across multiple tasks.
+
+
+\noindent\textbf{Analysis of Different Component Combinations.} In this section, we experiment with multiple component combinations. Table~\ref{tab:t2i_modality_combination} demonstrates that our guidance is effective on flexible component combinations.
+\input{table/t2i_modality_combination}
+
+
+\section{Other Additional Experimental Results}\label{sec:add_exp_supp}
+\noindent\textbf{User Study.}
+We conducted a user study with 15 participants. Among them, 86.7\% reported that our augmented data exhibits fewer artifacts than the ground truth (GT), while 100\% agreed that the interaction consistency between GT and augmented sequences is preserved. Additional statistics are provided in Figure~\ref{fig:user_study}, which further demonstrate that (\textbf{i}) our method qualitatively outperforms the baseline, and (\textbf{ii}) the proposed guidance mechanism leads to improved performance.
+
+\noindent\textbf{Quantitative Evaluation of the Quality of Augmented Data.} Table~\ref{tab:augmentation_quality} demonstrates that our augmented data can match the quality of the ground-truth set, showing minimal contact errors and demonstrating its suitability as synthetic training data. And our  augmentation of small objects on GRAB~\citep{taheri2020grab} could also greatly align the contact of the ground truth dataset
+
+
+
+
+\noindent\textbf{Quantitative Evaluation on additional datasets.} The Table~\ref{tab:t2i_omomo},~\ref{tab:t2i_behave} and  ablations in Table~\ref{tab:ablation_behave},~\ref{tab:ablation_omomo}, demonstrates that our guidance method is effective across multiple datasets, rather than only on a large-scale dataset. And also, token separation and independent noise schedule are also effective.
+
+\input{table/t2i_omomo}
+\input{table/t2i_behave}
+\input{table/ablation_behave}
+\input{table/ablation_omomo}
+
+
+\noindent\textbf{Disscussion of Runtime efficiency.} Our guidance requires three model forward passes per step, and a complete inference procedure is needed before applying guidance. Specifically, for a batch of 64 samples, each sample consisting of 300 frames, our guided inference completes in approximately 72 seconds on one A100 gpu. In contrast, HOI-Diff, InterDiff both takes about 15 seconds without guidance.
+
+\noindent\textbf{Limitations.} Despite the encouraging results, our approach currently faces several limitations. First, our framework is designed specifically for single-object scenarios, and extending it to multi-object interactions remains an open challenge. Furthermore, the current model does not explicitly incorporate static environmental contexts or detailed scene geometry, potentially limiting the contextual realism of generated motions. Additionally, while our method improves interaction coherence and physical plausibility, it may still struggle with highly dynamic or physically complex interactions requiring precise and rapid manipulations. Finally, due to the computational complexity introduced by staged conditioning and diffusion forcing, real-time or interactive applications might be challenging.

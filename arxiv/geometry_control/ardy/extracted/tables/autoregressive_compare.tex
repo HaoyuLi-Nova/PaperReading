@@ -1,0 +1,25 @@
+\begin{table}[t]
+\centering
+\caption{\textbf{Autoregressive Text and Constraint Control Comparison.} evaluation results of text-conditioned autoregressive motion generation with in-horizon and out-of-horizon sparse joint goals on HumanML3D. $\uparrow$ denotes higher values are better; $\downarrow$ denotes lower values are better.}
+\label{table:autoregressive_compare}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Method} & \textbf{R-Prec. $\uparrow$} & \textbf{FID $\downarrow$} & \textbf{Skate (\%) $\downarrow$} & \textbf{Error (cm) $\downarrow$} & \textbf{Latency (s) $\downarrow$} \\
+\midrule
+Dataset (HumanML3D retarget) & 0.711 & 0.000 & 8.53 & 0.00 & - \\
+Dataset (Our retarget) & 0.711 & 0.010 & 7.00 & 0.00 & - \\
+\midrule
+\multicolumn{6}{c}{\textit{In-horizon goals}} \\
+\midrule
+DiP \cite{tevet2025closd} & 0.609 & 0.967 & 12.29 & 9.20 & 0.15 \\
+\textbf{\method (Ours)} & \textbf{0.690} & \textbf{0.092} & \textbf{7.07} & \textbf{2.48} & 0.15 \\
+\midrule
+\multicolumn{6}{c}{\textit{Out-of-horizon goals}} \\
+\midrule
+DiP \cite{tevet2025closd} & 0.599 & 1.453 & 11.07 & 17.64 & 0.15 \\
+\textbf{\method (Ours)} & \textbf{0.684} & \textbf{0.100} & \textbf{7.63} & \textbf{2.92} & 0.15 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}

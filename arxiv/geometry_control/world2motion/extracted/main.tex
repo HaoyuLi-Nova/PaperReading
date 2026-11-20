@@ -1,0 +1,190 @@
+\documentclass{article} % For LaTeX2e
+\usepackage{iclr2027_conference,times}
+
+% Optional math commands from https://github.com/goodfeli/dlbook_notation.
+\input{math_commands.tex}
+
+\usepackage{hyperref}
+\usepackage{url}
+\hypersetup{
+  colorlinks=true,
+  allcolors=blue
+}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{wrapfig}
+\usepackage{xcolor}
+\usepackage{pifont}
+\usepackage{multirow}
+\usepackage{enumitem}
+\usepackage{placeins}
+
+% Continuous preprint layout: flexible floats with compact, readable spacing.
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{5}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.8}
+\setlength{\textfloatsep}{12pt plus 2pt minus 2pt}
+\setlength{\floatsep}{10pt plus 2pt minus 2pt}
+\setlength{\intextsep}{10pt plus 2pt minus 2pt}
+
+\newcommand{\fitwidth}[2]{%
+  \sbox0{#2}%
+  \ifdim\wd0>#1 \resizebox{#1}{!}{\usebox0}%
+  \else \usebox0\fi}
+\newcommand{\cmark}{\textcolor{green!60!black}{\ding{51}}} % 绿色勾
+\newcommand{\xmark}{\textcolor{red!70!black}{\ding{55}}}   % 红色叉
+
+
+% \title{World2Motion: Turning Video World Models into Third-Person Human Motion Generators}
+\title{World2Motion: Turning Video World Models into 3D Human Motion Generators}
+
+% arXiv author order follows OpenReview CHkfm9onjM, with Kaipeng Zhang
+% inserted after Zhixiang Wang as requested.
+
+% Affiliations: World2Motion OpenReview page; Kunhang Li and Kaipeng Zhang
+% use their OpenReview career profiles (checked 2026-09-29).
+% YIYI CAI and Bo Zheng affiliations corrected by the author on 2026-09-29.
+\author{\bfseries Fangyuan Tu$^{1}$, Xiangyue Zhang$^{2}$, YIYI CAI$^{2}$, YICHEN PENG$^{4}$ \\
+\bfseries Kunhang Li$^{2}$, Bo Zheng$^{3}$, Zhixiang Wang$^{3}$, Kaipeng Zhang$^{3}$ \\
+\bfseries Erwin Wu$^{4}$, Haoran Xie$^{1}$, Haiyang Liu$^{2}$ \\[4pt]
+{\normalfont\small $^{1}$Japan Advanced Institute of Science and Technology} \\
+{\normalfont\small $^{2}$The University of Tokyo \quad $^{3}$Alaya Lab} \\
+{\normalfont\small $^{4}$Institute of Science Tokyo}
+}
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to \LaTeX{} to determine where to break
+% the lines. Using \AND forces a linebreak at that point. So, if \LaTeX{}
+% puts 3 of 4 authors names on the first line, and the last on the second
+% line, try using \AND instead of \And before the third author name.
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+% Preprint formatting: show authors and suppress review line numbers.
+% The conference publication header is replaced immediately after \maketitle.
+\iclrfinalcopy
+\begin{document}
+
+
+\maketitle
+\fancyhead{}
+\lhead{Preprint}
+
+\begin{abstract}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\linewidth]{Fig/pdf/Teaser_v3.pdf}
+    % \caption{We propose World2Motion, turning video world models to synthesize realistic videos and 3d human motions synchronously based on a Mixture-of-Transformer(MoT) architecture. The top row shows the generated video frames, while the bottom row shows the generated human motions rendered in a 3D scene.}
+    \caption{World2Motion adapts a video world model to jointly generate scene-aware 3D human motion and corresponding video from a single image and a text prompt. The example shows a person approaching a stool, turning, and sitting down. The top row shows generated video frames, while the bottom row shows the corresponding 3D motion rendered in a scene for visualization.}
+    \label{fig:teaser}
+\end{figure}
+
+% Previous abstract preserved.
+% Text-to-Motion(T2M) methods generate human motions efficiently but lack scene-aware capability. Human Object Interaction(HOI) methods can synthesize interactions, whereas they requires additional 3D object information. Video world models capture rich priors about how humans interact with the surrounding world. We aim to synthesize diverse human motions by exploiting the understanding of the physical world in video generation models. A straightforward solution is to generate various videos from prompts and extracted motions by Human Motion Recovery(HMR) methods. However, this two-stage paradigm is computationally expensive. To address these challenges, We present World2Motion, which turns video world model to synthesize the motions and videos synchronously. Directly adding motion branch to the video models is not efficiency. Since the videos and motions have fundamentally different representation space, it's costly for video generation backbone to generate motions. To address this challenge, we leverage a Mixture-of-Transformer(MoT) backbone to synthesize the motions and videos by a shared attention. However, naively fine-tuning the MoT backbone will introduce severe jitter into the generated motions. To address this challenge, we leverage a coupled noise schedule to alleviate the jitter. To train the MoT framework needs paired RGB videos and 3D human motions in interactive 3D scenes, existing HOI datasets can't satisfy the requirements. We curate a dataset containing 3D human motions and realistic videos. Comparison experiments demonstrate the efficiency, convenience and scene awareness of  our method. The ablation studies validate the effectiveness of our strategies.
+% Before agreed claim-scope revision: We present World2Motion, a framework that generates scene-aware 3D human motion and corresponding video from a single image and a text prompt. While existing 3D motion generators learn from motion datasets, their generalization is constrained by limited coverage of environments. In contrast, video world models such as Cosmos 3 offer broader environmental priors but are not designed for full-body motion generation; recovering motion from their generated videos requires costly two-stage inference. To address these, we turn Cosmos 3 into a single-stage 3D motion generator. This adaptation has two challenges: the scarcity of paired video--motion data and temporal instability in the generated motion. First, we construct a training dataset combining synthetic video--motion pairs with real videos paired with estimated 3D motion. Second, we propose a shift-decoupled noise schedule that assigns different noise levels to video and motion through shared denoising progress. This design accommodates the different denoising requirements of the two modalities, reducing motion jitter. Experiments on a diverse test set assembled from multiple data sources show that World2Motion has better motion--text alignment and scene interaction compared with the evaluated 3D motion generators. It also matches the performance of the two-stage baseline while achieving approximately 3.3$\times$ faster inference.
+We present World2Motion, a framework that generates scene-aware 3D human motion and corresponding video from a single image and a text prompt. While existing 3D motion generators learn from motion datasets, their generalization is constrained by limited coverage of environments. In contrast, video world models such as Cosmos 3 offer broader environmental priors but are not designed for full-body motion generation; recovering motion from their generated videos requires costly two-stage inference. To address these, we turn Cosmos 3 into a single-stage 3D motion generator. This adaptation has two challenges: the scarcity of paired video--motion data and temporal instability in the generated motion. First, we construct a training dataset combining synthetic video--motion pairs with real videos paired with estimated 3D motion. Second, we propose a shift-decoupled noise schedule that assigns different noise levels to video and motion through shared denoising progress. This design accommodates the different denoising requirements of the two modalities, reducing motion jitter. Experiments on a multi-source interaction benchmark show that World2Motion has better motion--text alignment and scene interaction compared with the evaluated 3D motion generators. It also matches the interaction success rate of the two-stage baseline while achieving approximately 3.3$\times$ faster inference. Our project page is available at \url{https://fyantu.github.io/World2Motion/}. 
+
+% 1. leverage MoT architecture to solve the challenge 
+% 2. dual noise schedule
+% 3. dataset and experiment
+
+\end{abstract}
+
+
+% Main text: each section lives in its own file under sec/
+\input{sec/1_introduction.tex}
+\input{sec/2_related_work.tex}
+\input{sec/3_method.tex}
+\input{sec/4_experiment.tex}
+\input{sec/5_conclusion.tex}
+
+% Continuous preprint layout: no forced page break.
+% Unfilled statement templates preserved; omitted from the PDF.
+% \subsection*{AI use statement}
+% 
+% In this work, we used generative AI tools for [tasks with required disclosure].
+% We have not used generative AI tools for [other tasks with required disclosure],
+% and [the rest of the required disclosure tasks] are not applicable to this work.
+% Additionally, we used generative AI tools for [tasks with recommended
+% disclosure]. We have reviewed all AI-assisted work. We take responsibility for
+% the final content of this work, including text, claims or artifacts produced
+% with the aid of generative AI.
+% 
+% \subsection*{Ethics statement}
+% 
+% TODO
+% 
+% \subsection*{Reproducibility statement}
+% 
+% TODO
+% 
+% 
+% 
+% \subsection*{AI use statement}
+% Generative AI tools were used to assist with manuscript editing and organization. Uses of generative models in training-data construction and evaluation are described in Sections~\ref{sec:training-data} and~\ref{sec:experimental-setup}.
+
+\FloatBarrier
+\bibliography{iclr2027_conference}
+\bibliographystyle{iclr2027_conference}
+
+% Unwritten appendix outline preserved; omitted from the PDF.
+% Continuous preprint layout: no forced page break.
+\clearpage
+\appendix
+% Previous appendix heading: \section{Appendix}
+\section{Additional Qualitative Results}
+
+Figure~\ref{fig:supplementary-results-1} presents box lifting and carrying, approaching and sitting on a stool or armchair, and two yoga movements. The sitting examples show the approach to a seat as well as the transition from standing to sitting, allowing the reader to inspect body placement throughout the sequence. The yoga examples show full-body pose changes without object manipulation.
+
+
+% Root-translation table moved back to the main text as a wraptable.
+% \begin{table}[!htbp]
+% \centering
+% \small
+% \setlength{\tabcolsep}{5pt}
+% \caption{Root translation ablation without post-processing. Relative positions are measured from the initial root position. Bold marks the lower value in each column.}
+% \label{tab:ablation_norm}
+% \begin{tabular}{lcc}
+% \toprule
+% Root translation & Jerk $\downarrow$ & FSR $\downarrow$\\
+% \midrule
+% Absolute & 4.355 & 0.766\\
+% Relative to initial position & \textbf{1.251} & \textbf{0.457}\\
+% \bottomrule
+% \end{tabular}
+% \end{table}
+
+
+\begin{figure}[!htbp]
+    \centering
+    % Previous figure width: \linewidth
+    \includegraphics[width=0.90\linewidth]{Fig/pdf/Supplementary_Results_01_v3.pdf}
+        % Previous caption: \caption{Overview of World2Motion. From an image and a text prompt, the adapted Cosmos 3 backbone jointly generates 3D human motion and video. CameraHMR estimates the initial pose from the image. The shift-decoupled schedule uses modality-specific noise shifts with shared denoising progress.}
+    \caption{Qualitative results of World2Motion for box lifting and carrying, sitting on a stool or armchair, and two yoga movements. Each example shows five successive video frames (top) and corresponding 3D motion renderings (bottom), ordered from left to right. The input text prompt appears below each example.}
+    % Previous label: \label{fig:Method}
+    \label{fig:supplementary-results-1}
+\end{figure}
+
+\clearpage
+Figure~\ref{fig:supplementary-results-2} adds sofa sitting, picking up and carrying a vacuum cleaner, standing up from a stool, and two dance sequences. These examples include both changes in body position relative to furniture and coordinated limb movements. In both figures, the paired video and motion rows show five corresponding time points, making it possible to compare how the requested action progresses in the two outputs. The text prompt is provided below each example.
+
+\begin{figure}[!htbp]
+    \centering
+    % Previous figure width: \linewidth
+    \includegraphics[width=0.90\linewidth]{Fig/pdf/Supplementary_Results_02_v3.pdf}
+        % Previous caption: \caption{Overview of World2Motion. From an image and a text prompt, the adapted Cosmos 3 backbone jointly generates 3D human motion and video. CameraHMR estimates the initial pose from the image. The shift-decoupled schedule uses modality-specific noise shifts with shared denoising progress.}
+    \caption{Additional qualitative results of World2Motion for sofa sitting, picking up and carrying a vacuum cleaner, standing up from a stool, and two dance sequences. Each example shows five successive video frames (top) and corresponding 3D motion renderings (bottom), ordered from left to right. The input text prompt appears below each example.}
+    % Previous label: \label{fig:Method}
+    \label{fig:supplementary-results-2}
+\end{figure}
+
+
+
+\end{document}

@@ -1,0 +1,130 @@
+\section{Model Design}
+\label{sec:method}
+
+\begin{figure*}[h]
+    \centering
+    \includegraphics[width=\linewidth, trim=10 140 40 120, clip]{figures/pipeline_overview.pdf}
+    \vspace{-10pt}
+    \caption{
+        Overview of the \modelname{} framework.
+    }
+    \label{fig:pipeline}
+\end{figure*}
+
+
+
+
+
+
+The overview framework of \modelname{} is shown in Fig. \ref{fig:pipeline}.
+The core is our HY-Motion DiT model, which accepts a text prompt and an expected duration of the motion as inputs and generates a clip of 3D human motion as outputs.
+We first detail our motion representation in \cref{subsec:motion_rep}.
+Then the HY-Motion DiT model is described in \cref{subsec:backbone}.
+Besides the core model, we train an independent LLM (\cref{subsec:pipeline_enhancement}) to analyze user prompts and predict the expected duration of the motion clips, and additionally, convert user prompts into better-structured prompts.
+
+
+
+
+
+
+\subsection{Motion Representation}
+\label{subsec:motion_rep}
+
+
+
+We employ the skeleton definition of SMPL-H~\citep{Romero2017} (22 joints without hands).
+Formally, we denote a motion sequence as $\bm{x}=\{\bm{f}_1,\bm{f}_2,\dots,\bm{f}_N\}$, where each frame is represented as a vector $\bm{f}\in\mathbb{R}^{201}$, comprising the global root translation $\bm{t}\in\mathbb{R}^3$, the global body orientation $\bm{r}\in\mathbb{R}^6$, the local joint rotations $\bm{j}^r\in\mathbb{R}^{21\times6}$, and the local joint positions $\bm{j}^p\in\mathbb{R}^{22\times3}$.
+All rotational parameters adhere to the continuous 6D representation~\citep{Zhou2019}.
+Noticeably, our representation is similar to DART~\citep{DartControl}, where the rotation representation is compatible with typical animation workflows, which differs from the commonly used HumanML3D~\citep{Guo2022} representation.
+We further remove the explicit temporal derivatives (velocities) and foot contact labels, as we observed faster training convergence.
+
+
+
+
+
+
+\subsection{HY-Motion DiT}
+\label{subsec:backbone}
+
+\begin{figure*}[h]
+    \centering
+    \includegraphics[width=\linewidth]{figures/backbone_mmdit.pdf}
+    \vspace{-10pt}
+    \caption{
+        Model architecture of our HY-Motion DiT.
+    }
+    \label{fig:backbone_mmdit}
+\end{figure*}
+
+\paragraph{Model Architecture.}
+Similar to HunyuanVideo~\cite{Kong2024}, we employ a hybrid Transformer that combines dual-stream and single-stream processing to model the joint distribution of motion and text.
+The network begins with dual-stream blocks, where motion latents and text tokens are processed via independent QKV projections and MLPs.
+Crucially, they interact through a joint attention mechanism, allowing motion features to query semantic cues from the text while preserving their distinct, modality-specific representations.
+These streams subsequently merge in the single-stream blocks, where motion and text tokens are concatenated into a unified sequence.
+Here, we employ parallel spatial and channel attention modules to facilitate deep multimodal fusion and information exchange.
+
+
+\paragraph{Text Encoders.}
+We leverage a hierarchical dual-conditioning strategy to integrate both fine-grained and global text guidance.
+Firstly, we employ Qwen3-8B~\citep{Yang2025} to extract rich, token-wise semantic embeddings.
+Addressing the limitation that LLMs typically utilize causal attention—which restricts the context for non-autoregressive generation, we follow HunyuanVideo~\citep{Kong2024} by adopting a Bidirectional Token Refiner.
+This module transforms the causal LLM features into bidirectional representations before injecting them into the dual-stream blocks, thereby providing holistically contextualized guidance for the diffusion model.
+Complementarily, we utilize CLIP-L~\citep{Radford2021} to extract a global text embedding.
+This embedding is concatenated with the timestep embedding and injected via a separated AdaLN~\citep{Peebles2023} mechanism, where layer-specific modulation parameters are learned to adaptively regulate feature statistics throughout the network.
+
+
+\paragraph{Attention Mechanism and Positional Encoding.}
+We devise a composite Attention Mechanism that incorporates specific masking strategies for both cross-modal interaction and temporal modeling.
+First, to regulate multimodal information flow, we enforce an asymmetric attention mask.
+While motion tokens attend globally to the text sequence to extract semantic cues, text tokens are explicitly masked from the motion latents.
+This unidirectional constraint prevents the diffusion noise inherent in the motion states from propagating back to the text embeddings, thereby preserving the integrity of the semantic conditioning.
+Second, for temporal modeling within the motion branch, we implement a narrow band mask strategy.
+Predicated on the hypothesis that kinematic dynamics are governed primarily by local continuity, we restrict attention to a sliding window of $121$ frames under $30$ fps.
+This imposes a locality inductive bias that decomposes long sequences into coherent substructures, effectively focusing the model on complex local dynamics while ensuring linear computational complexity.
+To spatially ground these attention interactions, we optimize the Positional Encoding by adopting full Rotary Positional Embeddings (RoPE) \cite{su2024roformer}.
+Diverging from disjoint encoding schemes, we concatenate text and motion embeddings into a single sequence prior to encoding.
+By applying RoPE across this unified sequence, we establish a continuous relative coordinate system, enabling the model to inherently resolve the positional correspondence between specific textual tokens and temporal motion frames.
+
+\paragraph{Flow Matching Objective.}
+We employ Flow Matching~\citep{Lipman2022} to construct a continuous probability path that bridges the standard Gaussian noise distribution and the complex motion data distribution.
+We adopt the optimal transport path, defined as a linear interpolation $\bm{x}_t=(1-t)\bm{x}_0 + t\bm{x}_1$, which implies a constant target velocity~\citep{Liu2022}.
+The training objective is to minimize the Mean Squared Error (MSE) between the predicted and ground-truth velocity:
+\begin{equation}
+    \mathcal{L}_{\text{FM}} = \mathbb{E}_{t, \bm{x}_0, \bm{x}_1} [ || \bm{v}_{\bm{\theta}}(\bm{x}_t,\bm{c},t) - \bm{v}_t ||^2_2 ],
+    \label{eq:flow_matching}
+\end{equation}
+where $\bm{x}_1$ represents the clean motion data, $\bm{x}_0\sim\mathcal{N}(0, \bm{I})$ is the initial noise, and the target velocity is given by $\bm{v}_t=\bm{x}_1-\bm{x}_0$.
+During inference, the generation process is formulated as an Ordinary Differential Equation (ODE): $d\bm{x}/d\bm{t}=\bm{v}_{\bm{\theta}}(\bm{x}_t,\bm{c},t)$.
+Starting from random noise $\bm{x}_0$, we recover the clean motion $\bm{x}_1$ by numerically integrating this ODE along the predicted velocity field using an ODE solver (\eg, Euler).
+
+
+\subsection{Duration Prediction \& Prompt Rewrite}
+\label{subsec:pipeline_enhancement}
+
+To accommodate diverse user inputs, we employ a dedicated LLM for both duration prediction and prompt rewrite. This module first predicts the target motion's duration from the user prompt. It then transforms the prompt into a structured format optimized for our DiT model. This design is motivated by the observation that LLMs possess inherent common-sense knowledge about the typical duration of human activities, enabling them to infer temporal length from textual descriptions. To further enhance its accuracy, we fine-tune the LLM on a dataset of ground-truth motion durations, which aligns its predictions with our training data distribution. Crucially, this fine-tuning preserves the model's ability to generalize to unseen motion descriptions.
+
+
+\paragraph{Data Synthesis.}
+Our dataset for fine-tuning the LLM consists of data triplets \{\textit{user prompt}, \textit{optimized prompt}, \textit{duration}\}. The ``optimized prompt'' and ``duration'' are the ground-truth text caption and duration of each motion clip in our motion dataset, respectively.
+To simulate realistic ``user prompt'', we employed a powerful LLM (\eg, Gemini-2.5-Pro) to synthesize a dataset of user queries. Using the ground-truth text captions as a basis, we prompted the LLM to generate inputs that mimic the nature of casual human commands. These synthetic queries are intentionally diverse, encompassing informal language, a mix of English and Chinese, and varying levels of specificity, including queries that are deliberately brief and ambiguous.
+
+
+
+\paragraph{Two-Stage Fine-Tuning.}
+The duration prediction \& prompt rewrite module is fine-tuned from a Qwen3-30B-A3B~\citep{Yang2025} model with a two-stage training procedure.
+\begin{itemize}
+    \item \textit{Supervised Fine-Tuning (SFT):}
+    The model is first fine-tuned on the constructed dataset with ground-truth supervision.
+    It learns to sequentially generate ``optimized prompt'' and ``duration'' from the ``user prompt'', effectively grounding the temporal prediction in the semantic context of the rewritten text.
+
+    \item \textit{Reinforcement Learning (RL):}
+    To further mitigate hallucinations and enhance fidelity, we reinforce the model using Group Relative Policy Optimization (GRPO)~\citep{Shao2024}.
+    We utilize a more powerful model (Qwen3-235B-A22B-Instruct-2507~\citep{Yang2025}) as a reward judge to evaluate multiple candidate outputs for each prompt.
+    The reward function assesses two critical dimensions: semantic consistency, ensuring the rewrite remains faithful to the user's intent, and temporal plausibility, verifying that the predicted duration aligns with the physical complexity of the described action.
+    By optimizing against the relative advantages of these candidates, GRPO steers the policy toward generating instructions that are both semantically precise and temporally coherent.
+\end{itemize}
+
+
+
+
+

@@ -1,0 +1,41 @@
+\section{Introduction}
+\label{sec:intro}
+
+Learning to generate realistic 3D human motions has become a promising direction with applications ranging from character animation and simulation to humanoid robotics. 
+Offline authoring models can benefit animators and game developers through intuitive controls like text and kinematic constraints~\cite{xie2024omnicontrol,pinyoanuntapong2025MaskControl}.
+Meanwhile, interactive motion generators~\cite{shi2024amdm,xiao2025motionstreamer} are key for characters in games and simulations to react to their environment and user inputs in real time. 
+Besides digital humans, recent work in real-world humanoid robot control~\cite{liao2025beyondmimic,he2025asap,zhao2025resmimic, luo2025sonic} relies heavily on high-quality human motions for supervision during training or planning at runtime. 
+
+
+Recent methods in \emph{offline} motion modeling generate a full sequence of poses in parallel. Modern generative models such as diffusion~\cite{tevet2023mdm,zhang2024motiondiffuse, karunratanakul2023gmd, Kimodo2026} and generative masked modeling~\cite{jiang2024motiongpt,guo2024momask, pinyoanuntapong2025MaskControl} allow synthesized motions to follow complex text prompts and kinematic constraints such as pose keyframes and joint positions. 
+While these methods are expressive and controllable, their spatiotemporal design and/or slow inference time are usually not suitable for interactive applications such as computer games or robot control.
+
+
+In contrast, \emph{online} models generate motion at runtime~\cite{holden2017phase,ling2020character,chen2024camdm}, usually in an autoregressive fashion. 
+While these models are fast and capable of producing realistic animations, they tend to sacrifice controllability. Some approaches support text conditioning but lack kinematic control~\cite{xiao2025motionstreamer}, while others enable kinematic constraints but can not accept text input~\cite{shi2024amdm,chen2024camdm}.
+Although a few recent methods integrate both text and kinematic constraints control~\cite{zhao2025DartControl,tevet2025closd}, their restricted context windows limit the understanding of global text semantics and the execution of long-horizon kinematic goals. 
+
+
+In this work, we aim to get the best of both: controllability through complex text prompts and flexible kinematic goal constraints, while generating motion in a streaming fashion that enables online interactivity (see \cref{fig:teaser}).
+To achieve this, we introduce \textbf{\method}, an \textbf{A}uto-\textbf{R}egressive \textbf{D}iffusion model that leverages a h\textbf{Y}brid pose representation to generate high-quality motion interactively, conditioned on online text prompts and flexible kinematic constraints from user inputs.
+\method is comprised of two main components. 
+First, \method employs a hybrid motion representation that decomposes motion into an explicit root feature and a latent body embedding derived from a learned tokenizer. This hybrid representation enables explicit and accurate root control during generation while maintaining a compact representation for efficient generative learning.
+Second, \method utilizes an autoregressive transformer denoiser for interactive motion generation, conditioned on a text prompt and kinematic constraints that can be spatiotemporally sparse and span long horizons.
+To handle variable and potentially sparse constraints, we represent the constraints as a masked motion sequence that is injected as input conditioning to the autoregressive denoiser.
+The denoiser features a variable history context and supports kinematic goals extending beyond a single generation window, which are essential for complex long-term motion semantics and long-horizon kinematic goal reaching.
+Moreover, the autoregressive denoiser employs an interleaved two-stage architecture: it first predicts the clean explicit root, then predicts the clean latent body embedding conditioned on the first-stage root prediction. These two stages operate in an interleaved manner within the denoising loop, ensuring continuous mutual influence between root and body motion. This staged design is crucial for simultaneously satisfying text instructions and kinematic constraints.
+By training on a large-scale dataset with text labels and kinematic constraints sampled from the ground truth motion itself, \method learns conditional generation that supports online prompting and long-horizon kinematic goals, eliminating the need for additional control modules~\cite{shi2024amdm,zhao2025DartControl,pinyoanuntapong2025MaskControl} such as expensive test-time optimization or RL-based control policies.
+
+
+
+We present an interactive demo that highlights the practical capabilities of our method, including dynamic text control, dense and sparse key-pose constraints, path following, and real-time locomotion control via mouse and keyboard. This demonstration showcases the potential for generative models to power next-generation interactive animation systems.
+Moreover, we validate our design choices on the Bones Rigplay~\cite{BonesStudio2026} dataset—featuring a significantly larger scale and higher quality than the public HumanML3D dataset—to assess the impact of key architectural decisions.
+Furthermore, we evaluate \method against state-of-the-art offline and autoregressive conditional motion generation methods on the public HumanML3D~\cite{guo2022humanml3d} benchmark, validating its strong motion quality and kinematic constraint adherence in a controlled setting that isolates the effects of proprietary data. 
+
+In summary, the key contributions of this paper are (1) a hybrid latent-body explicit-root representation amenable to fast and controllable motion generation, (2) a two-stage autoregressive diffusion model featuring variable history context length and support for long-horizon kinematic constraint conditioning, including full-body keyframes, root waypoints, root paths, and end-effector positions/rotations, and (3) an extensive evaluation on a large-scale, production-quality dataset that highlights the efficacy of our design choices and demonstrates the strong capabilities of \method.
+
+
+
+
+
+

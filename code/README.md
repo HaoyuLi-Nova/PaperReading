@@ -29,6 +29,7 @@ rm -rf code/<track>/<slug>/.git
 |------|------|------|
 | LDM | [`base_models/ldm/`](base_models/ldm/) | `python base_models/ldm/featuremap_to_sequence.py` |
 | Wan | [`base_models/Wan2.1/`](base_models/Wan2.1/)、[`base_models/Wan2.2/`](base_models/Wan2.2/) | 官方推理代码；笔记见 `notes/base_models/wan2.1/`；训练代码阅读路线见 [`mycode/wan2.1/README.md`](mycode/wan2.1/README.md) |
+| Cosmos 3 | [`base_models/cosmos3/`](base_models/cosmos3/) | [nvidia/cosmos](https://github.com/nvidia/cosmos)；模型推理走 Diffusers |
 | Ovi | [`base_models/ovi/`](base_models/ovi/) | 官方推理代码；见目录内 `README.md` / `README_LOCAL.md` |
 
 ## Audio driven
@@ -58,6 +59,14 @@ rm -rf code/<track>/<slug>/.git
 | Free-Form Motion Control | [`geometry_control/free_form_motion_control/`](geometry_control/free_form_motion_control/) | [FudanCVL/SynFMC](https://github.com/FudanCVL/SynFMC) |
 | SymphoMotion | [`geometry_control/symphomotion/`](geometry_control/symphomotion/) | [grenoble-zhang/SymphoMotion](https://github.com/grenoble-zhang/SymphoMotion) |
 | CoMoVi | [`geometry_control/comovi/`](geometry_control/comovi/) | [IGL-HKUST/CoMoVi](https://github.com/IGL-HKUST/CoMoVi) |
+| World2Motion | [`geometry_control/world2motion/`](geometry_control/world2motion/) | [fyantu/World2Motion](https://github.com/fyantu/World2Motion) |
+| CameraHMR | [`geometry_control/camerahmr/`](geometry_control/camerahmr/) | [pixelite1201/CameraHMR](https://github.com/pixelite1201/CameraHMR) |
+| ARDY | [`geometry_control/ardy/`](geometry_control/ardy/) | [nv-tlabs/ardy](https://github.com/nv-tlabs/ardy) |
+| HY-Motion | [`geometry_control/hy_motion/`](geometry_control/hy_motion/) | [Tencent-Hunyuan/HY-Motion-1.0](https://github.com/Tencent-Hunyuan/HY-Motion-1.0) |
+| Kimodo | [`geometry_control/kimodo/`](geometry_control/kimodo/) | [nv-tlabs/kimodo](https://github.com/nv-tlabs/kimodo) |
+| Go to Zero | [`geometry_control/go_to_zero/`](geometry_control/go_to_zero/) | [VankouF/MotionMillion-Codes](https://github.com/VankouF/MotionMillion-Codes) |
+| LIGHT | [`geometry_control/light/`](geometry_control/light/) | [wzyabcas/LIGHT](https://github.com/wzyabcas/LIGHT) |
+| HOIFHLI | [`geometry_control/hoifhli/`](geometry_control/hoifhli/) | [zhenkirito123/hoifhli_release](https://github.com/zhenkirito123/hoifhli_release) |
 | MoGe4D | [`geometry_control/moge4d/`](geometry_control/moge4d/) | [Zhangyr2022/MoGe4D](https://github.com/Zhangyr2022/MoGe4D) |
 | Gen4P | [`geometry_control/gen4p/`](geometry_control/gen4p/) | [yitongx/Gen4P](https://github.com/yitongx/Gen4P) |
 | D4RT | [`geometry_control/d4rt/`](geometry_control/d4rt/) | 非官方 [Lijiaxin0111/Open-d4rt](https://github.com/Lijiaxin0111/Open-d4rt) |

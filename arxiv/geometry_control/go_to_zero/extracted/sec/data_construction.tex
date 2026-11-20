@@ -1,0 +1,90 @@
+\section{MotionMillion Construction}
+\label{sec:data_construction}
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=1\textwidth]{figures/data_construct.pdf}
+    \vspace{-1em}
+    \caption{Data Construction Pipeline of MotionMillion. We can obtain high-quality human motion from a monocular video via our six processing stages, i.e. Shot Segmentation, Human Detection, Video Filtering, SMPL Motion Estimation and Motion Filtering.}
+    \vspace{-1em}
+    \label{fig:data_construct}
+\end{figure*}
+\subsection{Overview}
+Our dataset construction integrates human motion reconstruction from large-scale in-the-wild video sources and the re-aggregation of existing motion datasets. To enhance diversity and coverage, we incorporate multiple established datasets, including MotionX~\citep{motionx}, InterHuman~\citep{liang2024intergen}, Inter-X~\citep{interx}, BABEL~\citep{babel}, Fitness~\citep{motionx}, PhantomDance~\citep{danceformer}, GDance~\citep{le2023music}, FineDance~\citep{finedance}, HI4D~\citep{yin2023hi4d}, TRUMANS~\citep{jiang2024scaling}, and HumanSC3D~\citep{fieraru2021learning}. To further scale data collection, we propose an efficient pipeline for reconstructing human motion from web-scale video sources.
+
+Our methodology primarily focuses on full-body motion while omitting hand and facial expressions. To represent human motion, we extract SMPL\citep{loper2023smpl} parameters, a widely adopted parametric model for human body articulation. As illustrated in Fig.\ref{fig:data_construct}, our motion reconstruction framework consists of six key stages: which are \textbf{I)} Shot Segmentation, \textbf{II)} Human Detection, \textbf{III)} Bounding Box Confidence Filtering, \textbf{IV)} Transition Filtering, \textbf{V)} SMPL Motion Estimation, and \textbf{VI)} Motion Filtering.
+\subsection{Human Motion Reconstruction}
+In this section, we will illustrate the motion reconstruction process from web-scale human motion videos in detail.
+
+\textbf{Stage I Shot Segmentation.} 
+Raw video data often exhibits varying quality and frequent scene transitions, leading to artifacts in SMPL parameter estimation and adversely impacting downstream tasks. To address these challenges, we employ PySceneDetect to segment videos into single-scene clips, enforcing temporal coherence by restricting each clip to a maximum of 200 frames. Additionally, we use the Laplacian operator from OpenCV to evaluate image sharpness, selecting the sharpest frame as the initial frame of each clip. This preprocessing pipeline enhances the robustness of motion reconstruction while mitigating noise in the extracted SMPL parameters.
+
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.75\textwidth]{figures/data_analysis.pdf}
+    \vspace{-1em}
+    \caption{Overview of MotionMillion. This dataset exhibits extensive semantic and pose diversity, encompassing a broad spectrum of indoor and outdoor human motions.}
+    \vspace{-1em}
+    \label{fig:data_analysis}
+\end{figure*}
+
+
+\textbf{Stage II Robust Human Detection and Tracking.} Accurate human detection and tracking are crucial for high-quality SMPL motion estimation. However, videos sourced from online platforms present two major challenges: (1) varying numbers of individuals present in each frame and (2) severe occlusions. To address these issues, we propose a \textbf{coarse-to-fine} approach that enhances the robustness of human detection and tracking, ensuring reliable motion estimation across diverse and complex scenarios. 
+
+\textbf{During the coarse stage}, we leverage Grounding DINO~\citep{liu2023grounding} and SAM2~\citep{ravi2024sam2} to fix the problem of variable human counts.  Grounding DINO trains on an extremely large-scale dataset, and can detect any object based on the input text. SAM2 is a foundation model for solving promotable visual segmentation in images and videos. It can use the bounding box of a person in the input image as a prompt to track that person's identity information in subsequent frames. Specifically, \textbf{1)} Use Grounding DINO for high-confidence human detection. If the first frame lacks a person, scan subsequent frames until a valid detection. We empirically set the threshold at 0.85 to make sure the detected human body contains high quality. \textbf{2)} Feed the detected bounding box into SAM2, which propagates the mask across frames via prompt-based segmentation.
+
+\textbf{During the fine stage}, we aims to solve the problem of severe occlusions.
+SAM2 demonstrates strong robustness in tracking individuals, even under occlusions, successfully preserving identity information. However, occlusions significantly degrade the accuracy of human keypoint detection, thereby impacting motion reconstruction quality. To mitigate this, we leverage Grounding DINO’s confidence score as an indicator of detection reliability and introduce a refinement mechanism to filter low-quality bounding boxes: 
+\textbf{1)} Calculating the IoU between SAM2 tracked boxes and Grounding DINO’s per-frame detections. \textbf{2)} Selecting candidates in Grounding DINO's detection with IoU greater than 0.85, then choosing the box with minimal area deviation from the box tracked by SAM2. \textbf{3)} If the confidence score of the selected bounding box is greater than a certain threshold, it is considered a successful match; otherwise, it is considered a failed match. By matching the corresponding bounding boxes and filtering according to the confidence level, we can effectively alleviate the situation where a large number of occluded humans are detected due to the robustness of SAM2.
+
+\textbf{Stage III \& IV Bounding Box Confidence Filtering and Transition Filtering.} We finish the bounding box confidence filtering during the fine stage of stage 2. 
+While PySceneDetect is employed for preliminary shot segmentation, it struggles with scenarios where the background remains unchanged, but the subject undergoes sudden positional shifts. To address this limitation, we introduce an additional detection step for sudden position changes. We calculate the distance between the centers of the bounding boxes of detected humans in two consecutive frames. If it is greater than a certain threshold, it is considered that there is a sudden position change, and thus the video clip is divided into two parts. 
+
+\textbf{Stage V Human Motion Reconstruction.} To obtain high-quality human parameters, we used the GVHMR~\cite{shen2024world}, which, as the state-of-the-art method in human motion reconstruction, could recover a much more realistic motion in both camera and world space. It first propose estimating human poses per-frame in a novel Gravity-View (GV) coordinate system. The GV system is defined by the world gravity and the camera view direction, which could naturally align with gravity and largely reduce the ambiguity in defining the world coordinate system. It takes the bounding box, 2D key points, image features, and relative camera rotations as input, and leverage a transformer network to predict the SMPL parameters, including the root translation $t$, body pose $\theta$, root orientation $R$, and shape $\beta$.
+
+\textbf{Stage VI Motion Filtering.} 
+PySceneDetect algorithm is limited in detecting sudden orientation changes in the foreground, particularly in scenarios where the background remains unchanged. 
+While GVHMR demonstrates strong performance in human motion estimation, it remains susceptible to errors caused by camera motion-induced jitter, leading to inconsistencies in human body estimation. Therefore, to mitigate these issues, we integrate global orientation ($R$) and joint's position ($J$) estimated by GVHMR to effectively detect sudden orientation changes while filtering out jitter-related artifacts.
+To filter sudden orientation changes, we compute the transformation angle $\Delta\theta$ between two consecutive frames using the global orientation R, formulated as:
+\vspace{-0.5em}
+\begin{equation}
+   \Delta\theta = Transform(R_iR_{i-1}^{-1})
+\label{eq:orient}
+\vspace{-0.5em}
+\end{equation}, where $i$ indicates the index of the verified frame and the $Transform$ represents the function of transforming the rotation from matrix form into the axis-angle form. For jitter filtering, we introduce the $jerk$ metric, which is sensitive to kinetic irregularities and can effectively indicate the motion smoothness~\citep{barquero2024seamless}. The jerk is defined as the time derivative of acceleration, formulated as: 
+\vspace{-0.5em}
+\begin{equation}
+   jerk = \dddot{J_i}
+\label{eq:jerk}
+\vspace{-0.5em}
+\end{equation}, where $J$ represents the global position of different body joints.
+After obtaining the $\Delta\theta$ and $jerk$ metrics for all of the video clips, we take the Isolation Forest~\citep{liu2008isolation} algorithm to identify the outliers for both metrics respectively, which can detect the moments when sudden orientation changes and jitters occur in the video clip in an unsupervised manner.  
+
+Our construction mechanism can generate precise and smooth motions. Finally, we standardize each motion to 30fps according to the frame rate of the corresponding raw video, obtaining our final motion.
+
+\subsection{Motion Caption.} Different from previous motion datasets (e.g. MotionX), our motion caption contains two steps: Motion Description and Description Augmentation. 
+
+\textbf{Motion Description.} 
+We split the video according to the results obtained from the previous human motion reconstruction to obtain the corresponding video clip. Then, we input this clip to GPT-4o to obtain the description of the human action in the corresponding bounding box. If the video title contains a description of the corresponding semantics, it is input to GPT-4o together. At the same time, different from MotionX, in addition to the description of body parts, we also focus on prompting the GPT-4o model to describe the age, body characteristics, movement styles, emotions, and environments of the subject, which is critical during motion generation. All the prompts used are shown in the appendix.
+
+\textbf{Description Augmentation} MotionX only describes the motion once, resulting in insufficient diversity of text descriptions of the same motion and subsequently significantly inhibits the model generalization ability. Therefore, after obtaining the motion description, we further prompt the model of LLAMA 3.1-8B~\citep{llama} to rewrite the motion description 20 times without changing the original semantic meaning, so as to realize the description augmentation.
+% \vspace{-1em}
+\subsection{Data Analysis}
+\input{tabs/compare_with_curr_dataset}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/jerk.pdf}
+    % \vspace{-1em}
+    \caption{Jerk comparison across MotionMillion, MotionX, and HumanML3D. Our MotionMillion exhibits the lowest jerk values, indicating that it produces smoother motion.}
+    % \vspace{-2em}
+    \label{fig:data_analysis_2}
+\end{figure}
+
+As presented in Table~\ref{tab:comp_curr_dataset}, our collected MotionMillion dataset comprises over 2,000 hours of human motion clips, encompassing more than 2 million motion sequences. Each sequence is ensured to exceed one second in duration, recorded at a frame rate of 30 frames per second.
+To enhance both the appearance and motion diversity, we curate a large collection of monocular videos from online sources, capturing a wide range of real-world scenarios. As depicted in Figure~\ref{fig:data_analysis}, our dataset encompasses various real-life settings, including indoor activities (e.g., performances, boxing) and outdoor movements (e.g., exercise, martial arts).
+
+We further assess data quality from multiple perspectives, including pose diversity, semantic diversity (illustrated at the top of Figure~\ref{fig:data_analysis}), and motion smoothness (depicted in Figure~\ref{fig:data_analysis_2}). To evaluate motion smoothness, we compute the average jerk of the dataset, as formulated in Equation~\ref{eq:jerk}. The results indicate that the motion smoothness achieved through our data construction pipeline is significantly enhanced compared to MotionX and near to the overall smoothness of HumanML3D, thereby ensuring the high quality of our dataset.
+
+Additionally, we visualize the top-2 principal components of body part poses and text features using t-SNE dimensionality reduction. The comparative analysis of pose distributions demonstrates that the diversity of poses within MotionMillion is on par with that of other datasets. However, in terms of semantic diversity, our dataset exhibits a significantly richer distribution compared to existing benchmarks. This is an expected outcome, as human motion often involves recurring pose patterns, yet distinct pose combinations yield semantically varied movements.
+Consequently, the increased semantic richness in our dataset presents challenges for smaller models to fully capture the underlying distribution, thereby stimulating further research in text-to-motion generation. In particular, our dataset underscores the necessity of scaling up model sizes and advancing the field towards zero-shot human motion generation.

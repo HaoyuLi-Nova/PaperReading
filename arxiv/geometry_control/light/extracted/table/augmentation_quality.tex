@@ -1,0 +1,24 @@
+\begin{table}
+    \centering
+    \caption{Quantitative evaluation of augmented data quality relative to ground truth annotations.}
+    \resizebox{0.65\columnwidth}{!}{
+    \begin{tabular}{@{}l l c c c c c@{}}
+        \toprule
+        {Dataset} & {Data source}  
+        & {Pene}$^\downarrow$  
+        & {Floating}$^\downarrow$ 
+        & $CH_{prec}^\uparrow$ 
+        & $CH_{rec}^\uparrow$ 
+        & $CH_{F1}^\uparrow$ \\
+        \midrule
+        \multirow{2}{*}{InterAct~\citep{xu2025interact}} 
+            & Ground Truth   & 0.008 & 0.005 & 0.947 & 0.911 &  0.920\\
+            & Augmentation   & 0.010 & 0.011 & 0.980 & 0.980 &  0.980 \\
+            \midrule
+        \multirow{2}{*}{GRAB~\citep{taheri2020grab}} 
+            & Ground Truth   & 0.003 & 0.000 & 1.000 & 1.000 & 1.000 \\
+            & Augmentation   & 0.004 & 0.000 & 0.994 & 0.998 & 0.996 \\
+        \bottomrule
+    \end{tabular}}
+    \label{tab:augmentation_quality}
+\end{table}

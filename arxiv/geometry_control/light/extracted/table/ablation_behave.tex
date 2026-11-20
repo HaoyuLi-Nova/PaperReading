@@ -1,0 +1,33 @@
+\begin{table}[!htbp]
+    \centering
+    \caption{\textbf{Ablation study} of token-separation strategies on the BEHAVE dataset~\cite{xu2025interact}. We report R-Precision with batch size 256.}
+    \label{tab:ablation_behave}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{@{}cccccccccccccc@{}}
+         \toprule
+        \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}hand--body\\ separation\end{tabular}} &
+        \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}human--object\\ separation\end{tabular}} &
+        \multicolumn{3}{c}{R-Precision$^\uparrow$} &
+        \multirow{2}{*}{FID$^\downarrow$} &
+        \multirow{2}{*}{MM Dist$^\downarrow$} &
+        \multirow{2}{*}{Diversity$^\rightarrow$} &
+        \multirow{2}{*}{FSR$^\downarrow$} &
+        \multirow{2}{*}{Pene$^\downarrow$} &
+        \multirow{2}{*}{Contact$^\rightarrow$} &
+        \multicolumn{3}{c}{Interaction$^\uparrow$} \\
+        \cmidrule(lr){3-5}\cmidrule(lr){12-14}
+        & &
+        \mycolor{Top 1} & \mycolor{Top 2} & \mycolor{Top 3} &
+        & & & & & &
+        $C_{prec}$ & $C_{rec}$ & $C_{F1}$ \\
+        \midrule
+        $\checkmark$ & $\checkmark$ &
+         0.277$^{\pm0.011}$ & 0.475$^{\pm0.014}$ & 0.561$^{\pm0.041}$ & \textbf{0.481}$^{\pm0.087}$ & 3.277$^{\pm0.076}$ & \textbf{6.961}$^{\pm0.066}$ & 0.171$^{\pm0.245}$ & 0.140$^{\pm0.004}$ & 0.170$^{\pm0.001}$ & \textbf{0.731}$^{\pm0.006}$ & \textbf{0.720}$^{\pm0.011}$ & \textbf{0.697}$^{\pm0.007}$ \\
+        \midrule
+        -- & $\checkmark$ &
+        \textbf{0.297}$^{\pm0.005}$ & \textbf{0.533}$^{\pm0.008}$ & \textbf{0.643}$^{\pm0.003}$ & 0.515$^{\pm0.005}$ & \textbf{2.991}$^{\pm0.053}$ & 6.963$^{\pm0.068}$ & 0.173$^{\pm0.250}$ & \textbf{0.126}$^{\pm0.003}$ & 0.157$^{\pm0.004}$ & \textbf{0.731}$^{\pm0.001}$ & 0.701$^{\pm0.012}$ & 0.692$^{\pm0.006}$ \\
+        $\checkmark$ & -- &
+        0.273$^{\pm0.022}$ & 0.471$^{\pm0.035}$ & 0.574$^{\pm0.038}$ & 0.498$^{\pm0.014}$ & 3.162$^{\pm0.000}$ & 6.898$^{\pm0.022}$ & \textbf{0.164}$^{\pm0.246}$ & 0.135$^{\pm0.000}$ & 0.166$^{\pm0.001}$ & 0.713$^{\pm0.006}$ & 0.690$^{\pm0.006}$ & 0.676$^{\pm0.005}$ \\
+        \bottomrule
+    \end{tabular}}%
+\end{table}

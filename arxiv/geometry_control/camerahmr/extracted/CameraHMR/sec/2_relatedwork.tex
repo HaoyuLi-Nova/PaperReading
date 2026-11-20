@@ -1,0 +1,19 @@
+\section{Related Work}
+\label{sec:relatedwork}
+
+\noindent\textbf{3D Human Pose and Shape Regression.}
+The field of mononcular 3D human pose and shape (HPS) estimation has made rapid advances. 
+The improvement of the backbone has played an important role, beginning with   ResNet architectures pre-trained on the ImageNet dataset~\cite{Kanazawa2018_hmr,spin,eft}, then the HRNet architecture pre-trained on the COCO dataset~\cite{hybrik,pymaf,pixie,expose},  and more recently  Transformer-based models~\cite{hmr2,refit,tokenhmr}.
+These changes have led to significant improvements in accuracy on standard benchmarks.
+
+HMR~\cite{Kanazawa2018_hmr} introduced a simplified weak perspective camera model to facilitate training with pseudo ground truth datasets. 
+The availability of increasingly accurate 3D ground truth datasets, enables methods to be trained using the more complex full perspective camera model~\cite{beyondwp,li2022cliff,bedlam}. 
+This evolution in camera modeling and training backbone has contributed to improvements in the accuracy of 3D pose and shape estimations. Despite advancements in achieving accurate 3D pose estimates, aligning these poses accurately with 2D image features remains challenging. 
+This issue has been recently highlighted by TokenHMR~\cite{tokenhmr}, which attributes the misalignment to the use of incorrect camera models during prediction. 
+Even methods that incorporate a full perspective camera model during training~\cite{li2022cliff,refit,beyondwp}, encounter alignment issues due to the absence of camera intrinsics during inference, leading to inaccurate projection into 2D. 
+
+\noindent\textbf{Regressing Camera Intrinsics.}
+Several approaches have been developed to regress camera intrinsics from monocular images~\cite{wildcamera,perspectivefields,ctrlc,spec}. However, these methods are often trained on datasets focused on indoor~\cite{sun3d,nyuv2}, driving~\cite{gsv,kitti}, or object-centric~\cite{objectron} images, which typically feature consistent vanishing points and geometric cues. 
+These images are quite different from images of people.
+Models trained on indoor and outdoor scenes struggle when presented with  images of people, particularly portrait images where vanishing points are often unclear or absent.
+ We argue that the human body itself offers essential cues for camera parameter estimation. To leverage this, we train our model on a dataset composed predominantly of images featuring people. Our experiments demonstrate that this approach significantly enhances the generalization of camera estimation across various human-centric benchmarks.

@@ -1,0 +1,16 @@
+\section{Discussion}
+\label{sec:discussion}
+We propose \method, an autoregressive motion diffusion model that enables interactive and controllable human motion generation. \method natively supports online text prompting and flexible kinematic goal constraints tailored to interactive applications, including long-horizon goals that extend beyond a single generation window. 
+We present a real-time demonstration of interactive and instructable motion generation, underscoring the potential of generative models for future animation systems.
+We validate our architectural decisions through extensive ablation studies on the large-scale, studio-quality Bones Rigplay dataset. Furthermore, experiments on the public HumanML3D benchmark demonstrate that \method outperforms existing methods in terms of both motion fidelity and control accuracy.
+
+\paragraph{Limitations}
+While \method demonstrates a promising system for interactive human motion generation, several aspects of the design remain open for future research improvement.
+First, \method explicitly utilizes all past motion frames as the history context during autoregressive generation, which can be inefficient for extremely long-horizon tasks. Exploring more efficient, structured memory representations and update mechanisms is an important future direction.
+Second, as a diffusion model, \method relies on a multi-step iterative generation process, which can be computationally demanding. This could potentially be further accelerated by combining our approach with recent advances in shortcut diffusion models~\cite{lu2025simplifying, geng2025mean}.
+Third, \method is a purely kinematic model and lacks awareness of physical dynamics. Consequently, artifacts such as foot skating and jittering can sometimes be observed in the generated motions. A crucial future direction is to integrate physics modelling into \method, proposing a unified generative model capable of predicting both the kinematics and dynamics of human motion, which is essential for physics-critical applications.
+
+\input{tables/perceptual_study}
+
+\section{Acknowledgments}
+We would like to thank Edy Lim, Eugene Jeong, Sam Wu, Ehsan Hassani, Michael Huang, and Jin-Bey Yu for their help with data processing and cleaning, and Cyrus Hogg, Simon Yuen, Lindsey Pavao, Jenna Diamond, Rizwan Khan, Samantha Shinagawa, and Akanksha Shukla for their efforts on data acquisition and labeling. We also thank the anonymous reviewers for their valuable feedback.

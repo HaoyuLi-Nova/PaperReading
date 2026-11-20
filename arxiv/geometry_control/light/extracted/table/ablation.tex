@@ -1,0 +1,36 @@
+
+\begin{table}
+    \centering
+    \caption{\textbf{Ablation study} of token-separation strategies on the InterAct dataset~\citep{xu2025interact}. We report R-Precision with batch size 256.}
+    \label{tab:ablation_interact}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{@{}cccccccccccccc@{}}
+         \toprule
+        \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}hand--body\\ separation\end{tabular}} &
+        \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}human--object\\ separation\end{tabular}} &
+        \multicolumn{3}{c}{R-Precision$^\uparrow$} &
+        \multirow{2}{*}{FID$^\downarrow$} &
+        \multirow{2}{*}{MM Dist$^\downarrow$} &
+        \multirow{2}{*}{Diversity$^\rightarrow$} &
+        \multirow{2}{*}{FSR$^\downarrow$} &
+        \multirow{2}{*}{Pene$^\downarrow$} &
+        \multirow{2}{*}{Contact$^\rightarrow$} &
+        \multicolumn{3}{c}{Interaction$^\uparrow$} \\
+        \cmidrule(lr){3-5}\cmidrule(lr){12-14}
+        & &
+        \mycolor{Top 1} & \mycolor{Top 2} & \mycolor{Top 3} &
+        & & & & & &
+        $C_{prec}$ & $C_{rec}$ & $C_{F1}$ \\
+        \midrule
+        $\checkmark$ & $\checkmark$ &
+         \textbf{0.421}$^{\pm0.014}$ & \textbf{0.637}$^{\pm0.016}$ & \textbf{0.754}$^{\pm0.016}$ & \textbf{0.148}$^{\pm0.014}$ & \textbf{2.756}$^{\pm0.018}$ & 7.712$^{\pm0.050}$ & 0.078$^{\pm0.197}$ & 0.132$^{\pm0.001}$ & 0.132$^{\pm0.001}$ & 0.731$^{\pm0.002}$ & \textbf{0.615}$^{\pm0.016}$ & \textbf{0.627}$^{\pm0.011}$ \\
+        \midrule
+        -- & $\checkmark$ &
+        0.414$^{\pm0.001}$ & 0.611$^{\pm0.003}$ & 0.717$^{\pm0.007}$ & 0.157$^{\pm0.017}$ & 2.863$^{\pm0.009}$ & 7.749$^{\pm0.125}$ & 0.089$^{\pm0.186}$ & 0.131$^{\pm0.000}$ & 0.124$^{\pm0.003}$ & \textbf{0.750}$^{\pm0.001}$ & 0.576$^{\pm0.014}$ & 0.611$^{\pm0.009}$ \\
+        $\checkmark$ & -- &
+        0.409$^{\pm0.003}$ & 0.590$^{\pm0.005}$ & 0.693$^{\pm0.002}$ & 0.155$^{\pm0.010}$ & 2.917$^{\pm0.030}$ & 7.768$^{\pm0.067}$ & \textbf{0.063}$^{\pm0.155}$ & \textbf{0.105}$^{\pm0.002}$ & 0.107$^{\pm0.004}$ & 0.742$^{\pm0.004}$ & 0.524$^{\pm0.009}$ & 0.572$^{\pm0.007}$ \\
+        \bottomrule
+    \end{tabular}}%
+    \vspace{-0.9em}
+\end{table}
+

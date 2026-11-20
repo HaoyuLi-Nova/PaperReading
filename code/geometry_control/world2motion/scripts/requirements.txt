@@ -1,0 +1,12 @@
+transformers==4.57.6
+diffusers==0.37.0
+numpy>=1.26,<3
+scipy>=1.11
+Pillow>=10
+einops>=0.8
+safetensors>=0.5
+attrs>=23
+tqdm>=4.66
+imageio>=2.34
+imageio-ffmpeg>=0.5
+packaging>=24

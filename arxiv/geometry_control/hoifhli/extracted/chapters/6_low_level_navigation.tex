@@ -1,0 +1,32 @@
+\subsection{Navigation Module}
+\label{sec:low_level_navigation}
+To generate long sequences of interactions with multiple objects, the human needs to navigate through the scene based on waypoints.
+We adopt a conditional diffusion model to generate human navigation motion $\bm{H} \in \mathbb{R}^{T \times D}$. The input conditions consist of the initial human pose, 2D waypoints, and waypoint orientations (expressed as normalized direction vectors) to maintain consistent facing directions. 
+Smooth transitions between the interaction and navigation modules are achieved by using the final pose of one module as the starting pose for the next.
+
+% This module utilizes a conditional diffusion model to predict human motion, represented as $\bm{H} \in \mathbb{R}^{T \times D}$, and feet-ground contact labels, denoted as $\bm{L_f} \in \mathbb{R}^{T \times 2}$. The model conditions on the initial human pose, a set of sparse waypoints, and textual inputs. To generate motions with consistent facing directions between every two waypoints, the condition $\bm{c}$ integrates both the position and orientation of the waypoints, with orientation expressed as a normalized direction vector pointing from the current to the next waypoint. To ensure smooth transitions between the interaction and navigation modules, the final pose from one module is used as the starting pose for the subsequent module.
+
+
+% The model architecture is the same as the interaction module, but trained with only the "simple" object \cite{ho2020denoising}:
+% \begin{align}
+%     \mathcal{L} &= \mathbb{E}_{x_0, n}\left\|\boldsymbol{F}_{\text{Navi}}\left(x_n, n, c \right)-x_0\right\|_1.
+% \end{align}
+
+% \subsection{Transition Between Interaction and Navigation}
+
+% To achieve natural motion generation, we aim for sufficiently smooth transitions between the interaction module and navigation module. 
+% Though both modules are conditioned on the initial human pose, simply adopting the last pose of one module as the initial pose for the next module does not suffice for two reasons.
+% Firstly, this approach only ensures that poses are proximate, but it fails to ensure continuity in velocity. Secondly, since the two diffusion models are trained on distinct datasets with differing data distributions, directly setting the output pose of one module as the initial pose for another module does not yield satisfactory results.
+
+% Therefore, we adopt the following methods to achieve smooth transitions.
+
+% \medskip\textit{Interaction to Navigation Transition. } 
+% 1. cut static ?????
+% The end pose of the interaction module can vary widely, including poses such as bending over or raising hands above the head. Directly setting these poses as the initial pose of the navigation module can result in unnatural movement, as the model hasn't encountered such motions during training. 
+% To tackle this issue, we create a new initial pose by substituting the upper body pose with a rest pose while preserving the lower body pose, as shown in Figure XXX. We then utilize interpolation techniques to ensure a smooth upper body transition.
+% We empirically observe that this approach significantly improves the generation of natural movement.
+
+% \medskip\textit{Navigation to Interaction Transition. } 
+% We found that the interaction module effectively handles initial poses where the human is close to the object, especially with walking or standing poses. Thus, we switch to the interaction module when the human is within a distance range of 0.3-0.5 meters from the object. 
+% Additionally, we empirically observe that transitioning when both feet are on the ground helps maintain velocity continuity and results in more natural motion.
+

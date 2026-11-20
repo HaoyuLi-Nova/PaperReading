@@ -1,0 +1,23 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+In this work, we presented HY-Motion 1.0, a series of large-scale motion generation models that establish a new state-of-the-art in the text-to-motion domain. By successfully scaling a DiT-based flow matching architecture and implementing a meticulous data curation pipeline alongside a comprehensive, full-stage training paradigm, we have provided a clear and effective path for developing high-performance, instruction-following motion generation models. Our work yields key insights into the principles of scaling text-to-motion models:
+
+\begin{itemize}
+    \item \textit{The Duality of Data Scale and Quality}: Our experiments reveal a clear distinction in how data properties affect model capabilities. We found that scaling the volume of training data is the primary driver for enhancing instruction following and semantic understanding. In contrast, improving the quality of the data through careful curation is the decisive factor for increasing motion fidelity and physical realism.
+
+    \item \textit{Effectiveness of the Multi-Stage Training Paradigm}: We demonstrate that our three-stage training framework — large-scale pretraining, high-quality fine-tuning, and reinforcement learning — is essential. This "coarse-to-fine" approach effectively balances the trade-off between motion diversity and precision, suggesting that this data-centric, multi-stage optimization strategy is a robust path forward for the field.
+\end{itemize}
+
+\paragraph{Limitations.}
+Despite these advancements, HY-Motion 1.0 exhibits certain limitations that point towards future research directions:
+
+\begin{itemize}
+    \item \textit{Complex Instructions}: While our model significantly outperforms baselines in semantic alignment, it still faces challenges with highly detailed or complex instructions. This is partially due to the inherent difficulty of our data captioning pipeline, i.e., creating complete and accurate textual descriptions for nuanced and intricate motions remains a significant challenge for both VLM-based captioning and the manual refinement process. 
+    
+    \item \textit{Human-Object Interaction (HOI)}: As our current dataset primarily focuses on body kinematics without explicit object geometry, the model may struggle to generate physically accurate interactions with external objects (e.g., precise contact points when holding a tool).
+\end{itemize}
+
+We are releasing HY-Motion 1.0 to the open-source community and hope it serves as a solid baseline, inspiring further exploration and accelerating the development of scalable, high-quality motion generation technologies.
+
+

@@ -1,0 +1,88 @@
+\section{Key Results}
+\label{sec:key_results}
+
+\model is designed for intuitive authoring of high-quality human motions. 
+To showcase its capabilities, we developed an interactive demo with Viser~\cite{yi2025viser}, which allows a user to generate motions from a combination of text prompts and kinematic constraints (see \cref{fig:authoring_demo}). 
+In this section, we detail the key features of the model within this demo interface, explore how scaling affects the model performance, and demonstrate downstream use of the model for humanoid robotics. 
+The motions produced by our model are best viewed in the supplementary videos on the project webpage (\hyperlink{https://research.nvidia.com/labs/sil/projects/kimodo/}{https://research.nvidia.com/labs/sil/projects/kimodo/}) or by running the demo in the released codebase (\hyperlink{https://github.com/nv-tlabs/kimodo}{https://github.com/nv-tlabs/kimodo}).
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=1.0\linewidth]{assets/authoring_demo.pdf}
+    \caption{\textbf{Motion Authoring Demo.} (Left) Our authoring interface built with Viser~\cite{yi2025viser} allows intuitive control over \model for motion generation. The timeline panel allows users to specify text prompts and constraints at specific frames or intervals, which are displayed in the 3D viewer. The options panel on the right side of the interface controls various generation parameters. (Right) In editing mode, users have fine-grained control to pose and translate the character at constrained frames. Editing and generation can be done on either the SOMA body skeleton~\cite{saito2026soma} or Unitree G1 robot.}
+    \label{fig:authoring_demo}
+\end{figure}
+
+\subsection{Motion Generation with Text Control}
+\label{sec:key_results:text}
+
+As shown in \cref{fig:text2motion_results}, motion generation with \model can be easily controlled through intuitive text prompting. 
+Our model, trained on the SOMA body skeleton~\cite{saito2026soma} at 30 fps, enables generating realistic human motions for a variety of behaviors contained in the training data, including locomotion, everyday activities, dancing, actions and combat, and different motion styles. The model can handle potentially complex text descriptions that contain multiple actions performed in sequence (``A person walks forward \textit{then} waves their arms.") or simultaneously (``A person walks forward \textit{while} waving their arms.").
+Additionally, we retargeted the training dataset to the Unitree G1 robot using the SOMA retargeter~\cite{soma_retarget}, allowing direct generation of kinematic robot demonstrations for important skills like recovering from stumbles and falls, and object interactions. 
+The bottom row of \cref{fig:text2motion_results} demonstrates the diversity of generated motions. The same frame from ten samples from the model is visualized, each with a different color. 
+Though all samples use the same text prompt describing a put-down motion, the model generates plausible variations including one and two-handed, high and low, and variable timing. 
+
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=1.0\linewidth]{assets/text2motion_results.pdf}
+    \caption{\textbf{Text-to-Motion Results.} (Top) \model enables generating high-quality human motions for a variety of behaviors on the SOMA body skeleton. Time progression is indicated by lighter to darker blue coloring. (Middle) Motions can also be generated directly on the G1 robot to easily collect plausible demonstrations. (Bottom) The same frame is visualized from ten different generated motion samples for the same prompt, demonstrating the diversity of \model outputs.}
+    \label{fig:text2motion_results}
+\end{figure}
+
+\model is trained to take a single prompt as input and expects the prompt to start with the subject, such as ''A person...", ``An old person...", or ``A zombie...". However, our interactive authoring demo enables chaining together multiple prompts in sequence with plausible transitions. 
+As shown in \cref{fig:multiprompt_results}, using multiple prompts can be effective for performing a sequence of actions that the model may struggle with when specified as a single prompt. Please see \cref{sec:method:inference} for technical details of multi-prompt generation.
+
+\model is designed as an offline motion authoring model, and is best suited for generating one or more motions in a batched fashion. On an NVIDIA RTX 3090, generating a motion from a single prompt takes anywhere from 2 to 5 sec, depending on the specified duration. The model is trained on a maximum of 10 sec sequences.
+\begin{wrapfigure}{r}{0.45\textwidth} %
+\vspace{-2mm}
+    \centering
+    \includegraphics[width=\linewidth]{assets/timeline_results.pdf}
+    \caption{\textbf{Multi-Prompt Generation.} Longer motion sequences can be generated from multiple prompts with the demo's timeline interface. Motions are generated sequentially with constraints between them for continuity.}
+    \vspace{-9mm}
+    \label{fig:multiprompt_results}
+\end{wrapfigure}
+
+\subsection{Kinematic Control with Pose Constraints}
+\label{sec:key_results:constraints}
+
+Precise control can be achieved through kinematic constraints on generated poses.
+As shown in \cref{fig:constraint_results}, \model supports a wide range of constraint types. 
+\textit{Full-body keyframes} constrain all the joint positions of the character at specific frames. 
+\textit{End-effector keyframes} specify the position and rotation of one or more hand or foot joints. 
+For 2D root constraints, \textit{waypoints} specify sparse targets on the ground for the character to hit, or a full dense \textit{path} can be used to constrain an interval of motion. 
+Constraints can be mixed arbitrarily to achieve desired motions.
+
+Kinematic control enables several useful motion authoring applications. Animators can use \model to generate plausible transitions between existing mocap clips through in-betweening, with full-body constraints placed at the start and end of the generated sequence. For characters to realistically move about an environment, 2D paths or waypoints can be specified automatically using traditional animation tools like navigation meshes. For object interactions, users or automated planners can place constraints, such as hand positions, on objects to encourage \model to generate pick and place motions that are plausible for a specific object size. To generate large scale motion datasets, constraints can be randomized to ensure diversity. For example, for creating a locomotion move set, a 2D root waypoint can be placed at varying angles from the starting location to synthesize locomotion in all different directions.
+
+We evaluated \model trained for the SOMA skeleton on a diverse test suite of constraint-conditioned motion generation cases (see \cref{sec:experiments_setup} for details). On average, the model achieves 3.21 cm joint errors for full-body keyframes, 3.63 cm joint position errors for end-effector constraints, 6.88 deg joint rotation errors for end-effectors, and 3.63 cm root errors across waypoints and paths. Given such precise model outputs, light post-processing can be applied on generated motions to ensure they \textit{exactly} hit user constraints without severely degrading motion quality.
+Note that, while we use the same evaluation protocol, these numbers are not comparable to those in \cref{sec:experiments}, where models are trained on a different character skeleton at 20 fps.
+
+\subsection{Scaling Behavior}
+\label{sec:key_results:scaling}
+A key component of \model's success is scaling along several axes. 
+To demonstrate this, we evaluate the model while varying data size, model size, and batch size (number of GPUs). 
+We summarize key results in this section, while full details are provided in \cref{sec:experiments:scaling}.
+
+\cref{fig:scaling} plots key metrics affected by each scaling axis.
+Increasing dataset size is particularly helpful for the model to see a larger variety of motions during training, which improves its ability to follow constraints and decreases errors across all constraint types.
+Increasing model size greatly improves text-following capabilities, as indicated by R-precision, along with motion quality, as indicated by FID. 
+Finally, increasing the number of GPUs available for training, thereby increasing batch size, allows for further improvements particularly in text-following.
+
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=1.0\linewidth]{assets/scaling_plot.pdf}
+    \caption{\textbf{Scaling Results.} Scaling dataset size, model size, and batch size improves controllability and motion quality. Increased dataset size results in greatly improved constraint following, while model size and batch size are particularly helpful for text following (R-precision) and motion quality (FID). See \cref{table:scaling} for full results.}
+    \label{fig:scaling}
+\end{figure}
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=1.0\linewidth]{assets/robot_demo.pdf}
+    \caption{\textbf{Generating Robot Demonstrations.} In these results, \model is used to generate demonstration data directly on the G1 robot, which is then tracked by a physics-based humanoid policy trained with ProtoMotions~\cite{protomotions} and deployed to a real-world robot.}
+    \label{fig:robot_demo}
+\end{figure}
+
+\subsection{Application: Demonstration Data for Humanoid Robots}
+\label{sec:key_results:robot}
+
+As shown in \cref{fig:robot_demo}, \model trained on G1 can directly generate demonstrations for robotics applications. Unlike traditional mocap or teleoperation, acquiring these motions takes a few seconds with a simple text prompt as input. Larger demonstration datasets can be created with batched generation and by employing constraints to ensure diversity of motion variations.
+

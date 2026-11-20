@@ -1,0 +1,56 @@
+\section{High-Level LLM Planner}
+\label{sec:high_level_planner}
+
+
+Inputs to the high-level planner consist of an initial scene description and human-level instructions. The scene description includes a list of objects in a 3D scene and their layout, while the human-level instruction describes a task that requires grounded reasoning based on world knowledge and common sense. For example, the instruction ``I want to do yoga in front of the TV'' implies that any obstacles in front of the TV should be moved elsewhere.
+
+Outputs of the high-level planner comprise the scene map and the execution plan.
+The scene map specifies the target position $p$ and orientation $q$ for each object $o$ that requires movement, represented as $\left\{ \left\{o_1, p_1, q_1 \right\}, \cdots, \left\{o_n, p_n, q_n \right\}\right\}$.
+The execution plan is a sequence of text actions associated with objects in the scene map. For example, “lift the monitor, move the monitor, put down the monitor”.
+
+\subsection{Scene Map Generation}
+\label{subsec:spatial_relationship}
+
+% Given a human-level instruction and a scene description, ideally, LLMs should directly output object positions and orientations.
+% However, recent research suggests that state-of-the-art LLM's ability to reason 3D information is not yet reliable \cite{aguina2024open, hong20233d}.
+% To increase LLM's reliability in spatial reasoning for our tasks, we use a in-context learning strategy and propose a method to ensure LLM's answers are actionable by the low-level motion generator. 
+To obtain a reliable scene map, inspired by recent works in room layout generation \cite{aguina2024open, yang2024holodeck}, we first instruct LLMs to reason about spatial relationships of the objects as an intermediate representation from which the 3D positions and orientations of the objects are calculated subsequently.
+We define the following relation functions to capture spatial relationships, with flexibility to include additional relationships if needed.
+% We define the following relation functions to describe the spatial relationships which are sufficient to address most rearrangement tasks in a typical home environment, though our framework remains flexible to include additional relationships if necessary.
+% \begin{enumerate}
+%     \item \texttt{on(object1, object2)} indicates that \texttt{object1} is positioned on top of \texttt{object2}.
+%     \item \texttt{adjacent(object1, object2, direction, distance)} determines the adjacency between \texttt{object1} and \texttt{object2}, with optional parameters, \texttt{direction} and \texttt{distance}, to specify the relative orientation and separation.
+%     \item \texttt{facing(object1, object2)} denotes that \texttt{object1} is oriented towards \texttt{object2}.
+% \end{enumerate}
+
+\begin{enumerate}
+    \item \texttt{on(object1, object2)}.
+    \item \texttt{adjacent(object1, object2, direction, distance)}.
+    \item \texttt{facing(object1, object2)}.
+\end{enumerate}
+
+For example, if a monitor needs to be put on the table facing the chair, we can use \texttt{on(monitor, table)} and \texttt{facing(monitor, chair)} to describe its pose. If a table is positioned 1 meter to the north of the door, we can use \texttt{adjacent(table, door, north, 1)} to describe the relationship. 
+We prompt LLMs to generate the spatial relationships of the objects according to the given instruction. 
+% In-context learning is employed during the process to assist LLMs to better understand the output requirements. We provide complete prompts for the LLM planner in the supplementary materials. 
+
+% \subsection{Target Layout Calculation}
+% \label{subsec:layout}
+
+
+Given the spatial relationships, we propose an algorithm to calculate the 3D positions of each object in the scene. The orientations of objects, enforced by ``facing'' relations, will be addressed in the subsequent step. 
+
+The algorithm first constructs a scene graph \cite{johnson2015image} to organize the objects (nodes) and their spatial relationships (edges), which are directional, pointing from \texttt{object2} to \texttt{object1}. The algorithm employs a method similar to topological sorting, assuming no cycles are present in the graph. The scene graph is initialized by visiting the nodes associated with static objects and setting their 3D positions as the given values. In each iteration, the algorithm looks for a new node whose 3D position has not been determined but all its predecessors have. By calculating an offset from the predecessors' known positions, we can determine the position of the new node. For example, if object $o_1$ is ``on'' object $o_2$, then $o_1$'s height is set to match the top surface of $o_2$, while the horizontal position is sampled within the horizontal range of $o_2$. If $o_1$ is ``adjacent'' to $o_2$, we use the direction and distance given by the LLMs as the offset. We have included pseudo-code in the supplementary material.
+%A post-process is applied to ensure no overlap between objects.
+
+To compute the orientation enforced by \texttt{facing($o_1$, $o_2$)}, we rotate the canonical direction of $o_1$ in its own local frame to align with the vector from the position of $o_1$ to the position of $o_2$. The canonical direction of each object is part of the input 3D geometry information.
+
+
+\subsection{Execution Plan Generation}
+\label{subsec:plan}
+ 
+After determining the scene map, the planner must specify the interaction order with each object to ensure natural motion. For instance, if a vase is on a table, the vase should be moved before the table. 
+LLMs are asked to generate this action sequence in a natural order and provide reasoning for it.
+The resulting execution plan consists of textual actions, $\left\{l_1, l_2, \dots, l_{T}\right\}$, where each action $l_t$ defines interaction involving one object. 
+Each $l_t$ serves as the textual input for the low-level generator, following the format: ``lift the \textit{object}, move the \textit{object}, put down the \textit{object}''. This format is designed to closely match the textual style of the training dataset of the low-level generator.
+
+With the scene map and execution plan in place, an A* planner generates collision-free paths to execute the plan. The path is a series of 2D waypoints in the scene, which then serve as inputs for the low-level motion generator.

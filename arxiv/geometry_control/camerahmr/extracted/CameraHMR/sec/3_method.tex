@@ -1,0 +1,123 @@
+
+\section{Method}
+
+\begin{figure*}
+\centerline{\includegraphics[width=1\textwidth]{CameraHMR/images/dataset_comp.pdf}}
+\vspace{-0.15in}
+\caption{\textbf{Pseudo-Ground-Truth (pGT) training data.} 
+Row 1: example images from the 4DHumans dataset.
+Rows 2 and 3: original pGT overlaid and viewed from a different perspective.
+Rows 4 and 5: our improved pGT using \camsmplify.
+Note that our approach reduces the bias towards bent knees (columns 1, 5, 6), improves 3D pose and image alignment when there is foreshortening (Column 2, 4, 7, 9), and estimates more realistic body shape (columns 1, 3, 7, 8).
+}
+\label{fig:dataset-comp}
+\end{figure*}
+
+In this section, we detail our approach for estimating camera intrinsics from images captured in uncontrolled settings. 
+We further present enhancements to the HMR2.0 architecture by incorporating bounding box and camera parameter tokens into the vision transformer and adopting a perspective camera model for projection, in contrast to the previously used weak perspective model. We designate the two models as \cameramodel and \hpsmodel. Furthermore, we describe the generation of improved pseudo-ground truth (pGT) by using a modified SMPLify fitting process, \textbf{\camsmplify}. 
+
+\subsection{Preliminaries}
+
+We use a simple perspective camera model for our experiments. In this model, a 3D point $(X, Y, Z)$ in camera coordinate space is projected onto the image plane, at a point $(x,y)$, using the camera intrinsic matrix  parameterized by focal length $f$ (assuming $f_x = f_y$) and principal point, $(c_x, c_y)$ in pixels coordinates. We simplify the model by assuming no radial distortion and that the principal point is the center of the image. 
+For \hpsmodel, we assume the body is always predicted in camera space, i.e.~the rotation of the camera is $R=I$. 
+
+As is common practice~\cite{wildcamera,ctrlc,spec}, we estimate the field of view from images instead of the focal length. The reason for this is that different focal lengths can produce images with same field of view if the camera sensor size is different. For example, a 50mm lens on a full-frame camera (35mm sensor) has a wider field of view than a 50mm lens with a crop sensor. While the focal length is an important characteristic of a lens, the field of view is a more direct measure of what will be captured in an image. Hence, we use vertical field of view $\upsilon$ as the primary output of \cameramodel. The focal length $f_y$ used in the camera intrinsics can be derived from $\upsilon$ using the image height $H$.
+\begin{equation}
+f_y  = \frac{H}{2 \cdot \tan\left(\frac{\upsilon}{2}\right)} .
+\label{eq: fl_from_fov}
+\end{equation}
+
+To represent the 3D human, we use the SMPL parametric human body model \cite{smpl}  controlled by parameters $(\theta, \beta)$, where $\theta \in \mathbb{R}^{72}$ represents pose and $\beta \in \mathbb{R}^{10}$ represents identity shape. 
+SMPL is a function that outputs a body mesh, $\mesh$  with vertices ${V} \in \mathbb{R}^{6890\times3}$. The 3D joints  ${J_{3d}} \in \mathbb{R}^{K\times3}$ with $K$ joints are obtained using a pre-trained joint regressor. We use a gender-neutral SMPL model with 10 shape components. We use a cropped bounding box of size $256\times256$ as input to our models.
+
+\subsection{\cameramodel}
+
+Given an image $I \in \mathbb{R}^{W\times H\times3}$ where $W$ and $H$ are the width and height of the original image respectively, we preprocess it by resizing it to a square resolution of $256 \times 256$ pixels. To achieve this, we resize the longer side to 256 and zero-pad  the smaller side to maintain the aspect ratio. This preprocessing ensures uniform input dimensions for the network while preserving the aspect ratio integrity of the original image, which is important for field of view estimation. 
+We train a deep neural network architecture with HRNet~\cite{hrnet} as the backbone and an MLP head for direct estimation of the vertical field of view $\upsilon_{\text{pred}}$. The HRNet backbone is pretrained on ImageNet~\cite{imagenet}.  Based on insights from previous work ~\cite{spec,beyondwp}, underestimating the FoV has less negative impact on reconstructed 3D poses compared to overestimating the FoV. Therefore, an asymmetric loss function is incorporated to penalize overestimation more heavily than underestimation. We define a loss, $L_{\upsilon}$, on the vertical field of view in radians as:
+\begin{equation}
+L_{\upsilon} = 
+\begin{cases} 
+    3 \left\lVert \upsilon_{\text{gt}} - \upsilon_{\text{pred}} \right\rVert_{2}^{2} & \text{if } \upsilon_{\text{pred}} > \upsilon_{\text{gt}} \\
+    \left\lVert \upsilon_{\text{gt}} - \upsilon_{\text{pred}} \right\rVert_{2}^{2} & \text{if } \upsilon_{\text{pred}} \leq \upsilon_{\text{gt}}.
+\end{cases}
+\label{eq:fov_loss}
+\end{equation}
+
+The training set for \cameramodel is described in Sec.~\ref{sec:HumanFoV}.
+We train \cameramodel for around 16 epochs with a batch size of 64 and learning rate of $5 \times 10^{-5}$. We use an Adam
+optimizer~\cite{adam} with no weight decay.  We use different data augmentation techniques during training to ensure the model's robustness. This includes  center-cropping of images to generate different aspect ratios. This augmentation helps the model become robust against variations in image cropping during inference. Images are also randomly flipped horizontally with a probability of 0.2, providing additional diversity to the training dataset.
+
+
+\subsection{\hpsmodel}
+HPS methods have evolved to use progressively more powerful backbones from ResNet~\cite{resnet} to HRNet~\cite{hrnet}, and most recently ViT~\cite{vit}, resulting in improved performance.
+Here we use a ViTPose~\cite{vitpose} backbone pretrained on COCO~\cite{coco} to extract features from cropped images. Specifically, we adopt the HMR2.0 architecture, which employs a ViT backbone, and modify it to support training with a full perspective camera instead of a weak perspective camera. 
+
+The ViT backbone processes images by dividing them into patches, converting these patches into feature embeddings known as tokens, and utilizing self-attention mechanisms to capture the relationships among them. Along with the image tokens, we also provide bounding box information of the cropped region and the  focal length as tokens. We follow CLIFF~\cite{li2022cliff} and compute the bounding box token $T_{\text{bbox}}$, using the bounding box center $c_x, c_y$, scale $s$, and the focal length $f$ of the full image. 
+\begin{equation}
+    \mathbf{T}_{\text{bbox}} = \left( \frac{c_x}{f}, \frac{c_y}{f}, \frac{s}{f} \right)
+\end{equation}
+The ground truth focal length is known during training and predicted using our \cameramodel during inference. 
+
+The decoder in our modified architecture cross-attends to both image-derived tokens and the supplementary bounding box and focal length tokens. This approach enables the decoder to generate features essential for accurately regressing 3D rotations and human mesh parameters while accommodating camera perspective. We explain the losses used in training the model in  Sup.~Mat.
+\begin{figure}
+\centerline{\includegraphics[width=1.0\columnwidth]{CameraHMR/images/fitting_diag.pptx.pdf}}
+\vspace{-0.1in}
+\caption{\textbf{Overview of CamSMPLify}: The DenseKP module processes cropped images to produce dense surface keypoints, while the \cameramodel module uses full images to estimate camera intrinsics. 
+The output from these are used by \camsmplify  to optimize the SMPL model parameters, $\beta$, $\theta$, and the global translation $t^{\text{full}}$.
+Our iterative training strategy 
+starts with initial estimates, $\mathrm{V}_{init}$ from \hpsmodel, which are used to regularize the \camsmplify estimates.  
+\hpsmodel is then iteratively refined based on the improved pGT from \camsmplify.}
+ \vspace{-0.15in}
+	\label{fig:smplify_diag}
+\end{figure}
+
+\subsection{\camsmplify}
+To train \hpsmodel, we modify the original 4DHumans~\cite{hmr2} dataset, upgrading it from a weak perspective to a full perspective camera format. This dataset includes images from the
+InstaVariety~\cite{insta}, COCO~\cite{coco}, MPII~\cite{mpii}, AI Challenger~\cite{aic}
+%InstaVariety~\cite{insta}, AI Challenger~\cite{aic} 
+and AVA~\cite{ava} datasets.
+Note that AVA~\cite{ava} contains many movie clips where the aspect ratio is stretched horizontally (e.g.~from 4:3 to 16:9), violating the assumption that $f_x = f_y$. These clips are hard to detect automatically so we exclude AVA from our improved pGT.
+We make several improvements to the fitting process to enhance the dataset, including better initialization and priors, more accurate camera intrinsics, dense surface 2D keypoints, and multiple fitting iterations. The overview is shown in Fig.~\ref{fig:smplify_diag}. This comprehensive approach results in better pseudo ground truth, significantly improving both 3D pose and shape accuracy, as well as 2D alignment as shown in Fig.~\ref{fig:dataset-comp}. In the following section, we explain each step in greater detail.
+
+\noindent\textbf{Camera Intrinsics.}
+One major challenge with in-the-wild image datasets is the absence of ground truth intrinsic camera parameters, which makes it difficult to accurately fit a 3D body to the 2D keypoints while ensuring plausible 3D poses and precise 2D alignment. To address this issue, we employ our  \cameramodel model to estimate the vertical field of view $\upsilon$ for all images in the 4DHumans dataset. The corresponding focal length $f$ is then calculated from $\upsilon$ and image height $H$ using Eq.~\ref{eq: fl_from_fov}. This approach enables us to infer the necessary camera intrinsics for the dataset, enabling us to project the 3D joints using a full perspective camera in contrast to the weak perspective camera used in the original dataset. As a result, we achieve accurate 2D alignments without compromising 3D pose accuracy during the fitting.
+
+\noindent\textbf{Surface Keypoints.}
+Another challenge that we face is that the original 4DHumans dataset is annotated with 17 sparse 2D body joints. This sparse annotation lacks sufficient detail to accurately reconstruct the 3D body shape.
+To address this, we train a dense surface keypoint detector, DenseKP, using the synthetic datasets BEDLAM and AGORA, which offer diverse body shapes and precise ground truth annotations. We use ViTPose~\cite{vitpose} pretrained on COCO to extract features from the cropped images. The model takes a centered crop of the person, resized to $256 \times 256$ pixels, as input and outputs 2D dense surface keypoints $S_{2d} \in \mathbb{R}^{138 \times 2}$. 
+\textcolor{black}{To generate the 138 surface keypoint ground truth labels, we down-sample the SMPL ground truth vertices and project them onto the image. The down-sampling approach, adapted from COMA~\cite{coma}, focuses on sampling vertices in high-curvature regions, which effectively preserves the body shape and key structural details.}
+To train the model we use an $L_2$ loss on ground truth $\hat{S}_{2d}$ and predicted keypoints $S_{2d}$. 
+We use this model to generate 138 dense keypoints for all images in the 4DHumans dataset. 
+We modify the fitting by combining the 17 provided joints with the estimated 138 dense surface keypoints. 
+This, along with improved camera intrinsics, helps achieve better shape alignment in 2D during projection.  
+
+\noindent\textbf{Initialization.}
+Like with any optimization-based method, the choice of initialization can significantly affect the performance of the fitting process, as poor initialization can lead to suboptimal convergence. To ensure a robust 3D initialization, we train our \hpsmodel on the BEDLAM and AGORA dataset, which provides accurate ground truth annotations, including camera intrinsics.
+Using this pre-trained model, we generate initial 3D pose $\theta_{\text{int}}$ and shape  $\beta_{\text{int}}$ predictions for the 4DHumans dataset, resulting in bodies with relatively accurate pose and shape. Additional refinement through surface keypoint and joint fitting improve both the body shape and pose, leading to even more precise results. We also predict the initial global translation of the mesh $t^{\text{full}}_{\text{int}}$ relative to the optical center of the full image. 
+Note that instead of the standard pose prior used in SMPLify \cite{smplify}, we regularize the solution to this initial prediction.
+
+\noindent\textbf{Losses.}
+We optimize the SMPL model parameters $\beta$ and $\theta$ to match the ground truth 2D body joints $\hat{J}_{2d}$ and 2D surface keypoints $\hat{S}_{2d}$ while also optimizing the global translation of the mesh $t^{\text{full}}$. The model parameters are initialized with $\beta_{\text{int}}$ and $\theta_{\text{int}}$, as determined during the initialization stage using \hpsmodel. The output vertices $V_{\text{int}}$ from the model $M(\beta_{\text{int}}, \theta_{\text{int}})$ serve as the prior in the regularization process. $J_{2d}$ and $S_{2d}$ are  obtained from the 3D joints $J_{3d}$ and surface keypoints $S_{3d}$ using $\Pi(J_{3d} + t^{\text{full}})$, where $\Pi$ represents the perspective projection with camera intrinsics obtained from \cameramodel. The $S_{3d}$ are derived from the SMPL vertices $V$ using a downsampling matrix similar to BEDLAM~\cite{bedlam}.
+Specifically the optimization minimizes the following objective function:
+\begin{equation}
+E(\beta, \theta, t^{\text{full}}) = \lambda_{S_{2d}} E_{S_{2d}} + \lambda_{J_{2d}} E_{J_{2d}} + E_\text{reg}
+\end{equation}
+\begin{equation}
+E_\text{reg} = \lambda_{\beta} \|\beta\|_2^2 + \lambda_{\text{int}} \| V - V_{\text{int}} \|_2^2,
+    \label{main:eq:reg}
+\end{equation}
+where $E_{J_{2d}}$ and $E_{S_{2d}}$ are $L_2$ losses on 2D joints and surface keypoints, respectively. The $\lambda$ terms denote the weights for each component of the objective function.
+We apply a threshold value $\tau$ to filter out results with $E > \tau$, thereby excluding pseudo ground truth samples with high convergence errors. For further details, refer to the Sup.~Mat.
+
+\noindent\textbf{Iteration.}
+We run the whole process for multiple iterations of refinement to ensure the pseudo ground truth is of high quality. This is similar in spirit to SPIN \cite{spin}.
+The $\theta$ and $\beta$ parameters for \camsmplify fitting are initialized using version \textbf{v1} of the \hpsmodel trained on the BEDLAM dataset. After applying the filtering criteria based on the threshold $\tau$ in \camsmplify fitting we obtain approximately 2.8 million crops out of 4 million crops from 4DHumans dataset. These crops, together with the BEDLAM dataset, are then utilized to train an enhanced version, \textbf{v2}, of \hpsmodel. 
+We further iterate and employ \textbf{v2} to generate improved initializations for the 4D Humans dataset, followed by another round of \camsmplify fitting.  This improved initialization substantially improves convergence, leading to a more accurate fitting with lower error. Applying the same filtering criteria, we are able to further expand our dataset to around 3.2 million high-quality annotations.
+
+
+
+
+
+
+
+ 

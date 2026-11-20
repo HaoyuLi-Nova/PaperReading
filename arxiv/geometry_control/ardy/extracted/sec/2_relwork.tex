@@ -1,0 +1,89 @@
+\section{Related Work}
+\label{sec:relwork}
+
+\begin{table*}[t]
+\centering
+\caption{\textbf{Method Feature Comparison.} Comparison of the proposed \method with existing conditional 3D motion generation methods. We delineate various capabilities including real-time performance, online prompting, supported spatial control types, the architectural mechanism of control (\ie, whether each method requires test-time optimization or RL policies), and the maximum history and future context length in model generation.}
+\label{table:comparison}
+\scriptsize
+
+\begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}ccccccccc}
+\toprule
+
+\multirow{2}{*}{\textbf{Method}} & 
+\multirow{2}{*}{\shortstack{\textbf{Real-time} \\ \textbf{generation}}} & 
+\multirow{2}{*}{\shortstack{\textbf{Online text} \\ \textbf{prompting}}} &
+\multicolumn{3}{c}{\textbf{Spatial control}} & 
+\multicolumn{2}{c}{\textbf{Native control}} & 
+\multicolumn{2}{c}{\textbf{Context length (s)}} \\ 
+
+\cmidrule(lr){4-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10}
+
+ & & & 
+ \shortstack{Root trajectory} & 
+ \shortstack{Joint position} & 
+ \shortstack{Joint rotation} & 
+ \shortstack{No optimization} & 
+ \shortstack{No RL policy} &
+ History & 
+ Future \\
+\midrule
+
+MaskControl \cite{pinyoanuntapong2025MaskControl}   & \xmark & \xmark & \cmark & \cmark & \xmark & \xmark & \cmark & N/A & 10.00 \\
+Kimodo \cite{Kimodo2026}   & \xmark & \xmark & \cmark & \cmark & \cmark & \cmark & \cmark & N/A & 10.00 \\
+AMDM \cite{shi2024amdm}          & \cmark & \xmark & \cmark & \cmark & \xmark & \cmark & \xmark & 0.03 & 0.03 \\
+CAMDM  \cite{chen2024camdm}        & \cmark & \xmark & \cmark & \xmark & \xmark & \cmark & \cmark & 0.33 & 1.50 \\
+MotionStreamer \cite{xiao2025motionstreamer}& \cmark & \cmark & \xmark & \xmark & \xmark & N/A & N/A & 10.00 & 10.00 \\
+DartControl  \cite{zhao2025DartControl}  & \cmark & \cmark & \cmark & \cmark & \xmark & \xmark & \xmark & 0.07 & 0.27 \\
+DiP   \cite{tevet2025closd}           & \cmark & \cmark & \cmark & \cmark & \xmark & \cmark & \cmark & 1.00 & 2.00 \\
+\textbf{\method (Ours)}  & \cmark & \cmark & \cmark & \cmark & \cmark & \cmark & \cmark & 8.00 & 10.00 \\
+\bottomrule
+\end{tabular*}
+\end{table*}
+
+
+
+
+
+
+In this section, we summarize relevant work in conditional 3D human motion generation and how our method fits in context. 
+For this purpose, we define \textit{offline} motion generation as a method that generates a full spatiotemporal sequence of poses in parallel, while \textit{online/interactive/runtime/streaming} motion generation refers to an autoregressive method that generates poses sequentially (either individually or in chunks) and can therefore react to dynamically changing conditions (\eg, new text prompts or constraints).
+
+\paragraph{Offline Human Motion Generation}
+A primary focus of many recent offline motion generation works is text conditioning.
+Enabled by motion datasets with natural language descriptions~\cite{plappert2016kit}, early work on this problem employed VAE-based architectures for diverse generation~\cite{petrovich22temos,guo2022humanml3d}.
+More recently, diffusion models have proven to be effective at capturing the complex distribution of text and motion, enabling high-quality motion generation from prompts~\cite{tevet2023mdm,chen2023executing,zhang2024motiondiffuse}. 
+Motion diffusion models are also capable of flexible kinematic control, enabling ``any-joint-any-time'' constraints on generated motions~\cite{xie2024omnicontrol,karunratanakul2024optimizing,karunratanakul2023gmd, Kimodo2026}. However, the iterative denoising process for potentially long motions tends to be too slow for interactive applications. Some methods have considerably sped up the denoising process by reducing the number of required steps~\cite{dai2025motionlcm,zhou2024emdm}, but are still designed to generate all poses in parallel. %
+While some diffusion approaches can handle a temporal sequence of input prompts, these methods generate all prompts jointly offline~\cite{barquero2024flowmdm,petrovich24stmc,li2025unimotion}, which is not suitable for interactive applications. 
+
+Another line of work leverages a discrete tokenized representation of human motion.
+Methods like MoMask~\cite{guo2024momask} and MMM~\cite{pinyoanuntapong2024mmm} generate motion from text by training a VQ-VAE motion tokenizer followed by a masked transformer that iteratively predicts masked poses, eventually resulting in a latent motion that can be decoded~\cite{meng2025rethinking,pinyoanuntapong2024bamm}.
+Some tokenized approaches also support precise kinematic controls through test-time-optimization~\cite{wan2024tlcontrol,pinyoanuntapong2025MaskControl}.
+Besides masked models, several approaches take inspiration from language models~\cite{radford2018gpt} and use autoregressive transformers to generate a sequence of motion tokens that are decoded to human poses~\cite{zhang2023generating,jiang2024motiongpt,fan2025gotozero,lu2025scamo}. 
+While these methods are in fact autoregressive, they are generally large and slow models, designed for offline motion generation without support for precise kinematic control.
+
+Our method \method delivers text-following and kinematic control capabilities on par with recent offline models, while operating within an interactive framework. This is achieved through a novel two-stage diffusion architecture that denoises a hybrid combination of latent (tokenized) body and explicit root representations.
+
+\paragraph{Interactive Motion Generation}
+Early works in autoregressive motion modeling leveraged non-linear latent variable models~\cite{taylor2006modeling} and recurrent neural networks~\cite{fragkiadaki2015recurrent}.
+Non-generative autoregressive prediction models~\cite{holden2017phase,starke2019neural,starke2022deepphase} have been trained for reactive character control by conditioning on various combinations of past and future poses and trajectory information. 
+In parallel, data-driven interactive animation systems such as Learned Motion Matching~\cite{holden2020learned} and Control Operators~\cite{gou2025control} enable responsive real-time character control via learned similarity metrics and modular control primitives rather than explicit generative modeling.
+Moving into generative approaches, autoregressive VAE models learned a low-dimensional motion latent space for task-based RL control~\cite{ling2020character,zhang2022wanderings} and tracking via optimization~\cite{rempe2021humor}.
+Similar approaches have learned human-object interactions~\cite{starke2019neural,hassan2021stochastic,zhao2023synthesizing} by conditioning the model on object geometry in addition to the future pose information.
+
+Autoregressive motion diffusion models have taken the approaches developed for offline generation and made them amenable to interactive settings, primarily through shorter motion generation horizon and fewer denoising steps~\cite{shi2024amdm,chen2024camdm,zhang2024tedi,ji2025towards,zhang2025primal,jiang2024autonomous,zhao2025DartControl,wu2025uniphys}.
+A-MDM learns to denoise the next pose in a motion given the previous pose, and allows flexible kinematic constraints through inpainting or RL control~\cite{shi2024amdm}. 
+Similarly, CAMDM~\cite{chen2024camdm} and PRIMAL~\cite{zhang2025primal} denoise a small window of future frames given a handful of past frames. CAMDM is conditioned on a future trajectory to follow while PRIMAL relies on guidance and an additional ControlNet for velocity, heading, and waypoint control. 
+While CAMDM and PRIMAL show action label conditioning, none of these methods support complex text prompting.
+UniPhys~\cite{wu2025uniphys} enables text control, but relies entirely on test-time guidance for kinematic controls, which is inefficient for interactive applications.
+Closest to our work is DiP~\cite{tevet2025closd}, which extends CAMDM by adding conditioning on text and 3D target joint locations provided every two seconds. However, DiP's short history and prediction horizon limit its ability to handle complex text prompts that require longer history context, and prevent it from satisfying kinematic constraints beyond its short generation horizon.
+
+Latent diffusion has also been leveraged for interactive motion generation~\cite{zhao2025DartControl,xiao2025motionstreamer,cen2025ready_to_react}.
+DartControl~\cite{zhao2025DartControl} uses a VAE to learn a continuous latent representation of motion primitives, then a diffusion model that predicts future motion in this latent space. Similar to DiP, DartControl is limited by a short history context, and kinematic control such as 2D waypoint reaching or full-body in-betweening requires test-time-optimization or training an additional RL control policy.
+MotionStreamer~\cite{xiao2025motionstreamer} also learns a continuous latent space using a causal convolutional autoencoder, then trains a causal transformer denoiser to generate the next latent conditioned on the past and text input. Similar to our approach, MotionStreamer is trained on variable history length, making it more robust to complex prompts. However, it lacks support for kinematic goal constraints.
+
+Several autoregressive diffusion models have been paired with physics-based controllers to carry out generated motions in simulation~\cite{tevet2025closd,wu2025uniphys,huang2025diffusecloc,rempe2023trace,ren2023insactor}. 
+Fully physics-based runtime character control is also an active area of study~\cite{peng2022ase,luo2023universal}, which has recently enabled both kinematic control and preliminary text prompting~\cite{tessler2024maskedmimic,wu2025uniphys}. 
+
+As shown in \cref{table:comparison}, our approach enables real-time generation with native support for online text prompting, variable-length history contexts, and flexible long-horizon kinematic constraints—a combination of capabilities unmatched by prior works.
+

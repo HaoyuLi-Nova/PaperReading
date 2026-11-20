@@ -1,0 +1,21 @@
+% Please add the following required packages to your document preamble:
+% \usepackage{graphicx}
+% \usepackage[table,xcdraw]{xcolor}
+% Beamer presentation requires \usepackage{colortbl} instead of \usepackage[table,xcdraw]{xcolor}
+% \usepackage[normalem]{ulem}
+% \useunder{\uline}{\ul}{}
+\begin{table}[t]
+\centering
+\resizebox{0.7\columnwidth}{!}{%
+\begin{tabular}{lcccc}
+\hline
+Method & FID$\downarrow$ & R@1$\uparrow$ & R@2$\uparrow$ & R@3$\uparrow$ \\ \hline
+ScaMo     & 89.0 & 0.67 & 0.81 & 0.87 \\ \hline
+Ours-1B   & 31.3 & 0.74 & 0.87 & 0.92 \\ 
+Ours-3B   & 10.8 & 0.79 & \textbf{0.91} & 0.94 \\
+Ours-7B   & \textbf{10.3} & 0.79 & 0.90 & 0.94 \\ \hline
+\end{tabular}%
+}
+\caption{Quantitative comparison of ScaMo and our models of different sizes on MotionMillion.}
+\label{tab:comp_on_motionmillion}
+\end{table}

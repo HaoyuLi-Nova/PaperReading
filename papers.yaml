@@ -6,7 +6,7 @@
 # priority: P0 (must) | P1 (important) | P2 (context)
 
 version: 1
-updated: 2026-11-11
+updated: 2026-11-13
 
 tracks:
   foundations:
@@ -362,6 +362,22 @@ papers:
     code: code/base_models/Wan2.1/
     one_liner: 开源大规模视频 DiT 基座（Wan2.1）
 
+  - id: cosmos3
+    track: base_models
+    slug: cosmos3
+    title: "Cosmos 3: Omnimodal World Models for Physical AI"
+    venue: arXiv
+    year: 2026
+    arxiv: "2606.02800"
+    status: pending
+    priority: P0
+    deps: [wan]
+    tags: [world_model, mot, video, physical_ai]
+    github: https://github.com/nvidia/cosmos
+    code: code/base_models/cosmos3/
+    project: https://www.nvidia.com/en-us/ai/cosmos/
+    one_liner: Mixture-of-Transformers 全模态世界模型；World2Motion 在其 NANO 上接全身运动
+
   - id: ovi
     track: base_models
     slug: ovi
@@ -497,6 +513,7 @@ papers:
     tags: [entity, drag, motion_control]
     one_liner: 实体表示驱动的任意物体拖拽式运动控制
     translation: translations/geometry_control/draganything/paper_zh.md
+    notes: notes/geometry_control/draganything/note.md
 
   - id: fulldit
     track: geometry_control
@@ -837,6 +854,132 @@ papers:
     code: code/geometry_control/comovi/
     project: https://igl-hkust.github.io/CoMoVi/
     one_liner: 双分支在同一去噪循环里联合生成人体视频与 3D 运动
+
+  # ---------- World2Motion：视频世界模型 → 场景感知 3D 人体运动 ----------
+  - id: world2motion
+    track: geometry_control
+    slug: world2motion
+    title: "World2Motion: Turning Video World Models into 3D Human Motion Generators"
+    venue: arXiv
+    year: 2026
+    arxiv: "2609.37004"
+    status: pending
+    priority: P0
+    deps: [cosmos3, wan, comovi, camerahmr, ardy]
+    tags: [human_motion, world_model, smpl, joint_generation, hoi]
+    github: https://github.com/fyantu/World2Motion
+    code: code/geometry_control/world2motion/
+    project: https://fyantu.github.io/World2Motion/
+    one_liner: 把 Cosmos 3 改成单阶段联合生成场景感知 3D 人体运动和视频，解耦噪声 shift 抑制抖动
+
+  - id: camerahmr
+    track: geometry_control
+    slug: camerahmr
+    title: "CameraHMR: Aligning People with Perspective"
+    venue: 3DV
+    year: 2025
+    arxiv: "2411.08128"
+    status: pending
+    priority: P0
+    deps: []
+    tags: [hmr, smpl, camera, pose]
+    github: https://github.com/pixelite1201/CameraHMR
+    code: code/geometry_control/camerahmr/
+    one_liner: 用预测内参和稠密表面关键点做透视相机下的单目人体网格恢复
+
+  - id: ardy
+    track: geometry_control
+    slug: ardy
+    title: "ARDY: Autoregressive Diffusion with Hybrid Representation for Interactive Human Motion Generation"
+    venue: SIGGRAPH
+    year: 2026
+    arxiv: "2607.08741"
+    status: pending
+    priority: P1
+    deps: [kimodo]
+    tags: [human_motion, autoregressive, diffusion, smpl]
+    github: https://github.com/nv-tlabs/ardy
+    code: code/geometry_control/ardy/
+    project: https://research.nvidia.com/labs/sil/projects/ardy/
+    one_liner: 显式根运动加身体隐变量的自回归扩散；World2Motion 沿用相对根位移与 6D 旋转
+
+  - id: hy_motion
+    track: geometry_control
+    slug: hy_motion
+    title: "HY-Motion 1.0: Scaling Flow Matching Models for Text-to-Motion Generation"
+    venue: arXiv
+    year: 2025
+    arxiv: "2512.23464"
+    status: pending
+    priority: P1
+    deps: []
+    tags: [text_to_motion, flow_matching, dit]
+    github: https://github.com/Tencent-Hunyuan/HY-Motion-1.0
+    code: code/geometry_control/hy_motion/
+    project: https://hunyuan.tencent.com/motion
+    one_liner: 十亿参数 DiT flow matching 的文本生成人体运动，World2Motion 的 T2M 对照
+
+  - id: kimodo
+    track: geometry_control
+    slug: kimodo
+    title: "Kimodo: Scaling Controllable Human Motion Generation"
+    venue: arXiv
+    year: 2026
+    arxiv: "2603.15546"
+    status: pending
+    priority: P1
+    deps: []
+    tags: [text_to_motion, diffusion, motion_capture]
+    github: https://github.com/nv-tlabs/kimodo
+    code: code/geometry_control/kimodo/
+    one_liner: 大规模光捕上的可控运动扩散，支持姿态与轨迹约束
+
+  - id: go_to_zero
+    track: geometry_control
+    slug: go_to_zero
+    title: "Go to Zero: Towards Zero-shot Motion Generation with Million-scale Data"
+    venue: ICCV
+    year: 2025
+    arxiv: "2507.07095"
+    status: pending
+    priority: P1
+    deps: []
+    tags: [text_to_motion, autoregressive, dataset]
+    github: https://github.com/VankouF/MotionMillion-Codes
+    code: code/geometry_control/go_to_zero/
+    one_liner: MotionMillion 两百万条序列上把文本生成运动扩到 7B
+
+  - id: light
+    track: geometry_control
+    slug: light
+    title: "Unleashing Guidance Without Classifiers for Human-Object Interaction Animation"
+    venue: ICLR
+    year: 2026
+    arxiv: "2603.25734"
+    status: pending
+    priority: P1
+    deps: []
+    tags: [hoi, diffusion_forcing, contact]
+    github: https://github.com/wzyabcas/LIGHT
+    code: code/geometry_control/light/
+    project: https://ziyinwang1.github.io/LIGHT/
+    one_liner: 异步去噪让更干净的运动分量引导更吵的分量，做无分类器接触感知 HOI
+
+  - id: hoifhli
+    track: geometry_control
+    slug: hoifhli
+    title: "Human-Object Interaction from Human-Level Instructions"
+    venue: ICCV
+    year: 2025
+    arxiv: "2406.17840"
+    status: pending
+    priority: P1
+    deps: []
+    tags: [hoi, llm_planning, finger]
+    github: https://github.com/zhenkirito123/hoifhli_release
+    code: code/geometry_control/hoifhli/
+    project: https://hoifhli.github.io
+    one_liner: 语言模型把高层指令拆成布局和子任务，再生成全身、手指和物体运动
 
   - id: moge4d
     track: geometry_control
